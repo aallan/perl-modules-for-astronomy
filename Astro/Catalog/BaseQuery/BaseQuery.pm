@@ -33,13 +33,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: BaseQuery.pm,v 1.2 2003/07/25 02:01:32 timj Exp $
+$Id: BaseQuery.pm,v 1.3 2003/07/25 04:03:28 timj Exp $
 
 =head1 METHODS
 
@@ -329,56 +329,38 @@ sub ra {
   my $self = shift;
 
   # SETTING R.A.
-  if (@_) { 
-    
+  if (@_) {
     # grab the new R.A.
     my $ra = shift;
-    
-    # mutilate it and stuff it and the current $self->{RA} 
-    $ra =~ s/\s/\+/g;
     $self->_set_query_options( ra => $ra );
   }
-  
-  # un-mutilate and return a nicely formated string to the user
-  my $ra = $self->query_options("ra");
-  $ra =~ s/\+/ /g;
-  return $ra;
+  # Return it
+  return $self->query_options("ra");
 }
 
 =item B<Dec>
 
 Return (or set) the current target Declination defined for the query
 
-   $dec = $usno->dec();
-   $usno->dec( $dec );
+   $dec = $q->dec();
+   $q->dec( $dec );
 
 where $dec should be a string of the form "+-HH MM SS.SS", e.g. +43 35 09.5
 or -40 25 67.89
 
 =cut
 
-sub dec { 
+sub dec {
   my $self = shift;
 
   # SETTING DEC
-  if (@_) { 
-
+  if (@_) {
     # grab the new Dec
     my $dec = shift;
-    
-    # mutilate it and stuff it and the current $self->{DEC} 
-    $dec =~ s/\+/%2B/g;
-    $dec =~ s/\s/\+/g;
-
     $self->_set_query_options( dec => $dec );
   }
-  
-  # un-mutilate and return a nicely formated string to the user
-  my $dec = $self->query_options("dec");
-  $dec =~ s/\+/ /g;
-  $dec =~ s/%2B/\+/g;
-  return $dec;
 
+  return $self->query_options("dec");
 }
 
 
@@ -408,7 +390,7 @@ sub target {
 
     # mutilate it and stuff it into ${$self->{OPTIONS}}{object}
     $ident =~ s/\s/\+/g;
-    $self->_set_query_options( 
+    $self->_set_query_options(
 			      object => $ident,
 			      dec => undef,
 			      ra => undef,
@@ -623,8 +605,7 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / RA Dec Target Radius Bright Faint Sort Number
-                    URL Timeout Proxy / ) {
+  for my $key ($self->_get_supported_init) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -642,6 +623,26 @@ sub configure {
 These methods are for internal use only.
 
 =over 4
+
+=item B<_get_supported_init>
+
+Return the list of initialization methods supported by this catalogue.
+This is not the same as the allowed options since some methods are
+not related to options and other methods that are related to options
+use different names.
+
+Returns a list. The default list is:
+
+  RA Dec Target Radius Bright Faint Sort Number
+  URL Timeout Proxy
+
+=cut
+
+sub _get_supported_init {
+  return (qw/ RA Dec Target Radius Bright Faint Sort Number
+                    URL Timeout Proxy /);
+}
+
 
 =item B<_set_query_options>
 
@@ -759,10 +760,20 @@ sub _make_query {
    my %allow = $self->_get_allowed_options;
    foreach my $key ( keys %allow ) {
      # Need to translate them...
-     $options .= "&$key=". $self->query_options($key)
-       if defined $self->query_options($key);
+     my $cvtmethod = "_from_" . $key;
+     my ($outkey, $outvalue);
+     if ($self->can($cvtmethod)) {
+       ($outkey, $outvalue) = $self->$cvtmethod();
+     } else {
+       # Currently assume everything is one to one
+       warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping");
+       $outkey = $key;
+       $outvalue = $self->query_options($key);
+     }
+
+     $options .= "&$outkey=". $outvalue
+       if defined $outvalue;
    }
-   print "Options: $options\n";
 
    # build final query URL
    $URL = $URL . $options;
@@ -787,7 +798,9 @@ sub _make_query {
 =item B<_dump_raw>
 
 Private function for debugging and other testing purposes. It will return
-the raw output of the last USNO-A2.0 query made using querydb().
+the raw output of the last query made using querydb().
+
+  @lines = $q->_dump_raw();
 
 =cut
 
@@ -815,6 +828,107 @@ sub _dump_options {
 }
 
 =back
+
+=head2 Translation Methods
+
+The query options stored internally in the object are not necessarily
+the form required for a query to a remote server. Methods for converting
+from the internal representation to the external query format are
+provided in the form of _from_$opt. ie:
+
+  ($outkey, $outvalue) = $q->_from_ra();
+  ($outkey, $outvalue) = $q->_from_object();
+
+The base class only includes one to one mappings.
+
+=cut
+
+# RA and Dec replace spaces with pluses and + sign with special code
+
+sub _from_ra {
+  my $self = shift;
+  my $ra = $self->query_options("ra");
+  my %allow = $self->_get_allowed_options();
+
+  # Must replace spaces with +
+  $ra =~ s/\s/\+/g if defined $ra;
+
+  return ($allow{ra},$ra);
+}
+
+sub _from_dec {
+  my $self = shift;
+  my $dec = $self->query_options("dec");
+  my %allow = $self->_get_allowed_options();
+
+  if (defined $dec) {
+    # Must replace + with %2B
+    $dec =~ s/\+/%2B/g;
+
+    # Must replace spaces with +
+    $dec =~ s/\s/\+/g;
+  }
+
+  return ($allow{dec},$dec);
+}
+
+# one to one mapping
+
+sub _from_object {
+  my $self = shift;
+  my $key = "object";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_radmax {
+  my $self = shift;
+  my $key = "radmax";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_magfaint {
+  my $self = shift;
+  my $key = "magfaint";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_magbright {
+  my $self = shift;
+  my $key = "magbright";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_sort {
+  my $self = shift;
+  my $key = "sort";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_nout {
+  my $self = shift;
+  my $key = "nout";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_format {
+  my $self = shift;
+  my $key = "format";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
 
 =end __PRIVATE_METHODS__
 

@@ -53,12 +53,17 @@ foreach my $line ( 0 .. $#buffer ) {
               
        # RA
        my $objra = "$separated[3] $separated[4] $separated[5]";
-       $star->ra( $objra );
               
        # Dec
        my $objdec = "$separated[6] $separated[7] $separated[8]";
-       $star->dec( $objdec );
-              
+
+       $star->coords( new Astro::Coords( name => $id,
+					 ra => $objra,
+					 dec => $objdec,
+					 units => 'sex',
+					 type => 'J2000',
+				       ));
+
        # B Magnitude
        my %b_mag = ( B => $separated[10] );
        $star->magnitudes( \%b_mag );

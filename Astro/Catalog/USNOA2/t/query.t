@@ -50,12 +50,17 @@ foreach my $line ( 0 .. $#buffer ) {
        
        # RA
        my $objra = "$separated[3] $separated[4] $separated[5]";
-       $star->ra( $objra );
-              
+
        # Dec
        my $objdec = "$separated[6] $separated[7] $separated[8]";
-       $star->dec( $objdec );
-              
+
+       $star->coords( new Astro::Coords( name => $id,
+					 ra => $objra,
+					 dec => $objdec,
+					 units => 'sex',
+					 type => 'J2000',
+				       ));
+
        # R Magnitude
        my %r_mag = ( R => $separated[9] );
        $star->magnitudes( \%r_mag );
@@ -241,6 +246,7 @@ print "# Connecting to ESO/ST-ECF USNO-A2 Catalogue\n";
 my $long_catalog = $long->querydb();
 print "# Continuing tests\n";
        
+
 # write to file
 
 $ENV{"ESTAR_DATA"} ||= '.';

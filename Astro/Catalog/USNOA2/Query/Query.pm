@@ -19,7 +19,7 @@ package Astro::Catalog::USNOA2::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.9 2003/07/25 02:18:24 timj Exp $
+#     $Id: Query.pm,v 1.10 2003/07/25 04:03:28 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -71,11 +71,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.9 2003/07/25 02:18:24 timj Exp $
+$Id: Query.pm,v 1.10 2003/07/25 04:03:28 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -124,6 +124,24 @@ sub _get_allowed_options {
 	 );
 }
 
+=item B<_get_supported_init>
+
+Return the list of initialization methods supported by this catalogue.
+This is not the same as the allowed options since some methods are
+not related to options and other methods that are related to options
+use different names.
+
+Returns a list.
+
+=cut
+
+sub _get_supported_init {
+  return (qw/ 
+	  
+	  /);
+
+}
+
 =item B<_set_default_options>
 
 Set the default query state.
@@ -160,7 +178,7 @@ make and parse the results.
 
 sub _parse_query {
   my $self = shift;
-  
+
   # get a local copy of the current BUFFER
   my @buffer = split( /\n/,$self->{BUFFER});
   chomp @buffer;
@@ -353,6 +371,22 @@ sub _parse_query {
 }
 
 =back
+
+=head2 Translation Methods
+
+The query options stored internally in the object are not necessarily
+the form required for a query to a remote server. Methods for converting
+from the internal representation to the external query format are
+provided in the form of _from_$opt. ie:
+
+  ($outkey, $outvalue) = $q->_from_ra();
+  ($outkey, $outvalue) = $q->_from_object();
+
+Currently translations are a bit thin on the ground...
+
+=cut
+
+# None special for subclass
 
 =end __PRIVATE_METHODS__
 

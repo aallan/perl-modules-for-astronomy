@@ -19,7 +19,7 @@ package Astro::Catalog::GSC::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.5 2003/07/25 02:18:24 timj Exp $
+#     $Id: Query.pm,v 1.6 2003/07/25 04:03:28 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -72,11 +72,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.5 2003/07/25 02:18:24 timj Exp $
+$Id: Query.pm,v 1.6 2003/07/25 04:03:28 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -127,6 +127,19 @@ sub _get_allowed_options {
 	  chart => 'chart',
 	  multi => 'multi',
 	 );
+}
+
+=item B<_get_supported_init>
+
+The init methods supported by this class are the same as the base class
+with the addition of the "multi" option.
+
+=cut
+
+sub _get_supported_init {
+  my $self = shift;
+  my @list = $self->SUPER::_get_supported_init();
+  return (@list, "Multi");
 }
 
 =item B<_set_default_options>
@@ -308,8 +321,55 @@ sub _parse_query {
 }
 
 
-
 =back
+
+=head2 Translation Methods
+
+The query options stored internally in the object are not necessarily
+the form required for a query to a remote server. Methods for converting
+from the internal representation to the external query format are
+provided in the form of _from_$opt. ie:
+
+  ($outkey, $outvalue) = $q->_from_ra();
+  ($outkey, $outvalue) = $q->_from_object();
+
+The base class only includes one to one mappings.
+
+=cut
+
+
+sub _from_chart {
+  my $self = shift;
+  my $key = "chart";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_epoch {
+  my $self = shift;
+  my $key = "epoch";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_multi {
+  my $self = shift;
+  my $key = "multi";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
+sub _from_catalogue {
+  my $self = shift;
+  my $key = "catalogue";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
 
 =end __PRIVATE_METHODS__
 
