@@ -4,6 +4,7 @@ Makefile.PL
 catalogs.PL
 supercosmos.PL
 finder.PL
+targets.dat
 GPL
 ChangeLog
 Catalog.pm
@@ -35,3 +36,4 @@ SuperCOSMOS/Query/Makefile.PL
 SuperCOSMOS/t/query.t
 t/star.t
 t/catalog.t
+META.yml                                Module meta-data (added by MakeMaker)

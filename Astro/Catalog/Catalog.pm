@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.9 2003/06/10 23:17:42 aa Exp $
+#     $Id: Catalog.pm,v 1.10 2003/07/19 02:16:23 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -30,7 +30,7 @@ package Astro::Catalog;
 
 =head1 NAME
 
-Astro::Catalog - A generic stellar catalogue object.
+Astro::Catalog - A generic API for stellar catalogues
 
 =head1 SYNOPSIS
 
@@ -56,14 +56,14 @@ use vars qw/ $VERSION /;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.9 2003/06/10 23:17:42 aa Exp $
+$Id: Catalog.pm,v 1.10 2003/07/19 02:16:23 aa Exp $
 
 =head1 METHODS
 
@@ -320,6 +320,37 @@ sub popstar {
 
   # pop the star out of the stack
   return pop( @{$self->{STARS}} );
+}
+
+=item B<popstarbyid>
+
+Return the C<Astro::Catalog::Star> objects that have the given ID.
+
+  @stars = $catalog->popstarbyid( $id );
+
+The method deletes the stars and returns the deleted C<Astro::Catalog::Star>
+objects. If no star exists with the given ID, the method returns undef.
+
+If called in scalar context this method returns an array reference, and if
+called in list context returns an array of C<Astro::Catalog::Star> objects.
+
+=cut
+
+sub popstarbyid {
+  my $self = shift;
+
+  # Return undef if they didn't pass an ID.
+  return undef unless @_;
+
+  my $id = shift;
+
+  my @match = grep { $_->id == $id } @{ $self->{STARS} };
+  my @unmatched = grep { $_->id != $id } @{ $self->{STARS} };
+
+  $self->{STARS} = \@unmatched;
+
+  return ( wantarray ? @match : \@match );
+
 }
 
 =item B<stars>

@@ -1,3 +1,13 @@
+2003-07-19  Alasdair Allan <aa@astro.ex.ac.uk> (version 2.1.3)
+
+        * Catalog.pm: added patch by Brad Cavangh to popstarbyid()
+        
+2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk> (version 2.1.2)
+
+        * Minor documentation tweaks
+        
+        * Added some example scripts to the distribution
+          
 2003-06-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Catalog.pm: Fixed bug in new _read_cluster() routine for
