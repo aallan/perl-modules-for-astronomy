@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.42 2004/02/24 04:26:50 timj Exp $
+#     $Id: Catalog.pm,v 1.43 2004/02/26 02:26:45 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -71,7 +71,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.42 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.43 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -79,7 +79,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.42 2004/02/24 04:26:50 timj Exp $
+$Id: Catalog.pm,v 1.43 2004/02/26 02:26:45 cavanagh Exp $
 
 =head1 METHODS
 
@@ -113,6 +113,7 @@ sub new {
                       RADIUS => undef,
 		      REFPOS => undef,
 		      REFTIME => undef,
+                      FIELDDATE => undef,
 		    }, $class;
 
   # If we have arguments configure the object
@@ -698,7 +699,35 @@ sub reftime {
   return $retval;
 }
 
+=item B<fielddate>
 
+The observation date/time of the field.
+
+  $fielddate = $src->fielddate;
+
+  $src->fielddate( $date );
+
+Date must be a C<Time::Piece> object. This defaults to the current
+time when the C<Astro::Catalog> object was instantiated.
+
+=cut
+
+sub fielddate {
+  my $self = shift;
+
+  if( @_ ) {
+    my $val = shift;
+    if( defined( $val ) ) {
+      if( UNIVERSAL::isa( $val, "Time::Piece" ) ) {
+        $self->{FIELDDATE} = $val;
+      } else {
+        croak "Must supply field date as a Time::Piece object";
+      }
+    }
+  }
+
+  return $self->{FIELDDATE};
+}
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -870,6 +899,10 @@ sub configure {
   for my $key ( keys %args ) {
     my $method = lc($key);
     $self->$method( $args{$key} ) if $self->can($method);
+  }
+
+  if( ! defined( $self->fielddate ) ) {
+    $self->fielddate( gmtime );
   }
 
   return $self;
