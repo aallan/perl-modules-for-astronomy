@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.35 2003/07/31 08:37:31 timj Exp $
+#     $Id: Catalog.pm,v 1.36 2003/08/27 01:08:25 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,7 +64,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.35 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.36 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -72,7 +72,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.35 2003/07/31 08:37:31 timj Exp $
+$Id: Catalog.pm,v 1.36 2003/08/27 01:08:25 timj Exp $
 
 =head1 METHODS
 
@@ -319,7 +319,7 @@ sub pushstar {
   # And push onto the copy ONLY IF WE HAVE A COPY
   # We do not want to force a copy unnecsarily by using scalar context
   if ($self->_have_copy) {
-    # push the new item onto the stack 
+    # push the new item onto the stack
     my $ref = $self->stars;
     push( @$ref, @_);
   }
@@ -375,10 +375,13 @@ sub popstarbyid {
 
   # This may need to be optimized because we traverse the array
   # twice and we generate a whole new array internally
-  my @match = grep { $_->id == $id } @{ $self->stars };
-  my @unmatched = grep { $_->id != $id } @{ $self->stars };
+  # Do not force copy of allstars array yet
+  my @current = $self->stars;
+  my @match = grep { defined $_ && defined $_->id && $_->id == $id } @current;
+  my @unmatched = grep { defined $_ && defined $_->id && $_->id != $id } 
+    @current;
 
-  @{ $self->stars } = \@unmatched;
+  @{ $self->stars } = @unmatched;
 
   return ( wantarray ? @match : \@match );
 
