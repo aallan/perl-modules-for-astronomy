@@ -1,3 +1,11 @@
+2003-08-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Query/Query/SIMBAD.pm: All the functionality of Astro::SIMBAD
+	integrated into Astro::Catalog... 
+
+	* Star/Star.pm: Add startype, spectype, longstartype and moreinfo
+	needed by SIMBAD query.
+
 2003-08-02  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Transport/*.pm: Reorganized as part of SkyCat work 
