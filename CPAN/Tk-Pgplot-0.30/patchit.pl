@@ -83,10 +83,14 @@ sub checkdir ($@) {
     my @files = @_;
 
     foreach (@files) {
+            
 	if (ref) {
 	    (ref eq 'ARRAY') || die "Internal error!";
 	    my @newdir = @$_;
 	    my $newdir = shift @newdir;
+            
+            next if $newdir =~ 'CVS/';
+            
 	    if (-d "$pgplotdir/${dir}$newdir") {
 		(-w "$pgplotdir/${dir}$newdir") || 
 		    die "$pgplotdir/${dir}$newdir is not writeable!\n";
@@ -98,6 +102,8 @@ sub checkdir ($@) {
 	    #print "d $pgplotdir/${dir}$newdir\n";
 	    checkdir($newdir, @newdir);
 	} else {
+            next if $_ =~ 'README';
+            
 	    #print "f $pgplotdir/${dir}$_\n";
 	    # Does the files exist and is backup not
 	    if (-e "$pgplotdir/${dir}$_") {
@@ -123,6 +129,8 @@ sub patchdir ($@) {
       (ref eq 'ARRAY') || die "Internal error!";
       my @newdir = @$_;
       my $newdir = shift @newdir;
+      
+      next if $newdir =~ 'CVS/';
 
       if ($newdir eq 'drivers/ptk/') {
 	if ($debug) {
@@ -135,6 +143,8 @@ sub patchdir ($@) {
       patchdir($newdir, @newdir);
 
     } else {
+      next if $_ =~ 'README';
+            
       # Backup the file unless it is one of the new ones
       if (! ($dir eq "drivers/ptk/" || $_ eq "pkdriv.c")) {
 	if ($debug) {
