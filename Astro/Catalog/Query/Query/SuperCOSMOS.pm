@@ -63,10 +63,10 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 $VERSION = '0.01';
-$DEBUG = 0;
+$DEBUG = 1;
 
 # Controls whether we follow 'directory' config entries and recursively
 # expand those. Default to false at the moment.
@@ -84,7 +84,7 @@ my %CONFIG;
 
 =head1 REVISION
 
-$Id: SuperCOSMOS.pm,v 1.9 2003/09/25 23:33:49 aa Exp $
+$Id: SuperCOSMOS.pm,v 1.8 2003/09/25 23:31:25 aa Exp $
 
 =head1 METHODS
 
