@@ -19,7 +19,7 @@ package Astro::Catalog::GSC::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.4 2003/07/25 02:01:32 timj Exp $
+#     $Id: Query.pm,v 1.5 2003/07/25 02:18:24 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -72,11 +72,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.4 2003/07/25 02:01:32 timj Exp $
+$Id: Query.pm,v 1.5 2003/07/25 02:18:24 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -173,7 +173,7 @@ make and parse the results.
 
 sub _parse_query {
   my $self = shift;
-  
+
   # get a local copy of the current BUFFER
   my @buffer = split( /\n/,$self->{BUFFER});
   chomp @buffer;
@@ -188,112 +188,120 @@ sub _parse_query {
   my ( $ra, $dec, $radius );
   # loop round the returned buffer and stuff the contents into star objects
   foreach $line ( 0 ... $#buffer ) {
-      
+
      # Parse field centre
-     # ------------------ 
-      
+     # ------------------
+     my %field;
+
      # RA
      if( lc($buffer[$line]) =~ "<td>ra:" ) {
         $_ = lc($buffer[$line]);
         ( $ra ) = /^\s*<td>ra:\s+(.*)<\/td>/;
-        $catalog->fieldcentre( RA => $ra ); 
+        $field{RA} = $ra;
      }
-     
+
      # Dec
      if( lc($buffer[$line]) =~ "<td>dec:" ) {
         $_ = lc($buffer[$line]);
         ( $dec ) = /^\s+<td>dec:\s+(.*)<\/td>/;
-        $catalog->fieldcentre( Dec => $dec ); 
+	$field{Dec} = $dec;
      }
-     
+
      # Radius
      if( lc($buffer[$line]) =~ "search radius:" ) {
         $_ = lc($buffer[$line+1]);
         ( $radius ) = />\s+(.*)\s\w/;
-        $catalog->fieldcentre( Radius => $radius ); 
+	$field{Radius} = $radius;
      }
-     
+     $catalog->fieldcentre( %field );
+
      # Parse list of objects
      # ---------------------
-     
+
      if( lc($buffer[$line]) =~ "<pre>" ) {
-     
+
         # reached the catalog block, loop through until </pre> reached
         $counter = $line+2;
         until ( lc($buffer[$counter+1]) =~ "</pre>" ) {
-                      
+
            # split each line
            my @separated = split( /\s+/, $buffer[$counter] );
-           
+
            # debugging (leave in)
            #foreach my $thing ( 0 .. $#separated ) {
            #   print "   $thing # $separated[$thing] #\n";
            #}
-           
+
            # check that there is something on the line
            if ( defined $separated[0] ) {
-              
+
               # create a temporary place holder object
               $star = new Astro::Catalog::Star(); 
 
               # ID
               my $id = $separated[2];
               $star->id( $id );
-               
+
               # debugging
               #my $num = $counter - $line -2;
-              #print "# ID $id star $num\n";      
-              
+              #print "# ID $id star $num\n";
+
               # RA
               my $objra = "$separated[3] $separated[4] $separated[5]";
-              $star->ra( $objra );
-              
+
               # Dec
               my $objdec = "$separated[6] $separated[7] $separated[8]";
-              $star->dec( $objdec );
-              
+
+	      $star->coords( new Astro::Coords(ra => $objra,
+					       dec => $objdec,
+					       units => 'sex',
+					       type => 'J2000',
+					       name => $id,
+					       ),
+			     );
+
               # B Magnitude
               my %b_mag = ( B => $separated[10] );
               $star->magnitudes( \%b_mag );
-              
+
               # B mag error
               my %mag_errors = ( B => $separated[11] );
               $star->magerr( \%mag_errors );
-              
+
               # Quality
               my $quality = $separated[11];
               $star->quality( $quality );
-              
+
               # Field
               my $field = $separated[12];
               $star->field( $field );
-              
+
               # GSC, obvious!
               $star->gsc( "TRUE" );
-              
+
               # Distance
               my $distance = $separated[16];
               $star->distance( $distance );
-              
+
               # Position Angle
               my $pos_angle = $separated[17];
               $star->posangle( $pos_angle );
 
            }
-             
+
            # Push the star into the catalog
            # ------------------------------
            $catalog->pushstar( $star );
-           
+
            # increment counter
            # -----------------
            $counter = $counter + 1;
         }
-        
+
         # reset $line to correct place
         $line = $counter;
      }
-     
+
   }
 
   return $catalog;
