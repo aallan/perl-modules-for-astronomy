@@ -40,6 +40,11 @@ The module requires the libwww-perl-5.60 package written by Gisle Aas
 <gisle@ActiveState.com> v5.53 or above. This package can be obtained
 via CPAN at http://search.cpan.org/search?dist=libwww-perl
 
+Also required is the Net::Domain module by Graham Barr <gbarr@pobox.com>.
+This module is included as part of Perl 5.7.2 and above, but otherwise
+can be downloaded from CPAN at http://search.cpan.org/search?dist=libnet
+as part of the libnet package.
+
 Provides
 --------
 

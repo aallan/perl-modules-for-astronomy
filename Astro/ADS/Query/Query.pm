@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.16 2001/11/10 17:35:52 aa Exp $
+#     $Id: Query.pm,v 1.17 2001/11/14 00:12:40 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -37,7 +37,11 @@ Astro::ADS::Query - Object definining an prospective ADS query.
   $query = new Astro::ADS::Query( Authors     => \@authors,
                                   AuthorLogic => $aut_logic,
                                   Objects     => \@objects,
-                                  ObjectLogic => $obj_logic  );
+                                  ObjectLogic => $obj_logic, 
+                                  Bibcode     => $bibcode,
+                                  Proxy       => $proxy,
+                                  Timeout     => $timeout,
+                                  URL         => $url );
 
   my $results = $query->querydb();
 
@@ -60,15 +64,16 @@ use vars qw/ $VERSION /;
 use LWP::UserAgent;
 use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
+use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.16 2001/11/10 17:35:52 aa Exp $
+$Id: Query.pm,v 1.17 2001/11/14 00:12:40 aa Exp $
 
 =head1 METHODS
 
@@ -83,7 +88,11 @@ Create a new instance from a hash of options
   $query = new Astro::ADS::Query( Authors     => \@authors,
                                   AuthorLogic => $aut_logic,
                                   Objects     => \@objects,
-                                  ObjectLogic => $obj_logic );
+                                  ObjectLogic => $obj_logic, 
+                                  Bibcode     => $bibcode,
+                                  Proxy       => $proxy,
+                                  Timeout     => $timeout,
+                                  URL         => $url );
 
 returns a reference to an ADS query object.
 
@@ -96,6 +105,7 @@ sub new {
   # bless the query hash into the class
   my $block = bless { OPTIONS   => {},
                       URL       => undef,
+                      QUERY     => undef,
                       FOLLOWUP  => undef,
                       USERAGENT => undef,
                       BUFFER    => undef }, $class;
@@ -218,6 +228,47 @@ sub timeout {
    # return the current timeout
    return $ua->timeout();
 
+}
+
+=item B<url>
+
+Return (or set) the current base URL for the ADS query.
+
+   $url = $query->url();
+   $query->url( "adsabs.harvard.edu" );
+
+if not defined the default URL is cdsads.u-strasbg.fr
+
+=cut
+
+sub url {
+  my $self = shift;
+
+  # SETTING URL
+  if (@_) { 
+
+    # set the url option 
+    my $base_url = shift; 
+    $self->{URL} = $base_url;
+    $self->{QUERY} = "http://$base_url/cgi-bin/nph-abs_connect?";
+    $self->{FOLLOWUP} = "http://$base_url/cgi-bin/nph-ref_query?";
+  }
+
+  # RETURNING URL
+  return $self->{URL};
+}
+
+=item B<agent>
+
+Returns the user agent tag sent by the module to the ADS server.
+
+   $agent_tag = $query->agent();
+
+=cut
+
+sub agent {
+  my $self = shift;
+  return $self->{USERAGENT}->agent();
 }
 
 # O T H E R   M E T H O D S ------------------------------------------------
@@ -415,18 +466,6 @@ Configures the object, takes an options hash as an argument
 
 Does nothing if the array is not supplied.
 
-=over 4
-
-=item B<Authors>
-
-A list of authors for the query. By default author logic is set to OR rather
-than the potentially more useful AND.
-
-=item B<AuthorLogic>
-
-By default the author logic, i.e. how the author names are combined during
-the search, is set to OR. Other options include; AND, combine with AND; SIMPLE, use simple logic (use +,-); BOOL, full boolean logic and FULLMATCH, do an AND query and calculate the score according to how many words in the author field match in the paper.
-
 =cut
 
 sub configure {
@@ -435,12 +474,20 @@ sub configure {
   # CONFIGURE DEFAULTS
   # ------------------
 
-  # define the default base URLs
-  $self->{URL} = "http://cdsads.u-strasbg.fr/cgi-bin/nph-abs_connect?";
-  $self->{FOLLOWUP} = "http://cdsads.u-strasbg.fr/cgi-bin/nph-ref_query?";
+  # define the default base URL
+  $self->{URL} = "cdsads.u-strasbg.fr";
+  
+  # define the query URLs
+  my $default_url = $self->{URL};
+  $self->{QUERY} = "http://$default_url/cgi-bin/nph-abs_connect?";
+  $self->{FOLLOWUP} = "http://$default_url/cgi-bin/nph-ref_query?";
 
+   
   # Setup the LWP::UserAgent
+  my $HOST = hostname();
+  my $DOMAIN = hostdomain();
   $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
+  $self->{USERAGENT}->agent("Astro::ADS/$VERSION ($HOST.$DOMAIN)");
 
   # Grab Proxy details from local environment
   $self->{USERAGENT}->env_proxy();
@@ -502,7 +549,8 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Authors AuthorLogic Objects ObjectLogic Bibcode / ) {
+  for my $key (qw / Authors AuthorLogic Objects ObjectLogic Bibcode 
+                    Proxy Timeout URL/ ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -538,7 +586,7 @@ sub _make_query {
    $self->{BUFFER} = "";
 
    # grab the base URL
-   my $URL = $self->{URL};
+   my $URL = $self->{QUERY};
    my $options = "";
 
    # loop round all the options keys and build the query

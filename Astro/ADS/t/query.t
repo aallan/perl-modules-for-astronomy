@@ -172,6 +172,9 @@ my @timj_abstract = $timj_thesis->abstract();
 # should have 32 lines of text!
 ok( @timj_abstract, 32 );
 
+# test the user agent tag
+print "# User Agent: " . $query3->agent() . "\n";
+
 exit;
 
 # D A T A   B L O C K  ----------------------------------------------------

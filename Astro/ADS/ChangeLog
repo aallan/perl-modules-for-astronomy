@@ -1,3 +1,11 @@
+2001-11-14  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added user agent tag to module and allowed the user
+          to specify an alternative URL for the closest ADS server to them
+          
+        * Makefile.PL: Added Net::Domain to the default build requirements,
+          needed for the user agent tag  
+
 2001-11-10  Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 	* Result/Paper/Paper.pm (summary): Deal with undefined values
@@ -6,12 +14,12 @@
 
 	* Result/Result.pm (summary): Fix -w warning
 
-2001-11-10 Alasdair Allan <aa@astro.ex.ac.uk>
+2001-11-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query.pm: Added bibcode() method and associated $self->{OPTIONS}
-          hash entry as requested by Tim.
+        * Query/Query.pm: Added bibcode() method and associated 
+          $self->{OPTIONS} hash entry as requested by Tim.
 
-2001-11-07 Tim Jenness  <t.jenness@jach.hawaii.edu>
+2001-11-07  Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 	* Result/Result.pm (summary): Add summary and stringify
 
@@ -21,28 +29,28 @@
 
 	* Result/Result.pm (papers): Add a papers method
 
-2001-11-07 Alasdair Allan <aa@astro.ex.ac.uk>
+2001-11-07  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query.pm: Added timeout() method
+        * Query/Query.pm: Added timeout() method
 
-2001-11-04 Alasdair Allan <aa@astro.ex.ac.uk>
+2001-11-04  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query.pm: Added proxy() method
+        * Query/Query.pm: Added proxy() method
 
-2001-11-02 Alasdair Allan <aa@astro.ex.ac.uk>
+2001-11-02  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Pre-alpha release, not for general distribution.
 
-2001-11-02 Alasdair Allan <aa@astro.ex.ac.uk>
+2001-11-02  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Now parses ADS successfully in all tested cases, can carry out
           a limited selection of followup queries on the results.
 
-2001-10-31 Alasdair Allan <aa@astro.ex.ac.uk>
+2001-10-31  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Minimum functionality implemented,  no parsing of ADS query 
           into Results object
 
-2001-10-30 Alasdair Allan <aa@astro.ex.ac.uk>
+2001-10-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Original version
