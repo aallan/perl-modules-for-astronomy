@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.17 2003/07/27 00:46:34 timj Exp $
+#     $Id: Catalog.pm,v 1.18 2003/07/27 01:24:21 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.17 2003/07/27 00:46:34 timj Exp $
+$Id: Catalog.pm,v 1.18 2003/07/27 01:24:21 aa Exp $
 
 =head1 METHODS
 
@@ -134,135 +134,38 @@ will write a catalogue with R, B-R and B-V.
 sub write_catalog {
   my $self = shift;
 
-  # croak unless we have arguments
-  croak ("Astro::Catalog write_catalog() - No filename provided" ) unless @_;
+  # grab the argument list
+  my %args = @_;
 
-  # grab file name and open file for writing
-  my $file_name = shift;
-  my $FH;
-  unless ( open( $FH, ">$file_name" ) ) {
-     croak("Astro::Catalog write_catalog() - Can not open file $file_name");
-  }
+  # Go through hash and downcase all keys
+  %args = _normalize_hash( %args );
 
-  # number of stars in catalogue
-  my $number = $#{$self->{STARS}};
-
-  # how many filters do we have?
-  my $num_filters = ${$self->{STARS}}[0]->what_filters();
-  my @filters = ${$self->{STARS}}[0]->what_filters();
-
-  # how many colours do we have?
-  my $num_colours = ${$self->{STARS}}[0]->what_colours();
-  my @colours = ${$self->{STARS}}[0]->what_colours();
-
-  # grab the filters and colours to be output to the file
-  my ( $output_mags, $output_cols );
-  if ( @_ ) {
-    $output_mags = shift;
-    $output_cols = shift;
+  # unless we have a Filename forget it...
+  my $file;
+  unless( $args{file} ) {
+     croak ( 'Usage: _write_catalog( File => $catalog, Format => $format');
   } else {
-    $output_mags = \@filters;
-    $output_cols = \@colours;
-  }
+     $file = $args{file};
+  }   
+     
+  
+  # default to cluster format if no filenames supplied
+  $args{format} = 'Cluster' unless ( defined $args{format} );
 
-  # define varaibles for output filters and colours
-  my ( @out_filters, @out_colours );
-
-  # if we want fewer magnitudes than we have in the object
-  # to be written to the cluster file
-  foreach my $m ( 0 .. $#{$output_mags} ) {
-     foreach my $n ( 0 .. $#filters ) {
-        if ( ${$output_mags}[$m] eq $filters[$n] ) {
-           push( @out_filters, ${$output_mags}[$m]);
-        }
-     }
-  }
-
-  # same for colours
-  foreach my $m ( 0 .. $#{$output_cols} ) {
-     foreach my $n ( 0 .. $#colours ) {
-        if ( ${$output_cols}[$m] eq $colours[$n] ) {
-           push( @out_colours, ${$output_cols}[$m]);
-        }
-     }
-  }
-
-  # write header
-
-  # check to see if we're outputing all the filters and colours
-  my $total = scalar(@out_filters) + scalar(@out_colours);
-
-  print $FH "$total colours were created\n";
-  print $FH "@out_filters @out_colours\n";
-  print $FH "A sub-set of USNO-A2: Field centre at RA " . $self->get_ra() .
-           ", Dec " . $self->get_dec() . ", Search Radius " .
-           $self->get_radius() . " arcminutes \n";
-
-  # loop through all the stars in the catalogue
-  foreach my $star ( 0 .. $#{$self->{STARS}} ) {
-
-     # field, number, ra, dec and x&y position
-     print $FH ${$self->{STARS}}[$star]->field() . "  ";
-     print $FH $star . "  ";
-     print $FH ${$self->{STARS}}[$star]->ra() . "  ";
-     print $FH ${$self->{STARS}}[$star]->dec() . "  ";
-     print $FH "0.000  0.000  ";
-
-     # magnitudes
-     foreach my $i ( 0 .. $num_filters-1 ) {
-
-        my $doit = 0;
-
-        # if we want fewer magnitudes than we have in the object
-        # to be written to the cluster file
-        if ( defined ${$output_mags}[0] ) {
-
-           $doit = -1;
-           # check to see if we have a valid filter
-           foreach my $m ( 0 .. $#{$output_mags} ) {
-              $doit = 1 if ( ${$output_mags}[$m] eq $filters[$i] );
-           }
-        }
-
-        # so long as $doit isn't -1 then we have a valid filter
-        if( $doit != -1 ) {
-          print $FH ${$self->{STARS}}[$star]->get_magnitude($filters[$i]) . "  ";
-          print $FH ${$self->{STARS}}[$star]->get_errors($filters[$i]) . "  ";
-          print $FH ${$self->{STARS}}[$star]->quality() . "  ";
-        }
-     }
-
-     # colours
-     foreach my $j ( 0 .. $num_colours-1 ) {
-
-        my $doit = 0;
-
-        # if we want fewer magnitudes than we have in the object
-        # to be written to the cluster file
-        if ( defined ${$output_cols}[0] ) { 
-
-           $doit = -1;
-           # check to see if we have a valid filter
-           foreach my $m ( 0 .. $#{$output_cols} ) {
-              $doit = 1 if ( ${$output_cols}[$m] eq $colours[$j] );
-           }
-        }
-
-        # so long as $doit isn't -1 then we have a valid filter
-        if( $doit != -1 ) {
-           print $FH ${$self->{STARS}}[$star]->get_colour( $colours[$j] ) . "  ";
-           print $FH ${$self->{STARS}}[$star]->get_colourerr($colours[$j]) ."  ";
-           print $FH ${$self->{STARS}}[$star]->quality() . "  ";
-        }
-     }
-
-     # next star
-     print $FH "\n";
-
-  }
-
-  # clean up
-  close ( $FH );
+  # Need to read the IO class
+  my $ioclass = _load_io_plugin( $args{format} );
+  return unless defined $ioclass;
+  
+  # remove the two handled hash options and pass the rest
+  delete $args{file};
+  delete $args{format};
+  
+  # call the io plugin's _write_catalog function
+  my $lines = $ioclass->_write_catalog( $self, %args );
+  
+  use Data::Dumper;
+  print Dumper( @$lines );
+  
 
 }
 
@@ -572,12 +475,10 @@ sub configure {
   # Go through hash and downcase all keys
   %args = _normalize_hash( %args );
 
-  use Data::Dumper;
-  print Dumper(\%args);
-
   # Check for deprecation
   if ( exists $args{cluster} ) {
-    warnings::warnif("deprecated", "Cluster option now deprecated. Use Format=>'Cluster',File=>file instead");
+    warnings::warnif("deprecated", 
+     "Cluster option now deprecated. Use Format=>'Cluster',File=>file instead");
     $args{file} = $args{cluster};
     $args{format} = 'Cluster';
   }
@@ -641,9 +542,6 @@ sub configure {
   # Define the field centre if provided
   # -----------------------------------
   $self->fieldcentre( %args );
-
-  use Data::Dumper;
-  print Dumper( $self );
 
   return $self;
 }
