@@ -65,7 +65,7 @@ in Astro::Aladin.
 If I'd had the source code I would have wrapped the Java source using
 Inline::Java which would have been alot neater. Better yet if I'd
 had the API for the  backend databases I could have written a Perl
-native implementation (atlough this would have taken alot longer).
+native implementation (although this would have taken alot longer).
 
 Unfortunately we're currently stuck with the kludge.
 
@@ -83,6 +83,11 @@ for download details.
 After installation you should set the ALADIN_JAR environment varible
 to point to the Aladin.jar file. This will be picked up by the module
 and used to locate your Aladin installation.
+
+You should also set the ALADIN_MEM variable, which defaults to "128m"
+which gives 128Mb of memory to the JVM. For large catalogue retrivals,
+with radii in excess of 15 to 20 arcminutes, this should be significantly
+increased.
 
 Provides
 --------

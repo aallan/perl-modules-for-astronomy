@@ -24,7 +24,7 @@ package Astro::Aladin::LowLevel;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: LowLevel.pm,v 1.1 2003/02/21 18:57:00 aa Exp $
+#     $Id: LowLevel.pm,v 1.2 2003/02/24 22:45:56 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2003 University of Exeter. All Rights Reserved.
@@ -58,7 +58,7 @@ use vars qw/ $VERSION /;
 use File::Spec;
 use Carp;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # G L O B A L  V A R I A B L E ---------------------------------------------
 
@@ -72,7 +72,7 @@ my $ALADIN = undef;
 
 =head1 REVISION
 
-$Id: LowLevel.pm,v 1.1 2003/02/21 18:57:00 aa Exp $
+$Id: LowLevel.pm,v 1.2 2003/02/24 22:45:56 aa Exp $
 
 =head1 METHODS
 
@@ -163,7 +163,8 @@ sub reopen {
      }
   
      # open the pipe to the application
-     open( $ALADIN ,"| java -jar $ENV{ALADIN_JAR} -script" );
+     $ENV{ALADIN_MEM} = "128m" unless defined $ENV{ALADIN_MEM};
+     open( $ALADIN ,"| java -mx$ENV{ALADIN_MEM} -jar $ENV{ALADIN_JAR} -script" );
      return;  
   }   
 

@@ -25,7 +25,7 @@ package Astro::Aladin;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Aladin.pm,v 1.1 2003/02/21 18:57:00 aa Exp $
+#     $Id: Aladin.pm,v 1.2 2003/02/24 22:45:56 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2003 University of Exeter. All Rights Reserved.
@@ -74,7 +74,7 @@ use threads;
 use threads::shared;
 use Astro::Aladin::LowLevel;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Check for threading
 #use Config;
@@ -103,7 +103,7 @@ my $threaded_supercos_catalog = sub {
     } else {
        $waveband = "1"; # Go with default, UKST Blue (Bj)  
     }
-
+    
     # grab catalogue
     $aladin->get( "SSS.cat", [$waveband], "$ra $dec", $radius );
     $aladin->sync();
@@ -119,7 +119,7 @@ my $threaded_supercos_catalog = sub {
 
 =head1 REVISION
 
-$Id: Aladin.pm,v 1.1 2003/02/21 18:57:00 aa Exp $
+$Id: Aladin.pm,v 1.2 2003/02/24 22:45:56 aa Exp $
 
 =head1 METHODS
 
@@ -334,6 +334,7 @@ sub supercos_catalog {
   share( $status );
 
   my $supercos_thread = threads->create( sub { 
+  
      $status = &$threaded_supercos_catalog( $ra, $dec, $radius, $band, $file ); 
   });   
   
