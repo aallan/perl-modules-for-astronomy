@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.49 2005/02/15 23:27:26 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.50 2005/02/25 21:40:17 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.49 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.50 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.49 2005/02/15 23:27:26 cavanagh Exp $
+$Id: Catalog.pm,v 1.50 2005/02/25 21:40:17 timj Exp $
 
 =head1 METHODS
 
@@ -1066,7 +1066,10 @@ sub filter_by_id {
   my $id = shift;
 
   # Convert to regex if required
-  $id = qr/$id/i unless ref $id;
+  if (not ref($id)) {
+    $id = quotemeta( $id );
+    $id = qr/$id/i;
+  }
 
   return $self->filter_by_cb( sub { $_[0]->id =~ $id; });
 

@@ -1,47 +1,59 @@
+2005-02-25  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* Catalog.pm (filter_by_id): Use quotemeta function to make sure
+	that things like + and () are escaped before being passed to the
+	regex engine.
+
 2005-02-15  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
-        * IO/Astrom.pm: Add epoch of observation support.
-        * Catalog.pm: Allow newer versions of Astro::Coords to be used
-          without screwing up output from the ra and dec methods.
-        * Star/Star.pm: Add wcs method allowing for a world coordinate
-          system to be associated with a star. Allow for calculation of
-          x/y position from ra/dec if possible. Allow newer versions
-          of Astro::Coords to be used without screwing up output from
-          the ra and dec methods.
+	* IO/Astrom.pm: Add epoch of observation support.
+
+	* Catalog.pm: Allow newer versions of Astro::Coords to be used
+	without screwing up output from the ra and dec methods.
+
+	* Star/Star.pm: Add wcs method allowing for a world coordinate
+	system to be associated with a star. Allow for calculation of x/y
+	position from ra/dec if possible. Allow newer versions of
+	Astro::Coords to be used without screwing up output from the ra
+	and dec methods.
 
 2005-02-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
-        * Query/Query/2MASS.pm: Tell TST which column the ID is in when
-          forming the new catalogue from the 2MASS output. This is done
-          to prevent a warning from appearing when TST tries to parse the
-          catalogue.
+	* Query/Query/2MASS.pm: Tell TST which column the ID is in when
+	forming the new catalogue from the 2MASS output. This is done to
+	prevent a warning from appearing when TST tries to parse the
+	catalogue.
 
 2005-02-02  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.9.0)
 
-        * Star/Star.pm: Fixed quality comparison in line 860 (now 865) so 
-          it can handle undef values. Not sure this was the right thing to, 
-          why was it getting undef values to start with? This could indicate 
-          a bug in one of the IO plugin modules?
+	* Star/Star.pm: Fixed quality comparison in line 860 (now 865) so
+	it can handle undef values. Not sure this was the right thing to,
+	why was it getting undef values to start with? This could indicate
+	a bug in one of the IO plugin modules?
 
 2005-02-02  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
-        * t/2_astrom.t: __DATA__ section needed updating to use publically-
-          available Astro::Coords.
-        * IO/Astrom.pm: Use Astro::Coords v0.05 methods instead of v0.06.
-        * t/helper.pl: Add compare_mpc_catalog and compare_mpc_star for
-          MPC checking.
-        * t/4_mpc.t: Use compare_mpc_catalog comparison method, update
-          asteroid positions.
+	* t/2_astrom.t: __DATA__ section needed updating to use
+	publically- available Astro::Coords.
+
+	* IO/Astrom.pm: Use Astro::Coords v0.05 methods instead of v0.06.
+
+	* t/helper.pl: Add compare_mpc_catalog and compare_mpc_star for
+	MPC checking.
+
+	* t/4_mpc.t: Use compare_mpc_catalog comparison method, update
+	asteroid positions.
 
 2005-02-01  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
-        * IO/FINDOFF.pm: Fix regex bug, clarify documentation, only write
-          ID in comment column.
-        * IO/SExtractor.pm: Declare filter variable to fix syntax error.
+	* IO/FINDOFF.pm: Fix regex bug, clarify documentation, only write
+	ID in comment column.
+
+	* IO/SExtractor.pm: Declare filter variable to fix syntax error.
 
 2005-01-18  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * MANIFEST: Fixed problems with MANIFEST file
+	* MANIFEST: Fixed problems with MANIFEST file
 
 2005-01-14  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
@@ -66,15 +78,15 @@
 
 2004-11-30  Alasdair Allan <aa@astro.ex.ac.uk> 
 
-        * IO/VOTable.pm: Changed dependancy to Astro::VO::VOTable away
-          from the older VOTable module. Updated docs to reflect this
-          change.
+	* IO/VOTable.pm: Changed dependancy to Astro::VO::VOTable away
+	from the older VOTable module. Updated docs to reflect this
+	change.
           
-        * t/2_votable.pm: Updated to reflect changes
+	* t/2_votable.pm: Updated to reflect changes
         
-        * Star/Morphology/Makefile.pm: Added in support of the new class.
+	* Star/Morphology/Makefile.pm: Added in support of the new class.
         
-        * IO/Cluster.pm: Flxed problem with looks_like_number() call 
+	* IO/Cluster.pm: Flxed problem with looks_like_number() call 
           
 2004-11-23  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
@@ -85,7 +97,7 @@
 
 2004-11-22  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
-        * IO/SExtractor.pm: Add simple reader for output from SExtractor.
+	* IO/SExtractor.pm: Add simple reader for output from SExtractor.
 
 2004-11-05  Tim Jenness  <tjenness@cpan.org>
 
@@ -105,7 +117,7 @@
 
 2004-05-20  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.7.0)
 
-        * Updated documentation ready for release.
+	* Updated documentation ready for release.
           
 2004-03-02  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
 
@@ -132,133 +144,134 @@
 
 2004-02-05  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
-        * Added STL support (read only) as a pluggable IO module
-          along with associated test harness.
+	* IO/STL.pm: Added STL support (read only) as a pluggable IO
+	module along with associated test harness.
 
 2003-11-14  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.5.2)
 
-        * README: Updated location of VOTable module package, which
-          moved. 
+	* README: Updated location of VOTable module package, which moved.
 
 2003-10-30  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.5.1)
 
-        * IO/Cluster.pm: Added read support for new style character
-          quality flags. Cluster files are still written using the
-          old style numeric flags.
+	* IO/Cluster.pm: Added read support for new style character
+	quality flags. Cluster files are still written using the old style
+	numeric flags.
           
 2003-10-17  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.5.0)
 
-        * IO/VOTable.pm: Very simple VOTable reader added, should
-          now get at least basic information into the Astro::Catalog
-          object if it is passed a VOTable.
+	* IO/VOTable.pm: Very simple VOTable reader added, should now get
+	at least basic information into the Astro::Catalog object if it is
+	passed a VOTable.
           
-        * t/2_votable.t: Added test harness for reading VOTables.  
+	* t/2_votable.t: Added test harness for reading VOTables.
 
-        * Minor documenation cleanup in various files, no actual
-          functionality changes.
+	* Minor documenation cleanup in various files, no actual
+	functionality changes.
           
 2003-10-16  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.4.0)
 
-        * IO/VOTable.pm: Fixed VOTable output to actually have some
-          meta-data, now readable by treeview. Added DEFINITIONS
-          element to the table and filled in various "default"
-          meta-data. The tables are not bogus, but the epoch and
-          equinoxes may be incorrect in some cases (SuperCOSMOS
-          catalogues for instance).
+	* IO/VOTable.pm: Fixed VOTable output to actually have some
+	meta-data, now readable by treeview. Added DEFINITIONS element to
+	the table and filled in various "default" meta-data. The tables
+	are not bogus, but the epoch and equinoxes may be incorrect in
+	some cases (SuperCOSMOS catalogues for instance).
           
 2003-10-13  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.3.0)
 
-        * Added VOTable support (write only) as a pluggable IO module
-          along with associated test harness.
+	* IO/VOTable.pm: Added VOTable support (write only) as a pluggable
+	IO module along with associated test harness.
           
 2003-09-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query/Query/Sesame.pm: Modified to cope with change in return
-          format by CDS. 
+	* Query/Query/Sesame.pm: Modified to cope with change in return
+	format by CDS.
                   
 2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query/Query/SIMBAD.pm: Removed debugging statements which 
-          generated a file containing a copy of the retrieved HTML in 
-          the current working directory.
+	* Query/Query/SIMBAD.pm: Removed debugging statements which
+	generated a file containing a copy of the retrieved HTML in the
+	current working directory.
                
-        * etc/sss.cfg: Added SkyCat SuperCOSMOS configuration file to 
-          default distribution
+	* etc/sss.cfg: Added SkyCat SuperCOSMOS configuration file to
+	default distribution
         
-        * etc/skycat.cfg: Added generic SkyCat configuration file to 
-          default distribution   
+	* etc/skycat.cfg: Added generic SkyCat configuration file to
+	default distribution
 
-        * Query/Query/SkyCat.pm: Updated to look for $PERLPREFIX/etc/skycat.cfg
-          configuration file by default.
-               
-        * Makefile.PL: Modified makefile to install the SkyCat configuration
-          files to $(PERLPREFIX)/etc in preperation for shifting access to
-          SuperCOSMOS from being dependant on Astro::Aladin to using the
-          Astro::Catalog::Query::SkyCat module. 
-          
-        * Query/Query/SuperCOSMOS.pm: Totally reimplemented this module
-          from scratch to use the SkyCat.pm module rather than relying
-          on the Astro::Aladin implementation. 
+	* Query/Query/SkyCat.pm: Updated to look for
+	$PERLPREFIX/etc/skycat.cfg configuration file by default.
+       
+	* Makefile.PL: Modified makefile to install the SkyCat
+	configuration files to $(PERLPREFIX)/etc in preperation for
+	shifting access to SuperCOSMOS from being dependant on
+	Astro::Aladin to using the Astro::Catalog::Query::SkyCat module.
+  
+	* Query/Query/SuperCOSMOS.pm: Totally reimplemented this module
+	from scratch to use the SkyCat.pm module rather than relying on
+	the Astro::Aladin implementation.
 
-        * t/4_skycat_supercos.t: Added a test suite for the new SuperCOSMOS
-          module. This superceedes the older 4_supercos.t test suite.
+	* t/4_skycat_supercos.t: Added a test suite for the new
+	SuperCOSMOS module. This superceedes the older 4_supercos.t test
+	suite.
 
-        * MANIFEST: Updated to reflect the actual package, we've been shipping
-          V3.x with bits missing since release, whoops!
-        
-        * old/*: Moved some of the non-functional test suite into a this
-          directory along with the old Astro::Aladin SuperCOSMOS module. 
+	* MANIFEST: Updated to reflect the actual package, we've been
+	shipping V3.x with bits missing since release, whoops!
+
+	* old/*: Moved some of the non-functional test suite into a this
+	directory along with the old Astro::Aladin SuperCOSMOS module.
            
 2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query/Query/CMC.pm: Added a Vizier Carlsberg Meridian Catalogue
-          (CMC/11) query sub-class to try and figure out how Tim had written 
-          the 2MASS (Vizier generic) class. RA & Dec incorrect.
+	* Query/Query/CMC.pm: Added a Vizier Carlsberg Meridian Catalogue
+	(CMC/11) query sub-class to try and figure out how Tim had written
+	the 2MASS (Vizier generic) class. RA & Dec incorrect.
 
-        * Query/Query/2MASS.pm: Moved colour generation for 2MASS catalogue
-          from the more generic IO/TST.pm module.
-        
-        * IO/TST.pm: See changes to Query/Query/2MASS.pm
+	* Query/Query/2MASS.pm: Moved colour generation for 2MASS
+	catalogue from the more generic IO/TST.pm module.
+
+	* IO/TST.pm: See changes to Query/Query/2MASS.pm
         
 2003-09-12  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query/Query/Sesame.pm: Modified to cope with change in return
-          format by CDS.
+	* Query/Query/Sesame.pm: Modified to cope with change in return
+	format by CDS.
 
-        * Query/Query/USNOA2.pm: Fixed problem with USNO-A2 having bogus
-          RA and Dec seconds fields (= 60.0) which breaks Astro::Catalog.
-          The query module now silently discards these objects (for now!).
+	* Query/Query/USNOA2.pm: Fixed problem with USNO-A2 having bogus
+	RA and Dec seconds fields (= 60.0) which breaks Astro::Catalog.
+	The query module now silently discards these objects (for now!).
 
-        * Query/Query/GSC.pm: Fixed problem with GSC which dropped the
-          B magnitude error into the quality flag. Fix breaks the t/4_gsc.t 
-          test harness.
-        
-        * Catalog.pm: Changed default origin of <UNKNOWN> to UNKNOWN to
-          avoid parsing problems when the results of a query are displayed
-          as part of an HTML page.
+	* Query/Query/GSC.pm: Fixed problem with GSC which dropped the B
+	magnitude error into the quality flag. Fix breaks the t/4_gsc.t
+	test harness.
+
+	* Catalog.pm: Changed default origin of <UNKNOWN> to UNKNOWN to
+	avoid parsing problems when the results of a query are displayed
+	as part of an HTML page.
                      
 2003-08-26  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Star/Star.pm: Modified quality() routine so it knows about
-          TST quality flags. Not a particularly good solution, need to
-          generalise this and move it to the IO::TST module.
-          
-        * IO/Cluster.pm: Moved id() changes for USNO-A2 to generic code
-          in the pluggable IO module
-          
-        * IO/TST.pm: Modified to generate colours and quality flags for 2MASS  
+	* Star/Star.pm: Modified quality() routine so it knows about TST
+	quality flags. Not a particularly good solution, need to
+	generalise this and move it to the IO::TST module.
+  
+	* IO/Cluster.pm: Moved id() changes for USNO-A2 to generic code in
+	the pluggable IO module
+  
+	* IO/TST.pm: Modified to generate colours and quality flags for
+	2MASS
 
 2003-08-03  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * IO/Cluster.pm: Fiddled with the quality flags for Cluster output,
-          to get rid of an uninitalised value warning. Still need to go to
-          character quality flags.
-          
-        * Query/Query/USNOA2.pm: Changed the id() of the downloaded USNO-A2
-          stars to be numberic, otherwise we break the cluster format which
-          requires numeric id's. Also tweaked the $catalog->pushstar() line
-          so if the Astro::Coords object in the Astro::Catalog::Star object
-          is broken (bogus dec?) its not going to get included in the catalog.
+	* IO/Cluster.pm: Fiddled with the quality flags for Cluster
+	output, to get rid of an uninitalised value warning. Still need to
+	go to character quality flags.
+  
+	* Query/Query/USNOA2.pm: Changed the id() of the downloaded
+	USNO-A2 stars to be numberic, otherwise we break the cluster
+	format which requires numeric id's. Also tweaked the
+	$catalog->pushstar() line so if the Astro::Coords object in the
+	Astro::Catalog::Star object is broken (bogus dec?) its not going
+	to get included in the catalog.
         
 2003-08-03  Tim Jenness  <timj@jach.hawaii.edu>
 
@@ -298,53 +311,55 @@
 
 2003-07-29  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Moved Astro::Catalog::BaseQuery to be Astro::Catalog::Query in
-          preparation for it be a proper polymorphic factory class for
-          generic catalogue queries.
-        
-        * Moved actualy query sub-classes down a directory level to allow
-          for the Query.pm file 
-          
-        * Added a WebService transport class, probably needs some added
-          generalisation, but our sample of web services is still small.
-          
-        * Added a Sesame.pm class to do CDS Sesame lookups by target name
-          using the new WebService transport class. 
+	* Moved Astro::Catalog::BaseQuery to be Astro::Catalog::Query in
+	preparation for it be a proper polymorphic factory class for
+	generic catalogue queries.
+
+	* Moved actualy query sub-classes down a directory level to allow
+	for the Query.pm file
+  
+	* Transport/WebService.pm: Added a WebService transport class,
+	probably needs some added generalisation, but our sample of web
+	services is still small.
+  
+	* Query/Query/Sesame.pm: Added a Sesame.pm class to do CDS Sesame
+	lookups by target name using the new WebService transport class.
                        
 2003-07-28  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Moved the catalogue query classes to chare a common namespace,
-          current classes now inherit from the Astro::Catalog::Transport::REST
-          class. While future web and GRID service classes will inherit from
-          related classes. All the Astro::Catalog::Transport classes inherit
-          from Tim's BaseQuery class.
-          
-        * Moved REST specific setup from BaseQuery to Transport::REST class  
+	* Moved the catalogue query classes to chare a common namespace,
+	current classes now inherit from the
+	Astro::Catalog::Transport::REST class. While future web and GRID
+	service classes will inherit from related classes. All the
+	Astro::Catalog::Transport classes inherit from Tim's BaseQuery
+	class.
+  
+	* Transport/REST.pm: Moved REST specific setup from BaseQuery to
+	Transport::REST class
 
-        * t/*.t: Test scripts modified to work within new framework.
-        
-        * t/1_compile.t: Now chekc for presence of Astro::Aladin module
+	* t/*.t: Test scripts modified to work within new framework.
+
+	* t/1_compile.t: Now chekc for presence of Astro::Aladin module
         
 2003-07-27  Tim Jenness <timj@jach.hawaii.edu>
 
-        * Added sorting and filtering of catalogues.
+	* Added sorting and filtering of catalogues.
 
-2003-07-26  Tim Jenness <timj@jach.hawaii.edu> 
-            & Alasdiar Allan <aa@astro.ex.ac.uk>
+2003-07-26  Tim Jenness <timj@jach.hawaii.edu> & Alasdiar Allan <aa@astro.ex.ac.uk>
             
-        * Added pluggable IO.
+	* Added pluggable IO.
             
 2003-07-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * t/catalog.t: Tests fixed to reflect the new two decimal place
-          precisions generated by using Astro::Coords objects
+	* t/catalog.t: Tests fixed to reflect the new two decimal place
+	precisions generated by using Astro::Coords objects
           
 2003-07-24  Tim Jenness <timj@jach.hawaii.edu>
 
 	* BaseQuery/BaseQuery.pm: Write base class for catalog query classes.
 
 	* Catalog.pm (_read_cluster): No longer use ra() and dec() methods
-	  to set the ra and dec (store the Astro::Coords object directly)
+	to set the ra and dec (store the Astro::Coords object directly)
 
 	* Star/Star.pm: ra($ra) and dec($dec) methods now deprecated.
 
@@ -355,83 +370,83 @@
 	* Star/Star.pm: Now uses Astro::Coords internally.
 
 	* Catalog.pm: Now uses Astro::Coords internally. Switch to lexical
-	  filehandles.
+	filehandles.
 
 2003-07-19  Alasdair Allan <aa@astro.ex.ac.uk> (version 2.1.3)
 
-        * Catalog.pm: added patch by Brad Cavanagh to popstarbyid()
+	* Catalog.pm: added patch by Brad Cavanagh to popstarbyid()
         
 2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk> (version 2.1.2)
 
-        * Minor documentation tweaks
+	* Minor documentation tweaks
         
-        * Added some example scripts to the distribution
+	* Added some example scripts to the distribution
           
 2003-06-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Catalog.pm: Fixed bug in new _read_cluster() routine for
-          instances where we're reading from a file.
+	* Catalog.pm: Fixed bug in new _read_cluster() routine for
+	instances where we're reading from a file.
           
 2003-06-09  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Fixed test scripts for Astro::Catalog::SuperCOSMOS so that
-          they fail gracefully if Astro::Aladin isn't installed.
+	* Fixed test scripts for Astro::Catalog::SuperCOSMOS so that they
+	fail gracefully if Astro::Aladin isn't installed.
           
-        * Astro::Catalog module patched to take an ARK catalogue via
-          a scalar rather than from a file. For backwards compatibility
-          reasons Astro::Catalog( Cluster => $file ) still refers to
-          a serialised version, whereas Astro::Catalog( Scalar => $file ) 
-          refers to a scalar holding a string that is an ARK Cluster
-          catalogue. This isn't optimal but I don't particularly want
-          to break the exisiting (extensive) codebase.
+	* Astro/Catalog.pm: Astro::Catalog module patched to take an ARK
+	catalogue via a scalar rather than from a file. For backwards
+	compatibility reasons Astro::Catalog( Cluster => $file ) still
+	refers to a serialised version, whereas Astro::Catalog( Scalar =>
+	$file ) refers to a scalar holding a string that is an ARK Cluster
+	catalogue. This isn't optimal but I don't particularly want to
+	break the exisiting (extensive) codebase.
 
 2003-02-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Astro::Catalog now wraps SuperCOSMOS catalogue using 
-          the Astro::Aladin module. Some example scripts using this
-          new module and the Astro::DSS module are included in the
-          distribution. NB: This isn't intended to be used seriously
-          by anyone, its not even a sub-optimal way of going about
-          things, but I was playing and since I wrote the code I may
-          as well distribute the stuff.
+	* Astro::Catalog now wraps SuperCOSMOS catalogue using the
+	Astro::Aladin module. Some example scripts using this new module
+	and the Astro::DSS module are included in the distribution. NB:
+	This isn't intended to be used seriously by anyone, its not even a
+	sub-optimal way of going about things, but I was playing and since
+	I wrote the code I may as well distribute the stuff.
           
 2002-05-31  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Removed references to Math::libm from the GSC modules, these
-          references seemed to have been missed by the previous patch.
+	* Removed references to Math::libm from the GSC modules, these
+	references seemed to have been missed by the previous patch.
           
 2002-05-29  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Applied patch provided by Stephen Quiney <S.J.Quinney@durham.ac.uk>,
-          removes dependancy on Math::libm and fixes test script problem
-          which required the $ESTAR_DATA environment variable to be set.
+	* Applied patch provided by Stephen Quiney
+	<S.J.Quinney@durham.ac.uk>, removes dependancy on Math::libm and
+	fixes test script problem which required the $ESTAR_DATA
+	environment variable to be set.
 
 2002-03-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Minor bug fix?
+	* Minor bug fix?
 
 2002-03-29  Alasdair Allan <aa@astro.ex.ac.uk>
         
-        * Added a freeze() function so that the the Catalog object can be
-          stored persistently using the Data::Dumper module
+	* Added a freeze() function so that the the Catalog object can be
+	stored persistently using the Data::Dumper module
           
 2002-01-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Various changes made to support the Field Correlation Client,
-          note that the USNO-A2 parsing was broken for catalogues with
-          more than 1000 stars before this update.
+	* Various changes made to support the Field Correlation Client,
+	note that the USNO-A2 parsing was broken for catalogues with more
+	than 1000 stars before this update.
 
 2002-01-14  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Catalog.pm: Can now read from, and dump to, ARK Cluster files.
+	* Catalog.pm: Can now read from, and dump to, ARK Cluster files.
 
 2002-01-13  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Generic Catalog and Star objects working, lacks way to parse
-          ARK format Cluster files into Astro::Catalog objects, but all
-          other functionality in place.
+	* Generic Catalog and Star objects working, lacks way to parse ARK
+	format Cluster files into Astro::Catalog objects, but all other
+	functionality in place.
           
 2002-01-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Original version.
+	* Original version.
 
