@@ -159,7 +159,10 @@ sub _write_catalog {
   # BUT THAT WE RETAIN THE ORDER OF THE SOURCES IN THE CATALOG
   # Hence an array for the information
   my @processed;
-  for my $src (@sources) {
+  for my $star (@sources) {
+
+    # Extract the coordinate object
+    my $src = $star->coords;
 
     # Get the name but do not deal with undef yet
     # in case the type is not valid
