@@ -6,6 +6,7 @@ use strict;
 
 #load test
 use Test::More tests => 150;
+use File::Spec;
 use Data::Dumper;
 
 BEGIN {
@@ -115,7 +116,10 @@ my $gsc_byname = new Astro::Catalog::Query::SkyCat( # Target => 'HT Cas',
 						    Radius => '5',
 						    Catalog => 'gsc',
 						  );
-                                                     
+print "# Reseting \$cfg_file to local copy in ./etc \n";
+my $file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
+$supercos->cfg_file( $file ); 
+                                                               
 print "# Connecting to ESO/ST-ECF GSC Catalogue\n";
 my $catalog_byname = $gsc_byname->querydb();
 print "# Continuing tests\n";

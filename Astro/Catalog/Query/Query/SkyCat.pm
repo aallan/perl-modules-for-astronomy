@@ -346,7 +346,9 @@ These methods are not associated with any particular object.
 =item B<cfg_file>
 
 Location of the skycat config file. Default location is
-C<$SKYCAT_CFG>, if defined, else C<$HOME/.skycat/skycat.cfg>.
+C<$SKYCAT_CFG>, if defined, else C<$HOME/.skycat/skycat.cfg>,
+or C<$PERLPREFIX/etc/skycat.cfg> if there isn't a version
+in the users home directory
 
 This could be made per-class if there is a demand for running
 queries with different catalogs. This would also move the config
@@ -355,9 +357,28 @@ contents into the query object itself.
 =cut
 
 {
-  my $cfg_file = (exists $ENV{SKYCAT_CFG} ? $ENV{SKYCAT_CFG} :
-		  File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg"));
-
+  my $cfg_file;
+  if( exists $ENV{SKYCAT_CFG} ) {
+     $cfg_file = $ENV{SKYCAT_CFG};
+  } elsif ( exists File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg") ){
+     $cfg_file = File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg");
+  } else {
+    # generate the default path to the $PERLPRFIX/etc/skycat.cfg file,
+    # this is a horrible hack, there is probably an elegant way to do
+    # this but I can't be bothered looking it up right now.
+    my $perlbin = $^X;
+    my ($volume, $dir, $file) = File::Spec->splitpath( $perlbin );
+    my @dirs = File::Spec->splitdir( $dir );
+    my @path;
+    foreach my $i ( 0 .. $#dirs-2 ) {
+      push @path, $dirs[$i];
+    }  
+    my $directory = File::Spec->catdir( @path, 'etc' );
+    
+    # reset to the default
+    $cfg_file = File::Spec->catfile( $directory, "skycat.cfg" );     
+  }
+  
   sub cfg_file {
     my $class = shift;
     if (@_) {
