@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.10 2003/07/19 02:16:23 aa Exp $
+#     $Id: Catalog.pm,v 1.11 2003/07/24 02:53:11 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -53,17 +53,18 @@ an ARK Cluster format catalogue.
 use strict;
 use vars qw/ $VERSION /;
 
+use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.10 2003/07/19 02:16:23 aa Exp $
+$Id: Catalog.pm,v 1.11 2003/07/24 02:53:11 timj Exp $
 
 =head1 METHODS
 
@@ -90,8 +91,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { STARS  => [],
-                      RA     => undef,
-                      DEC    => undef,
+		      COORDS => undef,
                       RADIUS => undef }, $class;
 
   # If we have arguments configure the object
@@ -131,20 +131,21 @@ sub write_catalog {
 
   # croak unless we have arguments
   croak ("Astro::Catalog write_catalog() - No filename provided" ) unless @_;
- 
+
   # grab file name and open file for writing
   my $file_name = shift;
-  unless ( open( FILE, ">$file_name" ) ) {
+  my $FH;
+  unless ( open( $FH, ">$file_name" ) ) {
      croak("Astro::Catalog write_catalog() - Can not open file $file_name");
-  } 
- 
+  }
+
   # number of stars in catalogue
   my $number = $#{$self->{STARS}};
- 
+
   # how many filters do we have?
   my $num_filters = ${$self->{STARS}}[0]->what_filters();
   my @filters = ${$self->{STARS}}[0]->what_filters();
-  
+
   # how many colours do we have?
   my $num_colours = ${$self->{STARS}}[0]->what_colours();
   my @colours = ${$self->{STARS}}[0]->what_colours();
@@ -157,11 +158,11 @@ sub write_catalog {
   } else {
     $output_mags = \@filters;
     $output_cols = \@colours;
-  }   
+  }
 
   # define varaibles for output filters and colours
   my ( @out_filters, @out_colours );
-        
+
   # if we want fewer magnitudes than we have in the object
   # to be written to the cluster file
   foreach my $m ( 0 .. $#{$output_mags} ) {
@@ -169,47 +170,47 @@ sub write_catalog {
         if ( ${$output_mags}[$m] eq $filters[$n] ) {
            push( @out_filters, ${$output_mags}[$m]);
         }
-     }   
+     }
   }
-  
+
   # same for colours
   foreach my $m ( 0 .. $#{$output_cols} ) {
      foreach my $n ( 0 .. $#colours ) {
         if ( ${$output_cols}[$m] eq $colours[$n] ) {
            push( @out_colours, ${$output_cols}[$m]);
-        }   
+        }
      }
-  }  
-        
+  }
+
   # write header
-  
+
   # check to see if we're outputing all the filters and colours
   my $total = scalar(@out_filters) + scalar(@out_colours);
-   
-  print FILE "$total colours were created\n";
-  print FILE "@out_filters @out_colours\n";
-  print FILE "A sub-set of USNO-A2: Field centre at RA " . $self->get_ra() .
-           ", Dec " . $self->get_dec() . ", Search Radius " . 
+
+  print $FH "$total colours were created\n";
+  print $FH "@out_filters @out_colours\n";
+  print $FH "A sub-set of USNO-A2: Field centre at RA " . $self->get_ra() .
+           ", Dec " . $self->get_dec() . ", Search Radius " .
            $self->get_radius() . " arcminutes \n";
-           
+
   # loop through all the stars in the catalogue
   foreach my $star ( 0 .. $#{$self->{STARS}} ) {
-  
+
      # field, number, ra, dec and x&y position
-     print FILE ${$self->{STARS}}[$star]->field() . "  ";
-     print FILE $star . "  ";
-     print FILE ${$self->{STARS}}[$star]->ra() . "  ";
-     print FILE ${$self->{STARS}}[$star]->dec() . "  ";
-     print FILE "0.000  0.000  ";
-     
+     print $FH ${$self->{STARS}}[$star]->field() . "  ";
+     print $FH $star . "  ";
+     print $FH ${$self->{STARS}}[$star]->ra() . "  ";
+     print $FH ${$self->{STARS}}[$star]->dec() . "  ";
+     print $FH "0.000  0.000  ";
+
      # magnitudes
      foreach my $i ( 0 .. $num_filters-1 ) {
-     
+
         my $doit = 0;
-        
+
         # if we want fewer magnitudes than we have in the object
         # to be written to the cluster file
-        if ( defined ${$output_mags}[0] ) { 
+        if ( defined ${$output_mags}[0] ) {
 
            $doit = -1;
            # check to see if we have a valid filter
@@ -217,20 +218,20 @@ sub write_catalog {
               $doit = 1 if ( ${$output_mags}[$m] eq $filters[$i] );
            }
         }
-           
-        # so long as $doit isn't -1 then we have a valid filter 
-        if( $doit != -1 ) {   
-          print FILE ${$self->{STARS}}[$star]->get_magnitude($filters[$i]) . "  ";
-          print FILE ${$self->{STARS}}[$star]->get_errors($filters[$i]) . "  ";
-          print FILE ${$self->{STARS}}[$star]->quality() . "  ";
-        } 
+
+        # so long as $doit isn't -1 then we have a valid filter
+        if( $doit != -1 ) {
+          print $FH ${$self->{STARS}}[$star]->get_magnitude($filters[$i]) . "  ";
+          print $FH ${$self->{STARS}}[$star]->get_errors($filters[$i]) . "  ";
+          print $FH ${$self->{STARS}}[$star]->quality() . "  ";
+        }
      }
-     
+
      # colours
      foreach my $j ( 0 .. $num_colours-1 ) {
-     
+
         my $doit = 0;
-        
+
         # if we want fewer magnitudes than we have in the object
         # to be written to the cluster file
         if ( defined ${$output_cols}[0] ) { 
@@ -241,22 +242,22 @@ sub write_catalog {
               $doit = 1 if ( ${$output_cols}[$m] eq $colours[$j] );
            }
         }
-           
-        # so long as $doit isn't -1 then we have a valid filter 
-        if( $doit != -1 ) {   
-           print FILE ${$self->{STARS}}[$star]->get_colour( $colours[$j] ) . "  ";
-           print FILE ${$self->{STARS}}[$star]->get_colourerr($colours[$j]) ."  ";
-           print FILE ${$self->{STARS}}[$star]->quality() . "  ";
+
+        # so long as $doit isn't -1 then we have a valid filter
+        if( $doit != -1 ) {
+           print $FH ${$self->{STARS}}[$star]->get_colour( $colours[$j] ) . "  ";
+           print $FH ${$self->{STARS}}[$star]->get_colourerr($colours[$j]) ."  ";
+           print $FH ${$self->{STARS}}[$star]->quality() . "  ";
         }
-     } 
-     
-     # next star      
-     print FILE "\n";
+     }
+
+     # next star
+     print $FH "\n";
 
   }
-  
+
   # clean up
-  close ( FILE );      
+  close ( $FH );
 
 }
 
@@ -395,7 +396,12 @@ Set the field centre and radius of the catalogue (if appropriate)
 
      $catalog->fieldcentre( RA     => $ra,
                             Dec    => $dec,
-                            Radius => $radius );
+                            Radius => $radius,
+                            Coords => new Astro::Coords() 
+                           );
+
+RA and Dec must be given together or as Coords.
+Coords (an Astro::Coords object) supercedes RA/Dec.
 
 =cut
 
@@ -403,31 +409,45 @@ sub fieldcentre {
   my $self = shift;
 
   # return unless we have arguments
-  return undef unless @_;
+  return () unless @_;
 
   # grab the argument list
   my %args = @_;
-  
-  # set RA
-  if ( defined $args{RA} ) {
-     $self->{RA} = $args{RA};
-  } 
-   
-  # set Dec
-  if ( defined $args{Dec} ) {
-     $self->{DEC} = $args{Dec};
-  }  
-  
+
+  if (defined $args{Coords}) {
+    $self->{COORDS} = $args{Coords};
+  } elsif ( defined $args{RA} && defined $args{Dec}) {
+    my $c = new Astro::Coords( type => 'J2000',
+			       ra => $args{RA},
+			       dec => $args{Dec},
+			     );
+    $self->{COORDS} = $c;
+  }
+
   # set field radius
   if ( defined $args{Radius} ) {
      $self->{RADIUS} = $args{Radius};
   }
-  
+
+}
+
+=item B<get_coords>
+
+Return the C<Astro::Coords> object associated with the field centre.
+
+  $c = $catalog->get_coords();
+
+=cut
+
+sub get_coords {
+  my $self = shift;
+  return $self->{COORDS};
 }
 
 =item B<get_ra>
 
-Return the RA of the catalogue field centre
+Return the RA of the catalogue field centre in sexagesimal,
+space-separated format. Returns undef if no coordinate supplied.
 
    $ra = $catalog->get_ra();
 
@@ -435,12 +455,18 @@ Return the RA of the catalogue field centre
 
 sub get_ra {
   my $self = shift;
-  return $self->{RA};
+  my $c = $self->get_coords;
+  return unless defined $c;
+  my $ra = $c->ra(format => 'sex');
+  $ra =~ s/:/ /g;
+  $ra =~ s/^\s*//;
+  return $ra;
 }
 
 =item B<get_dec>
 
-Return the Dec of the catalogue field centre
+Return the Dec of the catalogue field centre in sexagesimal
+space-separated format with leading sign.
 
    $dec = $catalog->get_dec();
 
@@ -448,7 +474,14 @@ Return the Dec of the catalogue field centre
 
 sub get_dec {
   my $self = shift;
-  return $self->{DEC};
+  my $c = $self->get_coords;
+  return unless defined $c;
+  my $dec = $c->dec(format => 'sex');
+  $dec =~ s/:/ /g;
+  $dec =~ s/^\s*//;
+  # prepend sign if there is no sign
+  $dec = (substr($dec,0,1) eq '-' ? '' : '+' ) . $dec;
+  return $dec;
 }
 
 =item B<get_radius>
@@ -494,67 +527,55 @@ sub configure {
 
   # Define the actual catalogue
   # ---------------------------
-  
+
   if ( defined $args{Stars} ) {
-  
+
     # grab the array reference and stuff it into the object
     @{$self->{STARS}} = @{$args{Stars}};
-    
+
   } elsif ( defined $args{Cluster} ) {
-      
-    # build from Cluster file    
+
+    # build from Cluster file
     my $file_name = $args{Cluster};
-    unless ( open( CAT, $file_name ) ) {
+    my $CAT;
+    unless ( open( $CAT, $file_name ) ) {
        croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
-    }     
-    # read from file   
+    }
+    # read from file
     $/ = "\n";
-    my @catalog = <CAT>;
-    close(CAT);
+    my @catalog = <$CAT>;
+    close($CAT);
     chomp @catalog;
-   
+
     #print "File is $file_name\n";
-   
+
     #print "Grabbed " . $#catalog . " lines of cluster catalog\n";
     #foreach my $loop ( 0 ... $#catalog ) {
     #   print "$loop# " . $catalog[$loop] . "\n";
     #}
-    
+
     # read catalogue
-     _read_cluster( $self, @catalog ); 
-        
+     _read_cluster( $self, @catalog );
+
   } elsif ( defined $args{Scalar} ) {
-  
+
     # Split the catalog out from its single scalar
     my @catalog = split( /\n/, $args{Scalar} );
 
     # read catalogue from file
-     _read_cluster( $self, @catalog );    
-        
+     _read_cluster( $self, @catalog );
+
   } else {
-  
+
      # no build arguements
      croak("Astro::Catalog - Bad constructor, no arguements supplied");
-  }   
-  
+  }
+
   # Define the field centre if provided
   # -----------------------------------
-  
-  # set RA
-  if ( defined $args{RA} ) {
-     $self->{RA} = $args{RA};
-  } 
-   
-  # set Dec
-  if ( defined $args{Dec} ) {
-     $self->{DEC} = $args{Dec};
-  }  
-  
-  # set field radius
-  if ( defined $args{Radius} ) {
-     $self->{RADIUS} = $args{Radius};
-  }
-  
+  $self->fieldcentre( %args );
+
+  return;
 }
 
 =item B<freeze>
@@ -593,101 +614,98 @@ sub _read_cluster {
 
    # loop through catalog
    foreach my $i ( 3 .. $#catalog ) {
- 
+
       # remove leading spaces
       $catalog[$i] =~ s/^\s+//;
 
       # split each line
       my @separated = split( /\s+/, $catalog[$i] );
- 
+
       # debugging (leave in)
       #print "$i # id $separated[1]\n";
       #foreach my $thing ( 0 .. $#separated ) {
       #   print "   $thing # $separated[$thing] #\n";
       #}
-                        
+
       # temporary star object
       my $star = new Astro::Catalog::Star();
-      
+
       # field
       $star->field( $separated[0] );
-      
+
       # id
       $star->id( $separated[1] );
-      
+
       # ra
       my $objra = "$separated[2] $separated[3] $separated[4]";
       $star->ra( $objra );
-       
+
       # dec
       my $objdec = "$separated[5] $separated[6] $separated[7]";
       $star->dec( $objdec );
-      
+
       # x & y
       $star->x( $separated[8] );
       $star->y( $separated[9] );
-      
+
       # number of magnitudes and colours
       $catalog[1] =~ s/^\s+//;
       my @colours = split( /\s+/, $catalog[1] );
-      
+
       my @quality;
       foreach my $j ( 0 .. $#colours ) {
-      
+
          # colours have minus signs
          if( lc($colours[$j]) =~ "-" ) {
-         
+
             # colours
             my %colours = ( $colours[$j] => $separated[3*$j+10] );
             $star->colours( \%colours );
-            
+
             # errors
             my %col_errors = ( $colours[$j] => $separated[3*$j+11] );
             $star->colerr( \%col_errors );
-            
+
             # quality flags
             $quality[$j] = $separated[3*$j+12];
-            
+
          } else {
-         
+
             # mags
             my %magnitudes = ( $colours[$j] => $separated[3*$j+10] );
             $star->magnitudes( \%magnitudes );
-            
+
             # errors
             my %mag_errors = ( $colours[$j] => $separated[3*$j+11] );
             $star->magerr( \%mag_errors );
-            
+
             # quality flags
             $quality[$j] = $separated[3*$j+12];
-            
+
             # increment counter
             $j = $j + 2;
-            
+
          }
-            
+
       }
-            
+
       # set default "good" quality
       $star->quality( 0 );
-      
+
       # check and set quality flag
       foreach my $k( 0 .. $#colours ) {
-      
+
          # if quality not good then set bad flag
          if( $quality[$k] != 0 ) {
             $star->quality( 1 );
-         }         
+         }
       }
-      
+
       # push it onto the stack
       push ( @{$self->{STARS}}, $star );
-   
-      
-   
+
    }
-   
-   
+
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
@@ -697,6 +715,8 @@ sub _read_cluster {
 =head1 COPYRIGHT
 
 Copyright (C) 2001 University of Exeter. All Rights Reserved.
+Some modificiations Copyright (C) 2003 Particle Physics and Astronomy
+Research Council. All Rights Reserved.
 
 This program was written as part of the eSTAR project and is free software;
 you can redistribute it and/or modify it under the terms of the GNU Public
@@ -706,9 +726,10 @@ License.
 =head1 AUTHORS
 
 Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
+Tim Jenness E<lt>tjenness@cpan.orgE<gt>
 
 =cut
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;      
+1;
