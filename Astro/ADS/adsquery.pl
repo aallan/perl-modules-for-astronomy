@@ -39,6 +39,17 @@ be specified simply by using the option more than once.
 
   adsquery --author="Author1" --author="Author2"
 
+=item B<--bibcode>
+
+Specify a bibcode to use for the query. If a bibcode (or multiple
+bibcodes) is specified then any authors supplied are ignored since
+a bibcode is unique.
+
+=item B<--bibfile>
+
+Name of a file containing multiple bibcodes. One bibcode per line.
+If the file can not be found the command aborts.
+
 =item B<--count>
 
 Simply counts the number of papers that match the query
@@ -72,11 +83,12 @@ use Getopt::Long;
 use Astro::ADS::Query;
 
 use vars qw/ $VERSION /;
-$VERSION = (qw$Revision: 1.1 $ )[1];
+$VERSION = (qw$Revision: 1.2 $ )[1];
 
 # Init options
 my ($help, $man, $version, %opt);
 $opt{author} = [];
+$opt{bibcode} = [];
 GetOptions( "help"     => \$help,
 	    "man"      => \$man,
 	    "version"  => \$version,
@@ -85,6 +97,8 @@ GetOptions( "help"     => \$help,
 	    "xml"      => \$opt{xml},
 	    "count"    => \$opt{count},
 	    "debug"    => \$opt{debug},
+	    "bibcode=s"  => $opt{bibcode},
+	    "bibfile=s"  => \$opt{bibfile},
 	  );
 
 # deal with options that abort
@@ -96,23 +110,59 @@ if ($version) {
   exit;
 }
 
-# Now form a query
-my $query = new Astro::ADS::Query( Authors => $opt{author} );
+# if we have been supplied with a file of bibcodes open it 
+# and store the results into the bibcode array
+if ($opt{bibfile}) {
+  open BIB, $opt{bibfile}
+    or die "Could not open bibfile $opt{bibfile}: $!\n";
 
-# Set the author logic
-if ($opt{useor}) {
-  $query->authorlogic("OR");
-} else {
-  $query->authorlogic("AND");
+  # Read each line from the file and remove the newline
+  # We only want to store it if the remainder of the line matches
+  # a non-space character
+  @{$opt{bibcode}} = grep { chomp; /\w/ } <BIB>;
+
+  close(BIB)
+    or die "Strange error closing bibfile: $!\n";
 }
 
+# Now form the query - we are either doing a bibcode query or
+# an author query. Currently multiple bibcodes must be
+# sent as multiple queries
+# Bibcodes override authors
+my $query;
+if (@{ $opt{bibcode} }) {
+
+  print "Bibcode: ", $opt{bibcode}->[0], "\n" if $opt{debug};
+
+  # For now just run the query on the first bibcode
+  # this is for code symmetry since then the result object
+  # can be used for the rest of the code.
+  $query = new Astro::ADS::Query( Bibcode => $opt{bibcode}->[0] );
+
+} elsif (@{ $opt{author} }) {
+  $query = new Astro::ADS::Query( Authors => $opt{author} );
+
+  # Set the author logic
+  if ($opt{useor}) {
+    $query->authorlogic("OR");
+  } else {
+    $query->authorlogic("AND");
+  }
+
+} else {
+  die "No query specified\n";
+}
+
+# Run the query
 print "Connecting to ADS\n" if $opt{debug};
 my $result = $query->querydb();
+my @papers = $result->papers;
 
-print "Received ",scalar($result->papers)," papers\n" if $opt{debug};
+
+print "Received ",scalar(@papers)," papers\n" if $opt{debug};
 
 if ($opt{count}) {
-  print scalar($result->papers),"\n";
+  print scalar(@papers),"\n";
   exit;
 }
 
@@ -127,6 +177,11 @@ if ($opt{xml}) {
 } else {
   print "$result";
 }
+
+=head1 BUGS
+
+Currently only a single bibcode is used for a bib query even if multiple
+values are supplied.
 
 =head1 AUTHORS
 
