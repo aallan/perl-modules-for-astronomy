@@ -6,5 +6,13 @@ ChangeLog
 Catalog.pm
 Star/Star.pm
 Star/Makefile.PL
+USNOA2/README
+USNOA2/MANIFEST
+USNOA2/Makefile.PL
+USNOA2/GPL
+USNOA2/ChangeLog
+USNOA2/Query/Query.pm
+USNOA2/Query/Makefile.PL
+USNOA2/t/query.t
 t/star.t
 t/catalog.t
