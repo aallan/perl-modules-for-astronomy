@@ -1,3 +1,8 @@
+2003-11-14  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.5.2)
+
+        * README: Updated location of VOTable module package, which
+          moved. 
+
 2003-10-30  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.5.1)
 
         * IO/Cluster.pm: Added read support for new style character
