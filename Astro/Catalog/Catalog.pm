@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.21 2003/07/27 02:02:18 timj Exp $
+#     $Id: Catalog.pm,v 1.22 2003/07/27 02:07:31 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.22 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.21 2003/07/27 02:02:18 timj Exp $
+$Id: Catalog.pm,v 1.22 2003/07/27 02:07:31 aa Exp $
 
 =head1 METHODS
 
@@ -116,18 +116,15 @@ sub new {
 
 =item B<write_catalog>
 
-Will write the catalogue object to an standard ARK Cluster format file
+Will serialise the catalogue object in a variety of file formats using
+pluggable IO, see the C<Astro::Catalog::IO> classes
 
-   $status = $catalog->write_catalog( $file_name, \@mags, \@colour );
+   $status = $catalog->write_catalog( 
+                  File => $file_name, Format => $file_type, [%opts] );
 
-returns zero on sucess and non-zero if the write failed. Only magnitudes
-and colours passed in the array will be written to the file, e.g.
-
-   my @mags = ( 'R' );
-   my @colour = ( 'B-R', 'B-V' );
-   $status = $catalog->write_catalog( $file_name, \@mags, \@colour );
-
-will write a catalogue with R, B-R and B-V.
+returns zero on sucess and non-zero if the write failed. The C<%opts>
+are optional arguements and are dependant on the output format chosen.
+Current valid output formats are 'Cluster' and 'JCMT'.
 
 =cut
 
@@ -164,7 +161,8 @@ sub write_catalog {
   
   # open file
   unless ( open ( CATALOG, ">$file" ) ) {
-      croak ( "Catalog.pm: Cannot open $file\n" );
+      #croak ( "Catalog.pm: Cannot open $file\n" );
+      return 0;
   }
   
   # write to file
@@ -175,7 +173,7 @@ sub write_catalog {
 
   # close file  
   close(CATALOG);
-  return;       
+  return 1;       
 }
 
 # A C C E S S O R  --------------------------------------------------------
