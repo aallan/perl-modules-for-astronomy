@@ -1,3 +1,8 @@
+2004-11-05  Tim Jenness  <tjenness@cpan.org>
+
+	* IO/UKIRTBS.pm: Add simple reader for the UKIRT version of the
+	Bright Star catalog. This is used by the ukstar web page at UKIRT.
+
 2004-08-11  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* TkAstroCatalog/AstroCatalog.pm: Add demo Catalog browser for Tk

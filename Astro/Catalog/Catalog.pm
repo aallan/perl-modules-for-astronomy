@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.45 2004/08/12 02:36:09 timj Exp $
+#     $Id: Catalog.pm,v 1.46 2004/11/06 01:23:15 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -50,8 +50,9 @@ scalar, glob or array.
 
 =head1 FORMATS
 
-For input the C<Astro::Catalog> module understands Cluster, Simple, JCMT,
-TST, STL, GaiaPick and (a very simple parsing) of VOTable.
+For input the C<Astro::Catalog> module understands Cluster, Simple,
+JCMT, TST, STL, GaiaPick, the UKIRT internal Bright Star catalogue
+format and (a very simple parsing) of VOTable.
 
 The module can output all of these formats except TST (which is input only).
 
@@ -71,7 +72,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.45 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.46 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -79,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.45 2004/08/12 02:36:09 timj Exp $
+$Id: Catalog.pm,v 1.46 2004/11/06 01:23:15 timj Exp $
 
 =head1 METHODS
 
@@ -1429,6 +1430,7 @@ sub _load_io_plugin {
   $format = 'VOTable' if $format eq 'Votable';
   $format = 'STL'  if $format eq 'Stl';
   $format = 'GaiaPick' if $format eq 'Gaiapick';
+  $format = 'UKIRTBS' if $format eq 'Ukirtbs';
 
   my $class = "Astro::Catalog::IO::" . $format;
 
