@@ -64,7 +64,7 @@
         nclip_old=nclip
         nclip=0
         do i=1, ndata
-          if (chi(i) > 9.0*chisq) then
+          if (chi(i) > 4.0*chisq) then
             weight(i) = 0.0
             nclip=nclip+1
           end if
@@ -194,7 +194,7 @@
       ! Search radius after tweaking positions.
       real, parameter :: final_rad=1.0
       ! Minimum change in magnitude to believe variable.
-      real, parameter :: min_mag_change=1.0
+      real, parameter :: min_mag_change=0.5
 
       ! Start as we mean to go on.
       corlate=0
@@ -450,17 +450,17 @@
 
         open(unit=1, file=file_name_7, status='unknown')
         write(1,'(/,/)')
-        write(1,*) &
-          10.0**(((           0.5)/real(-mprob))*maxval(prob(1:nprob))), &
-          0.0
-        do i=1, mprob
-          write(1,*) &
-          10.0**(((real(i    )+0.5)/real(-mprob))*maxval(prob(1:nprob))), &
-          bin(i)
-        end do
-        write(1,*) &
-          10.0**(((real(mprob)+1.5)/real(-mprob))*maxval(prob(1:nprob))), &
-          0.0
+        !write(1,*) &
+        !  10.0**(((           0.5)/real(-mprob))*maxval(prob(1:nprob))), &
+        !  0.0
+        !do i=1, mprob
+        !  write(1,*) &
+        !  10.0**(((real(i    )+0.5)/real(-mprob))*maxval(prob(1:nprob))), &
+        !  bin(i)
+        !end do
+        !write(1,*) &
+        !  10.0**(((real(mprob)+1.5)/real(-mprob))*maxval(prob(1:nprob))), &
+        !  0.0
         close(1)
 
         deallocate(prob)
