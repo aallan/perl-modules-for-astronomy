@@ -34,14 +34,14 @@ use VOTable::Document;
 
 use Data::Dumper;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOTable.pm,v 1.2 2003/10/13 10:41:32 aa Exp $
+$Id: VOTable.pm,v 1.3 2003/10/14 10:06:41 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -101,6 +101,17 @@ sub _write_catalog {
   croak ( 'Usage: _write_catalog( $catalog )') unless scalar(@_) >= 1;
   my $class = shift;
   my $catalog = shift;
+  
+  # debugging, drop the catalogue to disk as it flys right by...
+  #use Data::Dumper;
+  #print "Dumping Catalogue to disk 'catalog_dump.cat'\n";
+  #my $status = open my $fh, ">catalog_dump.cat";
+  #if (!$status) {
+  #    print "Error: cannot open dump file catalog_dump.cat\n";
+  #    return;
+  #}
+  #print $fh Dumper($catalog);
+  #close( $fh );
 
   # real list of filters and colours in the catalogue
   my @mags = $catalog->starbyindex(0)->what_filters();

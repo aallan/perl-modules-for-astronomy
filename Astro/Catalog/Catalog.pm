@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.38 2003/10/13 10:38:20 aa Exp $
+#     $Id: Catalog.pm,v 1.39 2003/10/14 10:06:41 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,7 +64,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.38 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.39 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -72,7 +72,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.38 2003/10/13 10:38:20 aa Exp $
+$Id: Catalog.pm,v 1.39 2003/10/14 10:06:41 aa Exp $
 
 =head1 METHODS
 
@@ -179,6 +179,9 @@ sub write_catalog {
 
   # Play it defensively - make sure we add the newlines
   chomp @$lines;
+
+  #use Data::Dumper;
+  #print Dumper(@$lines);
 
   # If we have a reference then we do not need to open or close
   # files - simpler to deal with each case in turn. This has the
