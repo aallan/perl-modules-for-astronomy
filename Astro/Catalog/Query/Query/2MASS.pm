@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: 2MASS.pm,v 1.3 2003/08/04 05:31:38 timj Exp $
+$Id: 2MASS.pm,v 1.4 2003/08/04 09:45:18 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -131,7 +131,13 @@ sub _parse_query {
   my $self = shift;
 
   print $self->{BUFFER};
-  return new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER});
+  return new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER},
+			     Origin => '2MASS Catalogue',
+			     ReadOpt => {
+					 ra_col => 1,
+					 dec_col => 2,
+					}
+			   );
 }
 
 
