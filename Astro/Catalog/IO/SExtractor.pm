@@ -62,9 +62,21 @@ parameters.
 sub _read_catalog {
   my $class = shift;
   my $lines = shift;
+  my %args = @_;
 
   if( ref( $lines ) ne 'ARRAY' ) {
     croak "Must supply catalogue contents as a reference to an array";
+  }
+
+  if( defined( $args{'filter'} ) &&
+      ! UNIVERSAL::isa( $args{'filter'}, "Astro::WaveBand" ) ) {
+    croak "Filter as passed to SExtractor->_read_catalog must be an Astro::WaveBand object";
+  }
+
+  if( defined( $args{'filter'} ) ) {
+    $filter = $args{'filter'}->natural;
+  } else {
+    $filter = 'unknown';
   }
 
   my @lines = @$lines; # Dereference, make own copy.
@@ -181,11 +193,11 @@ sub _read_catalog {
     # Set the magnitude and the magnitude error. Set the filter
     # to 'unknown' because SExtractor doesn't know about such things.
     if( $mag_column != -1 ) {
-      my %mags = ( 'unknown' => $fields[$mag_column] );
+      my %mags = ( $filter => $fields[$mag_column] );
       $star->magnitudes( \%mags );
     }
     if( $magerr_column != -1 ) {
-      my %magerrs = ( 'unknown' => $fields[$magerr_column] );
+      my %magerrs = ( $filter => $fields[$magerr_column] );
       $star->magerr( \%magerrs );
     }
 
@@ -234,7 +246,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.2 2004/12/22 01:39:46 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.3 2005/01/14 01:59:47 cavanagh Exp $
 
 =head1 FORMAT
 
