@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.21 2005/02/02 21:44:18 aa Exp $
+#     $Id: Star.pm,v 1.22 2005/02/15 23:28:34 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -48,6 +48,7 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
                                     PosAngle     => $position_angle,
                                     X            => $x_pixel_coord,
                                     Y            => $y_pixel_coord,
+                                    WCS          => new Starlink::AST(),
                                     Comment      => $comment_string
 				    SpecType     => $spectral_type,
 				    StarType     => $star_type,
@@ -87,7 +88,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.22 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -235,7 +236,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.21 2005/02/02 21:44:18 aa Exp $
+$Id: Star.pm,v 1.22 2005/02/15 23:28:34 cavanagh Exp $
 
 =head1 METHODS
 
@@ -296,6 +297,7 @@ sub new {
 		      COORDS     => undef,
                       X          => undef,
                       Y          => undef,
+                      WCS        => undef,
                       COMMENT    => undef,
 		      SPECTYPE   => undef,
 		      STARTYPE   => undef,
@@ -452,14 +454,24 @@ sub ra {
   my $outc = $self->coords;
   return unless defined $outc;
 
-  # Astro::Coords inserts colons by default
-  my $outra = $outc->ra(format => 's');
+  # Astro::Coords inserts colons by default. Grab the old delimiter
+  # and number of decimal places if we're using a recent enough
+  # version of Astro::Coords.
+  my $ra = $outc->ra;
+  if (UNIVERSAL::isa( $ra, "Astro::Coords::Angle" ) ) {
 
-  # Tidy for backwards compatibility
-  $outra =~ s/:/ /g;
-  $outra =~ s/^\s*//;
+    $ra->str_delim( ' ' );
+    $ra->str_ndp( 2 );
+    return "$ra";
 
-  return $outra;
+  } else {
+
+    my $outra = $outc->ra(format => 's');
+    $outra =~ s/:/ /g;
+    $outra =~ s/^\s*//;
+
+    return $outra;
+  }
 }
 
 =item B<dec>
@@ -526,16 +538,30 @@ sub dec {
   my $outc = $self->coords;
   return unless defined $outc;
 
-  # Astro::Coords inserts colons by default
-  my $outdec = $outc->dec(format => 's');
-  $outdec =~ s/:/ /g;
-  $outdec =~ s/^\s*//;
+  # Astro::Coords inserts colons by default. Grab the old delimiter
+  # and number of decimal places if we're using a recent enough
+  # version of Astro::Coords.
+  my $dec = $outc->dec;
+  if( UNIVERSAL::isa( $dec, "Astro::Catalog::Angle" ) ) {
 
-  # require leading sign for backwards compatibility
-  # Sign will be there for negative
-  $outdec = (substr($outdec,0,1) eq '-' ? '' : '+' ) . $outdec;
+    $dec->str_delim( ' ' );
+    $dec->str_ndp( 2 );
+    $dec = "$dec";
+    $dec = (substr($dec,0,1) eq '-' ? '' : '+' ) . $dec;
+    return $dec;
 
-  return $outdec;
+  } else {
+
+    my $outdec = $outc->dec(format => 's');
+    $outdec =~ s/:/ /g;
+    $outdec =~ s/^\s*//;
+
+    # require leading sign for backwards compatibility
+    # Sign will be there for negative
+    $outdec = (substr($outdec,0,1) eq '-' ? '' : '+' ) . $outdec;
+
+    return $outdec;
+  }
 }
 
 =item B<magnitudes>
@@ -981,6 +1007,31 @@ sub x {
   if (@_) {
     $self->{X} = shift;
   }
+
+  if( ! defined( $self->{X} ) &&
+      defined( $self->wcs ) &&
+      defined( $self->coords ) ) {
+
+    # We need to get a template FK5 SkyFrame to be able to convert
+    # properly between RA/Dec and X/Y, but we can only do this if
+    # we load Starlink::AST. So that we don't have a major dependency
+    # on that module, load it here at runtime.
+    eval( "require Starlink::AST" );
+    if( $@ ) {
+      croak "Attempted to convert from RA/Dec to X position and cannot load Starlink::AST. Error: $@";
+    }
+    my $template = new Starlink::AST::SkyFrame( "System=FK5" );
+    my $wcs = $self->wcs;
+    my $frameset = $wcs->FindFrame( $template, "" );
+    if( ! defined( $frameset ) ) {
+      croak "Could not find FK5 SkyFrame to do RA/Dec to X position translation";
+    }
+    my( $ra, $dec ) = $self->coords->radec();
+    my( $x, $y ) = $frameset->Tran2( [$ra->radians],
+                                     [$dec->radians],
+                                     0 );
+    $self->{X} = $x->[0];
+  }
   return $self->{X};
 }
 
@@ -998,9 +1049,56 @@ sub y {
   if (@_) {
     $self->{Y} = shift;
   }
+
+  if( ! defined( $self->{Y} ) &&
+      defined( $self->wcs ) &&
+      defined( $self->coords ) ) {
+
+    # We need to get a template FK5 SkyFrame to be able to convert
+    # properly between RA/Dec and X/Y, but we can only do this if
+    # we load Starlink::AST. So that we don't have a major dependency
+    # on that module, load it here at runtime.
+    eval( "require Starlink::AST" );
+    if( $@ ) {
+      croak "Attempted to convert from RA/Dec to Y position and cannot load Starlink::AST. Error: $@";
+    }
+    my $template = new Starlink::AST::SkyFrame( "System=FK5" );
+    my $wcs = $self->wcs;
+    my $frameset = $wcs->FindFrame( $template, "" );
+    if( ! defined( $frameset ) ) {
+      croak "Could not find FK5 SkyFrame to do RA/Dec to Y position translation";
+    }
+    my( $ra, $dec ) = $self->coords->radec();
+    my( $x, $y ) = $frameset->Tran2( [$ra->radians],
+                                     [$dec->radians],
+                                     0 );
+    $self->{Y} = $y->[0];
+  }
+
   return $self->{Y};
 }
 
+=item B<wcs>
+
+Return (or set) the WCS associated with the star.
+
+  $wcs = $star->wcs;
+  $star->wcs( $wcs );
+
+The WCS is a C<Starlink::AST> object.
+
+=cut
+
+sub wcs {
+  my $self = shift;
+  if( @_ ) {
+    my $wcs = shift;
+    if( UNIVERSAL::isa( $wcs, "Starlink::AST" ) ) {
+      $self->{WCS} = $wcs;
+    }
+  }
+  return $self->{WCS};
+}
 
 =item B<comment>
 
