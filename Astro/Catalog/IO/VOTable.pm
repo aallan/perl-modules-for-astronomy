@@ -30,18 +30,18 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
-use VOTable::Document;
+use Astro::VO::VOTable::Document;
 
 use Data::Dumper;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOTable.pm,v 1.7 2004/03/01 19:56:51 cavanagh Exp $
+$Id: VOTable.pm,v 1.8 2004/11/30 12:32:05 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -82,7 +82,7 @@ sub _read_catalog {
    #return;
 
    # create a VOTable object from the string.
-   my $doc = VOTable::Document->new_from_string($string);
+   my $doc = Astro::VO::VOTable::Document->new_from_string($string);
 
    # Get the VOTABLE element.
    my $votable = ($doc->get_VOTABLE())[0];
@@ -427,19 +427,19 @@ sub _write_catalog {
   
 
   # Create the VOTABLE document.
-  my $doc = new VOTable::Document();
+  my $doc = new Astro::VO::VOTable::Document();
 
   # Get the VOTABLE element. 
   my $votable = ($doc->get_VOTABLE)[0];
 
   # Create the DESCRIPTION element and its contents, and add it to the VOTABLE
-  my $description = new VOTable::DESCRIPTION();
+  my $description = new Astro::VO::VOTable::DESCRIPTION();
   $description->set('Created using Astro::Catalog::IO::VOTable');
   $votable->set_DESCRIPTION($description);
   
   # Create a DEFINITION element and its contents and add it to the VOTABLE
-  my $definitions = new VOTable::DEFINITIONS();
-  my $coosys = new VOTable::COOSYS();
+  my $definitions = new Astro::VO::VOTable::DEFINITIONS();
+  my $coosys = new Astro::VO::VOTable::COOSYS();
   $coosys->set_ID( "J2000" );
   $coosys->set_equinox( 2000.0 );
   $coosys->set_epoch( 2000.0 );
@@ -448,25 +448,25 @@ sub _write_catalog {
   $votable->set_DEFINITIONS( $definitions );
   
   # Create the RESOURCE element and add it to the VOTABLE.
-  my $resource = new VOTable::RESOURCE();
+  my $resource = new Astro::VO::VOTable::RESOURCE();
   $votable->set_RESOURCE($resource);
 
   #create the LINK element and its contents, and add it to the VOTABLE
-  my $link = new VOTable::LINK();
+  my $link = new Astro::VO::VOTable::LINK();
   $link->set_title('eSTAR Project');
   $link->set_href('http://www.estar.org.uk/');
   $link->set_content_role('doc');
   $resource->set_LINK($link);
   
   # Create the TABLE element and add it to the RESOURCE.
-  my $table = new VOTable::TABLE();
+  my $table = new Astro::VO::VOTable::TABLE();
   $resource->set_TABLE($table);
   
   # Create and add the FIELD elements to the TABLE.
   my($i);
   my($field);
   for ($i = 0; $i < @field_names; $i++) {
-      $field = new VOTable::FIELD();
+      $field = new Astro::VO::VOTable::FIELD();
       $field->set_name($field_names[$i]);
       $field->set_ucd($field_ucds[$i]);
       $field->set_datatype($field_datatypes[$i]);
@@ -476,20 +476,20 @@ sub _write_catalog {
   }
 
   # Create and append the DATA element.
-  my $data = new VOTable::DATA();
+  my $data = new Astro::VO::VOTable::DATA();
   $table->set_DATA($data);
 
   # Create and append the TABLEDATA element.
-  my $tabledata = new VOTable::TABLEDATA();
+  my $tabledata = new Astro::VO::VOTable::TABLEDATA();
   $data->set_TABLEDATA($tabledata);
 
   # Create and append each TR element, and each TD element.
   my($tr, $td);
   my($j);
   for ($i = 0; $i < @data; $i++) {
-    $tr = new VOTable::TR();
+    $tr = new Astro::VO::VOTable::TR();
     for ($j = 0; $j < @field_names; $j++) {
-	$td = new VOTable::TD();
+	$td = new Astro::VO::VOTable::TD();
 	$td->set($data[$i][$j]);
 	$tr->append_TD($td);
     }

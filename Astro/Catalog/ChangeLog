@@ -1,5 +1,20 @@
+2004-11-30  Alasdair Allan <aa@astro.ex.ac.uk> 
+
+        * IO/VOTable.pm: Changed dependancy to Astro::VO::VOTable away
+          from the older VOTable module. Updated docs to reflect this
+          change.
+          
+        * t/2_votable.pm: Updated to reflect changes
+        
+        * Star/Morphology/Makefile.pm: Added in support of the new class.
+        
+        * IO/Cluster.pm: Flxed problem with looks_like_number() call 
+          
 2004-11-23  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
-	* Star/Morphology.pm: Add simple support for object morphology.
+
+	* Star/Morphology/Morphology.pm: Add simple support for object
+          morphology.
+          
 	* Star.pm: Add morphology accessor method.
 
 2004-11-22  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
@@ -18,9 +33,9 @@
 	* Catalog.pm: Add auto_filter_observability
 
 	* IO/JCMT.pm: Publish a method for cleaning the target name (so
-	that the JCMT VAX control system will not get upset) and use that
-	method in the JCMT catalog writer (so that a "use this target"
-	message) is guaranteed to agree with the name in the catalogue.
+	  that the JCMT VAX control system will not get upset) and use that
+	  method in the JCMT catalog writer (so that a "use this target"
+	  message) is guaranteed to agree with the name in the catalogue.
 
 2004-05-20  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.7.0)
 
@@ -47,7 +62,7 @@
 2004-02-05  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* t/2_votable.t: Now attempt to skip VOtable tests if the VOTable
-	module is not installed.
+	  module is not installed.
 
 2004-02-05  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 

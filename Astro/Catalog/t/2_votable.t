@@ -16,7 +16,7 @@ require_ok("Astro::Catalog::Star");
 
 # Do a private require so that we can skip the tests if VOTable is missing
 eval {
-  require VOTable;
+  require Astro::VO::VOTable;
 };
 my $hasvo = ($@ ? 0 : 1);
 
@@ -203,7 +203,7 @@ exit;
 # D A T A   B L O C K --------------------------------------------------------
 
 __DATA__
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <VOTABLE>
   <DESCRIPTION>Created using Astro::Catalog::IO::VOTable</DESCRIPTION>
   <DEFINITIONS>

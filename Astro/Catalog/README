@@ -37,10 +37,10 @@ The madatory requirement of the Astro::Catalog package are,
   Test::More
   Data::Dumper
   Carp
-  VOTable
+  Astro::VO::VOTable
 
 See http://heasarc.gsfc.nasa.gov/classx/votable/index.html to obtain the GSFC
-VOTable package. You need a version dated on (or after) the 9th October 2003.
+VOTable package. You need V0.9 or later of this module.
 
 Provides
 --------
