@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.9 2001/11/02 01:39:25 aa Exp $
+#     $Id: Query.pm,v 1.10 2001/11/02 16:38:16 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -34,7 +34,10 @@ Astro::ADS::Query - Object definining an prospective ADS query.
 
 =head1 SYNOPSIS
 
-  $query = new Astro::ADS::Query( Authors => \@authors );
+  $query = new Astro::ADS::Query( Authors     => \@authors,
+                                  AuthorLogic => $aut_logic,
+                                  Objects     => \@objects,
+                                  ObjectLogic => $obj_logic  );
   
   my $results = $query->querydb();
 
@@ -55,13 +58,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.9 2001/11/02 01:39:25 aa Exp $
+$Id: Query.pm,v 1.10 2001/11/02 16:38:16 aa Exp $
 
 =head1 METHODS
 
@@ -73,7 +76,10 @@ $Id: Query.pm,v 1.9 2001/11/02 01:39:25 aa Exp $
 
 Create a new instance from a hash of options
 
-  $query = new Astro::ADS::Query( Authors => \@authors );
+  $query = new Astro::ADS::Query( Authors     => \@authors,
+                                  AuthorLogic => $aut_logic,
+                                  Objects     => \@objects,
+                                  ObjectLogic => $obj_logic );
 
 returns a reference to an ADS query object.
 
@@ -135,7 +141,8 @@ can be called directly.
 
    $results = $query->followup( $bibcode, $link_type );
 
-returns undef if no arguements passed.
+returns undef if no arguements passed. Possible $link_type values are AR,
+CITATIONS, REFERENCES and TOC.
 
 =cut
 
@@ -217,6 +224,9 @@ possible values for this parameter are OR, AND, SIMPLE, BOOL and FULLMATCH.
    $author_logic = $query->authorlogic();
    $query->authorlogic( "AND" );
 
+if called with no arguements, or invalid arguements, then the method will
+return the current logic.
+
 =cut
 
 sub authorlogic {
@@ -234,6 +244,82 @@ sub authorlogic {
   }
   
   return ${$self->{OPTIONS}}{"aut_logic"};
+}
+  
+=item B<Objects>
+
+Return (or set) the current objects defined for the ADS query.
+
+   @objects = $query->objects();
+   $query->objects( \@objects );
+
+=cut
+
+sub objects {
+  my $self = shift;
+  
+  # SETTING AUTHORS
+  if (@_) {   
+
+    # clear the current object list   
+    ${$self->{OPTIONS}}{"object"} = "";
+    
+    # grab the new list from the arguements
+    my $object_ref = shift;
+    
+    # make a local copy to use for regular expressions
+    my @object_list = @$object_ref;
+
+    # mutilate it and stuff it into the object list OPTION
+    for my $i ( 0 ... $#object_list ) {
+       $object_list[$i] =~ s/\s/\+/g;
+       
+       if ( $i eq 0 ) {
+          ${$self->{OPTIONS}}{"object"} = $object_list[$i];
+       } else {
+          ${$self->{OPTIONS}}{"object"} = 
+               ${$self->{OPTIONS}}{"object"} . ";" . $object_list[$i]; 
+       }
+    }
+  }
+  
+  # RETURNING OBJECTS 
+  my $object_line =  ${$self->{OPTIONS}}{"object"};
+  $object_line =~ s/\+/ /g;
+  my @objects = split(/;/, $object_line);
+
+  return @objects;
+  
+}
+
+=item B<ObjectLogic>
+
+Return (or set) the logic when dealing with multiple objects in a search,
+possible values for this parameter are OR, AND, SIMPLE, BOOL and FULLMATCH.
+
+   $obj_logic = $query->objectlogic();
+   $query->objectlogic( "AND" );
+
+if called with no arguements, or invalid arguements, then the method will
+return the current logic.
+
+=cut
+
+sub objectlogic {
+  my $self = shift;
+
+  if (@_) {
+  
+     my $logic = shift; 
+     if ( $logic eq "OR"   || $logic eq "AND" || $logic eq "SIMPLE" ||
+          $logic eq "BOOL" || $logic eq "FULLMATCH" ) {
+
+        # set the new logic
+        ${$self->{OPTIONS}}{"obj_logic"} = $logic;
+     }
+  }
+  
+  return ${$self->{OPTIONS}}{"obj_logic"};
 }
    
 # C O N F I G U R E -------------------------------------------------------
@@ -335,7 +421,7 @@ sub configure {
   my %args = @_;
   
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Authors AuthorLogic / ) {
+  for my $key (qw / Authors AuthorLogic Objects ObjectLogic / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }  
@@ -483,6 +569,7 @@ sub _parse_query {
      #     U     Document URL
      #     O     Object name
      #     B     Abstract
+     #     S     Score
             
      # NEW PAPER
      if( substr( $buffer[$line], 0, 2 ) eq "%R" ) {
@@ -499,8 +586,8 @@ sub _parse_query {
         $counter++;
                 
         # LOOP THROUGH PAPER
-        my ( @title, @authors, @affil, @journal, @pubdate,
-             @keywords, @origin, @links, @url, @object, @abstract );
+        my ( @title, @authors, @affil, @journal, @pubdate, @keywords, 
+             @origin, @links, @url, @object, @abstract, @score );
         while ( substr( $buffer[$counter], 0, 2 ) ne "%R" &&
                 $counter < $#buffer ) {
                          
@@ -708,6 +795,25 @@ sub _parse_query {
                 
               }  
            }
+           
+           # SCORE
+           # -----
+           if( $tag eq "S" ) {
+             
+              #do we have the start of an title block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @score, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@score, $buffer[$counter] );
+                
+              }  
+           }
+           
                       
            # increment the line counter
            $counter = $counter + 1;
@@ -843,6 +949,16 @@ sub _parse_query {
         }
         $paper->abstract( \@abstract ) if defined $abstract[0];
         
+        # PUSH SCORE INTO PAPER OBJECT
+        # ----------------------------
+        chomp @score;
+        my $score_line = "";
+        for my $i ( 0 ... $#score ) {
+           # drop it onto one line
+           $score_line = $score_line . $score[$i];      
+        }
+        $paper->score( $score_line ) if defined $score[0];
+        
           
      }
         
@@ -882,8 +998,9 @@ sub _dump_raw {
 
 Copyright (C) 2001 University of Exeter. All Rights Reserved.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Public License.
+This program was written as part of the eSTAR project and is free software;
+you can redistribute it and/or modify it under the terms of the GNU Public
+License.
 
 =head1 AUTHORS
 

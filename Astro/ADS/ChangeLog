@@ -1,5 +1,9 @@
 2001-11-02 Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Pre-alpha release
+
+2001-11-02 Alasdair Allan <aa@astro.ex.ac.uk>
+
         * Now queries ADS successfully, and can carry out a limited
           selection of followup queries on the results.
 

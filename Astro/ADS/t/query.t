@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 56 };
+BEGIN { plan tests => 60 };
 
 # load modules
 use Astro::ADS::Query;
@@ -68,7 +68,7 @@ print "Connecting to ADS\n";
 # query ADS
 my $result = $query->querydb();
 
-print Dumper($result);
+print "Continuing Tests\n";
 
 # grab the comparison from the DATA block
 my @data = <DATA>;
@@ -88,10 +88,37 @@ $author_logic = $query->authorlogic("OR");
 # check logic okay
 ok( $author_logic, "OR" );
 
+# list of objects
+my ( @objects );
+$objects[0] = "U Gem";
+$objects[1] = "SS Cyg";
+
+# Check the configuration of the Query object
+my $query2 = new Astro::ADS::Query( Objects => \@objects );
+
+my @ret_obj = $query2->objects();
+for my $i (0 .. $#objects) {
+   ok( $ret_obj[$i], $objects[$i] );
+}
+
+# change author logic
+my $obj_logic = $query2->objectlogic("AND");
+
+# check logic okay
+ok( $obj_logic, "AND" );
+
+# for verbose=1
+print "Connecting to ADS\n";
+
 # query ADS
-#my $other_result = $query->querydb();
+my $other_result = $query->querydb();
 #print Dumper($other_result);
 
+print "Continuing Tests\n";
+
+# check the number of papers returned, right now(!) it should be 304,
+# but by default we should get the first 100 abstracts only...
+ok( 100,  $other_result->sizeof());
 
 exit;
 
