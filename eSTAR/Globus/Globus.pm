@@ -3,6 +3,7 @@ package eSTAR::Globus;
 require 5.005_62;
 use strict;
 use warnings;
+use vars qw/ $VERSION /;
 
 require Exporter;
 require DynaLoader;
@@ -11,7 +12,7 @@ our @ISA = qw(Exporter DynaLoader);
 our %EXPORT_TAGS = ( 'all' => [ qw / GLOBUS_SUCCESS GLOBUS_FAILURE
                                      GLOBUS_TRUE GLOBUS_FALSE GLOBUS_NULL / ] ); our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw / /;
-our $VERSION = '0.01';
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 bootstrap eSTAR::Globus $VERSION;
 
