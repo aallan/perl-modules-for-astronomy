@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: 2MASS.pm,v 1.5 2003/08/04 10:10:37 timj Exp $
+$Id: 2MASS.pm,v 1.6 2003/08/04 10:14:17 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -93,7 +93,7 @@ sub _get_allowed_options {
 	  dec => '-c.dec',
 	  radmax => '-c.rm',
 	  nout => '-out.max',
-          catalogue => '-source',
+          catalog => '-source',
 	 );
 }
 
@@ -107,7 +107,7 @@ Get the default query state.
 sub _get_default_options {
   return (
 	  # Internal
-	  catalogue => '2MASS',
+	  catalog => '2MASS',
 
 	  # Target information
 	  ra => undef,
@@ -177,7 +177,7 @@ sub _translate_one_to_one {
   # convert to a hash-list
   return ($self->SUPER::_translate_one_to_one,
 	  map { $_, undef }(qw/
-			    catalogue
+			    catalog
 			    /)
 	 );
 }
