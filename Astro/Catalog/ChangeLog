@@ -1,3 +1,8 @@
+2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query/BSC.pm: Added a Vizier Bright Star Catalogue query
+          sub-class.
+        
 2003-09-12  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query/Sesame.pm: Modified to copy with change in return
