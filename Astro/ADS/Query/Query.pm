@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.20 2002/09/03 18:18:50 aa Exp $
+#     $Id: Query.pm,v 1.21 2002/09/23 21:07:49 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -67,13 +67,13 @@ use Astro::ADS::Result::Paper;
 use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.20 2002/09/03 18:18:50 aa Exp $
+$Id: Query.pm,v 1.21 2002/09/23 21:07:49 aa Exp $
 
 =head1 METHODS
 
@@ -810,10 +810,10 @@ sub _make_followup {
    # which database?
    my $db_key = ${$self->{OPTIONS}}{"db_key"};
    my $data_type = ${$self->{OPTIONS}}{"data_type"};
+   my $fmt = ${$self->{OPTIONS}}{"return_fmt"};
 
    # build the final query URL
-   $URL = $URL .
-          "bibcode=$bibcode&refs=$refs&db_key=$db_key&data_type=$data_type"; 
+   $URL = $URL . "bibcode=$bibcode&refs=$refs&db_key=$db_key&data_type=$data_type&return_fmt=$fmt"; 
 
    # build request
    my $request = new HTTP::Request('GET', $URL);
@@ -893,6 +893,7 @@ sub _parse_query {
 
         # grab the bibcode
         my $bibcode = substr( $buffer[$counter], 2 );
+        $bibcode =~ s/\s+//g;
 
         # New Astro::ADS::Result::Paper object
         $paper = new Astro::ADS::Result::Paper( Bibcode => $bibcode );

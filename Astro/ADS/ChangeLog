@@ -1,3 +1,8 @@
+2002-09-23  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Fixed a bug which meant that that followup
+	  queries no longer worked with the new interface.
+
 2002-09-03  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query.pm: Modified query string to reflect changes in

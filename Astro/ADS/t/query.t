@@ -12,7 +12,7 @@ use Astro::ADS::Query;
 use Astro::ADS::Result;
 
 # debugging
-use Data::Dumper;
+#use Data::Dumper;
 
 # T E S T   H A R N E S S --------------------------------------------------
 
