@@ -21,6 +21,7 @@ use Data::Dumper;
 # test the test system
 ok( 1 );
 
+
 # status variable
 my ( $status, $handle, $write_status, $close_status );
 
@@ -59,15 +60,15 @@ print "# Returned $write_status (should be 1)\n#\n";
 
 print "# Reading Message\n";
 
-my @reply = read_message( $handle );
+my $reply = read_message( $handle );
 
-unless ( defined $reply[0] ) {
+unless ( defined $reply ) {
    report_error();
    $status = eSTAR::Globus::deactivate_all();
    exit;
 } else { ok ( 1 ); }
 
-print "# Returned message '" . $reply[0] . "' #\n";
+print "# Returned message '" . @{$reply}[0] . "'\n#\n";
 
 # close the client ----------------------------------------------------------
 
