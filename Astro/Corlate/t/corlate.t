@@ -85,7 +85,7 @@ __DATA__
    0.0000000E+00 ! Mean separation in arcsec of stars successfully paired.
  !! Begining of new star description.
  K  ! Filter observed in.
-  -1.1217473 ! Increase brightness in magnitudes.
+  -1.1235368 ! Increase brightness in magnitudes.
    2.7586227E-02 ! Error in above.
    9.5367432E-06 ! False alarm probability.
  21 42  42.7999992 ! Target RA from archive catalogue.
