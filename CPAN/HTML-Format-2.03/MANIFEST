@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/HTML/FormatPS.pm
+lib/HTML/FormatRTF.pm
+lib/HTML/FormatText.pm
+lib/HTML/Formatter.pm
+t/ps.t
+t/rtf.t
+t/text.t
+test.html
