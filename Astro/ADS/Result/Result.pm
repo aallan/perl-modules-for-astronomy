@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.1 2001/10/30 17:18:37 aa Exp $
+#     $Id: Result.pm,v 1.2 2001/10/31 18:39:52 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -34,10 +34,13 @@ Astro::ADS::Result - Results from an ADS Query
 
 =head1 SYNOPSIS
 
-  $qery = new Astro::ADS::Result( ... );
+  $result = new Astro::ADS::Result( Papers => \@papers );
 
 =head1 DESCRIPTION
 
+Stores the results returned from an ADS search as a hash of
+Astro::ADS::Result::Paper objects, with the papers being indexed
+by bibcode.
 
 =cut
 
@@ -46,14 +49,15 @@ Astro::ADS::Result - Results from an ADS Query
 use strict;
 use vars qw/ $VERSION /;
 
+use Astro::ADS::Result::Paper;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.1 2001/10/30 17:18:37 aa Exp $
+$Id: Result.pm,v 1.2 2001/10/31 18:39:52 aa Exp $
 
 =head1 METHODS
 
@@ -65,9 +69,9 @@ $Id: Result.pm,v 1.1 2001/10/30 17:18:37 aa Exp $
 
 Create a new instance from a hash of options
 
-  $query = new Astro::ADS::Result( ... );
+  $result = new Astro::ADS::Result( Papers => \@papers );
 
-returns a reference to an ADS query object.
+returns a reference to an ADS Result object.
 
 =cut
 
@@ -83,7 +87,36 @@ sub new {
 
   return $block;
 
-} m,
+}
+
+# A C C E S S O R  --------------------------------------------------------
+
+=back
+
+=head2 Accessor Methods
+
+=over 4
+
+=item B<paperbybibcode>
+
+Return an Astro::ADS::Result::Paper object by bibcode.
+
+   $paper = $result->paperbybibcode("1999MNRAS.310...407W");
+
+=cut
+
+sub paperbybibcode {
+  my $self = shift;
+
+  # return unless we have arguments
+  return undef unless @_;  
+  
+  my $bibcode = shift;
+  
+  return ${$self->{RESULTS}}{$bibcode};
+}
+
+
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -97,9 +130,20 @@ sub new {
 
 Configures the object, takes an options hash as argument
 
-  $result->configure( ... );
+  $result->configure( %options );
 
-Does nothing if the array is not supplied.
+Takes a hash as argument with the following keywords:
+
+=over 4
+
+=item B<Papers>
+
+An reference to an array of Astro::ADS::Result::Paper objects.
+
+
+=back
+
+Does nothing if these keys are not supplied.
 
 =cut
 
@@ -112,88 +156,16 @@ sub configure {
   # grab the argument list
   my %args = @_;
 
-}
-
-
-# T I E D   I N T E R F A C E -----------------------------------------------
-
-=back
-
-=head1 TIED INTERFACE
-
-The C<Astro::ADS::Result> object can also be tied to a hash
-
-   use Astro::ADS::Query;
-
-   $query = new Astro::ADS::Query( ... );
-   $result = $query->querydb();
- 
-   tie %hash, "Astro::ADS::Result", $result 
-
-   $value = $hash{$keyword};
-   $hash{$keyword} = $value;
-
-   print "keyword $keyword is present" if exists $hash{$keyword};
-
-   foreach my $key (keys %hash) {
-      print "$key = $hash{$key}\n";
-   }
-
-
-=cut
-
-# constructor
-sub TIEHASH {
-  my ( $class, $obj, %options ) = @_;
-  return bless $obj, $class;  
-}
-
-# fetch key and value pair
-sub FETCH {
-  my ($self, $key) = @_;
-  
-  
-}
-
-# store key and value pair
-sub STORE {
-  my ($self, $keyword, $value) = @_;
- 
+  if (defined $args{Papers}) {
+   
+     # Go through each of the supplied paper objects and index by bibcode
+     for my $i ( 0 ...$#{$args{Papers} ) {
+        my $key = ${$args{Papers}}[$i]->bibcode();
+        ${$self->{RESULTS}}{$key} = ${$args{Papers}}[$i];
+     }
+  }
 
 }
-
-# reports whether a key is present in the hash
-sub EXISTS {
-  my ($self, $keyword) = @_;
- 
-}
-
-# deletes a key and value pair
-sub DELETE {
-  my ($self, $keyword) = @_;
-
-}
-
-# empties the hash
-sub CLEAR {
-  my $self = shift; 
-  
-}
-
-# implements keys() and each()
-sub FIRSTKEY {
-  my $self = shift;
- 
-}
-
-# implements keys() and each()
-sub NEXTKEY {
-  my ($self, $keyword) = @_; 
-  
-}
-
-# garbage collection
-# sub DESTROY { }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 

@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.1 2001/10/30 17:18:37 aa Exp $
+#     $Id: Paper.pm,v 1.2 2001/10/31 18:39:52 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -34,16 +34,20 @@ Astro::ADS::Result::Paper - A individual paper in an Astro::ADS::Result object
 
 =head1 SYNOPSIS
 
-  $query = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
+  $paper = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                           Title     => $title,
-                                          Authors   => @authors,
-                                          Affil     => @affil,
+                                          Authors   => \@authors,
+                                          Affil     => \@affil,
                                           Journal   => $journal_refernce,
                                           Published => $published,
+                                          Keywords  => \@keywords,
                                           Origin    => $journal,
-                                          Links     => @associated_links,
+                                          Links     => \@associated_links,
                                           URL       => $abstract_url,
-                                          Abstract  => $abstract );
+                                          Abstract  => \@abstract );
+
+  $bibcode = $paper->bibcode();
+  @authors = $paper->authors();
 
 =head1 DESCRIPTION
 
@@ -58,13 +62,13 @@ use strict;
 use vars qw/ $VERSION /;
 
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.1 2001/10/30 17:18:37 aa Exp $
+$Id: Paper.pm,v 1.2 2001/10/31 18:39:52 aa Exp $
 
 =head1 METHODS
 
@@ -78,14 +82,15 @@ Create a new instance from a hash of options
 
   $paper = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                           Title     => $title,
-                                          Authors   => @authors,
-                                          Affil     => @affil,
+                                          Authors   => \@authors,
+                                          Affil     => \@affil,
                                           Journal   => $journal_refernce,
                                           Published => $published,
+                                          Keywords  => \@keywords,
                                           Origin    => $journal,
-                                          Links     => @outbound_links,
+                                          Links     => \@outbound_links,
                                           URL       => $abstract_url,
-                                          Abstract  => $abstract  );
+                                          Abstract  => \@abstract  );
 
 returns a reference to an ADS paper object.
 
@@ -102,17 +107,236 @@ sub new {
                       AFFIL     => [],
                       JOURNAL   => undef,
                       PUBLISHED => undef,
+                      KEYWORDS  => [],
                       ORIGIN    => undef,
                       LINKS     => [],
                       URL       => undef,
-                      ABSTRACT  => undef}, $class;
+                      ABSTRACT  => [] }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
 
   return $block;
 
-} m,
+} 
+
+# A C C E S S O R  --------------------------------------------------------
+
+=back
+
+=head2 Accessor Methods
+
+=over 4
+
+=item B<bibcode>
+
+Return (or set) the bibcode for the paper
+
+   $bibcode = $paper->bibcode();
+   $paper->bibcode( $bibcode );
+
+=cut
+
+sub bibcode {
+  my $self = shift;
+  if (@_) { 
+    $self->{Bibcode} = shift;
+  }
+  return $self->{Bibcode};
+}
+
+=item B<Title>
+
+Return (or set) the title for the paper
+
+   $title = $paper->title();
+   $paper->title( $title );
+
+=cut
+
+sub title {
+  my $self = shift;
+  if (@_) { 
+    $self->{Title} = shift;
+  }
+  return $self->{Title};
+}
+
+=item B<Authors>
+
+Return (or set) the authors for the paper
+
+   @authors = $paper->authors();
+   $first_author = $paper->authors();
+   $paper->authors( \@authors );
+
+if called in a scalar context it will return the first author.
+
+=cut
+
+sub authors {
+  my $self = shift;
+  if (@_) { 
+    $self->{Authors} = shift;
+  }  
+  my @authors = @{$self->{Authors}};
+  return wantarray ? @authors : $authors[0];
+}
+
+=item B<Affil>
+
+Return (or set) the affiliation of each author for the paper
+
+   @institutions = $paper->affil();
+   $first_author_inst = $paper->affil();
+   $paper->affil( \@institutions );
+
+if called in a scalar context it will return the affiliation of the
+first author.
+
+=cut
+
+sub affil {
+  my $self = shift;
+  if (@_) { 
+    $self->{Affil} = shift;
+  }
+  my @affil = @{$self->{Affil}};
+  return wantarray ? @affil : $affil[0];;
+}
+
+=item B<Journal>
+
+Return (or set) the journal reference for the paper
+
+   $journal_ref = $paper->journal();
+   $paper->journal( $journal_ref );
+
+=cut
+
+sub journal {
+  my $self = shift;
+  if (@_) { 
+    $self->{Journal} = shift;
+  }
+  return $self->{Journal};
+}
+
+=item B<Published>
+
+Return (or set) the month and year when the paper was published.
+
+   $published = $paper->published();
+   $paper->published( $published );
+
+=cut
+
+sub published {
+  my $self = shift;
+  if (@_) { 
+    $self->{Published} = shift;
+  }
+  return $self->{Published};
+}
+
+=item B<Links>
+
+Return (or set) the different keywords the paper is indexed by, could
+include such keys as ACCRETION DISCS, WHITE DWARFS, etc.
+
+   @keywords = $paper->keywords();
+   $paper->keywords( \@keywords );
+
+if called in a scalar context it will return the number of keywords.
+
+=cut
+
+sub keywords {
+  my $self = shift;
+  if (@_) { 
+    $self->{Keywords} = shift;
+  }
+  return wantarray ? @{$self->{Keywords}} : $#{$self->{Keywords}};
+}
+
+=item B<Origin>
+
+Return (or set) the origin of the paper in the ADS archive, this is not
+necessarily the journal in which the paper was published, but could be
+set to AUTHOR, ADS or SIMBAD for instance.
+
+   $source = $paper->origin();
+   $paper->origin( $source );
+
+=cut
+
+sub origin {
+  my $self = shift;
+  if (@_) { 
+    $self->{Origin} = shift;
+  }
+  return $self->{Origin};
+}
+
+=item B<Links>
+
+Return (or set) the different type of outbounds links offered by ADS for this
+paper, examples include ABSTRACT, EJOURNAL, ARTICLE, REFERENCES, CITATIONS,
+SIMBAD objects etc.
+
+   @outbound_links = $paper->links();
+   $paper->links( \@outbound_links );
+
+if called in a scalar context it will return the number of outbound links
+available.
+
+=cut
+
+sub links {
+  my $self = shift;
+  if (@_) { 
+    $self->{Links} = shift;
+  }
+  return wantarray ? @{$self->{Links}} : $#{$self->{Links}};
+}
+
+=item B<URL>
+
+Return (or set) the URL pointing to the paper at the ADS
+
+   $adsurl = $paper->url();
+   $paper->url( $adsurl );
+
+=cut
+
+sub url {
+  my $self = shift;
+  if (@_) { 
+    $self->{URL} = shift;
+  }
+  return $self->{URL};
+}
+
+=item B<Abstract>
+
+Return (or set) the abstract of the paper, this may be either the full text
+of the abstract, or a URL pointing to the scanned abstract at the ADS.
+
+   @abstract = $paper->abstract();
+   $paper->abstract( @abstract );
+
+if called in a scalar context it will return the number of lines of text in
+the abstract.
+
+=cut
+
+sub abstract {
+  my $self = shift;
+  if (@_) { 
+    $self->{Abstract} = shift;
+  }
+  return wantarray ? @{$self->{Abstract}} : $#{$self->{Abstract}};
+}
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -156,6 +380,10 @@ The journal reference for the paper, e.g. MNRAS, 279, 1345-1348 (1996)
 
 Month and year published, e.g. 4/1996
 
+=item B<Keywords>
+
+Keywords for the paper, e.g. ACCRETION DISCS
+
 =item B<Origin>
 
 Origin of citation in ADS archive, this is not necessarily the journal, the
@@ -188,97 +416,16 @@ sub configure {
 
   # grab the argument list
   my %args = @_;
-  
+
   # Loop over the allowed keys storing the values
   # in the object if they exist  
   for my $key (qw / Bibcode Title Authors Affil Journal Published
-                   Origin Links URL Abstract /) {
+                    Keywords Origin Links URL Abstract /) {
       my $method = lc($key);
       $self->$method( $args{$key}) if exists $args{$key};
   }  
 
 }
-
-
-# T I E D   I N T E R F A C E -----------------------------------------------
-
-=back
-
-=head1 TIED INTERFACE
-
-The C<Astro::ADS::Result> object can also be tied to a hash
-
-   use Astro::ADS::Query;
-
-   $query = new Astro::ADS::Query( ... );
-   $result = $query->querydb();
- 
-   tie %hash, "Astro::ADS::Result", $result 
-
-   $value = $hash{$keyword};
-   $hash{$keyword} = $value;
-
-   print "keyword $keyword is present" if exists $hash{$keyword};
-
-   foreach my $key (keys %hash) {
-      print "$key = $hash{$key}\n";
-   }
-
-
-=cut
-
-# constructor
-sub TIEHASH {
-  my ( $class, $obj, %options ) = @_;
-  return bless $obj, $class;  
-}
-
-# fetch key and value pair
-sub FETCH {
-  my ($self, $key) = @_;
-  
-  
-}
-
-# store key and value pair
-sub STORE {
-  my ($self, $keyword, $value) = @_;
- 
-
-}
-
-# reports whether a key is present in the hash
-sub EXISTS {
-  my ($self, $keyword) = @_;
- 
-}
-
-# deletes a key and value pair
-sub DELETE {
-  my ($self, $keyword) = @_;
-
-}
-
-# empties the hash
-sub CLEAR {
-  my $self = shift; 
-  
-}
-
-# implements keys() and each()
-sub FIRSTKEY {
-  my $self = shift;
- 
-}
-
-# implements keys() and each()
-sub NEXTKEY {
-  my ($self, $keyword) = @_; 
-  
-}
-
-# garbage collection
-# sub DESTROY { }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 
@@ -291,7 +438,7 @@ sub NEXTKEY {
 Copyright (C) 2001 University of Exeter. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the GNU Public License.
 
 =head1 AUTHORS
 
