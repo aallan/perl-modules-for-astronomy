@@ -1,7 +1,11 @@
+2001-11-07 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query.pm: Added timeout() method
+
 2001-11-04 Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query.pm: Added Proxy method
-        
+        * Query.pm: Added proxy() method
+
 2001-11-02 Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Pre-alpha release, not for general distribution.

@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.13 2001/11/04 21:22:45 aa Exp $
+#     $Id: Query.pm,v 1.14 2001/11/07 17:56:38 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -44,9 +44,11 @@ Astro::ADS::Query - Object definining an prospective ADS query.
 =head1 DESCRIPTION
 
 Stores information about an prospective ADS query and allows the query to
-be made, returning an Astro::ADS::Result object. The object will by default
-pick up the proxy information from the HTTP_PROXY and NO_PROXY environment
-variables.
+be made, returning an Astro::ADS::Result object. 
+
+The object will by default pick up the proxy information from the HTTP_PROXY 
+and NO_PROXY environment variables, see the LWP::UserAgent documentation for
+details.
 
 =cut
 
@@ -60,13 +62,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.13 2001/11/04 21:22:45 aa Exp $
+$Id: Query.pm,v 1.14 2001/11/07 17:56:38 aa Exp $
 
 =head1 METHODS
 
@@ -190,6 +192,31 @@ sub proxy {
    
    # return the current proxy
    return $ua->proxy('http');
+    
+}
+
+=item B<timeout>
+
+Return (or set) the current timeout in seconds for the ADS request.
+
+   $query->timeout( 30 );
+   $proxy_timeout = $query->timeout();
+
+=cut
+
+sub timeout {
+   my $self = shift;
+
+   # grab local reference to user agent
+   my $ua = $self->{USERAGENT};
+   
+   if (@_) {   
+      my $time = shift;
+      $ua->timeout( $time );
+   }
+   
+   # return the current timeout
+   return $ua->timeout();
     
 }
 
