@@ -34,3 +34,5 @@ t/3_star.t
 t/4_gsc.t
 t/4_supercos.t
 t/4_usnoa2.t
+t/4_skycat_usno.t
+t/4_skycat_gsc.t
