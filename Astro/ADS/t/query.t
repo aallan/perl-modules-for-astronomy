@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 61 };
+BEGIN { plan tests => 62 };
 
 # load modules
 use Astro::ADS::Query;
@@ -132,7 +132,7 @@ print "Connecting to ADS\n";
 
 # query ADS
 my $next_result = $query2->querydb();
-#print Dumper($next_result);
+print Dumper($next_result);
 
 print "Continuing Tests\n";
 
@@ -144,6 +144,12 @@ print "Continuing Tests\n";
 # should (hopefully) be 0
 ok( 0,  $next_result->sizeof());
 
+
+# set and check the proxy
+$query2->proxy('http://wwwcache.ex.ac.uk:8080/');
+my $proxy_url = $query2->proxy();
+
+ok( $proxy_url , 'http://wwwcache.ex.ac.uk:8080/');
 
 exit;
 

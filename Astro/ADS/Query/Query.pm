@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.11 2001/11/02 17:13:16 aa Exp $
+#     $Id: Query.pm,v 1.12 2001/11/04 21:14:35 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -58,13 +58,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.11 2001/11/02 17:13:16 aa Exp $
+$Id: Query.pm,v 1.12 2001/11/04 21:14:35 aa Exp $
 
 =head1 METHODS
 
@@ -164,6 +164,31 @@ sub followup {
   # return an Astro::ADS::Result object 
   return $self->_parse_query(); 
 
+}
+
+=item B<proxy>
+
+Return (or set) the current proxy for the ADS request.
+
+   $query->proxy( 'http://wwwcache.ex.ac.uk:8080/' );
+   $proxy_url = $query->proxy();
+
+=cut
+
+sub proxy {
+   my $self = shift;
+
+   # grab local reference to user agent
+   my $ua = $self->{USERAGENT};
+   
+   if (@_) {   
+      my $proxy_url = shift;
+      $ua->proxy('http', $proxy_url );
+   }
+   
+   # return the current proxy
+   return $ua->proxy('http');
+    
 }
 
 # O T H E R   M E T H O D S ------------------------------------------------
