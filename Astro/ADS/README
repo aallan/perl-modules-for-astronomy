@@ -36,7 +36,8 @@ data mining the ADS. This module was the result.
 Requirements
 ------------
 
-The module requires the libwww-perl-5.60 package written by Gisle Aas <gisle@ActiveState.com> v5.53 or above. This package can be obtained
+The module requires the libwww-perl-5.60 package written by Gisle Aas
+<gisle@ActiveState.com> v5.53 or above. This package can be obtained
 via CPAN at http://search.cpan.org/search?dist=libwww-perl
 
 Provides
@@ -61,6 +62,7 @@ http://www.astro.ex.ac.uk/people/aa/pages/computing/estar.html
 
 Installation
 ------------
+
 Installation is automated using the ExtUtils::MakeMaker library
 
      % perl Makefile.PL
@@ -70,12 +72,13 @@ Installation is automated using the ExtUtils::MakeMaker library
 
 Authors
 -------
-This core functionality of the module was written by Alasdair Allan
+
+The core functionality of the module was written by Alasdair Allan
 <aa@astro.ex.ac.uk>, of the University of Exeter Astrophysics Group
 (http://www.astro.ex.ac.uk/) as part of his work for the eSTAR project.
 
 Additional functionality and the user space scripts were written by
-Tim Jenness <timj@jach.hawaii.edu> of the Joint Astronomy Center (JAC) 
+Tim Jenness <timj@jach.hawaii.edu> of the Joint Astronomy Centre (JAC) 
 in Hawaii.
 
 License
