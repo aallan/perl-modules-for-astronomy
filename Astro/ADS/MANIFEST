@@ -12,4 +12,3 @@ Result/Paper/Makefile.PL
 t/query.t
 t/result.t
 t/paper.t
-t/tied.t

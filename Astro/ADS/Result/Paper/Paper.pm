@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.2 2001/10/31 18:39:52 aa Exp $
+#     $Id: Paper.pm,v 1.3 2001/10/31 23:10:02 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -62,13 +62,13 @@ use strict;
 use vars qw/ $VERSION /;
 
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.2 2001/10/31 18:39:52 aa Exp $
+$Id: Paper.pm,v 1.3 2001/10/31 23:10:02 aa Exp $
 
 =head1 METHODS
 
@@ -358,7 +358,12 @@ Takes a hash as argument with the following keywords:
 
 =item B<Bibcode>
 
-The bibcode of the paper (see ADS for details of the article bibcode standard).
+The bibcode of the paper. A complete description of the bibcode reference 
+coding has been published as a chapter of the book "Information & On-Line 
+Data in Astronomy", 1995, D. Egret and M. A. Albrecht (Eds), Kluwer Acad. Publ.
+
+A copy of the relevant chapter in this book is available online as a Postscript
+file via the CDS at http://cdsweb.u-strasbg.fr/simbad/refcode.ps 
 
 =item B<Title>
 
@@ -422,7 +427,7 @@ sub configure {
   for my $key (qw / Bibcode Title Authors Affil Journal Published
                     Keywords Origin Links URL Abstract /) {
       my $method = lc($key);
-      $self->$method( $args{$key}) if exists $args{$key};
+      $self->$method( $args{$key} ) if exists $args{$key};
   }  
 
 }
