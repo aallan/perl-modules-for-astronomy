@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.5 2002/03/29 17:40:17 aa Exp $
+#     $Id: Catalog.pm,v 1.6 2002/03/31 21:39:48 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -55,14 +55,14 @@ use vars qw/ $VERSION /;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.5 2002/03/29 17:40:17 aa Exp $
+$Id: Catalog.pm,v 1.6 2002/03/31 21:39:48 aa Exp $
 
 =head1 METHODS
 
@@ -131,7 +131,7 @@ sub write_catalog {
  
   # grab file name and open file for writing
   my $file_name = shift;
-  unless ( open( FH, ">$file_name" ) ) {
+  unless ( open( FILE, ">$file_name" ) ) {
      croak("Astro::Catalog write_catalog() - Can not open file $file_name");
   } 
  
@@ -183,9 +183,9 @@ sub write_catalog {
   # check to see if we're outputing all the filters and colours
   my $total = scalar(@out_filters) + scalar(@out_colours);
    
-  print FH "$total colours were created\n";
-  print FH "@out_filters @out_colours\n";
-  print FH "A sub-set of USNO-A2: Field centre at RA " . $self->get_ra() .
+  print FILE "$total colours were created\n";
+  print FILE "@out_filters @out_colours\n";
+  print FILE "A sub-set of USNO-A2: Field centre at RA " . $self->get_ra() .
            ", Dec " . $self->get_dec() . ", Search Radius " . 
            $self->get_radius() . " arcminutes \n";
            
@@ -193,11 +193,11 @@ sub write_catalog {
   foreach my $star ( 0 .. $#{$self->{STARS}} ) {
   
      # field, number, ra, dec and x&y position
-     print FH ${$self->{STARS}}[$star]->field() . "  ";
-     print FH $star . "  ";
-     print FH ${$self->{STARS}}[$star]->ra() . "  ";
-     print FH ${$self->{STARS}}[$star]->dec() . "  ";
-     print FH "0.000  0.000  ";
+     print FILE ${$self->{STARS}}[$star]->field() . "  ";
+     print FILE $star . "  ";
+     print FILE ${$self->{STARS}}[$star]->ra() . "  ";
+     print FILE ${$self->{STARS}}[$star]->dec() . "  ";
+     print FILE "0.000  0.000  ";
      
      # magnitudes
      foreach my $i ( 0 .. $num_filters-1 ) {
@@ -217,9 +217,9 @@ sub write_catalog {
            
         # so long as $doit isn't -1 then we have a valid filter 
         if( $doit != -1 ) {   
-          print FH ${$self->{STARS}}[$star]->get_magnitude($filters[$i]) . "  ";
-          print FH ${$self->{STARS}}[$star]->get_errors($filters[$i]) . "  ";
-          print FH ${$self->{STARS}}[$star]->quality() . "  ";
+          print FILE ${$self->{STARS}}[$star]->get_magnitude($filters[$i]) . "  ";
+          print FILE ${$self->{STARS}}[$star]->get_errors($filters[$i]) . "  ";
+          print FILE ${$self->{STARS}}[$star]->quality() . "  ";
         } 
      }
      
@@ -241,19 +241,19 @@ sub write_catalog {
            
         # so long as $doit isn't -1 then we have a valid filter 
         if( $doit != -1 ) {   
-           print FH ${$self->{STARS}}[$star]->get_colour( $colours[$j] ) . "  ";
-           print FH ${$self->{STARS}}[$star]->get_colourerr($colours[$j]) ."  ";
-           print FH ${$self->{STARS}}[$star]->quality() . "  ";
+           print FILE ${$self->{STARS}}[$star]->get_colour( $colours[$j] ) . "  ";
+           print FILE ${$self->{STARS}}[$star]->get_colourerr($colours[$j]) ."  ";
+           print FILE ${$self->{STARS}}[$star]->quality() . "  ";
         }
      } 
      
      # next star      
-     print FH "\n";
+     print FILE "\n";
 
   }
   
   # clean up
-  close ( FH );      
+  close ( FILE );      
 
 }
 
@@ -470,10 +470,10 @@ sub configure {
   
     # build from Cluster file    
     my $file_name = $args{Cluster};
-    unless ( open( FH, "$file_name" ) ) {
+    unless ( open( FILE, "$file_name" ) ) {
        croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
     }     
-    close(FH);
+    close(FILE);
 
     # read catalogue from file
      _read_cluster( $self, $file_name );    
@@ -543,14 +543,14 @@ sub _read_cluster {
    # build from Cluster file
    my $file_name = shift;
       
-   unless ( open( FH, $file_name ) ) {
+   unless ( open( FILE, $file_name ) ) {
        croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
    } 
    
    # read from file   
-   my @file = <FH>;
+   my @file = <FILE>;
    chomp @file;
-   close(FH);
+   close(FILE);
    
    # loop through file
    foreach my $i ( 3 .. $#file ) {

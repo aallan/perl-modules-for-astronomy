@@ -1,3 +1,7 @@
+2002-03-30  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Minor bug fix?
+
 2002-03-29  Alasdair Allan <aa@astro.ex.ac.uk>
         
         * Added a freeze() function so that the the Catalog object can be
