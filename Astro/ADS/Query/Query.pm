@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.12 2001/11/04 21:14:35 aa Exp $
+#     $Id: Query.pm,v 1.13 2001/11/04 21:22:45 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -44,7 +44,9 @@ Astro::ADS::Query - Object definining an prospective ADS query.
 =head1 DESCRIPTION
 
 Stores information about an prospective ADS query and allows the query to
-be made, returning an Astro::ADS::Result object.
+be made, returning an Astro::ADS::Result object. The object will by default
+pick up the proxy information from the HTTP_PROXY and NO_PROXY environment
+variables.
 
 =cut
 
@@ -58,13 +60,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.12 2001/11/04 21:14:35 aa Exp $
+$Id: Query.pm,v 1.13 2001/11/04 21:22:45 aa Exp $
 
 =head1 METHODS
 
@@ -389,6 +391,9 @@ sub configure {
     
   # Setup the LWP::UserAgent
   $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
+  
+  # Grab Proxy details from local environment
+  $self->{USERAGENT}->env_proxy();
 
   # configure the default options
   ${$self->{OPTIONS}}{"db_key"}           = "AST";
