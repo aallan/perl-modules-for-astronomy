@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.13 2003/07/27 03:19:06 timj Exp $
+#     $Id: Star.pm,v 1.14 2003/07/27 04:00:19 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -35,8 +35,7 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
 =head1 SYNOPSIS
 
   $star = new Astro::Catalog::Star( ID         => $id, 
-                                    RA         => $ra,
-                                    Dec        => $dec,
+                                    Coords     => new Astro::Coords(),
                                     Magnitudes => \%magnitudes,
                                     MagErr     => \%mag_errors,
                                     Colours    => \%colours,
@@ -47,7 +46,8 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
                                     Distance   => $distance_to_centre,
                                     PosAngle   => $position_angle,
                                     X          => $x_pixel_coord,
-                                    Y          => $y_pixel_coord );
+                                    Y          => $y_pixel_coord,
+                                    Comment    => $comment_string );
 
 =head1 DESCRIPTION
 
@@ -79,14 +79,14 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.13 2003/07/27 03:19:06 timj Exp $
+$Id: Star.pm,v 1.14 2003/07/27 04:00:19 aa Exp $
 
 =head1 METHODS
 
@@ -111,7 +111,8 @@ Create a new instance from a hash of options
                                     Distance   => $distance_to_centre,
                                     PosAngle   => $position_angle,
                                     X          => $x_pixel_coord,
-                                    Y          => $y_pixel_coord );
+                                    Y          => $y_pixel_coord,
+                                    Comment    => $comment_string );
 
 returns a reference to an Astro::Catalog::Star object.
 
