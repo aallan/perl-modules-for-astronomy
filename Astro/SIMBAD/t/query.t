@@ -24,14 +24,14 @@ my $coord_query = new Astro::SIMBAD::Query( RA        => "01 10 12.98",
                                             Units     => "arcsec" );
                                       
 print "# Connecting to SIMBAD\n";
-$coord_query->querydb();
+my $coord_result = $coord_query->querydb();
 print "# Continuing Tests\n";
-#print Dumper($coord_query);
+
+print Dumper($coord_result);
 
 my $ident_query = new Astro::SIMBAD::Query( Target    => "HT Cas",
                                             Error     => 10,
                                             Units     => "arcsec" );                                      
 print "# Connecting to SIMBAD\n";
-$ident_query->querydb();
+my $ident_result = $ident_query->querydb();
 print "# Continuing Tests\n";
-#print Dumper($ident_query);

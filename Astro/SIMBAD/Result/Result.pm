@@ -19,7 +19,7 @@ package Astro::SIMBAD::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.1 2001/11/27 18:09:42 aa Exp $
+#     $Id: Result.pm,v 1.2 2001/11/28 03:02:12 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.1 2001/11/27 18:09:42 aa Exp $
+$Id: Result.pm,v 1.2 2001/11/28 03:02:12 aa Exp $
 
 =head1 METHODS
 
@@ -81,7 +81,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { RESULTS => {},
-                      SIZE    => undef }, $class;
+                      SIZE    => 0 }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -130,14 +130,14 @@ sub addobject {
   
   # grab the object reference
   my $new_object = shift;
+    
+  # increment the sizeof counter
+  $self->{SIZE} = $self->{SIZE} + 1;
   
   # get the object name as a key for $self->{RESULTS} hash
   my $object_name = $new_object->name();
-  
+  $object_name = "Object " . $self->{SIZE} unless defined $object_name;
   ${$self->{RESULTS}}{$object_name} = $new_object;
-  
-  # increment the sizeof counter
-  $self->{SIZE} = $self->{SIZE} + 1;
   
   return $self->{SIZE};
 
@@ -219,20 +219,17 @@ sub configure {
   my %args = @_;
 
   if (defined $args{Objects}) {
-  
-     # zero out the size of the object hash counter unless it already
-     # has a size, i.e. the Result object already contains objects
-     $self->{SIZE} = 0 unless defined $self->{SIZE};
 
      # Go through each of the supplied stellar object and add it
      for my $i ( 0 ...$#{$args{Objects}} ) {
-
-        # extract the object name and index by it
-        my $object_name = ${$args{Objects}}[$i]->name();
-        ${$self->{RESULTS}}{$object_name} = ${$args{Objects}}[$i];
-        
+ 
         # increment the hash counter
         $self->{SIZE} = $self->{SIZE} + 1;
+        
+        # extract the object name and index by it
+        my $object_name = ${$args{Objects}}[$i]->name();
+        $object_name = "Object " . $self->{SIZE} unless defined $object_name;
+        ${$self->{RESULTS}}{$object_name} = ${$args{Objects}}[$i];
 
      }
   }

@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.6 2001/11/28 02:27:23 aa Exp $
+#     $Id: Query.pm,v 1.7 2001/11/28 03:02:12 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.6 2001/11/28 02:27:23 aa Exp $
+$Id: Query.pm,v 1.7 2001/11/28 03:02:12 aa Exp $
 
 =head1 METHODS
 
@@ -568,11 +568,6 @@ sub _parse_query {
   # create an Astro::SIMBAD::Result object to hold the search results
   my $result = new Astro::SIMBAD::Result();
 
-  # create a temporary object to hold objects, I _really_ should have
-  # called Astro::SIMBAD::Result::Object something else, this is getting
-  # really confusing, oh well, too late now...
-  my $object;
-
   # loop round the returned buffer 
   my ( $line );
   foreach $line ( 0 ... $#buffer ) {
@@ -592,12 +587,51 @@ sub _parse_query {
         $line = $#buffer;
      }  
   }
-  
+    
   # ...and stuff the contents into Object objects
   my ( $star );
   foreach $star ( 0 ... $#target ) {
-  
-     print "target: " . $target[$star] . "\n";
+
+     # create a temporary place holder object
+     my $object = new Astro::SIMBAD::Result::Object();  
+     
+     # split each line using the "pipe" symbol sepearating the table columns
+     my @separated = split( /|/, $target[$star] );
+     
+     # FRAME
+     # -----
+     
+     # grab the current co-ordinate frame from the query object itself
+     my @coord_frame = ( ${$self->{OPTIONS}}{"CooFrame"},
+                         ${$self->{OPTIONS}}{"CooEpoch"},
+                         ${$self->{OPTIONS}}{"CooEqui"} );
+     $object->frame( \@coord_frame );
+     
+     # URL
+     # ---
+     
+     # NAME
+     # ----
+     
+     # TYPE
+     # ----
+     
+     # LONG TYPE
+     # ---------
+     
+     # RA
+     # --
+     
+     # DEC
+     # ---
+     
+     # SPECTRAL TYPE
+     # -------------
+          
+     
+     # Add the target object to the Astro::SIMBAD::Result object
+     # ---------------------------------------------------------
+     $result->addobject( $object );
   }
   
   # return an Astro::SIMBAD::Result object, or undef if no abstracts returned
