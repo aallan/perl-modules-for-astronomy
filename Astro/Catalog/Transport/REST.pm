@@ -34,11 +34,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: REST.pm,v 1.5 2003/08/03 06:18:35 timj Exp $
+$Id: REST.pm,v 1.6 2003/09/25 21:27:50 aa Exp $
 
 =head1 METHODS
 
@@ -356,7 +356,7 @@ sub _default_useragent_id {
     $pack_version = ${ $package."::VERSION" };
   }
   $pack_version = 'UNKNOWN' unless defined $pack_version;
-  return "Astro::Catalog::USNOA2/$pack_version ($HOST.$DOMAIN)";
+  return "Astro::Catalog::REST/$pack_version ($HOST.$DOMAIN)";
 }
 
 

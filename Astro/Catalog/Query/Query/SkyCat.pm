@@ -40,7 +40,6 @@ $FOLLOW_DIRS = 0;
 # if that 
 my $CFG_FILE;
 
-
 # This is the content of the config file
 # organized as a hash indexed by remote server shortname
 # this has the advantage of removing duplicates
@@ -400,6 +399,8 @@ sub _load_config {
   my $self = shift;
   my $cfg = $self->cfg_file;
 
+  print "SkyCat.pm: \$cfg = $cfg\n" if $DEBUG;
+
   if (!defined $cfg) {
     warnings::warnif("Config file not specified (undef)");
     return;
@@ -422,6 +423,8 @@ sub _load_config {
   # Process the config file and extract the raw content
   my @configs = $self->_extract_raw_info( \@lines );
 
+  print "Pre-filtering has \@configs " . @configs . " entries\n" if $DEBUG;
+
   # Close file
   close( $fh ) or do {
     warnings::warnif("Error closing config file, $cfg: $!");
@@ -435,16 +438,19 @@ sub _load_config {
   # so throw everything else away
   @configs = grep { $_->{serv_type} =~ /(namesvr|catalog|archive)/  } @configs;
 
+  print "Post-filtering has \@configs " . @configs . " entries\n" if $DEBUG;
 
   # Process each entry. Mainly URL processing
   for my $entry ( @configs ) {
-
     # Skip if we have already analysed this server
     if (exists $CONFIG{lc($entry->{short_name})}) {
       print "Already know about " . $entry->{short_name} . "\n"
 	if $DEBUG;
       next;
     }
+    
+    print "  Processing " . $entry->{short_name} . "\n" if $DEBUG;
+    print Dumper( $entry ) if( $DEBUG );
 
     # Extract info from the 'url'. We need to extract the following info:
     #  - Host name and port
@@ -517,13 +523,15 @@ sub _load_config {
       $entry->{tokens} = \@tokens;
       $entry->{allow}  = \%allow;
 
+      print Dumper( $entry ) if( $DEBUG );
+
       # And store this in the config. Only store it if we have 
       # tokens
       $CONFIG{lc($entry->{short_name})} = $entry;
 
-    }
+    } # if entry
 
-  }
+  } # for loop
 
   # Debug
   print Dumper(\%CONFIG) if $DEBUG;

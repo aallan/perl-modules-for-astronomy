@@ -31,18 +31,6 @@ WriteMakefile(
 
 package MY;
 
-# What happens when we say 'make test'
-sub test
-{
-
-q{
-TEST_VERBOSE=1
-
-test: all
-	$(FULLPERL) t/TEST $(TEST_VERBOSE)
-
-}; }
-
 sub install {
   my $self = shift;
   my $inherited = $self->SUPER::install (@_);
@@ -51,6 +39,14 @@ sub install {
   $inherited;
 }
 
+
+sub test {
+  my $self = shift;
+  my $inherited = $self->SUPER::test (@_);
+
+  $inherited =~ s/^TEST_VERBOSE=0$/TEST_VERBOSE=1/gm;
+  $inherited;
+}
 
 # configuration files
 sub postamble {

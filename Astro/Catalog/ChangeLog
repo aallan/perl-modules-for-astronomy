@@ -11,6 +11,12 @@
           file to $(PERLPREFIX)/etc in preperation for shifting access to
           SuperCOSMOS from being dependant on Astro::Aladin to using the
           Astro::Catalog::Query::SkyCat module 
+          
+        * Query/Query/SuperCOSMOS.pm: Totally reimplemented this module
+          from scratch to use the SkyCat.pm module rather than relying
+          on the Astro::Aladin implementation. 
+
+        * t/4_skycat_supercos.t: Added
 
 2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
 

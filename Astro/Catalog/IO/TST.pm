@@ -95,15 +95,20 @@ sub _read_catalog {
   my %extras;
 
   # Loop over each line
+  my $counter = 0;
   for (@$lines) {
+    
+    # increment line counter
+    $counter++;
 
     # Make sure we have a copy since there is some processing
     # of the line and we do not want the content of the supplied
     # catalog to change from under the caller.
     my $line = $_;
     chomp($line);
-
+    
     # Simply loop if there is no content
+    #print "PARSING line $counter\n" if $DEBUG;
     next unless $line =~ /\S/;
 
     # Look for comments
@@ -111,15 +116,18 @@ sub _read_catalog {
       # Usually indicates that we can stop parsing.
       # At the very least this means end of data.
       # so reset $intable
-      print "FOUND EOD - no need to continue\n" if $DEBUG;
+      #print "   FOUND EOD - no need to continue\n" if $DEBUG;
       last;
 
     } elsif ($line =~ /^\s*\#/) {
       # probably a comment although CURSA extensions allow
       # some column information
       if ($line =~ /^\s*\#column-(.*):/) {
+
 	# Special key: usually units, types or formats
 	my $key = $1;
+
+        #print "   FOUND CURSA extension: $key\n" if $DEBUG;
 
 	# Remove the crud
 	$line =~ s/^\s*\#column-$key://;
@@ -136,17 +144,22 @@ sub _read_catalog {
       } else {
 	# Standard comment - strip the hash
 	$line =~ s/^\s*\#//;
+        #print "   FOUND standard comment\n" if $DEBUG;
 	push(@comments, $line);
       }
     } elsif ($line =~ /\t/) {
       # Parse the line in standard manner
+      #print "  FOUND standard line\n" if $DEBUG;
       my @content = $class->_parse_line( $line );
+      #print Dumper(@content) if $DEBUG;
+
 
       # If the line includes tab characters it is probably a table
       # entry. Either the header or the content or the separator
       if ($intable) {
 	# Must be reading real content
 	warnings::warnif("Column mismatch: name count different to actual content!:\n$line\n") if @columns != @content;
+        #print "  FOUND content line\n" if $DEBUG;
 
 	# Store the content in a hash indexed by the associated columns
 	# This will be a problem for degenerate headings!
@@ -156,10 +169,19 @@ sub _read_catalog {
       } elsif ( !@columns ) {
 	# We have read no column information so this must be
 	# the table description
+        #print "  FOUND table description line\n" if $DEBUG;
 	@columns = @content;
 
-      } elsif ($line =~ /^[-\t]+$/) {
+      #} elsif ($line =~ /^[-\t]+$/) {  # This doesn't seem to parse the
+                                        # SuperCOSMOS TST separator, not
+                                        # sure what's going on here.
+                                        
+      } elsif ( $content[0] =~ /^[-]+$/ && $content[1] =~ /^[-]+$/ ) { 
+        # this is probably safe enough, but its another un-Godly hack,
+        # sorry Tim, have a look at the SuperCOSMOS.pm module and turn
+        # on debugging in TST to see whats going on here during parsing.                                  
 
+        #print "  FOUND table separator line\n" if $DEBUG;
 	warnings::warnif("Table separator has already been encountered!")
 	    if $intable;
 
@@ -195,8 +217,8 @@ sub _read_catalog {
   # itself. The supplied values override values read from the file
   %params = (%params, %options);
 
-  print Dumper( \@descr, \@comments, \@columns, \%params, \%extras, \@stars)
-    if $DEBUG;
+  #print Dumper( \@descr, \@comments, \@columns, \%params, \%extras, \@stars)
+  #  if $DEBUG;
 
   # Now we need to go through the parameters to see whether there are
   # any _col parameters that we need to map to an "ra", "dec" and "id"
@@ -265,12 +287,12 @@ sub _read_catalog {
 
   # Now convert the information into a star object
 
-  # This is a back-of-the-envelope data dictionary from looking at USNO 
-  # and 2MASS and Bright Star Catalogues. Maps, Aastro::Catlog::Star methods 
-  # to different columns names
+  # This is a back-of-the-envelope data dictionary from looking at 
+  # USNO-A2, 2MASS, Bright Star Catalogues and SuperCOSMOS. Maps the
+  # Aastro::Catalog::Star methods to different columns names
   my %datadict = (
-		  field => [ qw/ field /],
-		  quality => [ qw/ qual /, qw/ qflg / ],
+		  field => [ qw/ field /, qw/ fldno / ],
+		  quality => [ qw/ qual /, qw/ qflg /, qw/ quality / ],
 		  distance => [ "d'" ],
 		  posangle => [ qw/ pa /, qw/ _r / ],
 		 );
@@ -360,7 +382,39 @@ sub _read_catalog {
     $construct{magnitudes} = {};
     $construct{magerr} = {};
     for my $key (keys %$star) {
+      
+      #print "LOOPING KEY = $key\n" if $DEBUG;
+      
+      # Un-Goldy hack number #5 for the SuperCOSMOS catalogue, for some
+      # bloody stupid reason they've decided to label their magntitudes
+      # B_J, R_1, R_2 and I. God help me, if I ever find the guy responsible
+      # for this stupid idea. For now lets munge these here and cross our
+      # fingers.
+      if ( $key eq "b_j" ) {
+         $$star{bj_mag} = $star->{$key};
+         delete $star->{$key};
+         $key = "bj_mag";
+      }
+      if (  $key eq "r_1" ) {
+         $$star{r1_mag} = $star->{$key};
+         delete $star->{$key};
+         $key = "r1_mag" ;
+      }
+      if (  $key eq "r_2" ) {
+         $$star{r2_mag} = $star->{$key};
+         delete $star->{$key};
+         $key = "r2_mag" ;
+      }
+      if (  $key eq "i" ) {
+         $$star{i_mag} = $star->{$key};
+         delete $star->{$key};
+         $key = "i_mag" ;
+      }
+      
+      
+      # drop through unless we have a magnitude
       next unless $key =~ /^(.*?)_?mag$/; # non-greedy
+
 
       # No capture - assume R
       my $filter = ( $1 ? uc($1) : "R" );
@@ -389,7 +443,7 @@ sub _read_catalog {
     for my $key (keys %$star) {
       next unless $key =~ /^(\w)-(\w)$/; # non-greedy
       $construct{colours}->{uc($key)} = $star->{$key};
-      print "Found color ".uc($key)." ... \n" if $DEBUG;
+      print "Found colour ".uc($key)." ... \n" if $DEBUG;
     }
 
     # Modify the array in place
@@ -455,7 +509,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.9 2003/09/24 18:07:19 aa Exp $
+ $Id: TST.pm,v 1.10 2003/09/25 21:27:50 aa Exp $
 
 =head1 FORMAT
 

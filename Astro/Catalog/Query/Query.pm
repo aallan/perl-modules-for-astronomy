@@ -29,13 +29,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.7 2003/08/04 05:31:38 timj Exp $
+$Id: Query.pm,v 1.8 2003/09/25 21:27:50 aa Exp $
 
 =head1 METHODS
 
@@ -370,7 +370,7 @@ sub configure {
       # set the option explcitly
       $self->_set_query_options( $lckey => $args{$key} );
     } else {
-      warnings::warnif("Unrecognized option: $key. Ignoring it.");
+      #warnings::warnif("Unrecognized option: $key. Ignoring it.");
     }
   }
 
