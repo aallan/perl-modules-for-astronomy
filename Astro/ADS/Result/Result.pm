@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.3 2001/10/31 19:04:44 aa Exp $
+#     $Id: Result.pm,v 1.4 2001/11/01 18:02:53 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.3 2001/10/31 19:04:44 aa Exp $
+$Id: Result.pm,v 1.4 2001/11/01 18:02:53 aa Exp $
 
 =head1 METHODS
 
@@ -116,7 +116,28 @@ sub paperbybibcode {
   return ${$self->{RESULTS}}{$bibcode};
 }
 
+=item B<pushpaper>
 
+Append a new paper onto the end of the Astro::ADS::Result object
+
+   $result->pushpaper( $paper );
+
+=cut
+
+sub pushpaper {
+  my $self = shift;
+
+  # return unless we have arguments
+  return undef unless @_;  
+  
+  my $paper = shift;
+  my $bibcode = $paper->bibcode();
+
+  # push the new hash item onto the stack 
+  ${$self->{RESULTS}}{$bibcode} = $paper;
+  
+  return;
+}
 
 # C O N F I G U R E -------------------------------------------------------
 

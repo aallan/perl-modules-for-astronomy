@@ -18,7 +18,7 @@ ok(1);
 
 # create a test paper object
 my ( $bibcode, $title, @authors, @affil, $journal, $published, @keywords,
-     $origin, @links, $URL, @abstract1, @abstract2 );
+     $origin, @links, $URL, @abstract1, @abstract2, $object );
 
 # separate the two abstracts from the __DATA_ block
 my @data = <DATA>;
@@ -68,6 +68,8 @@ $links[6] = "SIMBAD";
 $URL =
  "http://cdsads.u-strasbg.fr/cgi-bin/nph-bib_query?bibcode=1998MNRAS.295..167A";
 
+$object = "EX Hya";
+
 # create an Astro::ADS::Result::Paper object from the meta-data
 my $paper = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                            Title     => $title,
@@ -79,7 +81,8 @@ my $paper = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                            Origin    => $origin,
                                            Links     => \@links,
                                            URL       => $URL,
-                                           Abstract  => \@abstract1 );
+                                           Abstract  => \@abstract1,
+                                           Object    => $object );
 
 # some new meta-data
 $bibcode = "2001adass..10..459A";

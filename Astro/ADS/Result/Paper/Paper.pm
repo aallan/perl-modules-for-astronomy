@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.3 2001/10/31 23:10:02 aa Exp $
+#     $Id: Paper.pm,v 1.4 2001/11/01 18:02:53 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -44,7 +44,8 @@ Astro::ADS::Result::Paper - A individual paper in an Astro::ADS::Result object
                                           Origin    => $journal,
                                           Links     => \@associated_links,
                                           URL       => $abstract_url,
-                                          Abstract  => \@abstract );
+                                          Abstract  => \@abstract,
+                                          Object    => $object );
 
   $bibcode = $paper->bibcode();
   @authors = $paper->authors();
@@ -62,13 +63,13 @@ use strict;
 use vars qw/ $VERSION /;
 
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.3 2001/10/31 23:10:02 aa Exp $
+$Id: Paper.pm,v 1.4 2001/11/01 18:02:53 aa Exp $
 
 =head1 METHODS
 
@@ -90,7 +91,8 @@ Create a new instance from a hash of options
                                           Origin    => $journal,
                                           Links     => \@outbound_links,
                                           URL       => $abstract_url,
-                                          Abstract  => \@abstract  );
+                                          Abstract  => \@abstract,
+                                          Object    => $object  );
 
 returns a reference to an ADS paper object.
 
@@ -111,7 +113,8 @@ sub new {
                       ORIGIN    => undef,
                       LINKS     => [],
                       URL       => undef,
-                      ABSTRACT  => [] }, $class;
+                      ABSTRACT  => [],
+                      OBJECT    => undef }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -338,6 +341,23 @@ sub abstract {
   return wantarray ? @{$self->{Abstract}} : $#{$self->{Abstract}};
 }
 
+=item B<object>
+
+Return (or set) the object tag for the paper.
+
+   $object = $paper->object();
+   $paper->object( $object );
+
+=cut
+
+sub object {
+  my $self = shift;
+  if (@_) { 
+    $self->{Object} = shift;
+  }
+  return $self->{Object};
+}
+
 # C O N F I G U R E -------------------------------------------------------
 
 =back
@@ -425,7 +445,7 @@ sub configure {
   # Loop over the allowed keys storing the values
   # in the object if they exist  
   for my $key (qw / Bibcode Title Authors Affil Journal Published
-                    Keywords Origin Links URL Abstract /) {
+                    Keywords Origin Links URL Abstract Object /) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }  

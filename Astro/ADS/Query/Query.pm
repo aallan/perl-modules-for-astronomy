@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.2 2001/10/31 23:10:02 aa Exp $
+#     $Id: Query.pm,v 1.3 2001/11/01 18:02:53 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,14 +51,17 @@ use strict;
 use vars qw/ $VERSION /;
 
 use LWP::UserAgent;
+use Astro::ADS::Result;
+use Astro::ADS::Result::Paper;
+use Carp;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.2 2001/10/31 23:10:02 aa Exp $
+$Id: Query.pm,v 1.3 2001/11/01 18:02:53 aa Exp $
 
 =head1 METHODS
 
@@ -111,11 +114,158 @@ Returns an Astro::ADS::Result object
 
 sub querydb {
   my $self = shift;
+  use Data::Dumper;
 
   # call the private method to make the actual ADS query
-  my $result = $self->_make_query();
+  $self->_make_query();
 
-  return $result;
+  # check for failed connect
+  return undef unless defined $self->{BUFFER};
+   
+  # get a local copy of the current BUFFER
+  my @buffer = split( /\n/,$self->{BUFFER});
+  chomp @buffer;
+ 
+  # create an Astro::ADS::Result object to hold the search results
+  my $result = new Astro::ADS::Result();
+  
+  # create a temporary object to hold papers
+  my $paper;
+  
+  # loop round the returned buffer and stuff the contents into Paper objects
+  my ( $line, $next, $counter );
+  $next = $counter = 0;
+  foreach $line ( 0 ... $#buffer ) {
+
+     #     R     Bibcode
+     #     T     Title
+     #     A     Author List
+     #     F     Affiliations
+     #     J     Journal Reference
+     #     D     Publication Date
+     #     K     Keywords
+     #     G     Origin
+     #     I     Outbound Links
+     #     U     Document URL
+     #     O     Object name
+     #     B     Abstract
+            
+     # NEW PAPER
+     if( substr( $buffer[$line], 0, 2 ) eq "%R" ) {
+                    
+        $counter = $line;
+        my $tag = substr( $buffer[$counter], 1, 1 );
+        
+        # grab the bibcode
+        my $bibcode = substr( $buffer[$counter], 2 );
+        
+        # New Astro::ADS::Result::Paper object
+        $paper = new Astro::ADS::Result::Paper( Bibcode => $bibcode );
+                       
+        $counter++;
+                
+        # LOOP THROUGH PAPER
+        my ( @title, @authors );
+        while ( substr( $buffer[$counter], 0, 2 ) ne "%R" &&
+                $counter < $#buffer ) {
+           
+           #print "counter $counter\n";
+           #print "substring " . substr( $buffer[$counter], 0, 2 ) . "\n";
+           #print "buffer: $buffer[$counter]\n";
+                         
+           # grab the tags
+           if( substr( $buffer[$counter], 0, 1 ) eq "%" ) {
+              $tag = substr( $buffer[$counter], 1, 1 );
+           }
+           
+           # ckeck for each tag and stuff the contents into the paper object
+           
+           # TITLE
+           # -----
+           if( $tag eq "T" ) {
+             
+              #do we have the start of an title block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @title, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@title, $buffer[$counter] );
+                
+              }  
+           }
+           
+           # AUTHORS
+           # -------
+           if( $tag eq "A" ) {
+           
+              #do we have the start of an author block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @authors, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@authors, $buffer[$counter] );
+                
+              }
+           }
+           
+           
+           
+
+           # increment the line counter
+           $counter = $counter + 1;
+           # set the next paper increment
+           $next = $counter - 1;            
+              
+        }
+        
+        # PUSH TITLE INTO PAPER OBJECT
+        # ------------------------------
+        chomp @title;
+        my $title_line = "";
+        for my $i ( 0 ... $#title ) {
+           # drop it onto one line
+           $title_line = $title_line . $title[$i];      
+        }
+        $paper->title( $title_line );
+        
+        # PUSH AUTHORS INTO PAPER OBJECT
+        # ------------------------------
+        chomp @authors;
+        my $author_line = "";
+        for my $i ( 0 ... $#authors ) {
+           # drop it onto one line
+           $author_line = $author_line . $authors[$i];      
+        }
+        # get rid of leading spaces before author names
+        $author_line =~ s/;\s+/;/g;
+        
+        my @paper_authors = split( /;/, $author_line );
+        $paper->authors( \@paper_authors );
+        
+           
+     }
+        
+     # increment the line counter to the correct index for the next paper
+     $line = $line + $next;
+
+     #print "line $line, next $next, counter $counter, #buffer $#buffer\n";
+     #print Dumper($paper);
+  
+     # push the new paper onto the Astro::ADS::Result object
+     $result->pushpaper($paper) if defined $paper;
+     $paper = undef;
+     
+   }   
+
+   print Dumper($result);
 }
 
 =item B<Authors>
@@ -307,7 +457,7 @@ These methods are for internal use only.
 =item B<_make_query>
 
 Private function used to make an ADS query. Should not be called directly,
-instead use the querydb() assessor method.
+since it does not parse the results. Instead use the querydb() assessor method.
 
 =cut
 
@@ -328,8 +478,7 @@ sub _make_query {
    foreach my $key ( keys %{$self->{OPTIONS}} ) {
       $options = $options . "&$key=${$self->{OPTIONS}}{$key}"; 
    }
-   
-   
+     
    # build final query URL
    $URL = $URL . $options;
    
@@ -343,7 +492,8 @@ sub _make_query {
       # stuff the page contents into the buffer
       $self->{BUFFER} = ${$reply}{"_content"};
    } else {
-      $self->{BUFFER} = "Failed";
+      $self->{BUFFER} = undef;
+      croak("Error ${$reply}{_rc}: Failed to establish network connection");
    }
 }
 

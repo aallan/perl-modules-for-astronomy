@@ -16,7 +16,7 @@ use Astro::ADS::Result::Paper;
 ok(1);
 
 my ( $bibcode, $title, @authors, @affil, $journal, $published, @keywords,
-     $origin, @links, $URL, @abstract );
+     $origin, @links, $URL, @abstract, $object );
 
 # Set the test paper meta-data
 $bibcode = "1998MNRAS.295..167A";
@@ -59,6 +59,8 @@ $URL =
 @abstract = <DATA>;
 chomp @abstract;
 
+$object = "EX Hya";
+
 # create an Astro::ADS::Result::Paper object from the meta-data
 my $paper = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                            Title     => $title,
@@ -70,7 +72,8 @@ my $paper = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                            Origin    => $origin,
                                            Links     => \@links,
                                            URL       => $URL,
-                                           Abstract  => \@abstract );
+                                           Abstract  => \@abstract,
+                                           Object    => $object );
 
 # compare bibcodes  
 ok( $paper->bibcode(), $bibcode );

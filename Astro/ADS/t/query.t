@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 55 };
+BEGIN { plan tests => 56 };
 
 # load modules
 use Astro::ADS::Query;
@@ -77,7 +77,14 @@ for my $i (0 .. $#data) {
    ok( $returned_paper[$i], $data[$i] );
 }
 
+# change author logic
+$author_logic = $query->authorlogic("OR");
 
+# check logic okay
+ok( $author_logic, "OR" );
+
+# query ADS
+#my $other_result = $query->querydb();
 
 
 
