@@ -118,7 +118,7 @@ catalogues.
 
 =head1 REVISION
 
-$Id: catalogs.PL,v 1.1 2003/02/24 22:31:09 aa Exp $
+$Id: catalogs.PL,v 1.2 2003/02/25 00:23:46 aa Exp $
 
 =head1 AUTHORS
 
@@ -673,7 +673,7 @@ foreach my $i ( 0 ... $#id ) {
           if ($pid = fork) {
              return;
           } elsif ( defined $pid ) { 
-      	     exec ( "$^X ./supercosmos.pl" .
+      	     exec ( "$^X ./supercosmos" .
                     " -id \"$id[$i]\" -ra \"$ra[$i]\" ".
                     " -dec \"$dec[$i]\" -radius $radius" );
           } elsif ($! == EAGAIN ) {
