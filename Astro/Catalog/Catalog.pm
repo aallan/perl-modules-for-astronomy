@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.28 2003/07/27 08:30:24 timj Exp $
+#     $Id: Catalog.pm,v 1.29 2003/07/27 21:39:21 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,14 +64,14 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.28 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.29 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.28 2003/07/27 08:30:24 timj Exp $
+$Id: Catalog.pm,v 1.29 2003/07/27 21:39:21 timj Exp $
 
 =head1 METHODS
 
@@ -1108,7 +1108,7 @@ sub sort_catalog {
 
     # Now do the search
     if ($sort =~ /(name|id)/) {
-      @rSources = sort  by_name @unsorted;
+      @rSources = sort  by_id @unsorted;
     } elsif ($sort =~ /ra/) {
       @rSources = sort by_ra @unsorted;
     } elsif ($sort =~ /dec/) {
@@ -1137,22 +1137,22 @@ sub sort_catalog {
 
 =over 4
 
-=item by_name
+=item by_id
 
-Internal routine to sort the entries in a source catalog by name.
+Internal routine to sort the entries in a source catalog by ID.
 
-  sort by_name @sources;
+  sort by_id @sources;
 
 Returns -1,0,1
 
 =cut
 
-sub by_name
+sub by_id
 {
   my $b2 = $b->{id};
   my $a2 = $a->{id};
 
-  # only compare if the name is defined and has length
+  # only compare if the ID is defined and has length
   if (defined $a2 && defined $b2 &&
      length($a2) > 0 && length($b2) > 0) {
     $a2 = uc($a2);
