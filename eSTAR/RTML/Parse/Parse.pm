@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.11 2002/03/28 02:22:14 aa Exp $
+#     $Id: Parse.pm,v 1.12 2002/03/29 18:02:15 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.11 2002/03/28 02:22:14 aa Exp $
+$Id: Parse.pm,v 1.12 2002/03/29 18:02:15 aa Exp $
 
 =head1 METHODS
 
@@ -372,6 +372,19 @@ sub rtml {
   _parse_rtml();
 
 }
+
+=item B<freeze>
+
+Method to return a blessed reference to the object so that we can store
+ths object on disk using Data::Dumper module.
+
+=cut
+
+sub freeze {
+  my $self = shift;
+  return bless $self, 'eSTAR::RTML::Parse';
+}
+
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 

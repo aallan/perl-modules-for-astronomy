@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.6 2002/03/18 17:23:22 aa Exp $
+#     $Id: Build.pm,v 1.7 2002/03/29 18:02:15 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -64,13 +64,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.6 2002/03/18 17:23:22 aa Exp $
+$Id: Build.pm,v 1.7 2002/03/29 18:02:15 aa Exp $
 
 =head1 METHODS
 
@@ -758,6 +758,20 @@ sub configure {
   }
 
 }
+
+=item B<freeze>
+
+Method to return a blessed reference to the object so that we can store
+ths object on disk using Data::Dumper module.
+
+=cut
+
+sub freeze {
+  my $self = shift;
+  return bless $self, 'eSTAR::RTML::Build';
+}
+
+
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 
