@@ -1,3 +1,11 @@
+2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * SIMBAD.pm: Mindor documeation tweak to bring the module into
+          line with the rest of my modules, and to get round a doc bug
+          in search.cpan.org
+          
+        * t/query.t: Fixed broken test case.  
+          
 2002-05-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * t/query.t: Applied bug fix patch file for test harness
