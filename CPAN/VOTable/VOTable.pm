@@ -44,7 +44,7 @@ Eric Winter, NASA GSFC (elwinter@milkyway.gsfc.nasa.gov)
 
 =head1 VERSION
 
-$Id: VOTable.pm,v 1.1 2003/10/13 10:51:22 aa Exp $
+$Id: VOTable.pm,v 1.2 2004/02/12 18:12:21 aa Exp $
 
 =cut
 
@@ -53,6 +53,9 @@ $Id: VOTable.pm,v 1.1 2003/10/13 10:51:22 aa Exp $
 # Revision history
 
 # $Log: VOTable.pm,v $
+# Revision 1.2  2004/02/12 18:12:21  aa
+# Removed 'use 5.6.1' pragmas
+#
 # Revision 1.1  2003/10/13 10:51:22  aa
 # GSFC VOTable module V0.10
 #
@@ -69,7 +72,6 @@ $Id: VOTable.pm,v 1.1 2003/10/13 10:51:22 aa Exp $
 package VOTable;
 
 # Specify the minimum acceptable Perl version.
-use 5.6.0;
 
 # Turn on strict syntax checking.
 use strict;

@@ -80,7 +80,7 @@ Eric Winter, NASA GSFC (Eric.L.Winter.1@gsfc.nasa.gov)
 
 =head1 VERSION
 
-$Id: DESCRIPTION.pm,v 1.1 2003/10/13 10:51:23 aa Exp $
+$Id: DESCRIPTION.pm,v 1.2 2004/02/12 18:12:21 aa Exp $
 
 =cut
 
@@ -89,6 +89,9 @@ $Id: DESCRIPTION.pm,v 1.1 2003/10/13 10:51:23 aa Exp $
 # Revision history
 
 # $Log: DESCRIPTION.pm,v $
+# Revision 1.2  2004/02/12 18:12:21  aa
+# Removed 'use 5.6.1' pragmas
+#
 # Revision 1.1  2003/10/13 10:51:23  aa
 # GSFC VOTable module V0.10
 #
@@ -138,7 +141,6 @@ $Id: DESCRIPTION.pm,v 1.1 2003/10/13 10:51:23 aa Exp $
 package VOTable::DESCRIPTION;
 
 # Specify the minimum acceptable Perl version.
-use 5.6.1;
 
 # Turn on strict syntax checking.
 use strict;

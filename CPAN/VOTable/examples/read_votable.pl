@@ -7,7 +7,7 @@
 use VOTable::Document;
 
 # Read the VOTABLE document.
-my $doc = new_from_file VOTable::Document 'votable.xml' or die;
+my $doc = new_from_file VOTable::Document $ARGV[0] or die;
 
 # Get the VOTABLE element.
 my $votable = ($doc->get_VOTABLE)[0] or die;

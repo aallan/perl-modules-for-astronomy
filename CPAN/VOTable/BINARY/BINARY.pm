@@ -70,7 +70,7 @@ Eric Winter, NASA GSFC (Eric.L.Winter.1@gsfc.nasa.gov)
 
 =head1 VERSION
 
-$Id: BINARY.pm,v 1.1 2003/10/13 10:51:22 aa Exp $
+$Id: BINARY.pm,v 1.2 2004/02/12 18:12:21 aa Exp $
 
 =cut
 
@@ -79,6 +79,9 @@ $Id: BINARY.pm,v 1.1 2003/10/13 10:51:22 aa Exp $
 # Revision history
 
 # $Log: BINARY.pm,v $
+# Revision 1.2  2004/02/12 18:12:21  aa
+# Removed 'use 5.6.1' pragmas
+#
 # Revision 1.1  2003/10/13 10:51:22  aa
 # GSFC VOTable module V0.10
 #
@@ -125,7 +128,6 @@ $Id: BINARY.pm,v 1.1 2003/10/13 10:51:22 aa Exp $
 package VOTable::BINARY;
 
 # Specify the minimum acceptable Perl version.
-use 5.6.1;
 
 # Turn on strict syntax checking.
 use strict;
