@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 48 };
+BEGIN { plan tests => 50 };
 
 # load modules
 use Astro::ADS::Query;
@@ -18,7 +18,7 @@ use Astro::ADS::Result::Paper;
 ok(1);
 
 my ( $bibcode, $title, @authors, @affil, $journal, $published, @keywords,
-     $origin, @links, $URL, @abstract, $object );
+     $origin, @links, $URL, @abstract, $object, $score );
 
 # Set the test paper meta-data
 $bibcode = "1998MNRAS.295..167A";
@@ -63,6 +63,8 @@ chomp @abstract;
 
 $object = "EX Hya";
 
+$score = 1.0;
+
 # create an Astro::ADS::Result::Paper object from the meta-data
 my $paper = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                            Title     => $title,
@@ -75,7 +77,8 @@ my $paper = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                            Links     => \@links,
                                            URL       => $URL,
                                            Abstract  => \@abstract,
-                                           Object    => $object );
+                                           Object    => $object,
+                                           Score     => $score );
 
 # compare bibcodes  
 ok( $paper->bibcode(), $bibcode );
@@ -142,20 +145,36 @@ for my $m (0 .. $#abstract) {
 my $lines = $paper->abstract();
 ok( $lines, $#abstract );
 
+# compare objects 
+ok( $paper->object(), $object );
+
+# compare scores  
+ok( $paper->score(), $score );
+
+# FOLLOWUP QUERIES
+# ----------------
+
+
 # do a followup query
+print "Connecting to ADS\n";
 my $refs = $paper->references();
+print "Continuing Tests\n";
 
 # should be 27 references on ADS for this paper
 ok( $refs->sizeof(), 27 );
 
 # do a followup query
+print "Connecting to ADS\n";
 my $cites = $paper->citations();
+print "Continuing Tests\n";
 
 # currently should be 5 citations on ADS for this paper
 ok( $cites->sizeof(), 5 );
 
 # shouldn't be a TOC with this paper
+print "Connecting to ADS\n";
 my $toc = $paper->tableofcontents();
+print "Continuing Tests\n";
 ok( $toc, undef );
 
 exit;
