@@ -22,15 +22,16 @@ use 5.006;
 use strict;
 use warnings;
 use warnings::register;
-use vars qw/ $VERSION /;
+use vars qw/ $VERSION $DEBUG /;
 use Carp;
+use Data::Dumper;
 
 use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
-
-$VERSION = '0.01';
+$DEBUG = 0;
+$VERSION = '0.02';
 
 =begin __PRIVATE_METHODS__
 
@@ -106,7 +107,14 @@ sub _read_catalog {
     next unless $line =~ /\S/;
 
     # Look for comments
-    if ($line =~ /^\s*\#/) {
+    if ($line =~ /^\[EOD\]/) {
+      # Usually indicates that we can stop parsing.
+      # At the very least this means end of data.
+      # so reset $intable
+      print "FOUND EOD - no need to continue\n" if $DEBUG;
+      last;
+
+    } elsif ($line =~ /^\s*\#/) {
       # probably a comment although CURSA extensions allow
       # some column information
       if ($line =~ /^\s*\#column-(.*):/) {
@@ -138,7 +146,7 @@ sub _read_catalog {
       # entry. Either the header or the content or the separator
       if ($intable) {
 	# Must be reading real content
-	warnings::warnif("Column mismatch: name count different to actual content!") if @columns != @content;
+	warnings::warnif("Column mismatch: name count different to actual content!:\n$line\n") if @columns != @content;
 
 	# Store the content in a hash indexed by the associated columns
 	# This will be a problem for degenerate headings!
@@ -187,8 +195,8 @@ sub _read_catalog {
   # itself. The supplied values override values read from the file
   %params = (%params, %options);
 
-  use Data::Dumper;
-  print Dumper( \@descr, \@comments, \@columns, \%params, \%extras, \@stars);
+  print Dumper( \@descr, \@comments, \@columns, \%params, \%extras, \@stars)
+    if $DEBUG;
 
   # Now we need to go through the parameters to see whether there are
   # any _col parameters that we need to map to an "ra", "dec" and "id"
@@ -201,22 +209,34 @@ sub _read_catalog {
     # counting at 0)
     my $colnum = $params{$key};
 
-    # Negative value indicates that we are not actually specifying
-    # a column
-    if ($colnum == -1) {
-      # should the entry "$col" be deleted from each star hash
-      # if it is present but has been designated -1 by a parameter?
+    # This is the translated name [either the name supplied
+    # directly or a column number
+    my $oldname;
 
-      next;
+    # it is possible that this number is actually a column name
+    if ($colnum =~ /[A-Za-z]/) {
+      # has a word character
+      $oldname = lc($colnum);
+    } else {
+      # Need to map column number to a name
+
+      # Negative value indicates that we are not actually specifying
+      # a column
+      if ($colnum == -1) {
+	# should the entry "$col" be deleted from each star hash
+	# if it is present but has been designated -1 by a parameter?
+	next;
+      }
+
+      # The old column name
+      $oldname = lc( $columns[$colnum]);
     }
-
-    # The old column name
-    my $oldname = lc( $columns[$colnum]);
 
     # Insert new column into hash
     # overwriting existing content if required without warning
+    # Assuming $star->{$oldname} actually exists
     for my $star (@stars) {
-      $star->{$col} = $star->{$oldname};
+      $star->{$col} = $star->{$oldname} if exists $star->{$oldname};
     }
 
   }
@@ -333,13 +353,38 @@ sub _read_catalog {
     # If no prefix assume R (yeah right) - we do not know the
     # source of the catalog at this point so can not even guess
     $construct{magnitudes} = {};
+    $construct{magerr} = {};
     for my $key (keys %$star) {
       next unless $key =~ /^(.*?)_?mag$/; # non-greedy
 
       # No capture - assume R
       my $filter = ( $1 ? uc($1) : "R" );
-      $construct{magnitudes}->{$filter} = $star->{$key};
 
+      # if the filter starts with e_ then it is probably an
+      # error in the magnitude
+      if ($filter =~ /^E_(\w)$/i) {
+	# error in magnitude
+	my $err = $1;
+	$construct{magerr}->{$err} = $star->{$key}
+	  if $star->{$key} =~ /\d/;
+	print "Found Mag Error $err ... \n" if $DEBUG;
+      } elsif ($filter =~ /_/) {
+	# is this a color?
+	warnings::warnif "Found unrecognised filter string: $filter\n";
+      } else {
+	# Assume it is a filter
+	$construct{magnitudes}->{$filter} = $star->{$key};
+	print "Found filter $filter ...\n" if $DEBUG;
+      }
+
+    }
+
+    # Colors: Look for B-V
+    $construct{colours} = {};
+    for my $key (keys %$star) {
+      next unless $key =~ /^(\w)-(\w)$/; # non-greedy
+      $construct{colours}->{uc($key)} = $star->{$key};
+      print "Found color ".uc($key)." ... \n" if $DEBUG;
     }
 
     # Modify the array in place
@@ -382,13 +427,19 @@ sub _parse_line {
   my $class = shift;
   my $line = shift;
 
-  my @cols =  split(/\s*\t\s*/,$line);
+  # Just so we do things correctly, add a ' ' to the
+  # end of a string if it ends in a tab. Otherwise for blank
+  # last column we end up being a column short
+  $line .= " " if $line =~ /\t$/;
 
-  # first column may have leading space
-  $cols[0] =~ s/^\s*//;
+  # Do the split on tab and then clean up each string
+  # Safer since \s include \t
+  my @cols =  split(/\t/,$line);
 
-  # last column may have trailing space
-  $cols[-1] =~ s/\s*$//;
+  for (@cols) {
+    s/^\s*//;
+    s/\s*$//;
+  }
 
   return @cols;
 }
@@ -399,7 +450,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.2 2003/08/03 09:35:31 timj Exp $
+ $Id: TST.pm,v 1.3 2003/08/03 11:20:35 timj Exp $
 
 =head1 FORMAT
 
