@@ -34,14 +34,14 @@ use VOTable::Document;
 
 use Data::Dumper;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOTable.pm,v 1.6 2003/10/17 11:35:35 aa Exp $
+$Id: VOTable.pm,v 1.7 2004/03/01 19:56:51 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -93,6 +93,22 @@ sub _read_catalog {
    # Get the DESCRIPTION element and its contents.
    my $description = ($resource->get_DESCRIPTION())[0];   
 
+   # Get the DEFINITIONS element and its contents.
+   my $definitions = ( $votable->get_DEFINITIONS())[0];
+
+   # Get the coordinate system (COOSYS) and its contents.
+   my $coosys = ( $definitions->get_COOSYS())[0];
+
+   # ...and the equinox and epoch and system. I LOVE VOTABLE.
+   my $equinox = $coosys->get_equinox();
+   my $epoch = $coosys->get_epoch();
+   my $system = $coosys->get_system();
+   if( $system =~ /fk4/i ) {
+     $equinox = "B" . $equinox;
+   } else {
+     $equinox = "J" . $equinox;
+   }
+
    # Get the TABLE element.
    my $table = ($resource->get_TABLE())[0];
 
@@ -117,18 +133,17 @@ sub _read_catalog {
    # we can stuff the table contents into the relevant places
    my %contents;
    foreach my $i ( 0 ... $#field_ucds ) {
-  
        $contents{"id"} = $i if $field_ucds[$i] =~ "ID_MAIN";
        $contents{"ra"} = $i if $field_ucds[$i] =~ "POS_EQ_RA_MAIN";
        $contents{"dec"} = $i if $field_ucds[$i] =~ "POS_EQ_DEC_MAIN";
        $contents{"quality"} = $i if $field_ucds[$i] =~ "CODE_QUALITY";
        if( $field_ucds[$i] =~ "PHOT_" ) {
            $contents{ $field_ucds[$i] } = $i;  
-       }     
+       }
+       $contents{"parallax"} = $i if $field_ucds[$i] =~ "POS_EQ_PLX_FACTOR";
+       $contents{"pm_dec"} = $i if $field_ucds[$i] =~ "POS_EQ_PMDEC";
+       $contents{"pm_ra"} = $i if $field_ucds[$i] =~ "POS_EQ_PMRA";
    }
-   
-   #print "# CONTENTS\n";
-   #print Dumper( %contents );
    
    # loop over each row in the TABLEDATA (ie each star)
    foreach my $j ( 0 ... $tabledata->get_num_rows()-1 ) {
@@ -168,11 +183,31 @@ sub _read_catalog {
          
       }
       
+      # Set defaults for the proper motions and parallax.
+      my $pm_dec = ( exists( $contents{"pm_dec"} ) && defined( $contents{"pm_dec"} ) ? $row[$contents{"pm_dec"}] : undef );
+      my $pm_ra = ( exists( $contents{"pm_ra"} ) && defined( $contents{"pm_ra"} ) ? $row[$contents{"pm_ra"}] : undef );
+      my @pm;
+      if( ! defined( $pm_dec ) && ! defined( $pm_ra ) ) {
+        @pm = ();
+      } else {
+        @pm = ( $pm_ra, $pm_dec );
+      }
+      my $parallax = ( exists( $contents{"parallax"} ) && defined( $contents{"parallax"} ) ? $row[$contents{"parallax"}] : undef );
+
+      # Create an Astro::Coords object for the star.
+      my $coords = new Astro::Coords( ra => $row[$contents{"ra"}],
+                                      dec => $row[$contents{"dec"}],
+                                      type => $equinox,
+                                      epoch => $epoch,
+                                      pm => \@pm,
+                                      parallax => $parallax,
+                                      units => 's',
+                                    );
+
       # create a star
       my $star = new Astro::Catalog::Star( 
                            id  => $row[$contents{"id"}],
-                           ra  => $row[$contents{"ra"}],
-                           dec => $row[$contents{"dec"}],
+                           coords => $coords,
                            magnitudes => \%mags,
                            colours => \%colours,
                            quality => $row[$contents{"quality"}] );
@@ -244,6 +279,7 @@ sub _write_catalog {
     push @field_names, $cols[$i] . " Error";
   } 
   push @field_names, "Quality"; 
+
  
   # field ucds
   push @field_ucds, "ID_MAIN";
@@ -261,6 +297,7 @@ sub _write_catalog {
   } 
   push @field_ucds, "CODE_QUALITY";   
 
+
   # field datatypes
   push @field_datatypes, "char";
   push @field_datatypes, "char";
@@ -274,6 +311,7 @@ sub _write_catalog {
     push @field_datatypes, "double";
   } 
   push @field_datatypes, "int"; 
+
 
   # field units
   push @field_units, "";
@@ -289,6 +327,7 @@ sub _write_catalog {
   } 
   push @field_units, ""; 
 
+
   # array size
   push @field_sizes, "*";
   push @field_sizes, "*";
@@ -300,7 +339,28 @@ sub _write_catalog {
   
   foreach my $star ( 0 .. $#$stars ) {
      my @row;
-     
+
+     # Check to see if we should be writing out the proper motions
+     # and parallax.
+     my $coords = ${$stars}[$star]->coords;
+
+     if( scalar( $coords->pm ) ) {
+       push @field_names, "RA Proper Motion";
+       push @field_names, "Dec Proper Motion";
+       push @field_ucds, "POS_EQ_PMRA";
+       push @field_ucds, "POS_EQ_PMDEC";
+       push @field_datatypes, "double";
+       push @field_datatypes, "double";
+       push @field_units, "arcsec/yr";
+       push @field_units, "arcsec/yr";
+     }
+     if( defined( $coords->parallax ) ) {
+       push @field_names, "Parallax";
+       push @field_ucds, "POS_EQ_PLX_FACTOR";
+       push @field_datatypes, "double";
+       push @field_units, "arcsec";
+     }
+
      # id
      if ( defined ${$stars}[$star]->id() ) {
         push @row, ${$stars}[$star]->id();
@@ -308,9 +368,9 @@ sub _write_catalog {
         push @row, $star;
      } 
 
-     # ra & dec 
-     push @row,  ${$stars}[$star]->ra();
-     push @row,  ${$stars}[$star]->dec();
+     # ra & dec -- we want these in J2000.
+     push @row, $coords->ra2000(format => 's');
+     push @row, $coords->dec2000(format => 's');
  
      # magnitudes
      foreach my $i ( 0 .. $#mags ) {
@@ -350,7 +410,16 @@ sub _write_catalog {
      } else {
         push @row, "0";
      }
-     
+
+     # Proper motions and parallax
+     if( defined ${$stars}[$star]->coords ) {
+       my $coords = ${$stars}[$star]->coords;
+       my @pm = $coords->pm;
+       push @row, $pm[0];
+       push @row, $pm[1];
+       push @row, $coords->parallax;
+     }
+
      # push a reference to the row into the data                     
      push @data, \@row;
      
