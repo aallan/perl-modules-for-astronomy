@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.8 2002/03/19 15:06:49 aa Exp $
+#     $Id: Parse.pm,v 1.9 2002/03/20 18:33:48 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.8 2002/03/19 15:06:49 aa Exp $
+$Id: Parse.pm,v 1.9 2002/03/20 18:33:48 aa Exp $
 
 =head1 METHODS
 
@@ -194,6 +194,18 @@ Return the URL of the data image
 sub dataimage {
   my $self = shift;
   return ${${$self->{OBSERVATION}}{Imagedata}}{tag_value};
+}
+
+=item B<id>
+
+Return the unqiue ID of the observation
+
+  $unique_id = $rtml->id();
+
+=cut
+sub id {
+  my $self = shift;
+  return ${$self->{INTELLIGENTAGENT}}{tag_value};
 }
 
 # C O N F I G U R E ----------------------------------------------------------
