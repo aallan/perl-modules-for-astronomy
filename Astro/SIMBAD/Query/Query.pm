@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.9 2001/12/03 03:42:30 aa Exp $
+#     $Id: Query.pm,v 1.10 2001/12/03 08:58:00 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.9 2001/12/03 03:42:30 aa Exp $
+$Id: Query.pm,v 1.10 2001/12/03 08:58:00 aa Exp $
 
 =head1 METHODS
 
@@ -692,7 +692,8 @@ sub configure {
   # that due to the order these are called in supplying both and RA and Dec
   # and an object Identifier (e.g. HT Cas) will cause the query to default
   # to using the identifier rather than the supplied co-ordinates.
-  for my $key (qw / RA Dec Target Error Units Frame Epoch Equinox / ) {
+  for my $key (qw / RA Dec Target Error Units Frame Epoch Equinox 
+                    Proxy Timeout URL / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
