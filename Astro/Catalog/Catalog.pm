@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.48 2005/01/15 01:36:18 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.49 2005/02/15 23:27:26 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.48 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.49 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.48 2005/01/15 01:36:18 cavanagh Exp $
+$Id: Catalog.pm,v 1.49 2005/02/15 23:27:26 cavanagh Exp $
 
 =head1 METHODS
 
@@ -579,10 +579,17 @@ sub get_ra {
   my $self = shift;
   my $c = $self->get_coords;
   return unless defined $c;
-  my $ra = $c->ra(format => 'sex');
-  $ra =~ s/:/ /g;
-  $ra =~ s/^\s*//;
-  return $ra;
+  my $ra = $c->ra;
+  if( UNIVERSAL::isa( $ra, "Astro::Coords::Angle" ) ) {
+    $ra->str_delim( ' ' );
+    $ra->str_ndp( 2 );
+    return "$ra";
+  } else {
+    $ra = $c->ra( format => 's' );
+    $ra =~ s/:/ /g;
+    $ra =~ s/^\s*//;
+    return $ra;
+  }
 }
 
 =item B<get_dec>
@@ -598,12 +605,21 @@ sub get_dec {
   my $self = shift;
   my $c = $self->get_coords;
   return unless defined $c;
-  my $dec = $c->dec(format => 'sex');
-  $dec =~ s/:/ /g;
-  $dec =~ s/^\s*//;
-  # prepend sign if there is no sign
-  $dec = (substr($dec,0,1) eq '-' ? '' : '+' ) . $dec;
-  return $dec;
+  my $dec = $c->dec;
+  if( UNIVERSAL::isa( $dec, "Astro::Catalog::Angle" ) ) {
+    $dec->str_delim( ' ' );
+    $dec->str_ndp( 2 );
+    $dec = "$dec";
+    $dec = ( substr( $dec, 0, 1 ) eq '-' ? '' : '+' ) . $dec;
+    return $dec;
+  } else {
+    $dec = $c->dec( format => 's' );
+    $dec =~ s/:/ /g;
+    $dec =~ s/^\s*//;
+    # prepend sign if there is no sign
+    $dec = (substr($dec,0,1) eq '-' ? '' : '+' ) . $dec;
+    return $dec;
+  }
 }
 
 =item B<get_radius>
