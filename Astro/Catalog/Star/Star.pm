@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.11 2003/07/27 02:44:41 aa Exp $
+#     $Id: Star.pm,v 1.12 2003/07/27 02:51:01 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -79,14 +79,14 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.11 2003/07/27 02:44:41 aa Exp $
+$Id: Star.pm,v 1.12 2003/07/27 02:51:01 aa Exp $
 
 =head1 METHODS
 
@@ -137,7 +137,8 @@ sub new {
                       POSANGLE   => undef,
 		      COORDS     => undef,
                       X          => undef,
-                      Y          => undef }, $class;
+                      Y          => undef,
+                      COMMENT    => undef }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -752,6 +753,24 @@ sub y {
     $self->{Y} = shift;
   }
   return $self->{Y};
+}
+
+
+=item B<comment>
+
+Return (or set) a comment associated with the star
+
+   $comment = $star->comment();
+   $star->comment( $comment_string );
+
+=cut
+
+sub comment {
+  my $self = shift;
+  if (@_) {
+    $self->{COMMENT} = shift;
+  }
+  return $self->{COMMENT};
 }
 
 # C O N F I G U R E -------------------------------------------------------
