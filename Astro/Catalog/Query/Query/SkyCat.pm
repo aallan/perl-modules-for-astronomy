@@ -21,18 +21,19 @@ use warnings;
 use warnings::register;
 use vars qw/ $VERSION $FOLLOW_DIRS $DEBUG /;
 
+use Data::Dumper;
 use Carp;
 use File::Spec;
 
 use base qw/ Astro::Catalog::Transport::REST /;
 
 
-$VERSION = '0.01';
-$DEBUG = 1;
+$VERSION = '0.02';
+$DEBUG = 0;
 
 # Controls whether we follow 'directory' config entries and recursively
 # expand those. Default to false at the moment.
-$FOLLOW_DIRS = 1;
+$FOLLOW_DIRS = 0;
 
 # This is the name of the config file that was used to generate
 # the content in %CONFIG. Can be different to the contents ofg_file
@@ -206,8 +207,7 @@ sub _build_query {
   # Translate all the options to the internal skycat format
   my %translated = $self->_translate_options();
 
-  use Data::Dumper;
-  print Dumper(\%translated,$url);
+  print "Translated query: ".Dumper(\%translated,$url) if $DEBUG;
 
   # Now for each token replace it in the URL
   for my $key (keys %translated) {
@@ -217,7 +217,7 @@ sub _build_query {
     $url =~ s/$tok/$translated{$key}/;
   }
 
-  print "URL: $url\n";
+  print "Final URL: $url\n" if $DEBUG;
 
   return $url;
 }
@@ -241,7 +241,7 @@ sub _parse_query {
   my %params;
   for my $key (keys %{ $CONFIG{$cat} }) {
     if ($key =~ /_col$/) {
-      print "FOUND $key\n";
+      print "FOUND column specified $key\n" if $DEBUG;
       $params{$key} = $CONFIG{$cat}->{$key};
     }
   }
@@ -249,7 +249,7 @@ sub _parse_query {
   # If this catalogue is a GSC, pass in a GSC parameter
   $params{gsc} = 1 if $cat =~ /^gsc/i;
 
-  print $self->{BUFFER} ."\n";
+  print $self->{BUFFER} ."\n" if $DEBUG;
 
   # Make sure we set origin and field centre if we know it
   my $newcat = new Astro::Catalog( 
@@ -441,7 +441,8 @@ sub _load_config {
 
     # Skip if we have already analysed this server
     if (exists $CONFIG{lc($entry->{short_name})}) {
-      print "Already know about " . $entry->{short_name} . "\n";
+      print "Already know about " . $entry->{short_name} . "\n"
+	if $DEBUG;
       next;
     }
 
@@ -525,8 +526,7 @@ sub _load_config {
   }
 
   # Debug
-  use Data::Dumper;
-  print Dumper(\%CONFIG);
+  print Dumper(\%CONFIG) if $DEBUG;
 
   return;
 }
