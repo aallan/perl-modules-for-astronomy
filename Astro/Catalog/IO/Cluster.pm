@@ -8,6 +8,7 @@ Astro::Catalog::IO::Cluster - Input/Output in ARK Cluster format
 
   $catalog = Astro::Catalog::IO::Cluster->_read_catalog( \@lines );
   \@lines = Astro::Catalog::IO::Cluster->_write_catalog( $catalog, %opts );
+  Astro::Catalog::IO::Cluster->_default_file();
 
 =head1 DESCRIPTION
 
@@ -30,20 +31,18 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.1 2003/07/26 23:48:39 aa Exp $
-
-=back
+$Id: Cluster.pm,v 1.2 2003/07/27 00:21:40 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
-=head2 Private methods
+=head1 Private methods
 
 These methods are for internal use only and are called from the 
 Astro::Catalog module. Its not expected that anyone would want to
@@ -55,6 +54,8 @@ call them from utside that module.
 
 Parses a reference to an array containing an ARK Cluster format
 catalog, returns an Astro::Catalog object.
+
+  $catalog = Astro::Catalog::IO::Cluster->_read_catalog( \@lines );
 
 =cut
 
@@ -197,19 +198,19 @@ will write a catalogue with R, B-R and B-V.
 =cut
 
 sub write_catalog {
-  croak ( 'Usage: _write_cluster( $catalog, [%opts] )' unless scalar(@_) >= 1;
+  croak ( 'Usage: _write_cluster( $catalog, [%opts] ') unless scalar(@_) >= 1;
   my $catalog = shift;
 
   # real list of filters and colours in the catalogue
-  my @filters = $catalog->starbyindex[0]->what_filters();
-  my @colours = $catalog->starbyindex[0]->what_colours();
+  my @filters = $catalog->starbyindex(0)->what_filters();
+  my @colours = $catalog->starbyindex(0)->what_colours();
 
   # number of stars in catalogue
   my $number = $catalog->sizeof();
   
   # number of filters & colours
-  my $num_mags = $catalog->starbyindex[0]->what_filters();
-  my $num_cols = $catalog->starbyindex[0]->what_colours();
+  my $num_mags = $catalog->starbyindex(0)->what_filters();
+  my $num_cols = $catalog->starbyindex(0)->what_colours();
 
   # reference to the $self->{STARS} array in Astro::Catalog
   my $stars = $catalog->stars();
@@ -236,7 +237,7 @@ sub write_catalog {
   # if we want fewer magnitudes than we have in the object
   # to be written to the cluster file
   foreach my $m ( 0 .. $#{$mags} ) {
-     foreach my $n ( 0 .. $#num_mags ) {
+     foreach my $n ( 0 .. $num_mags ) {
         if ( ${$mags}[$m] eq $filters[$n] ) {
            push( @out_mags, ${$mags}[$m] );
         }   
@@ -244,10 +245,10 @@ sub write_catalog {
   }
 
   # same for colours
-  foreach my $m ( 0 .. $#{$cols} ) {
-     foreach my $n ( 0 .. $#num_cols ) {
-        if ( ${$cols}[$m] eq $colours[$n] ) {
-           push( @out_cols, ${$cols}[$m] );
+  foreach my $k ( 0 .. $#{$cols} ) {
+     foreach my $l ( 0 .. $num_cols ) {
+        if ( ${$cols}[$k] eq $colours[$l] ) {
+           push( @out_cols, ${$cols}[$k] );
         }   
      }
   } 
@@ -255,10 +256,10 @@ sub write_catalog {
   # write header
   # ------------
   my @output;
-  my $ouptut_line;
+  my $output_line;
   
   # check to see if we're outputing all the filters and colours
-  my $total = scalar(@out_filters) + scalar(@out_colours);
+  my $total = scalar(@out_mags) + scalar(@out_cols);
 
   push( @output, "$total colours were created\n" );
   push( @output, "@out_mags @out_cols\n" );
@@ -285,7 +286,7 @@ sub write_catalog {
      $output_line = $output_line . ${$stars}[$star]->dec() . "  ";
      
      if ( defined ${$stars}[$star]->x() && defined ${$stars}[$star]->y() ) {
-        $ouput_line = $output_line . 
+        $output_line = $output_line . 
                 ${$stars}[$star]->x() . " " . ${$stars}[$star]->y()  . " ";
      } else {
         $output_line = $output_line . "0.000  0.000  ";
@@ -298,21 +299,21 @@ sub write_catalog {
 
         # if we want fewer magnitudes than we have in the object
         # to be written to the cluster file
-        if ( defined ${$out_mags}[0] ) {
+        if ( defined $out_mags[0] ) {
 
            $doit = -1;
            # check to see if we have a valid filter
-           foreach my $m ( 0 .. $#{$out_mags} ) {
-              $doit = 1 if ( ${$out_mags}[$m] eq ${$mags}[$i] );
+           foreach my $m ( 0 .. $#out_mags ) {
+              $doit = 1 if ( $out_mags[$m] eq ${$mags}[$i] );
            }
         }
 
         # so long as $doit isn't -1 then we have a valid filter
         if( $doit != -1 ) {
           $output_line = $output_line . 
-                         ${$stars}[$star]->get_magnitude($mags[$i]) . "  ";
+                         ${$stars}[$star]->get_magnitude(${$mags}[$i]) . "  ";
           $output_line = $output_line . 
-                         ${$stars}[$star]->get_errors($mags[$i]) . "  ";
+                         ${$stars}[$star]->get_errors(${$mags}[$i]) . "  ";
           $output_line = $output_line . 
                          ${$stars}[$star]->quality() . "  ";
         }
@@ -326,34 +327,34 @@ sub write_catalog {
 
         # if we want fewer magnitudes than we have in the object
         # to be written to the cluster file
-        if ( defined ${$out_cols}[0] ) {
+        if ( defined $out_cols[0] ) {
 
            $doit = -1;
            # check to see if we have a valid filter
-           foreach my $m ( 0 .. $#{$out_cols} ) {
-              $doit = 1 if ( ${$out_cols}[$m] eq ${$cols}[$i] );
+           foreach my $m ( 0 .. $#out_cols ) {
+              $doit = 1 if ( $out_cols[$m] eq ${$cols}[$i] );
            }
         }
 
         # so long as $doit isn't -1 then we have a valid filter
         if( $doit != -1 ) {
           $output_line = $output_line . 
-                         ${$stars}[$star]->get_colour($mags[$i]) . "  ";
+                         ${$stars}[$star]->get_colour(${$cols}[$i]) . "  ";
           $output_line = $output_line . 
-                         ${$stars}[$star]->get_colourerr($mags[$i]) . "  ";
+                         ${$stars}[$star]->get_colourerr(${$cols}[$i]) . "  ";
           $output_line = $output_line . 
                          ${$stars}[$star]->quality() . "  ";
         }
      }
 
      # next star
-     $ouput_line = $output_line . "\n";
+     $output_line = $output_line . "\n";
      push (@output, $output_line );
 
   }
 
   # clean up
-  return \@ouput;
+  return \@output;
 
 }
 
