@@ -1,22 +1,22 @@
+#!perl
+
 # Astro::Catalog test harness
 
 # strict
 use strict;
 
 #load test
-use Test;
+use Test::More tests => 9;
 use File::Spec;
 use Data::Dumper;
-BEGIN { plan tests => 6 };
 
 # load modules
-use Astro::Catalog;
-use Astro::Catalog::Star;
+BEGIN {
+  use_ok "Astro::Catalog";
+  use_ok "Astro::Catalog::Star";
+}
 
 # T E S T   H A R N E S S --------------------------------------------------
-
-# test the test system
-ok(1);
 
 # setup environemt
 my $dir = File::Spec->tmpdir();
@@ -68,7 +68,9 @@ $star[1] = new Astro::Catalog::Star( ID         => 'U1500_01194795',
                                      Distance   => '0.08',
                                      PosAngle   => '12.567',
                                      Field      => '00081' );
-                                     
+
+isa_ok( $star[1], "Astro::Catalog::Star");
+
 # Create Catalog Object
 # ---------------------
 
@@ -76,6 +78,8 @@ my $catalog = new Astro::Catalog( RA     => '01 10 12.9',
                                   Dec    => '+60 04 35.9',
                                   Radius => '1',
                                   Stars  => \@star );
+
+isa_ok($catalog, "Astro::Catalog");
 
 # Write Catalog to Cluster File
 # -----------------------------
@@ -99,7 +103,7 @@ chomp @file;
 close(FILE);
 
 for my $i (0 .. $#buffer) {
-   ok( $file[$i], $buffer[$i] );
+   is( $file[$i], $buffer[$i], "compare buffer" );
 }
 
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------

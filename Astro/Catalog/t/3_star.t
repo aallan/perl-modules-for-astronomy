@@ -1,20 +1,18 @@
+#!perl
 # Astro::Catalog::Star test harness
 
 # strict
 use strict;
 
 #load test
-use Test;
-BEGIN { plan tests => 16 };
+use Test::More tests => 17;
+
 
 # load modules
-use Astro::Catalog::Star;
+BEGIN { use_ok("Astro::Catalog::Star") };
 use Data::Dumper;
 
 # T E S T   H A R N E S S --------------------------------------------------
-
-# test the test system
-ok(1);
 
 # magnitude and colour hashes
 my %mags = ( R => '16.1', B => '16.4', V => '16.3' );
@@ -36,9 +34,11 @@ my $star = new Astro::Catalog::Star( ID         => 'U1500_01194794',
                                      PosAngle   => '50.69',
                                      Field      => '00080' );
 
+isa_ok($star,"Astro::Catalog::Star");
+
 # FILTERS AND MAGNITUDES
 # ----------------------
-                                     
+
 # grab input filters
 my @input;
 for my $key ( sort keys %mags ) {
@@ -54,9 +54,11 @@ print "# output = @filters\n";
 
 # compare input and returned filters
 for my $i (0 .. $#filters) {
- ok( $filters[$i], $input[$i] );
- ok( $star->get_magnitude($filters[$i]), $mags{$filters[$i]} );
- ok( $star->get_errors($filters[$i]), $mag_error{$filters[$i]} );
+ is( $filters[$i], $input[$i], "compare filter name" );
+ is( $star->get_magnitude($filters[$i]), $mags{$filters[$i]},
+   "compare filter mag");
+ is( $star->get_errors($filters[$i]), $mag_error{$filters[$i]},
+   "compare filter magerror");
 }
 
 # grab input colours
@@ -74,17 +76,12 @@ print "# output = @cols2\n";
 
 # compare input and returned filters
 for my $i (0 .. $#cols2) {
- ok( $cols[$i], $cols2[$i] );
- ok( $star->get_colour($cols2[$i]), $colours{$cols2[$i]} );
- ok( $star->get_colourerr($cols2[$i]), $col_error{$cols2[$i]} );
+ is( $cols[$i], $cols2[$i], "compare colours names" );
+ is( $star->get_colour($cols2[$i]), $colours{$cols2[$i]}, 
+     "compare colour values" );
+ is( $star->get_colourerr($cols2[$i]), $col_error{$cols2[$i]},
+     "compare colour error");
 }
-
-
-
-# L A S T   O R D E R S   A T   T H E   B A R --------------------------------
-
-# Dump star object to screen
-#print Dumper($star);
 
 # T I M E   A T   T H E   B A R ---------------------------------------------
 exit;                                     
