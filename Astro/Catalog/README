@@ -9,55 +9,20 @@ The module is a generic object orientated astronomical catalogue object.
 What has changed recently?
 --------------------------
 
-As of v2.2 the module has been rewritten  to make use of Tim Jenness'
-Astro::Coords module which much simplifies the internals. Some of the
-pre-exisiting API is therefore depreciated and new API functions have 
-appeared. Some of the broken encapsulation has also been fixed and the
-module POD has been much improved.
 
 Requirements
 ------------
 
-While useful in itself as a generic catalogue object, the additional
-optionals Astro::Catalog::USNOA2 and Astro::Catalog::GSC modules provides 
-an interfaces  to the online USNO-A2 and Guide Star Catalogues provided by
-ESO/ST-ECF.
-
-The following external modules are required by the Astro::Catalog module and
-associated classes
-
-   LWP::UserAgent
-   Net::Domain 
-   File::Spec
-   Carp
-   
-all these modules, if not already installed, are available from CPAN. If you
-want to (optionally) use the Astro::Catalog::SuperCOSMOS module then the
-
-   Astro::Aladin
-   
-module and supporting CDS Java infrastructure must be installed. This is
-also needed, along with the Astro::DSS module, if you want to make use of
-the example scripts provided with the distribution.   
   
 Provides
 --------
 
-The package provides the following classes
-
-    Astro::Catalog
-    Astro::Catalog::Star
-    Astro::Catalog::SuperCOSMOS::Query
-    Astro::Catalog::GSC::Query
-    Astro::Catalog::USNOA2::Query
-    
-further information can be found in the POD included in modules.
 
 Where can I get it?
 -------------------
 
-The package is availabe from CPAN <http://www.cpan.org/> and from
-the eSTAR Project at http://www.estar.org.uk/
+The package is availabe from CPAN <http://www.cpan.org/> and from the 
+eSTAR Project at http://www.estar.org.uk/
 
 Installation
 ------------
@@ -73,12 +38,13 @@ Authors
 -------
 
 The module was originally written by Alasdair Allan <aa@astro.ex.ac.uk>,
-of the  University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/)  
+of the University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/)  
 as part of his work for the eSTAR project.
 
 The internal architecture of the module has been extensively rewritten 
-for v2.2 by Tim Jenness <t.jenness@jach.hawaii.edu> of the Joint Astronomy
-Centre in Hawaii.
+for v3.0 by Tim Jenness <t.jenness@jach.hawaii.edu> of the Joint Astronomy
+Centre in Hawaii and Alasdair Allan <aa@astro.ex.ac.uk>, of the University 
+of Exeter Astrophysics Group
 
 This version also includes patches supplied by Stephen Quinney
 <S.J.Quinney@durham.ac.uk> of Durham University, and Brad Cavanagh
