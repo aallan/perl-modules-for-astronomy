@@ -157,7 +157,7 @@ print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
 # Now compare the stars in the catalogues in order
 #-------------------------------------------------
-compare_catalog( $catalog_data, $catalog_byname);
+compare_catalog( $catalog_byname, $catalog_data);
 
 exit;
 

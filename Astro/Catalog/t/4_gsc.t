@@ -122,7 +122,7 @@ print "# DAT has " . $catalog_data->sizeof() . " stars\n";
 print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
 # Compare catalogues
-compare_catalog( $catalog_data, $catalog_byname );
+compare_catalog( $catalog_byname, $catalog_data);
 
 # quitting time
 exit;
