@@ -31,14 +31,14 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.2 2003/07/27 00:21:40 aa Exp $
+$Id: Cluster.pm,v 1.3 2003/07/27 00:44:32 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -59,8 +59,8 @@ catalog, returns an Astro::Catalog object.
 
 =cut
 
-sub _read_cluster {
-   croak( 'Usage: _read_cluster( \@lines )' ) unless scalar(@_) >= 1;
+sub _read_catalog {
+   croak( 'Usage: _read_catalog( \@lines )' ) unless scalar(@_) >= 1;
    my $arg = shift;
    my @lines = @{$arg};
    
@@ -197,7 +197,7 @@ will write a catalogue with R, B-R and B-V.
 
 =cut
 
-sub write_catalog {
+sub _write_catalog {
   croak ( 'Usage: _write_cluster( $catalog, [%opts] ') unless scalar(@_) >= 1;
   my $catalog = shift;
 
