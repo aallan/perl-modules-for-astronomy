@@ -21,21 +21,4 @@ do $p."helper.pl" or die "Error reading test functions: $!";
 
 # T E S T   H A R N E S S --------------------------------------------------
 
-# Grab catalogue from Vizier
-
-my $bsc = new Astro::Catalog::Query::CMC( RA     => "01 10 13.0",
-                                          Dec    => "+60 04 36",
-                                          Radius => '60' );
-
-print "# Connecting to Vizier CMC/11 Catalogue\n";
-my $catalog = $bsc->querydb();
-print "# Continuing tests\n";
-
-print Dumper( $catalog );
-my $buffer;
-$catalog->write_catalog( File => \$buffer, Format => 'Cluster' );
-print "\n" . $buffer . "\n";                         
-
-
-
 exit;
