@@ -50,6 +50,8 @@ for my $i (0 .. $#info) {
 
 exit;
 
+# --------------------------------------------------------------------------
+
 __DATA__
    0.7889522 ! Mean separation in arcsec of stars successfully paired.
  !! Begining of new star description.
