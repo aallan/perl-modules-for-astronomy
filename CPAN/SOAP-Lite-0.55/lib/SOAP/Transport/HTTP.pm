@@ -4,7 +4,7 @@
 # SOAP::Lite is free software; you can redistribute it
 # and/or modify it under the same terms as Perl itself.
 #
-# $Id: HTTP.pm,v 1.1 2003/05/01 14:30:58 aa Exp $
+# $Id: HTTP.pm,v 1.2 2003/06/04 05:40:56 aa Exp $
 #
 # ======================================================================
 
@@ -225,6 +225,8 @@ sub BEGIN {
 sub handle {
   my $self = shift->new;
 
+  SOAP::Trace::transport(sub {$self->request->as_string} );  
+
   if ($self->request->method eq 'POST') {
     $self->action($self->request->header('SOAPAction') || undef);
   } elsif ($self->request->method eq 'M-POST') {
@@ -293,7 +295,10 @@ sub make_response {
          !$SOAP::Constants::DO_NOT_USE_CHARSET && $encoding ? 'charset=' . lc($encoding) : ()),
        'Content-Length' => SOAP::Utils::bytelength $response), 
      $response,
-  ));
+  )); 
+  
+  SOAP::Trace::transport( sub {$self->response->as_string} );  
+
 }
 
 sub product_tokens { join '/', 'SOAP::Lite', 'Perl', SOAP::Transport::HTTP->VERSION }
