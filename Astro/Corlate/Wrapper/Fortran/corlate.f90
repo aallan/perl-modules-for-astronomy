@@ -176,6 +176,7 @@
         corlate=-1
         write(2,*) 'Failed to open archive file ', file_name_1
         close(2)
+        close(1)
         return
       end if
       call read_cluster_file(1, nstars1, ncol1, colstr1, star1) 
@@ -192,6 +193,7 @@
       if (iostat /= 0) then
         corlate=-2
         write(2,*) 'Failed to open new data file ', file_name_2
+        close(1)
         close(2)
         return
       end if
@@ -253,6 +255,7 @@
         write(2,*) 'Too few pairs to continue.'
         corlate=-3
         deallocate(matches)
+        close(2)
         return
       end if
 

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
                'NAME'           => 'Astro::Corlate',
-               'VERSION'        => '1.6',
+               'VERSION'        => '1.7',
                'PREREQ_PM'      => { },
                'dist'           => { COMPRESS => "gzip -9f"},
                ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
