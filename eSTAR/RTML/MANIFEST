@@ -7,8 +7,6 @@ RTML.pm
 t/rtml.t
 t/build.t
 t/parse.t
-observation.pl
-server.pl
 Build/Makefile.PL
 Build/Build.pm
 Parse/Makefile.PL
