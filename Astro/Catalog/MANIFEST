@@ -1,10 +1,6 @@
 README
 MANIFEST
 Makefile.PL
-catalogs.PL
-supercosmos.PL
-finder.PL
-targets.dat
 GPL
 ChangeLog
 Catalog.pm
