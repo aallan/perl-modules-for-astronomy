@@ -245,13 +245,22 @@ sub _read_catalog {
 
   # Now convert the information into a star object
 
+  # This is a back-of-the-envelope data dictionary from looking
+  # at USNO. Maps, A::C::Star methods to different columns names
+  my %datadict = (
+		  field => [ qw/ field /],
+		  quality => [ qw/ qual /],
+		  distance => [ "d'" ],
+		  posangle => [ qw/ pa /],
+		 );
+
+
   # precalculate EQUINOX (type for Astro::Coords at the moment
   # since it can not deal with JXXXX.XX format)
   my $type = $params{EQUINOX};
   if (defined $type) {
     if ($type =~ /(B1950|J2000)(\.0*)?$/) {
       $type = $1;
-      print "NEWTYPE $type\n";
     } else {
       warnings::warnif("Unsupported equinox '$type'. Defaulting to J2000");
       $type = "J2000";
@@ -291,6 +300,48 @@ sub _read_catalog {
 
     }
 
+
+    # Assume that some field names are standardised. This is
+    # probably rubbish (whoever heard of standards!).
+    # Need to create a data dictionary with all the alternatives
+    # that are in use.
+    # Be very scared if we have to provide mapping routines
+    for my $starkey (keys %datadict) {
+      for my $colname (@{ $datadict{$starkey} }) {
+	if (exists $star->{$colname}) {
+	  $construct{$starkey} = $star->{$colname};
+
+	  # stop looking
+	  next;
+	}
+      }
+    }
+
+    # In GSC, posangle has junk on the end. We know it should be
+    # a number
+    $construct{posangle} =~ s/\D+$// if exists $construct{posangle};
+
+    # gsc flag requires some work
+    if (exists $star->{gsc}) {
+      $construct{gsc} = ( $star->{gsc} eq '+' ? "TRUE" : "FALSE");
+    } elsif ($params{gsc}) {
+      $construct{gsc} = "TRUE";
+    }
+
+    # Magnitudes <- anything that ends in mag
+    # Assdume filter is in X_mag
+    # If no prefix assume R (yeah right) - we do not know the
+    # source of the catalog at this point so can not even guess
+    $construct{magnitudes} = {};
+    for my $key (keys %$star) {
+      next unless $key =~ /^(.*?)_?mag$/; # non-greedy
+
+      # No capture - assume R
+      my $filter = ( $1 ? uc($1) : "R" );
+      $construct{magnitudes}->{$filter} = $star->{$key};
+
+    }
+
     # Modify the array in place
     $star = new Astro::Catalog::Star( id => $star->{id}, %construct );
 
@@ -321,9 +372,9 @@ Returns back the columns.
 
  @content = $class->_parse_line( $line );
 
-This routine is trivial but it seemed sensible to put it in
-a function since the parse is done in more than one place
-in _read_catalog.
+This routine is trivial but it seemed sensible to put it in a function
+since the parse is done in more than one place in _read_catalog. 
+Whitespace around the column separators is stripped.
 
 =cut
 
@@ -331,7 +382,15 @@ sub _parse_line {
   my $class = shift;
   my $line = shift;
 
-  return split(/\t/,$line);
+  my @cols =  split(/\s*\t\s*/,$line);
+
+  # first column may have leading space
+  $cols[0] =~ s/^\s*//;
+
+  # last column may have trailing space
+  $cols[-1] =~ s/\s*$//;
+
+  return @cols;
 }
 
 
@@ -340,7 +399,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.1 2003/07/31 03:49:26 timj Exp $
+ $Id: TST.pm,v 1.2 2003/08/03 09:35:31 timj Exp $
 
 =head1 FORMAT
 
@@ -357,8 +416,8 @@ L<Astro::Catalog>, L<Astro::Catalog::IO::Simple>.
 Copyright (C) 2003 Particle Physics and Astronomy Research Council.
 All Rights Reserved.
 
-This module is free software; you can redistribute it and/or modify it under the terms of the GNU
-Public License.
+This module is free software; you can redistribute it and/or modify it
+under the terms of the GNU Public License.
 
 =head1 AUTHORS
 
