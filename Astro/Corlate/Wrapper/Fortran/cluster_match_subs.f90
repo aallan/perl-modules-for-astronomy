@@ -6,11 +6,11 @@
 
     contains
 
-    subroutine read_cluster_file(iunit, nstars, ncol, colstr, star) 
+    subroutine read_cluster_file(file, nstars, ncol, colstr, star) 
 
       ! Reads in a cluster format file on an already open unit.
 
-      integer, intent(in) :: iunit
+      character(len=*), dimension(:), intent(in) :: file
       integer, intent(out) :: nstars, ncol
       character(len=*), dimension(:), intent(out) :: colstr
       type(a_star), dimension(:), allocatable, intent(out) :: star
@@ -19,25 +19,21 @@
       character(len=30) :: tmpstr
 
       ! Three lines of header.
-      read(iunit,'(/,/)')
-      nstars=0.0
-      count_them: do
-        read(iunit,*, iostat=iostat) i
+      nstars=0
+      count_them: do i=4, size(file)
+        read(file(i),*, iostat=iostat)
         if (iostat < 0) exit count_them
         nstars=nstars+1
       end do count_them
-      rewind(iunit)
-      read(iunit,*,iostat=iostat) ncol
+      read(file(1),*,iostat=iostat) ncol
       if (iostat < 0) ncol=4
       ! The next line should have the names of the colours on it, but
       ! it may not.
-      read(iunit,'(a30)') tmpstr
-      read(tmpstr,*,iostat=iostat) (colstr(i),i=1,ncol)
+      read(file(2),*,iostat=iostat) (colstr(i),i=1,ncol)
       if (iostat < 0) colstr=' '
-      read(iunit,*)
       allocate(star(nstars))
       do istar=1, nstars
-        iostat=read_star(iunit, star(istar), ncol)
+        iostat=read_star(1, star(istar), ncol, file(istar+3))
         if (iostat /= 0) then
           print*, 'Error reading that file, iostat is', iostat
           print*, 'For line number ', istar+3
@@ -107,7 +103,7 @@
         ibright=0
         bright=huge(star1(matches(1))%col(1)%data)
         do i=1, n_matches
-          if (star1(matches(i))%col(1)%flg == 0) then
+          if (star1(matches(i))%col(1)%flg == 'OO') then
             if (star1(matches(i))%col(1)%data < bright) then
               ibright=i
               bright=star1(matches(i))%col(1)%data

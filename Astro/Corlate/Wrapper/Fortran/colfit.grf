@@ -1,0 +1,14 @@
+read,ytab=11,yeta=12,yfta=13,xtab=14,xeta=15,xfta=16
+new_colfit.cat                                        
+limi
+plot,bars
+axes
+xlab
+ylab
+read
+new_colfit.fit                                        
+plot
+read,ytab=11,yeta=12,yfta=13,xtab=14,xeta=15,xfta=16
+new_corlate.cat
+plot stars                                        
+keys

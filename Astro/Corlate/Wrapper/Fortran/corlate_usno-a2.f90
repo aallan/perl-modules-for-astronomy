@@ -1,13 +1,3 @@
-  ! Modifcation history.
-
-  ! Originally written for the eSTAR LX200 e-science demonstrator.
-
-  ! Modified in August 2003 for the UKIRT tests.  Much of the stuff
-  ! which was specific for USNO A2 vs optical data (likely accuracy of
-  ! of photometry, number of correlations etc) changed into parameters
-  ! set at the head of the corlate code.
-
-
   module corlate_subs
 
     implicit none
@@ -64,7 +54,7 @@
         nclip_old=nclip
         nclip=0
         do i=1, ndata
-          if (chi(i) > 4.0*chisq) then
+          if (chi(i) > 9.0*chisq) then
             weight(i) = 0.0
             nclip=nclip+1
           end if
@@ -93,7 +83,7 @@
 
     end subroutine fit
 
-    integer function corlate( file_1, file_2, file_name_3, &
+    integer function corlate( file_name_1, file_name_2, file_name_3, &
                               file_name_4, file_name_5, file_name_6, &
                               file_name_7, file_name_8 ) 
 
@@ -131,8 +121,8 @@
       !    of header.
       ! 8. A file of useful information on the variable stars.
 
-      character(len=*), dimension(:), intent(in):: file_1
-      character(len=*), dimension(:), intent(in):: file_2
+      character(len=*), intent(in):: file_name_1
+      character(len=*), intent(in):: file_name_2
       character(len=*), intent(in):: file_name_3
       character(len=*), intent(in):: file_name_4
       character(len=*), intent(in):: file_name_5
@@ -156,6 +146,7 @@
       integer :: npair
 
       integer :: i, iostat, istar
+      real :: fixrad
       integer, dimension(:), allocatable :: matches
       integer :: n_matches
       real :: work
@@ -164,49 +155,32 @@
       real :: a, b, chisq
       integer :: nclip
 
-      ! For calculating the modal separation.
-      real :: another_alpha, another_delta
-      real :: mod_shift_alpha, mod_shift_delta
-      real, dimension(:), allocatable :: dist_alpha, dist_delta
-      ! For the mean.
-      real :: dist_mean, dist
+      ! For calculating the mean seperation.
+      real :: another_alpha, another_delta, dist, dist_mean
 
       ! For the probablility.
       integer, parameter :: mprob=101
       real, dimension(mprob) :: bin
       integer :: nprob, iprob, ibin
       real, allocatable, dimension(:) :: prob
-      real :: delta_mag, abs_delta_mag
-
-      ! Some things you may want to tweak.
-      ! The minimum number of stars in common you must have.
-      ! For 2MASS + UKIRT 3; for USNO-A2 + LX200 10.
-      integer, parameter :: minpair=10
-      ! The lowest signal-to-noise stars you will use in the correlation.
-      ! For 2MASS + UKIRT 0.2; for USNO A-2 + LX200 0.1.
-      real, parameter :: lowest_sn=0.1
-      ! The false alarm probablility you are prepared to accept.
-      ! For 2MASS + UKIRT 0.05; for USNO A-2 + LX200 0.01.
-      real, parameter :: accept_prob=0.01
-      ! Set this true if you want to find stars that have faded as well as
-      ! those which have brightened.
-      logical, parameter :: allow_fading=.false.
-      ! The initial search radius.
-      real, parameter :: inital_rad=8.0
-      ! Search radius after tweaking positions.
-      ! For 2MASS + UKIRT 1.0; for USNO-A2 + LX200 used to use sum (in 
-      ! quadrature) of RMS of fit + 3.0.
-      real, parameter :: final_rad=3.0
-      ! Minimum change in magnitude to believe variable.
-      ! For 2MASS + UKIRT started with 0.5, but 0.0 is intellectually correct
-      ! (which is what USNO-A2 + LX200 used).
-      real, parameter :: min_mag_change=0.0
+      real :: delta_mag
 
       ! Start as we mean to go on.
       corlate=0
       open(unit=2, file=file_name_3, status='unknown')
 
-      call read_cluster_file(file_1, nstars1, ncol1, colstr1, star1) 
+      fixrad=3.0
+
+      open(1,file=file_name_1, status='old', iostat=iostat, action='read')
+      if (iostat /= 0) then
+        corlate=-1
+        write(2,*) 'Failed to open archive file ', file_name_1
+        close(2)
+        close(1)
+        return
+      end if
+      call read_cluster_file(1, nstars1, ncol1, colstr1, star1) 
+      close(1)
 
       ! Make the ra and dec arrays.
       allocate(alpha(nstars1), delta(nstars1))
@@ -215,42 +189,55 @@
         star1(i)%dc_d, star1(i)%dc_m, star1(i)%dc_s, alpha(i), delta(i))
       end do
 
-      call read_cluster_file(file_2, nstars2, ncol2, colstr2, star2) 
+      open(unit=1, file=file_name_2, status='old', iostat=iostat, action='read')
+      if (iostat /= 0) then
+        corlate=-2
+        write(2,*) 'Failed to open new data file ', file_name_2
+        close(1)
+        close(2)
+        return
+      end if
+      call read_cluster_file(1, nstars2, ncol2, colstr2, star2) 
+      close(1)
 
       ! Remove any variability flags.
-      where(star2%col(1)%flg(1:1) == 'V') star2%col(1)%flg(1:1)='O'
-      where(star2%col(1)%flg(2:2) == 'V') star2%col(1)%flg(2:2)='O'
+      where(star2%col(1)%flg/10 == 6) star2%col(1)%flg=star2%col(1)%flg-60
+      where(star2%col(1)%flg - 10*(star2%col(1)%flg/10) == 6) &
+      star2%col(1)%flg=star2%col(1)%flg-6
 
       ! A first run through to tweak up the matching radius.
 
       allocate(matches(nstars1))
       npair=0
-
-      allocate(dist_alpha(nstars2), dist_delta(nstars2))
+      dist_mean=0.0
 
       rad: do istar=1, nstars2
 
         call match_them(nstars1, star1, alpha, delta, star2(istar), &
-        inital_rad, matches, n_matches)
+        fixrad, matches, n_matches)
 
         if (n_matches > 0) then
 
           ! Now, go through the reasons for not fitting this star.
-          if (star2(istar)%col(1)%err > lowest_sn) cycle rad
-          if (star2(istar)%col(1)%flg /= 'OO') cycle rad
-          if (star1(matches(1))%col(1)%flg /= 'OO') cycle rad
-          if (star1(matches(1))%col(2)%flg /= 'OO') cycle rad
+          if (star2(istar)%col(1)%err > 0.1) cycle rad
+          if (star2(istar)%col(1)%flg /= 0) cycle rad
+          if (star1(matches(1))%col(1)%flg /= 0) cycle rad
+          if (star1(matches(1))%col(2)%flg /= 0) cycle rad
 
           ! O.K., its one we want.
-
-          npair=npair+1
 
           ! First find the separation.
           call radec2rad(star2(istar)%ra_h, star2(istar)%ra_m, &
           star2(istar)%ra_s, star2(istar)%dc_d, star2(istar)%dc_m, &
           star2(istar)%dc_s, another_alpha, another_delta)
-          dist_alpha(npair)=(another_alpha-alpha(matches(1)))
-          dist_delta(npair)=(another_delta-delta(matches(1)))
+          dist=(another_alpha-alpha(matches(1)))
+          dist=dist*cos((another_delta+delta(matches(1)))/2.0)
+          dist=dist**2.0
+          dist=dist+(another_delta-delta(matches(1)))**2.0
+          dist=sqrt(dist)*206264.8
+          dist_mean=dist_mean+(dist*dist)
+
+          npair=npair+1
 
         end if
 
@@ -258,26 +245,19 @@
 
       write(2,*) 'Number of pairs for first pass was ', npair
 
-      if (npair < minpair) then
+      if (npair > 10) then
+        dist_mean=sqrt(dist_mean/real(npair))
+        write(2,*) 'Which gave a mean separation of ', dist_mean
+        ! We have some objects with significant proper motions, so let
+        ! the slop be 3 arcsec plus the RMS.
+        fixrad = sqrt ( (3.0*dist_mean)**2.0 + 3.0**2.0)
+      else        
         write(2,*) 'Too few pairs to continue.'
         corlate=-3
         deallocate(matches)
         close(2)
         return
       end if
-
-      dist_alpha=dist_alpha*206264.8
-      dist_delta=dist_delta*206264.8*cos(delta(1))
-      mod_shift_alpha=median(dist_alpha, npair)
-      mod_shift_delta=median(dist_delta, npair)
-
-      deallocate(dist_alpha, dist_delta)
-
-      write(2,*) 'Which gave a modal separations in RA and dec of ', &
-      mod_shift_alpha, mod_shift_delta, ' arcseconds.'
-
-      mod_shift_alpha=mod_shift_alpha/206264.8
-      mod_shift_delta=mod_shift_delta/(206264.8*cos(delta(1)))
 
       allocate(pair(nstars2))
       npair=0
@@ -291,8 +271,8 @@
 
       new_star: do istar=1, nstars2
 
-        call match_them(nstars1, star1, alpha+mod_shift_alpha, delta+mod_shift_delta, star2(istar), &
-        final_rad, matches, n_matches)
+        call match_them(nstars1, star1, alpha, delta, star2(istar), &
+        fixrad, matches, n_matches)
 
         if (n_matches == 0) then
           ! Not found any match.
@@ -300,10 +280,10 @@
         else
 
           ! Now, go through the reasons for not fitting this star.
-          if (star2(istar)%col(1)%err > lowest_sn) cycle new_star
-          if (star2(istar)%col(1)%flg /= 'OO') cycle new_star
-          if (star1(matches(1))%col(1)%flg /= 'OO') cycle new_star
-          if (star1(matches(1))%col(2)%flg /= 'OO') cycle new_star
+          if (star2(istar)%col(1)%err > 0.1) cycle new_star
+          if (star2(istar)%col(1)%flg /= 0) cycle new_star
+          if (star1(matches(1))%col(1)%flg /= 0) cycle new_star
+          if (star1(matches(1))%col(2)%flg /= 0) cycle new_star
 
           ! O.K., its one we want.
 
@@ -311,10 +291,10 @@
           call radec2rad(star2(istar)%ra_h, star2(istar)%ra_m, &
           star2(istar)%ra_s, star2(istar)%dc_d, star2(istar)%dc_m, &
           star2(istar)%dc_s, another_alpha, another_delta)
-          dist=(another_alpha-alpha(matches(1))-mod_shift_alpha)
+          dist=(another_alpha-alpha(matches(1)))
           dist=dist*cos((another_delta+delta(matches(1)))/2.0)
           dist=dist**2.0
-          dist=dist+(another_delta-delta(matches(1))-mod_shift_delta)**2.0
+          dist=dist+(another_delta-delta(matches(1)))**2.0
           dist=sqrt(dist)*206264.8
           dist_mean=dist_mean+(dist*dist)
 
@@ -344,7 +324,7 @@
           pair%col(1)%data=pair%col(4)%data - pair%col(3)%data
           pair(npair)%col(1)%err = &
           sqrt(pair(npair)%col(3)%err**2.0 + pair(npair)%col(4)%err**2.0)
-          pair(1:npair)%col(1)%flg='OO'
+          pair(1:npair)%col(1)%flg=0
 
           call write_star(1, pair(npair), 4)
 
@@ -357,7 +337,7 @@
 
       write(2,*) 'Number of pairs for fitting is ', npair
 
-      if (npair >= minpair) then
+      if (npair > 10) then
 
         dist_mean=sqrt(dist_mean/real(npair))
         write(2,*) 'Whose mean separation is ', dist_mean, ' arcsec.'
@@ -389,23 +369,15 @@
         nprob=0
         do istar=1, npair
           delta_mag = pair(istar)%col(1)%data - a-b*pair(istar)%col(2)%data
-          !print*, delta_mag
-          if (allow_fading) then
-            abs_delta_mag=abs(delta_mag)
-          else
-            abs_delta_mag=delta_mag
-          end if
-          if (abs_delta_mag > min_mag_change) then
+          if (delta_mag > 0.0) then
             nprob=nprob+1
             ! Work out the probablility, after scaling the error bar by chisq.
             prob(nprob)= &
-            pchisq(((abs_delta_mag/pair(istar)%col(1)%err)**2.0)/chisq)
+            pchisq(((delta_mag/pair(istar)%col(1)%err)**2.0)/chisq)
             prob(nprob)=1.0-(1.0-prob(nprob))**real(npair)
-            ! One day we should correct the above to be two 
-            ! sided if (allow_fading).
-            if (prob(nprob) < accept_prob) then
+            if (prob(nprob) < 0.01) then
               ! Change colour 1 to be the change in magnitde.
-              ! pair(istar)%col(1)%data = -delta_mag
+              pair(istar)%col(1)%data = -delta_mag
               call write_star(1, pair(istar), 4)
               write(3,*) '!! Begining of new star description.'
               write(3,*) colstr2(1), '! Filter observed in.'
@@ -434,17 +406,17 @@
 
         open(unit=1, file=file_name_7, status='unknown')
         write(1,'(/,/)')
-        !write(1,*) &
-        !  10.0**(((           0.5)/real(-mprob))*maxval(prob(1:nprob))), &
-        !  0.0
-        !do i=1, mprob
-        !  write(1,*) &
-        !  10.0**(((real(i    )+0.5)/real(-mprob))*maxval(prob(1:nprob))), &
-        !  bin(i)
-        !end do
-        !write(1,*) &
-        !  10.0**(((real(mprob)+1.5)/real(-mprob))*maxval(prob(1:nprob))), &
-        !  0.0
+        write(1,*) &
+          10.0**(((           0.5)/real(-mprob))*maxval(prob(1:nprob))), &
+          0.0
+        do i=1, mprob
+          write(1,*) &
+          10.0**(((real(i    )+0.5)/real(-mprob))*maxval(prob(1:nprob))), &
+          bin(i)
+        end do
+        write(1,*) &
+          10.0**(((real(mprob)+1.5)/real(-mprob))*maxval(prob(1:nprob))), &
+          0.0
         close(1)
 
         deallocate(prob)
@@ -461,40 +433,5 @@
 
             
     end function corlate
-
-    real function median(srtbuf, nfile)
-
-      ! Finds the median value in steps of 1.  Needs generalising.
-
-      real, intent(out), dimension(:) :: srtbuf
-      integer, intent(in) :: nfile
-
-      integer :: k, l, m
-      real :: aval
-      integer, dimension(:), allocatable :: count
-
-      do 140 k=2, nfile
-        aval=srtbuf(k)
-        do l=1, k-1
-          if (aval .lt. srtbuf(l)) then
-            do m=k, l+1, -1
-              srtbuf(m)=srtbuf(m-1)
-            end do
-            srtbuf(l)=aval
-            goto 140
-          endif
-        end do
-140   continue
-
-      allocate(count(nint(srtbuf(1)):nint(srtbuf(nfile))))
-      count=0
-      do k=1, nfile
-        l=nint(srtbuf(k))
-        count(l)=count(l)+1
-      end do
-      median=real(minval(maxloc(count)))+nint(srtbuf(1))-1
-      deallocate(count)
-
-    end function median
 
   end module corlate_subs
