@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.6 2002/03/31 21:39:48 aa Exp $
+#     $Id: Catalog.pm,v 1.7 2003/06/09 04:03:44 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -55,14 +55,14 @@ use vars qw/ $VERSION /;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.6 2002/03/31 21:39:48 aa Exp $
+$Id: Catalog.pm,v 1.7 2003/06/09 04:03:44 aa Exp $
 
 =head1 METHODS
 
@@ -74,10 +74,12 @@ $Id: Catalog.pm,v 1.6 2002/03/31 21:39:48 aa Exp $
 
 Create a new instance from a hash of options 
 
-  $catalog = new Astro::Catalog( Stars   => \@array );
-  $catalog = new Astro::Catalog( Cluster => $file_name );
+  $catalog = new Astro::Catalog( Stars       => \@array );
+  $catalog = new Astro::Catalog( Cluster     => $file_name );
+  $catalog = new Astro::Catalog( Scalar      => $scalar );
 
-returns a reference to an C<Astro::Catalog> object.
+returns a reference to an C<Astro::Catalog> object. Where $scalar is a scalar
+holding a string representing an ARK Cluster Format file.
 
 =cut
 
@@ -473,11 +475,22 @@ sub configure {
     unless ( open( FILE, "$file_name" ) ) {
        croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
     }     
+    # read from file   
+    my @catalog = <FILE>;
+    chomp @catalog;
     close(FILE);
+   
+    # read catalogue
+     _read_cluster( $self, @catalog ); 
+        
+  } elsif ( defined $args{Scalar} ) {
+  
+    # Split the catalog out from its single scalar
+    my @catalog = split( /\n/, $args{Scalar} );
 
     # read catalogue from file
-     _read_cluster( $self, $file_name );    
-    
+     _read_cluster( $self, @catalog );    
+        
   } else {
   
      # no build arguements
@@ -530,36 +543,22 @@ These methods are for internal use only.
 
 =itemB<_read_cluster>
 
-Reads and parses an ARK Format Cluster file into the object.
+Reads and parses a scalar containing an ARK Format Cluster file into the object.
 
 =cut
 
 sub _read_cluster {
    my $self = shift;
-   
-   # croak unless we have arguments
-   croak ("Astro::Catalog read_catalog() - No filename provided" ) unless @_;
-    
-   # build from Cluster file
-   my $file_name = shift;
-      
-   unless ( open( FILE, $file_name ) ) {
-       croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
-   } 
-   
-   # read from file   
-   my @file = <FILE>;
-   chomp @file;
-   close(FILE);
-   
+   my @catalog = @_;
+
    # loop through file
-   foreach my $i ( 3 .. $#file ) {
+   foreach my $i ( 3 .. $#catalog ) {
  
       # remove leading spaces
-      $file[$i] =~ s/^\s+//;
+      $catalog[$i] =~ s/^\s+//;
 
       # split each line
-      my @separated = split( /\s+/, $file[$i] );
+      my @separated = split( /\s+/, $catalog[$i] );
  
       # debugging (leave in)
       #foreach my $thing ( 0 .. $#separated ) {

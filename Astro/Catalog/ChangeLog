@@ -1,9 +1,25 @@
+2003-06-09  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Fixed test scripts for Astro::Catalog::SuperCOSMOS so that
+          they fail gracefully if Astro::Aladin isn't installed.
+          
+        * Astro::Catalog module patched to take an ARK catalogue via
+          a scalar rather than from a file. For backwards compatibility
+          reasons Astro::Catalog( Cluster => $file ) still refers to
+          a serialised version, whereas Astro::Catalog( Scalar => $file ) 
+          refers to a scalar holding a string that is an ARK Cluster
+          catalogue. This isn't optimal but I don't particularly want
+          to break the exisiting (extensive) codebase.
+
 2003-02-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Astro::Catalog now wraps SuperCOSMOS catalogue using 
           the Astro::Aladin module. Some example scripts using this
           new module and the Astro::DSS module are included in the
-          distribution.
+          distribution. NB: This isn't intended to be used seriously
+          by anyone, its not even a sub-optimal way of going about
+          things, but I was playing and since I wrote the code I may
+          as well distribute the stuff.
           
 2002-05-31  Alasdair Allan <aa@astro.ex.ac.uk>
 
