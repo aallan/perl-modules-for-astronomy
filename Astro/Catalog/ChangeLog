@@ -1,3 +1,9 @@
+2005-02-01  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+        * IO/FINDOFF.pm: Fix regex bug, clarify documentation, only write
+          ID in comment column.
+        * IO/SExtractor.pm: Declare filter variable to fix syntax error.
+
 2005-01-18  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * MANIFEST: Fixed problems with MANIFEST file
