@@ -12,7 +12,7 @@ the L<Astro::ADS::Query> module.
 
 =head1 REVISION
 
-$Id: ADS.pm,v 1.1 2003/07/15 20:35:34 aa Exp $
+$Id: ADS.pm,v 1.2 2003/07/16 18:56:43 aa Exp $
 
 =head1 METHODS
 
@@ -35,6 +35,6 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 use strict;
 use vars qw/ $VERSION /;
-$VERSION = '1.20.6'
+$VERSION = '1.20.7'
 
 1;                                                                  
