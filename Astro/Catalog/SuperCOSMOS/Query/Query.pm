@@ -2,7 +2,7 @@ package Astro::Catalog::SuperCOSMOS::Query;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::Catalog::SuperCOSMOS::Query
 
@@ -20,7 +20,7 @@ package Astro::Catalog::SuperCOSMOS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.2 2003/02/24 22:31:09 aa Exp $
+#     $Id: Query.pm,v 1.3 2003/07/25 03:20:22 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -56,7 +56,9 @@ through a proxy (unlike the USNO-A2 and GSC modules).
 
 # L O A D   M O D U L E S --------------------------------------------------
 
+use 5.006;
 use strict;
+use warnings;
 use vars qw/ $VERSION /;
 
 use Net::Domain qw(hostname hostdomain);
@@ -65,162 +67,24 @@ use File::Spec;
 use Carp;
 
 # generic catalog objects
+use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
 # aladin stuff
 use Astro::Aladin;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.2 2003/02/24 22:31:09 aa Exp $
+$Id: Query.pm,v 1.3 2003/07/25 03:20:22 timj Exp $
 
 =head1 METHODS
 
-=head2 Constructor
-
 =over 4
-
-=item B<new>
-
-Create a new instance from a hash of options
-
-  $supercos = new Astro::Catalog::SuperCOSMOS::Query( RA        => $ra,
-                                                      Dec       => $dec,
-                                                      Band      => $waveband,
-                                                      Radius    => $radius
-                                                    );
-
-returns a reference to an SuperCOSMOS query object.
-
-=cut
-
-sub new {
-  my $proto = shift;
-  my $class = ref($proto) || $proto;
-
-  # bless the query hash into the class
-  my $block = bless { RA        => undef,
-                      DEC       => undef,
-                      RADIUS    => undef,
-                      BAND      => undef,
-                      BUFFER    => [] }, $class;
-
-  # Configure the object
-  $block->configure( @_ );
-
-  return $block;
-
-}
-
-# Q U E R Y  M E T H O D S ------------------------------------------------
-
-=back
-
-=head2 Accessor Methods
-
-=over 4
-
-=item B<querydb>
-
-Returns an Astro::Catalog object from a SuperCOSMOS query.
-
-   $catalog = $supercos->querydb();
-
-=cut
-
-sub querydb {
-  my $self = shift;
-
-  # call the private method to make the actual SuperCOSMOS query
-  my $status = $self->_make_query();
-
-  # check for failed query
-  return undef unless defined $self->{BUFFER};
-
-  # parse the returned page
-  my $catalog = $self->_parse_query();
-  
-  # parse catalog and return an Astro::Catalog object
-  return $catalog;
-  
-
-}
-
-
-# O T H E R   M E T H O D S ------------------------------------------------
-
-
-=item B<RA>
-
-Return (or set) the current target R.A. defined for the SuperCOSMOS query
-
-   $ra = $supercos->ra();
-   $supercos->ra( $ra );
-
-where $ra should be a string of the form "HH MM SS.SS", e.g. 21 42 42.66
-
-=cut
-
-sub ra {
-  my $self = shift;
-
-  # SETTING R.A.
-  if (@_) { 
-     $self->{RA} = shift;
-  }
-  
-  return $self->{RA};
-}
-
-=item B<Dec>
-
-Return (or set) the current target Declination defined for the SuperCOSMOS 
-query
-
-   $dec = $supercos->dec();
-   $supercos->dec( $dec );
-
-where $dec should be a string of the form "+-HH MM SS.SS", e.g. +43 35 09.5
-or -40 25 67.89
-
-=cut
-
-sub dec { 
-  my $self = shift;
-
-  # SETTING DEC
-  if (@_) { 
-    $self->{DEC} = shift;
-  }
-  
-  return $self->{DEC};
-}
-
-=item B<Radius>
-
-The radius to be searched for objects around the target R.A. and Dec in
-arc minutes, the radius defaults to 5 arc minutes.
-
-   $radius = $query->radius();
-   $query->radius( 20 );
-
-=cut
-
-sub radius {
-  my $self = shift;
-
-  if (@_) { 
-    $self->{RADIUS} = shift;
-  }
-  
-  return $self->{RADIUS};
-
-}
 
 =item B<Band>
 
@@ -236,63 +100,15 @@ valid options are "UKST Blue", "UKST Red", "UKST Infrared", "ESO Red" and
 
 sub band {
   my $self = shift;
-  
-  if (@_) {
-    $self->{BAND} = shift;
-  } 
 
-  return $self->{BAND};  
-  
+  if (@_) {
+    $self->_set_query_options( band => shift );
+  }
+
+  return $self->query_options( "band" );
 }
 
 # C O N F I G U R E -------------------------------------------------------
-
-=back
-
-=head2 General Methods
-
-=over 4
-
-=item B<configure>
-
-Configures the object, takes an options hash as an argument
-
-  $dss->configure( %options );
-
-Does nothing if the array is not supplied.
-
-=cut
-
-sub configure {
-  my $self = shift;
-
-  # CONFIFGURE FROM DEFAULTS
-  # ------------------------
-  
-  $self->{RA}     = undef;
-  $self->{DEC}    = undef;
-  $self->{BAND}   = "UKST Blue";
-  $self->{RADIUS} = 10;
-
-
-  # CONFIGURE FROM ARGUEMENTS
-  # -------------------------
-
-  # return unless we have arguments
-  return undef unless @_;
-
-  # grab the argument list
-  my %args = @_;
-
-  # Loop over the allowed keys and modify the default query options
-  for my $key (qw / RA Dec Radius Band / ) {
-      my $method = lc($key);
-      $self->$method( $args{$key} ) if exists $args{$key};
-  }
-
-}
-
-# T I M E   A T   T H E   B A R  --------------------------------------------
 
 =back
 
@@ -303,6 +119,53 @@ sub configure {
 These methods are for internal use only.
 
 =over 4
+
+=item B<_get_allowed_options>
+
+=cut
+
+sub _get_allowed_options {
+  my $self = shift;
+  return (
+	  ra => "RA",
+	  dec => "Dec",
+	  radmax => 'Radius',
+	  band => 'Band',
+	 );
+}
+
+=item B<_get_supported_init>
+
+Initialise methods supported by this routine are:
+
+  RA, Dec, Radius and Band
+
+=cut
+
+sub _get_supported_init {
+  return (qw/ RA Dec Radius Band / );
+}
+
+=item B<_set_default_options>
+
+Set the default query state.
+
+=cut
+
+sub _set_default_options {
+  my $self = shift;
+
+  my %defaults = (
+		  ra => undef,
+		  dec => undef,
+
+		  radmax => 10,
+		  band => "UKST Blue",
+		 );
+
+  $self->_set_query_options( %defaults );
+  return;
+}
 
 =item B<_make_query>
 
@@ -317,46 +180,55 @@ sub _make_query {
 
    # clean out the buffer
    $self->{BUFFER} = [""];
-   
+
    # generate a (hopefully) unique ID
    my $unique_id = $ENV{"USER"} . "@" . hostname() . "." . hostdomain();
 
-   my $ra_string = $self->{RA};
-   $ra_string =~ s/\s+//g;
-   
-   my $dec_string = $self->{DEC};
-   $dec_string =~ s/^\s//;
-   $dec_string = "+" . $dec_string unless $dec_string =~ "-";
-   $dec_string =~ s/\s+//g; 
+   my ($rakey,$ra_string) = $self->_from_ra();
+   my ($deckey,$dec_string) = $self->_from_dec();
 
    my $filename = $unique_id . "_" . $ra_string . $dec_string . ".cat";
-               
+
    my $file = File::Spec->catfile( File::Spec->tmpdir() , $filename );
-   
+
+   my %args;
+   my %allow = $self->_get_allowed_options;
+   for my $key (keys %allow) {
+     # Translate
+     my $cvtmethod = "_from_" . $key;
+     my ($outkey, $outvalue);
+     if ($self->can($cvtmethod)) {
+       ($outkey, $outvalue) = $self->$cvtmethod();
+     } else {
+       # Currently assume everything is one to one
+       warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping");
+       $outkey = $key;
+       $outvalue = $self->query_options($key);
+     }
+     $args{$outkey} = $args{$outvalue};
+   }
+
    # make query
-   
+
    my $aladin = new Astro::Aladin();
-   my $status = $aladin->supercos_catalog( RA     => $self->{RA},
-                                           Dec    => $self->{DEC},
-                                           Radius => $self->{RADIUS},
-                                           Band   => $self->{BAND},
+   my $status = $aladin->supercos_catalog( %args,
                                            File   => $file );
-   
+
    # read file back in again (booh!)
-   unless ( open( TMPCAT, $status ) ) {
+   my $TMPCAT;
+   unless ( open( $TMPCAT, $status ) ) {
        croak("SuperCOSMOS - Can't find catalogue $status");
-   } 
-   
-   # read from file   
-   @{$self->{BUFFER}} = <TMPCAT>;
+   }
+
+   # read from file
+   @{$self->{BUFFER}} = <$TMPCAT>;
    chomp( @{$self->{BUFFER}} );
-   close(TMPCAT); 
-   
+   close($TMPCAT);
+
    # read it in, now lets clean up
-   #unlink( $status);     
-   
-   return $status;                                      
-   
+   #unlink( $status);
+
+   return $status;
 }
 
 =item B<_parse_query>
@@ -369,14 +241,14 @@ make and parse the results.
 
 sub _parse_query {
   my $self = shift;
-  
+
   # get a local copy of the current BUFFER
   my @buffer = @{$self->{BUFFER}};
 
   # create an Astro::Catalog object to hold the search results
   my $catalog = new Astro::Catalog();
-  $catalog->fieldcentre( RA => $self->{RA}, Dec => $self->{Dec}, 
-                         Radius => $self->{RADIUS} );
+  $catalog->fieldcentre( RA => $self->ra, Dec => $self->dec,
+                         Radius => $self->radius );
 
   # create a temporary object to hold stars
   my $star;
@@ -384,22 +256,21 @@ sub _parse_query {
   # loop round the returned buffer and stuff the contents into star 
   # objects, skip the first two lines, they're just headers 
   foreach my $i ( 2 ... $#buffer ) {
-    
+
      # break the line down into bits
      my @line = split( /\t+/,$buffer[$i]);
-              
+
      # create a temporary place holder object
      $star = new Astro::Catalog::Star(); 
-       
+
      # ID
      $star->id( $line[2] );
-     
+
      # RA & Dec - Need to convert to sextuplets
      my $ra_deg = $line[0];
      $ra_deg = $ra_deg/15.0;  # should this be cos(delta) here?
-     
+
      #print "1: $ra_deg\n";
-     
      my $period = index( $ra_deg, ".");
      my $length = length( $ra_deg );
      my $ra_min = substr( $ra_deg, -($length-$period-1));
@@ -407,79 +278,81 @@ sub _parse_query {
      $ra_min = $ra_min*60.0;
 
      #print "2: $ra_deg $ra_min\n";
-     
+
      $ra_deg = substr( $ra_deg, 0, $period);
      $period = index( $ra_min, ".");
      $length = length( $ra_min );
 
      #print "3: $ra_deg $ra_min\n";
-     
+
      my $ra_sec = substr( $ra_min, -($length-$period-1));
      $ra_sec = "0." . $ra_sec;
      $ra_sec = $ra_sec*60.0;
      $ra_min = substr( $ra_min, 0, $period);
 
      #print "4: $ra_deg $ra_min $ra_sec\n";
-     
+
      my $dec_deg = $line[1];
 
      #print "1: $dec_deg\n";
-     
+
      my $sign = "pos";
      if ( $dec_deg =~ "-" ) {
         $dec_deg =~ s/-//;
         $sign = "neg";
-     }   
+     }
 
      #print "2: $dec_deg\n";
-     
-     my $period = index( $dec_deg, ".");
-     my $length = length( $dec_deg );
+
+     $period = index( $dec_deg, ".");
+     $length = length( $dec_deg );
      my $dec_min = substr( $dec_deg, -($length-$period-1));
      $dec_min = "0." . $dec_min;
      $dec_min = $dec_min*60.0;
 
      #print "3: $dec_deg $dec_min\n";
-     
+
      $dec_deg = substr( $dec_deg, 0, $period);
      $period = index( $dec_min, ".");
      $length = length( $dec_min );
 
      #print "4: $dec_deg $dec_min\n";
-     
+
      my $dec_sec = substr( $dec_min, -($length-$period-1));
      $dec_sec = "0." . $dec_sec;
      $dec_sec = $dec_sec*60.0;
-     $dec_min = substr( $dec_min, 0, $period);     
+     $dec_min = substr( $dec_min, 0, $period);
 
      #print "5: $dec_deg $dec_min $dec_sec\n";
-     
+
      if( $sign == "neg" ) {
         $dec_deg = "-" . $dec_deg;
      }
-     
+
      #print "6: $dec_deg $dec_min $dec_sec\n\n";
-     
-     
-     $star->ra( "$ra_deg $ra_min $ra_sec" );
-     $star->dec( "$dec_deg $dec_min $dec_sec" );
-     
+     $star->coords( new Astro::Coords( ra =>  "$ra_deg $ra_min $ra_sec",
+				       dec => "$dec_deg $dec_min $dec_sec",
+				       type => 'J2000',
+				       units => 'sex',
+				       name => $star->id,
+				     ));
+
      # Magnitudes
      $star->magnitudes( {Bj => $line[10]} );
      $star->magnitudes( {R2 => $line[12]} );
      $star->magnitudes( {I  => $line[13]} );
      $star->magnitudes( {R1 => $line[11]} );
-     
+
      # Field
      $star->field( $line[22] );
-   
+
      # Quality flag
      if( $line[18] == 2.0 ) {
         $star->quality( 0 );
      } else {
         $star->quality( 1 );
      }
-     
+
      # calulate the errors
      $star->magerr( {Bj => 0.04} ) if( $star->get_magnitude( "Bj" ) > 15.0 );
      $star->magerr( {Bj => 0.05} ) if( $star->get_magnitude( "Bj" ) > 17.0 );
@@ -494,14 +367,14 @@ sub _parse_query {
      $star->magerr( {R1 => 0.10} ) if( $star->get_magnitude( "R1" ) > 14.0 );
      $star->magerr( {R1 => 0.12} ) if( $star->get_magnitude( "R1" ) > 18.0 );
      $star->magerr( {R1 => 0.18} ) if( $star->get_magnitude( "R1" ) > 19.0 );
-         
+
      $star->magerr( {R2 => 0.02} ) if( $star->get_magnitude( "R2" ) > 12.0 );
      $star->magerr( {R2 => 0.03} ) if( $star->get_magnitude( "R2" ) > 13.0 );
      $star->magerr( {R2 => 0.04} ) if( $star->get_magnitude( "R2" ) > 15.0 );
      $star->magerr( {R2 => 0.05} ) if( $star->get_magnitude( "R2" ) > 17.0 );
      $star->magerr( {R2 => 0.06} ) if( $star->get_magnitude( "R2" ) > 18.0 );
-     $star->magerr( {R2 => 0.11} ) if( $star->get_magnitude( "R2" ) > 19.0 );     
-     $star->magerr( {R2 => 0.16} ) if( $star->get_magnitude( "R2" ) > 20.0 );     
+     $star->magerr( {R2 => 0.11} ) if( $star->get_magnitude( "R2" ) > 19.0 );
+     $star->magerr( {R2 => 0.16} ) if( $star->get_magnitude( "R2" ) > 20.0 );
 
      $star->magerr( {I => 0.05} ) if( $star->get_magnitude( "I" ) > 15.0 );
      $star->magerr( {I => 0.06} ) if( $star->get_magnitude( "I" ) > 16.0 );
@@ -513,40 +386,76 @@ sub _parse_query {
                                   - $star->get_magnitude( "R2" ) )} );
      $star->colours( {"Bj-I" => (   $star->get_magnitude( "Bj" )
                                  - $star->get_magnitude( "I" ) )} );
-                                        
+
      # calculate colour errors
      my $delta_bjmr = ( ( $star->get_errors( "Bj" ) )**2.0 +
                         ( $star->get_errors( "R2" ) )**2.0     )** (1/2);
-     
+
      my $delta_bjmi = ( ( $star->get_errors( "Bj" ) )**2.0 +
                         ( $star->get_errors( "I" ) )**2.0     )** (1/2);
-     
+
      $star->colerr( {"Bj-R2" => $delta_bjmr} );
      $star->colerr( {"Bj-I"  => $delta_bjmi} );
-      
-     # push star onto catalog                               
+
+     # push star onto catalog
      $catalog->pushstar( $star );
-                                  
-                                        
   }
 
   return $catalog;
 }
 
+=back
 
-=item B<_dump_raw>
+=head2 Translation Methods
 
-Private function for debugging and other testing purposes. It will return
-the raw output of the last SuperCOSMOS query made using querydb().
+The query options stored internally in the object are not necessarily
+the form required for a query to a remote server. Methods for converting
+from the internal representation to the external query format are
+provided in the form of _from_$opt. ie:
+
+  ($outkey, $outvalue) = $q->_from_ra();
+  ($outkey, $outvalue) = $q->_from_object();
+
+The base class only includes one to one mappings.
 
 =cut
 
-sub _dump_raw {
-   my $self = shift;
-   return @{$self->{BUFFER}};
+# RA and Dec replace spaces with pluses and + sign with special code
+
+sub _from_ra {
+  my $self = shift;
+  my $ra = $self->query_options("ra");
+  my %allow = $self->_get_allowed_options();
+
+  # Must remove spaces completely
+  $ra =~ s/\s+//g if defined $ra;
+
+  return ($allow{ra},$ra);
 }
 
-=back
+sub _from_dec {
+  my $self = shift;
+  my $dec = $self->query_options("dec");
+  my %allow = $self->_get_allowed_options();
+
+  if (defined $dec) {
+   $dec_string =~ s/^\s//;
+   $dec_string = "+" . $dec_string unless $dec_string =~ /^-/;
+   $dec_string =~ s/\s+//g;
+  }
+
+  return ($allow{dec},$dec);
+}
+
+# one to one mapping
+
+sub _from_band {
+  my $self = shift;
+  my $key = "band";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
 
 =end __PRIVATE_METHODS__
 
@@ -566,4 +475,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-;
+1;
