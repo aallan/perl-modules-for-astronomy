@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.20 2003/07/27 02:00:42 aa Exp $
+#     $Id: Catalog.pm,v 1.21 2003/07/27 02:02:18 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.20 2003/07/27 02:00:42 aa Exp $
+$Id: Catalog.pm,v 1.21 2003/07/27 02:02:18 timj Exp $
 
 =head1 METHODS
 
@@ -524,7 +524,10 @@ sub configure {
 	if (ref($args{data}) eq 'GLOB') {
 	  # A file handle
 	  local $/ = "\n";
-	  @lines = <$args{data}>;
+	  # For some reason <$args{data}> does not do the right thing
+	  my $fh = $args{data};
+	  @lines = <$fh>;
+	  print Dumper(\@lines);
 	} elsif (ref($args{data}) eq 'ARRAY') {
 	  # An array of lines
 	  @lines = @{ $args{data} };
