@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.18 2004/02/12 18:15:44 aa Exp $
+#     $Id: Star.pm,v 1.19 2004/02/26 01:42:57 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -52,6 +52,7 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
 				    StarType     => $star_type,
 				    LongStarType => $long_star_type,
 				    MoreInfo     => $url,
+                                    InsertDate   => new Time::Piece(),
 				  );
 
 =head1 DESCRIPTION
@@ -84,7 +85,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -232,7 +233,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.18 2004/02/12 18:15:44 aa Exp $
+$Id: Star.pm,v 1.19 2004/02/26 01:42:57 cavanagh Exp $
 
 =head1 METHODS
 
@@ -263,6 +264,7 @@ Create a new instance from a hash of options
 				    StarType     => $star_type,
 				    LongStarType => $long_star_type,
 				    MoreInfo     => $url,
+                                    InsertDate   => new Time::Piece(),
 				  );
 
 returns a reference to an Astro::Catalog::Star object.
@@ -295,6 +297,7 @@ sub new {
 		      STARTYPE   => undef,
 		      LONGTYPE   => undef,
 		      MOREINFO   => undef,
+                      INSERTDATE => undef,
 		    }, $class;
 
   # If we have arguments configure the object
@@ -1062,6 +1065,24 @@ sub moreinfo {
   return $self->{MOREINFO};
 }
 
+=item B<insertdate>
+
+The time the information for the star in question was gathered. This
+is different from the time of observation of the star.
+
+  $insertdate = $star->insertdate;
+
+This is a C<Time::Piece> object.
+
+=cut
+
+sub insertdate {
+  my $self = shift;
+  if( @_ ) {
+    $self->{INSERTDATE} = shift;
+  }
+  return $self->{INSERTDATE};
+}
 
 # C O N F I G U R E -------------------------------------------------------
 
