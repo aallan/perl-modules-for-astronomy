@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.30 2003/07/27 23:14:09 timj Exp $
+#     $Id: Catalog.pm,v 1.31 2003/07/28 00:32:47 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,14 +64,14 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.30 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.31 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.30 2003/07/27 23:14:09 timj Exp $
+$Id: Catalog.pm,v 1.31 2003/07/28 00:32:47 timj Exp $
 
 =head1 METHODS
 
@@ -190,13 +190,13 @@ sub write_catalog {
     # to an array, just do the copy and return early. We do not
     if (ref($file) eq 'SCALAR') {
       # Copy single string to scalar
-      $$file = join("\n", @$lines);
+      $$file = join("\n", @$lines) ."\n";
     } elsif (ref($file) eq 'ARRAY') {
       # Just copy the lines into the output array
       @$file = @$lines;
     } elsif (ref($file) eq 'GLOB') {
       # GLOB - so print the full string to the file handle
-      print $file join("\n", @$lines);
+      print $file join("\n", @$lines) ."\n";
     } else {
       croak "Can not write catalogue to reference of type ".
 	ref($file)."\n";
@@ -301,6 +301,9 @@ returns the number of stars now in the Catalog object (even if no
 arguments were supplied). The method guarantees that the stars are
 pushed onto the internal original list and the filtered/sorted
 version.
+
+Currently no check is made to make sure that the star is already
+on one of the two lists.
 
 =cut
 
@@ -695,7 +698,7 @@ sub reftime {
 
 Configures the object from multiple pieces of information.
 
-  $catalog->configure( %options );
+  $newcat = $catalog->configure( %options );
 
 Takes a hash as argument with the list of keywords. Supported options
 are:
@@ -820,7 +823,11 @@ sub configure {
     chomp @lines;
 
     # Now read the catalog (overwriting $self)
+    print "READING CATALOG $ioclass \n";
     $self =  $ioclass->_read_catalog( \@lines );
+
+    croak "Error reading catalog of class $ioclass\n"
+      unless defined $self;
 
     # Remove used args
     delete $args{format};
