@@ -18,12 +18,20 @@ use Astro::SIMBAD::Query;
 # test the test system
 ok(1);
 
-my $query = new Astro::SIMBAD::Query( RA        => "01 10 12.98",
-                                      Dec      => "+60 04 35.9",
-                                      Error     => 10,
-                                      Units     => "arcsec" );
+my $coord_query = new Astro::SIMBAD::Query( RA        => "01 10 12.98",
+                                            Dec       => "+60 04 35.9",
+                                            Error     => 10,
+                                            Units     => "arcsec" );
                                       
 print "# Connecting to SIMBAD\n";
-$query->querydb();
+$coord_query->querydb();
 print "# Continuing Tests\n";
-print Dumper($query);
+#print Dumper($coord_query);
+
+my $ident_query = new Astro::SIMBAD::Query( Target    => "HT Cas",
+                                            Error     => 10,
+                                            Units     => "arcsec" );                                      
+print "# Connecting to SIMBAD\n";
+$ident_query->querydb();
+print "# Continuing Tests\n";
+#print Dumper($ident_query);

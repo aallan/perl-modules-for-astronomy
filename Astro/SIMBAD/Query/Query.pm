@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.4 2001/11/28 01:31:58 aa Exp $
+#     $Id: Query.pm,v 1.5 2001/11/28 01:39:44 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.4 2001/11/28 01:31:58 aa Exp $
+$Id: Query.pm,v 1.5 2001/11/28 01:39:44 aa Exp $
 
 =head1 METHODS
 
@@ -131,7 +131,7 @@ sub querydb {
   return undef unless defined $self->{BUFFER};
 
   # return an Astro::SIMBAD::Result object
-  #return $self->_parse_query();
+  return $self->_parse_query();
 
 }
 
@@ -308,13 +308,13 @@ sub dec {
 
 }
 
-=item B<Identifier>
+=item B<Target>
 
 Instead of querying SIMBAD by R.A. and Dec., you may also query it by object
 name. Return (or set) the current target object defined for the SIMBAD query
 
-   $ident = $query->identifier();
-   $query->identifier( "HT Cas" );
+   $ident = $query->target();
+   $query->target( "HT Cas" );
 
 using an object name will override the current R.A. and Dec settings for the
 Query object (if currently set) and the next querydb() method call will query
@@ -322,7 +322,7 @@ SIMBAD using this identifier rather than any currently set co-ordinates.
 
 =cut
 
-sub identifier {
+sub target {
   my $self = shift;
 
   # SETTING IDENTIFIER
@@ -485,7 +485,7 @@ sub configure {
   # that due to the order these are called in supplying both and RA and Dec
   # and an object Identifier (e.g. HT Cas) will cause the query to default
   # to using the identifier rather than the supplied co-ordinates.
-  for my $key (qw / RA Dec Identifier Error Units Frame Epoch Equinox / ) {
+  for my $key (qw / RA Dec Target Error Units Frame Epoch Equinox / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
