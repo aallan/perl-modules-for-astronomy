@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.43 2004/02/26 02:26:45 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.44 2004/02/26 02:28:57 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -71,7 +71,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.43 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.44 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -79,7 +79,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.43 2004/02/26 02:26:45 cavanagh Exp $
+$Id: Catalog.pm,v 1.44 2004/02/26 02:28:57 cavanagh Exp $
 
 =head1 METHODS
 
@@ -902,7 +902,8 @@ sub configure {
   }
 
   if( ! defined( $self->fielddate ) ) {
-    $self->fielddate( gmtime );
+    my $date = gmtime;
+    $self->fielddate( $date );
   }
 
   return $self;
