@@ -1,0 +1,2 @@
+globus_module_descriptor_t * T_PTROBJ
+globus_object_t *   T_PTROBJ
