@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.29 2003/07/27 21:39:21 timj Exp $
+#     $Id: Catalog.pm,v 1.30 2003/07/27 23:14:09 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,14 +64,14 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.29 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.30 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.29 2003/07/27 21:39:21 timj Exp $
+$Id: Catalog.pm,v 1.30 2003/07/27 23:14:09 timj Exp $
 
 =head1 METHODS
 
@@ -135,7 +135,13 @@ pluggable IO, see the C<Astro::Catalog::IO> classes
 returns zero on sucess and non-zero if the write failed (the reason
 can be obtained using the C<errstr> method). The C<%opts> are optional
 arguments and are dependant on the output format chosen.  Current
-valid output formats are 'Cluster' and 'JCMT'.
+valid output formats are 'Simple', 'Cluster' and 'JCMT'.
+
+The File argument can refer to a file name on disk (simple scalar), 
+a glob (eg \*STDOUT), a reference to a scalar (\$content) or reference
+to an array. For the last two options, the contents of the catalogue
+file are stored in the scalar or in the array (a line per array entry
+with no new lines).
 
 =cut
 
@@ -170,36 +176,52 @@ sub write_catalog {
   # call the io plugin's _write_catalog function
   my $lines = $ioclass->_write_catalog( $self, %args );
 
-  # If file is a GLOB then we do not need to open or close it
-  # Do we have a glob?
-  my $isglob = ( ref($file) eq 'GLOB' ? 1 : 0 );
+  # Play it defensively - make sure we add the newlines
+  chomp @$lines;
 
-  # Open the output file (if we do not have a glob)
-  my $fh;
-  if ($isglob) {
-    $fh = $file;
+  # If we have a reference then we do not need to open or close
+  # files - simpler to deal with each case in turn. This has the
+  # side effect of repeating the join() in 3 separate places.
+  # Probably better than creating a large scalar for the one time
+  # when we do not need it.
+
+  if (ref($file)) {
+    # If we are storing in a reference to a scalar or reference
+    # to an array, just do the copy and return early. We do not
+    if (ref($file) eq 'SCALAR') {
+      # Copy single string to scalar
+      $$file = join("\n", @$lines);
+    } elsif (ref($file) eq 'ARRAY') {
+      # Just copy the lines into the output array
+      @$file = @$lines;
+    } elsif (ref($file) eq 'GLOB') {
+      # GLOB - so print the full string to the file handle
+      print $file join("\n", @$lines);
+    } else {
+      croak "Can not write catalogue to reference of type ".
+	ref($file)."\n";
+    }
+
   } else {
-    my $status = open $fh, ">$file";
+    # A file name
+    my $status = open my $fh, ">$file";
     if (!$status) {
       $self->errstr(__PACKAGE__ .": Error creating catalog file $file: $!" );
       return;
     }
-  }
 
-  # Play it defensively - make sure we add the newlines
-  chomp @$lines;
+    # write to file
+    print $fh join("\n", @$lines) ."\n";
 
-  # write to file
-  print $fh join("\n", @$lines) ."\n";
-
-  # close file if we opened it
-  if (! $isglob) {
-    my $status = close($fh);
+    # close file
+    $status = close($fh);
     if (!$status) {
       $self->errstr(__PACKAGE__.": Error closing catalog file $file: $!");
       return;
     }
   }
+
+  # everything okay
   return 1;
 }
 
@@ -698,6 +720,9 @@ The options are case-insensitive.
 Note that in some cases (when reading a catalogue) this method will
 act as a constructor. In any case, always returns a catalog object
 (either the same one that went in or a modified one).
+
+API uncertainty - in principal Data is not needed since File
+could be overloaded (in a similar way to write_catalog).
 
 =cut
 
