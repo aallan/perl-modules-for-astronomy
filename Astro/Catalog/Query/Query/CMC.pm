@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: CMC.pm,v 1.2 2003/09/24 18:07:19 aa Exp $
+$Id: CMC.pm,v 1.3 2003/09/25 15:56:59 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -107,7 +107,7 @@ Get the default query state.
 sub _get_default_options {
   return (
 	  # Internal
-	  catalog => 'I/256/stars',
+	  catalog => 'I/282/cmc12',
 
 	  # Target information
 	  ra => undef,
