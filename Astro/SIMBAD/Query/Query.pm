@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.3 2001/11/28 01:23:03 aa Exp $
+#     $Id: Query.pm,v 1.4 2001/11/28 01:31:58 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.3 2001/11/28 01:23:03 aa Exp $
+$Id: Query.pm,v 1.4 2001/11/28 01:31:58 aa Exp $
 
 =head1 METHODS
 
@@ -260,7 +260,10 @@ sub ra {
     ${$self->{OPTIONS}}{"Ident"} = "$ra+$dec";
   }
   
-  return $self->{RA};
+  # un-mutilate and return a nicely formated string to the user
+  my $ra = $self->{RA};
+  $ra =~ s/\+/ /g;
+  return $ra;
 }
 
 =item B<Dec>
@@ -297,7 +300,11 @@ sub dec {
     ${$self->{OPTIONS}}{"Ident"} = "$ra+$dec";
   }
   
-  return $self->{DEC};
+  # un-mutilate and return a nicely formated string to the user
+  my $dec = $self->{DEC};
+  $dec =~ s/\+/ /g;
+  $dec =~ s/%2B/\+/g;
+  return $dec;
 
 }
 

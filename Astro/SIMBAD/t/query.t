@@ -26,8 +26,4 @@ my $query = new Astro::SIMBAD::Query( RA        => "01 10 12.98",
 print "# Connecting to SIMBAD\n";
 $query->querydb();
 print "# Continuing Tests\n";
-
-my @buffer = $query->_dump_raw();
-print "@buffer";
-
-#print Dumper($query);
+print Dumper($query);
