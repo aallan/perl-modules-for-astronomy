@@ -1,0 +1,69 @@
+=head1 NAME
+
+XML::LibXML::SAX - XML::LibXML direct SAX parser
+
+=head1 DESCRIPTION
+
+
+
+
+XML::LibXML provides an interface to libxml2 direct
+SAX interface. Through this interface it is possible
+to generate SAX events directly while parsing a
+document. While using the SAX parser XML::LibXML will
+not create a DOM Document tree.
+
+
+
+
+
+Such an interface is useful if very large XML
+documents have to be processed and no DOM functions
+are required. By using this interface it is possible
+to read data stored within a XML document directly
+into the application datastructures without loading
+the document into memory.
+
+
+
+
+
+The SAX interface of XML::LibXML is based on the
+famous XML::SAX interface. It uses the generic
+interface as provided by XML::SAX::Base.
+
+
+
+
+
+Additionaly to the generic functions, that are only
+able to process entire documents, XML::LibXML::SAX
+provides B<parse_chunk()>. This method allows to
+generate SAX events from well ballanced data such as
+is often provided by databases.
+
+
+
+
+
+B<NOTE:> At the moment XML::LibXML provides only
+an incomplete interface to libxml2's native SAX
+implementaion. The current implementation is not
+tested in production environment. It may causes
+significant memory problems or shows wrong behaviour.
+
+
+
+
+=head1 AUTHOR
+
+Matt Sergeant, Christian Glahn
+
+=head1 SEE ALSO
+
+XML::LibXML, XML::SAX, XML::LibXML::SAX::Parser, XML::LibXML::SAX::Builder
+
+=head1 VERSION
+
+1.53
+

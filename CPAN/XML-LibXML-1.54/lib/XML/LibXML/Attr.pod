@@ -1,0 +1,126 @@
+=head1 NAME
+
+XML::LibXML::Attr - The DOM Attribute Class
+
+=head1 synopsis
+
+ use XML::LibXML
+
+ $attr = XML::LibXML::Attr->new($name [,$value]);
+ $string = $attr->getValue();
+ $value = $attr->value;
+ $attr->setValue( $string );
+ $node = $attr->getOwnerElement();
+ $attr->setNamespace($nsURI, $prefix);
+
+
+=head1 DESCRIPTION
+
+
+
+
+This is the interface to handle Attributes like
+ordinary nodes. The naming of the class relies on the
+W3C DOM documentation.
+
+
+
+
+=head2 Methods
+
+=over 4
+
+=item B<new>
+
+
+
+
+Class constructor. If you need to work with iso
+encoded strings, you should B<allways> use
+the I<createAttrbute> of
+B<XML::LibXML::Document>.
+
+
+
+
+=item B<getValue>
+
+
+
+
+Returns the value stored for the attribute. If
+undef is returned, the attribute has no value,
+which is different of being I<not
+                    specified>.
+
+
+
+
+=item B<value>
+
+
+
+
+Alias for B<getValue()>
+
+
+
+
+=item B<setValue>
+
+
+
+
+This is needed to set a new attributevalue. If iso
+encoded strings are passed as parameter, the node
+has to be bound to a document, otherwise the
+encoding might be wrong done.
+
+
+
+
+=item B<getOwnerElement>
+
+
+
+
+returns the node the attribute belongs to. If the
+attribute is not bound to a node, undef will be
+returned. Overwriting the underlaying
+implementation, the B<parentNode> function
+will return undef, instead of the owner element.
+
+
+
+
+=item B<setNamespace>
+
+
+
+
+This function activates a namespace for the given
+attribute. If the attribute was not previously
+declared in the context of the attribute this
+function will be silently ignored. In this case
+you may wish to call setNamespace() on the
+ownerElement.
+
+
+
+
+
+
+=back
+
+=head1 AUTHOR
+
+Matt Sergeant, Christian Glahn
+
+=head1 SEE ALSO
+
+XML::LibXML, XML::LibXML::Node, XML::LibXML::Element, XML::LibXML::Document, XML::LibXML::DocumentFragment
+
+=head1 VERSION
+
+1.53
+
