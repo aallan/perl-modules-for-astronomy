@@ -1,12 +1,8 @@
 use ExtUtils::MakeMaker;
-use File::Spec;
-
-my $file = File::Spec->catfile(File::Spec->curdir, "Query", "Query.pm");
-
 
 WriteMakefile( 
                'NAME'           => 'Astro::ADS',
-	       'VERSION_FROM'   => $file,
+	       'VERSION_FROM'   => '1.18',
                'PREREQ_PM'      => { LWP         => 5.53,
                                      Net::Domain => 2.13,
                                      Pod::Usage  => 1.14 },
