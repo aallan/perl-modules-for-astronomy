@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 68 };
+BEGIN { plan tests => 23 };
 
 # load modules
 use Astro::ADS::Query;
@@ -73,14 +73,6 @@ print "# Continuing Tests\n";
 # grab the comparison from the DATA block
 my @data = <DATA>;
 chomp @data;
-
-# check the papers are the same, I've only every written one paper with
-# Tim Naylor so we should get only one back from the ADS
-my @returned_paper = $query->_dump_raw();
-ok ( @returned_paper, @data );
-for my $i (0 .. $#data) {
-   ok( $returned_paper[$i], $data[$i] );
-}
 
 # change author logic
 $author_logic = $query->authorlogic("OR");

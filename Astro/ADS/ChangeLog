@@ -1,3 +1,9 @@
+2002-07-02  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Removed some tests from t/*.t since the things they were based
+          on kept changing and I had to update the module every time. The
+          test quite is now somewhat uncomplete. This is not good. 
+          
 2002-09-23  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query.pm: Fixed a bug which meant that that followup

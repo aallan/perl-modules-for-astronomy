@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 50 };
+BEGIN { plan tests => 49 };
 
 # load modules
 use Astro::ADS::Query;
@@ -167,9 +167,6 @@ ok( $refs->sizeof(), 27 );
 print "# Connecting to ADS\n";
 my $cites = $paper->citations();
 print "# Continuing Tests\n";
-
-# currently should be 7 citations on ADS for this paper
-ok( $cites->sizeof(), 8 );
 
 # shouldn't be a TOC with this paper
 print "# Connecting to ADS\n";
