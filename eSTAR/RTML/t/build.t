@@ -43,8 +43,7 @@ ok( $message->dec(), '+60 00 00' );
 
 # dump out the request
 my $doc = $message->dump_rtml();
-
-print $doc;
+#print $doc;
 
 # Create an RTML object
 my $message2 = new eSTAR::RTML::Build( 
@@ -56,7 +55,7 @@ my $message2 = new eSTAR::RTML::Build(
              Email       => 'aa@astro.ex.ac.uk' );
              
 # build a score request
-my $status = $message2->score_observation(
+$status = $message2->score_observation(
              Target => 'Test Target',
              RA     => '09 00 00',
              Dec    => '+60 00 00', 
@@ -73,7 +72,7 @@ ok( $message2->flux(), '12.0' );
 
 # dump out the request
 my $doc2 = $message2->dump_rtml();
-print $doc2;
+#print $doc2;
 
 # Create an RTML object
 my $message3 = new eSTAR::RTML::Build( 
@@ -85,7 +84,7 @@ my $message3 = new eSTAR::RTML::Build(
              Email       => 'aa@astro.ex.ac.uk' );
              
 # build a score request
-my $status = $message3->request_observation(
+$status = $message3->request_observation(
              Target => 'Test Target',
              RA     => '09 00 00',
              Dec    => '+60 00 00', 
@@ -102,7 +101,7 @@ ok( $message3->flux(), '12.0' );
 
 # dump out the request
 my $doc3 = $message3->dump_rtml();
-print $doc3;
+#print $doc3;
 
 
 # build a score request
@@ -114,7 +113,7 @@ my $message4 = new eSTAR::RTML::Build(
              Institution => 'University of Exeter',
              Email       => 'aa@astro.ex.ac.uk' );
              
-my $status = $message4->score_observation(
+$status = $message4->score_observation(
              Target => 'Test Target',
              RA     => '09 00 00',
              Dec    => '+60 00 00');
@@ -127,4 +126,4 @@ $message4->score_response(
              
 # dump out the request
 my $doc4 = $message4->dump_rtml();
-print $doc4;
+#print $doc4;
