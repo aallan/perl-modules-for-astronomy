@@ -8,7 +8,7 @@ use Test;
 BEGIN { plan tests => 1 };
 
 # load modules
-use Astro::Corlate
+#use Astro::Corlate;
 
 # debugging
 use Data::Dumper;

@@ -21,7 +21,7 @@ package Astro::Corlate;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Corlate.pm,v 1.1 2001/12/07 00:01:27 aa Exp $
+#     $Id: Corlate.pm,v 1.2 2001/12/12 02:37:41 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -63,13 +63,13 @@ use vars qw/ $VERSION /;
 use Astro::Corlate::Wrapper qw / corlate /;
 use Carp;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Corlate.pm,v 1.1 2001/12/07 00:01:27 aa Exp $
+$Id: Corlate.pm,v 1.2 2001/12/12 02:37:41 aa Exp $
 
 =head1 METHODS
 
@@ -117,10 +117,11 @@ Runs the catalog corelation subroutine
 
 returns a status value
 
-   0 = success
-  -1 = failed to open catalog file
-  -2 = failed to open observation file
+   0 = Success
+  -1 = Failed to open catalog file
+  -2 = Failed to open observation file
   -3 = Too few stars paired between catalogues
+  -4 = Incorrect number of file names supplied
 
 =cut
 

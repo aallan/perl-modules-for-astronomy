@@ -1,6 +1,13 @@
-Changes
+ChangeLog
+README
+GPL
 MANIFEST
 Makefile.PL
-Wrapper.pm
-Wrapper.xs
-test.pl
+Corlate.pm
+Wrapper/Makefile.PL
+Wrapper/Wrapper.pm
+Wrapper/Wrapper.xs
+t/archive.cat
+t/new.cat
+t/wrapper.t
+t/corlate.t

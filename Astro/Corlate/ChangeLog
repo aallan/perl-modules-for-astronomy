@@ -1,3 +1,8 @@
+2001-12-12  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Wrapper/Makefile.PL: Changed to link using f95, undocumented
+          feature in ExtUtils::F77
+          
 2001-12-06  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Original version
