@@ -1,0 +1,15 @@
+README
+MANIFEST
+Makefile.PL
+GPL
+ChangeLog
+Query/Query.pm
+Query/Makefile.PL
+Result/Result.pm
+Result/Makefile.PL
+Result/Paper/Paper.pm
+Result/Paper/Makefile.PL
+t/query.t
+t/result.t
+t/paper.t
+t/tied.t
