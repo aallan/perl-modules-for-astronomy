@@ -19,7 +19,7 @@ package eSTAR::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.2 2002/03/15 05:26:13 aa Exp $
+#     $Id: RTML.pm,v 1.3 2002/03/18 06:20:00 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -54,13 +54,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.2 2002/03/15 05:26:13 aa Exp $
+$Id: RTML.pm,v 1.3 2002/03/18 06:20:00 aa Exp $
 
 =head1 METHODS
 
@@ -93,31 +93,6 @@ sub new {
 
 }
 
-# L O A D I N G  M E T H O D S ----------------------------------------------
-
-=back
-
-=head2 Methods
-
-=over 4
-
-=item B<file>
-
-Loads the RTML file into the
-
-   $dtd = $rtml->file( $rtml_file );
-
-=cut
-
-sub file {
-  my $self = shift;
-  if (@_) { 
-     my $file = shift;
-     $self->{DOCUMENT} = $self->{XML}->parsefile( $file );
-  }
-  return ;
-}
-
 # A C C E S S O R   M E T H O D S -------------------------------------------
 
 =back
@@ -132,6 +107,10 @@ Return the type of the RTML document
 
   $type = $rtml->determine_type();
 
+this is the only information about the document available via this module,
+to fully parse the RTML the C<eSTAR::RTML> objet should be passed to an
+L<eSTAR::RTML::Parse> object.
+
 =cut
 
 sub determine_type {
@@ -145,9 +124,11 @@ Returnd the RTML document tree
 
   $type = $rtml->return_tree();
 
-used internally in the eSTAR::RTML::Parse module to pull the RTML document
-from the object. While public, its unlikely that anyone would actually want
-to do this outside this module.
+used by the C<eSTAR::RTML::Parse> module to pull the C<XML::Parse> document
+tree from the C<eSTAR::RTML> object. While a public method, its hard to see
+why you would want to do this unles the output is going to be parsed by a
+module that understands such trees. In which case it might be better to call
+C<XML::Parse> directly rather than deal with the C<eSTAR::RTML> infrastructure.
 
 =cut
 
@@ -172,7 +153,7 @@ Configures the object, takes an options hash as an argument
 
   $rtml->configure( %options );
 
-Does nothing if the array is not supplied.
+does nothing if the hash is not supplied.
 
 =cut
 
@@ -206,8 +187,32 @@ sub configure {
 
 }
 
+# M E T H O D S -------------------------------------------------------------
+
+=item B<file>
+
+Populates the object from a file returning the version number of the DTD.
+
+   $dtd = $rtml->file( $rtml_file );
+
+This method is called directly from configure() is the C<File> key and value is passed into to teh object in the %options hash.
+
+=cut
+
+sub file {
+  my $self = shift;
+  if (@_) { 
+     my $file = shift;
+     $self->{DOCUMENT} = $self->{XML}->parsefile( $file );
+  }
+  return ${${${$self->{DOCUMENT}}[1]}[0]}{'dtd'};
+}
+
+
 # T I M E   A T   T H E   B A R  --------------------------------------------
-   
+
+=back
+
 =head1 COPYRIGHT
 
 Copyright (C) 2002 University of Exeter. All Rights Reserved.
