@@ -34,11 +34,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: REST.pm,v 1.6 2003/09/25 21:27:50 aa Exp $
+$Id: REST.pm,v 1.7 2004/03/03 00:50:15 cavanagh Exp $
 
 =head1 METHODS
 
@@ -446,6 +446,10 @@ sub _build_query {
     $options .= "&$key=". $translated{$key}
       if defined $translated{$key};
   }
+
+  # Remove the leading ampersand from the options list because
+  # it can cause some forms to fail.
+  $options =~ s/^&//;
 
   # build final query URL
   $URL = $URL . $options;
