@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.22 2003/07/27 02:07:31 aa Exp $
+#     $Id: Catalog.pm,v 1.23 2003/07/27 02:22:22 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.22 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.23 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.22 2003/07/27 02:07:31 aa Exp $
+$Id: Catalog.pm,v 1.23 2003/07/27 02:22:22 timj Exp $
 
 =head1 METHODS
 
@@ -94,6 +94,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { STARS  => [],
+		      ERRSTAR => '',
 		      ORIGIN => '<UNKNOWN>',
 		      COORDS => undef,
                       RADIUS => undef }, $class;
@@ -119,12 +120,14 @@ sub new {
 Will serialise the catalogue object in a variety of file formats using
 pluggable IO, see the C<Astro::Catalog::IO> classes
 
-   $status = $catalog->write_catalog( 
-                  File => $file_name, Format => $file_type, [%opts] );
+   $catalog->write_catalog( 
+          File => $file_name, Format => $file_type, [%opts] )
+     or die $catalog->errstr;
 
-returns zero on sucess and non-zero if the write failed. The C<%opts>
-are optional arguements and are dependant on the output format chosen.
-Current valid output formats are 'Cluster' and 'JCMT'.
+returns zero on sucess and non-zero if the write failed (the reason
+can be obtained using the C<errstr> method). The C<%opts> are optional
+arguments and are dependant on the output format chosen.  Current
+valid output formats are 'Cluster' and 'JCMT'.
 
 =cut
 
@@ -143,37 +146,53 @@ sub write_catalog {
      croak ( 'Usage: _write_catalog( File => $catalog, Format => $format');
   } else {
      $file = $args{file};
-  }   
-      
+  }
+
   # default to cluster format if no filenames supplied
   $args{format} = 'Cluster' unless ( defined $args{format} );
 
   # Need to read the IO class
   my $ioclass = _load_io_plugin( $args{format} );
   return unless defined $ioclass;
-  
+
   # remove the two handled hash options and pass the rest
   delete $args{file};
   delete $args{format};
-  
+
   # call the io plugin's _write_catalog function
   my $lines = $ioclass->_write_catalog( $self, %args );
-  
-  # open file
-  unless ( open ( CATALOG, ">$file" ) ) {
-      #croak ( "Catalog.pm: Cannot open $file\n" );
-      return 0;
-  }
-  
-  # write to file
-  foreach my $i ( 0 ... $#$lines ) {
-     chomp( ${$lines}[$i] );
-     print CATALOG ${$lines}[$i] . "\n";
+
+  # If file is a GLOB then we do not need to open or close it
+  # Do we have a glob?
+  my $isglob = ( ref($file) eq 'GLOB' ? 1 : 0 );
+
+  # Open the output file (if we do not have a glob)
+  my $fh;
+  if ($isglob) {
+    $fh = $file;
+  } else {
+    my $status = open $fh, ">$file";
+    if (!$status) {
+      $self->errstr(__PACKAGE__ .": Error creating catalog file $file: $!" );
+      return;
+    }
   }
 
-  # close file  
-  close(CATALOG);
-  return 1;       
+  # Play it defensively - make sure we add the newlines
+  chomp @$lines;
+
+  # write to file
+  print $fh join("\n", @$lines) ."\n";
+
+  # close file if we opened it
+  if ($isglob) {
+    my $status = close($fh);
+    if (!$status) {
+      $self->errstr(__PACKAGE__.": Error closing catalog file $file: $!");
+      return;
+    }
+  }
+  return 1;
 }
 
 # A C C E S S O R  --------------------------------------------------------
@@ -201,6 +220,21 @@ sub origin {
     $self->{ORIGIN} = shift;
   }
   return $self->{ORIGIN};
+}
+
+=item B<errstr>
+
+Error string associated with any error. Can only be trusted immediately
+after a call that sets it (eg write_catalog).
+
+=cut
+
+sub errstr {
+  my $self = shift;
+  if (@_) {
+    $self->{ERRSTAR} = shift;
+  }
+  return $self->{ERRSTR};
 }
 
 =item B<sizeof>
@@ -525,7 +559,6 @@ sub configure {
 	  # For some reason <$args{data}> does not do the right thing
 	  my $fh = $args{data};
 	  @lines = <$fh>;
-	  print Dumper(\@lines);
 	} elsif (ref($args{data}) eq 'ARRAY') {
 	  # An array of lines
 	  @lines = @{ $args{data} };
