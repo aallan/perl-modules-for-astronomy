@@ -1,7 +1,7 @@
 #!perl
 
 # Astro::Catalog test harness
-use Test::More tests => 64;
+use Test::More tests => 67;
 
 # strict
 use strict;
@@ -114,7 +114,7 @@ foreach my $i ( 0 .. $#buffer ) {
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
 END {
-  unlink "$tempfile";
+  #unlink "$tempfile";
 }
 
 
@@ -127,12 +127,15 @@ exit;
 __DATA__
 <?xml version="1.0"?>
 <VOTABLE>
+  <DESCRIPTION>Created using Astro::Catalog::IO::VOTable</DESCRIPTION>
+  <DEFINITIONS>
+    <COOSYS ID="J2000" equinox="2000" epoch="2000" system="eq_FK5"/>
+  </DEFINITIONS>
   <RESOURCE>
     <TABLE>
-      <DESCRIPTION>Created using Astro::Catalog::IO::VOTable</DESCRIPTION>
-      <FIELD name="Identifier" ucd="ID_MAIN" datatype="char" unit=""/>
-      <FIELD name="RA" ucd="POS_EQ_RA_MAIN" datatype="char" unit=""/>
-      <FIELD name="Dec" ucd="POS_EQ_DEC_MAIN" datatype="char" unit=""/>
+      <FIELD name="Identifier" ucd="ID_MAIN" datatype="char" unit="" arraysize="*"/>
+      <FIELD name="RA" ucd="POS_EQ_RA_MAIN" datatype="char" unit="&quot;h:m:s&quot;" arraysize="*"/>
+      <FIELD name="Dec" ucd="POS_EQ_DEC_MAIN" datatype="char" unit="&quot;d:m:s&quot;" arraysize="*"/>
       <FIELD name="B Magnitude" ucd="PHOT_MAG_B" datatype="double" unit="mag"/>
       <FIELD name="B Error" ucd="CODE_ERROR" datatype="double" unit="mag"/>
       <FIELD name="R Magnitude" ucd="PHOT_MAG_R" datatype="double" unit="mag"/>

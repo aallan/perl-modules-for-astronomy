@@ -34,14 +34,14 @@ use VOTable::Document;
 
 use Data::Dumper;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOTable.pm,v 1.4 2003/10/16 09:10:44 aa Exp $
+$Id: VOTable.pm,v 1.5 2003/10/16 15:26:09 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -129,7 +129,7 @@ sub _write_catalog {
 
   # generate the field headers
   # --------------------------
-  my ( @field_names, @field_ucds, @field_datatypes, @field_units );
+  my (@field_names, @field_ucds, @field_datatypes, @field_units, @field_sizes);
    
   # field names
   push @field_names, "Identifier";
@@ -177,8 +177,8 @@ sub _write_catalog {
 
   # field units
   push @field_units, "";
-  push @field_units, "";
-  push @field_units, "";
+  push @field_units, '"h:m:s"';
+  push @field_units, '"d:m:s"';
   foreach my $i ( 0 .. $#mags ) {
     push @field_units, "mag";
     push @field_units, "mag";
@@ -188,7 +188,12 @@ sub _write_catalog {
     push @field_units, "mag";
   } 
   push @field_units, ""; 
-     
+
+  # array size
+  push @field_sizes, "*";
+  push @field_sizes, "*";
+  push @field_sizes, "*";
+         
   # generate the data table
   # -----------------------
   my @data;
@@ -258,19 +263,29 @@ sub _write_catalog {
   # Get the VOTABLE element. 
   my $votable = ($doc->get_VOTABLE)[0];
 
+  # Create the DESCRIPTION element and its contents, and add it to the VOTABLE
+  my $description = new VOTable::DESCRIPTION();
+  $description->set('Created using Astro::Catalog::IO::VOTable');
+  $votable->set_DESCRIPTION($description);
+  
+  # Create a DEFINITION element and its contents and add it to the VOTABLE
+  my $definitions = new VOTable::DEFINITIONS();
+  my $coosys = new VOTable::COOSYS();
+  $coosys->set_ID( "J2000" );
+  $coosys->set_equinox( 2000.0 );
+  $coosys->set_epoch( 2000.0 );
+  $coosys->set_system( 'eq_FK5' );
+  $definitions->set_COOSYS( $coosys );
+  $votable->set_DEFINITIONS( $definitions );
+  
   # Create the RESOURCE element and add it to the VOTABLE.
   my $resource = new VOTable::RESOURCE();
   $votable->set_RESOURCE($resource);
 
-  # Create the DESCRIPTION element and its contents, and add it to the
-  # RESOURCE.
-  my $description = new VOTable::DESCRIPTION();
-  $description->set('Created using Astro::Catalog::IO::VOTable');
-
   # Create the TABLE element and add it to the RESOURCE.
   my $table = new VOTable::TABLE();
   $resource->set_TABLE($table);
-  $table->set_DESCRIPTION($description);
+
   
   # Create and add the FIELD elements to the TABLE.
   my($i);
@@ -281,6 +296,7 @@ sub _write_catalog {
       $field->set_ucd($field_ucds[$i]);
       $field->set_datatype($field_datatypes[$i]);
       $field->set_unit($field_units[$i]);
+      $field->set_arraysize($field_sizes[$i]) if defined $field_sizes[$i];
       $table->append_FIELD($field);
   }
 

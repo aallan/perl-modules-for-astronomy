@@ -1,7 +1,10 @@
 2003-10-16  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.3.0)
 
         * IO/VOTable.pm: Fixed VOTable output to actually have some
-          meta-data, now readable by treeview.
+          meta-data, now readable by treeview. Added DEFINITIONS
+          element to the table and filled in various "default"
+          meta-data. The tables are not bogus, but the epoch and
+          equinoxes may be incorrect in some cases.
           
 2003-10-13  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.3.0)
 
