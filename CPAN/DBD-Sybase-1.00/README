@@ -1,0 +1,277 @@
+$Id: README,v 1.1 2003/07/18 00:23:04 aa Exp $
+	
+	   DBD::Sybase  --  a Sybase DBI driver for Perl 5.
+
+   Copyright (c) 1996 - 2003  Michael Peppler
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+
+This Sybase DBI driver is built using the Sybase OpenClient Client
+Library (aka CT-library). You will need to have that installed before
+you can do anything with this package. You will also need Tim Bunce's
+DBI module, latest release. DBI is available from CPAN, in
+
+    "CPAN"/authors/id/TIMB/DBI-1.xx-tar.gz
+
+The Sybase OpenClient libraries are of course available from Sybase.
+For Linux you can get the full Sybase ASE 11.0.3.3 release for free
+(this includes the server and the client libraries.)
+See http://linux.sybase.com for details, or my homepage 
+(http://www.mbay.net/~mpeppler).
+
+An alternative is to use the FreeTDS reimplementation of Client Library.
+With FreeTDS DBD::Sybase can be used to query a MS-SQL 7 or 2000
+database server from a Unix/linux host.
+See http://www.freetds.org for details.
+
+If you use FreeTDS please read the README.freetds file.
+
+DBD::Sybase is a reasonably complete implementation of the DBI spec, but 
+there are still some features that are missing. Please see the DBD::Sybase
+man page for details.
+
+The full write-ups of the bugs that are listed below as "fixed" can be
+seen at http://www.peppler.org/cgi-bin/bug.cgi.
+
+Getting Help
+============
+
+If you are stuck please start by searching the Web, the appropriate
+mailing lists and my bug database, as it is likely that someone else
+will have experienced the same problem before you.
+
+The sybperl-l mailing list is dedicated to Sybase <-> perl issues and 
+covers both the sybperl modules (Sybase::CTlib, etc.) and DBD::Sybase.
+It is archived and searchable at http://www.peppler.org/archive/sybperl-l/
+
+If after seaching you still don't find any solution then post a question
+(with as much detail as possible) to either dbi-users@perl.org,
+sybperl-l@peppler.org or freetds@lists.ibiblio.org (only use the
+latter if you use the FreeTDS libraries with DBD::Sybase).
+
+
+Recent changes:
+
+Release 1.00
+
+	Removed "beta" tag!
+	Added data_sources().
+        Allow "SQL_BINARY" placeholder parameters to be passed either
+        as a hex string (with or without leading 0x), or as raw binary
+        data.
+
+	Bugs Fixed:
+
+	477 - segfault when servermsg_cb is called with a null connection
+	480 - Makefile.PL searches system dirs before PERL5LIB dirs when 
+              looking for DBI installation.
+	485 - Incorrect handling of large varbinary columns on fetches.
+	489 - (same as 497, see below).
+	492 - Can't compile on Win2k.
+	494 - Do not try to use the ocs.cfg file if it exists.
+	495 - Incorrect handling of parameters when using placeholders &
+              stored procs.
+        497 - implicit type conversions with prepared statements often fail
+	503 - Binary placeholders with stored procedures.
+	506 - Default scriptName/hostname connect() params.
+	508 - DBD::Sybase doesn't build under Win2k.
+
+Release 0.95
+
+        Support for building DBD::Sybase in 64 bit mode with the
+        64 bit version of OpenClient on Solaris, HP-UX, AIX, etc.
+        (note that perl itself must also be built in 64 bit
+        mode for this to work!)
+
+	Added column_info() method.
+
+	Added G_EVAL flag to syb_err_handler calls.
+	Improved syb_err_handler handling (thanks to Matthew Persico)
+        Fixed memory leak when opening additional connections for multiple
+        statement handles on a single database handle (thanks to Stefan
+        Harbeck)
+        Applied minor patch by Alex Fridman to get to build on WinNT.
+	Force a ct_cancel() if, due to syb_do_proc_status, we force a 
+	failure on a request that could have more results pending (Blaise 
+	Lepeuple)
+	Added syb_cancel_request_on_error attribute (see bug 471).
+	Warning - the default value for this attribute changes the behavior
+	of $sth->execute() when there is a failure that is detected in
+	multi-statement requests.
+	Added syb_bind_empty_string_as_null attribute (see bug 446) to
+	allow user configurable empty string binding semantics (convert
+	to single space [default] or to NULL).
+
+	Bugs Fixed:
+
+	431 - fetchrow_hashref() has incorrect keys when retrieving
+              multiple result sets.
+        437 - imp_sth->numRows in st_next_result not always set.
+	444 - Incorrect example for ct_get_data(). ct_get_data() SEGV
+              if passed a non-reference for $image.
+        394 - $sth->{CursorName} fails hard.
+	449 - ct_get_data() limited to 32k
+	450 - Fix incorrect NULLABLE handling.
+	452 - Incorrect $sth->finish() handling in syb_flush_finish mode
+              (thanks to Steve Willer).
+        443 - $sth->fetch produces error if called after $sth->execute on
+	      statement that doesn't return any rows.
+	411 - statement handle attributes do not change between result sets.
+	430 - $dbh->prepare can return undef without triggering RaiseError.
+	436 - Problems with make test generating errors creating 
+              Makefile.aperl.
+	441 - amadmin who,sqm fails while in a transaction.
+	446 - Empty string converts to a space (fixed by making this
+	      configurable).
+	448 - define strncasecmp as strnicmp for Win32 systems.
+	454 - syb_err_handler won't catch connect-time error.
+	456 - ping still fails if connection is dead.
+	461 - Memory leak if NOT using placeholders in selects and
+	      calling execute() multiple times.
+	464 - Binding an empty string for a date field causes "1/1/1900"
+              to be inserted (instead of NULL).
+	469 - nsql error handling bug.
+	447 - syb_db_disconnect(): ct_con_drop() failed.
+	471 - Certain class of errors isn't detected by DBD::Sybase.
+
+
+        Documentation changes to explain why 
+         ... WHERE (product_code = ? OR (? IS NULL AND product_code IS NULL))
+        doesn't work with Sybase.
+	
+
+
+Release 0.94
+
+        Added optional SQL buffer argument to syb_err_handler.
+	Interactive setting of user/server/pwd entries in PWD
+	for "make test".
+	Add syb_failed_db_fatal and syb_no_child_con attributes.
+
+	Bugs Fixed:
+
+	408 - Add the YYYYMMDD format to _date_fmt().
+	414 - Binding '' is interpreted as NULL.
+	415 - Fix buffer overlow in syb_db_login().
+	418 - Fix incorrect handing of CS_CANCELED return code in 
+              st_next_result().
+        421 - ActiveState patches.
+
+
+
+Building:
+
+This version attempts to find out which libraries it needs by looking
+at $SYBASE/lib ($SYBASE/$SYBASE_OCS/lib for ASE 12.x installations.) 
+This behaviour is experimental, and will only work
+on Unix and VMS systems (ie on Win32 you still have to edit the CONFIG
+file the old way), but appears to work fine on the two systems I have
+access to (Sybase 12.0/Solaris 7 & Sybase 12.5/linux) and on Sybase
+10.0.2.3/OpenVMS AXP 7.1. It assumes that $SYBASE is set and points to 
+the Sybase installation directory that you want to use to build 
+DBD::Sybase, and will also use the value of $SYBASE_OCS if it is set.
+
+Start by editing the PWD file to set a valid user, password and server
+for the test scripts to use.
+Make sure that the SYBASE environment variable points to the Sybase
+installation that you want to use for this build.
+
+Then run 
+	perl Makefile.PL
+If there were warnings about missing libraries, go to the manual 
+configuration, below.
+Run
+	make
+If the make failed, go to the manual configuration, below.
+Run
+	make test
+If this succeeds you can install the package, via
+	make install
+(which you probably have to run as root.)
+
+Manual Configuration:
+
+If the automatic configuration fails, then you will have to edit the
+CONFIG file, and set the EXTRA_LIBS entry according to your OS and
+Sybase release, and then run 
+	perl Makefile.PL --file
+
+The CONFIG file can be used to set certain system variables that
+are needed for the build. 
+	SYBASE is the root directory of your Sybase installation. DBD::Sybase
+	will use $SYBASE/lib and $SYBASE/include during the build.
+
+	EXTRA_LIBS lists any extra libraries that are required on your
+	system. For example, Solaris 2.x needs -ltli. See your OS specific
+	documentation supplement from Sybase to determine what is required.
+
+	DBI_INCLUDE is the directory where DBI installed its include files.
+	Makefile.PL will normally deduce this directory from perl's Config
+	module, so you only need to set this if Makefile.PL fails.
+
+	LINKTYPE. Uncomment and set to 'static' if you want to build
+	DBD::Sybase statically (ie always included in a new perl binary).
+
+Edit PWD, and set the user, password and server that you want to use for the 
+'make test'.
+
+Run perl Makefile.PL, make, make test.
+
+If everything's fine, run "make install" to move the files to your 
+installed perl library tree.
+
+
+Known Problems:
+===============
+
+Solaris 2.x:
+-----------
+On Solaris 2.x make test will fail if LD_LIBRARY_PATH is set and has
+/usr/lib or /lib before $SYBASE/lib. This is because both Solaris 2.x
+and Sybase have a library called libintl.so, and if /usr/lib is placed 
+before $SYBASE/lib in LD_LIBRARY_PATH the dynamic loader will search
+the wrong library when loading DBD::Sybase. In general it is not
+necessary to set LD_LIBRARY_PATH on Solaris, and it is only rarely
+necessary to include /usr/lib or /lib in the LD_LIBRARY_PATH as those
+directories will be searched by default.
+
+Linux:
+------
+If the LANG or LC_ALL environment variable is set and points to an 
+entry that does not exist in $SYBASE/locales/locales.dat (in the 
+[linux] section) then you will get a core dump. This is an
+OpenClient problem. 
+See http://www.mbay.net/~mpeppler/Linux-ASE-FAQ.html#q1.14 for
+additional details.
+
+FreeTDS:
+--------
+
+See the README.freetds file for details.
+
+The regression tests cover the normal operations, but they are by no 
+means complete, so don't necessarily believe all is fine if the
+tests succeed...
+
+NOTE: t/fail.t will *fail* on test #8 if you are connecting to 
+      an 11.0.3.3 server. This is a bug in the server, and not something
+      that I can do anything about, unfortunately. It's a fairly
+      obscure constraint violation condition - read the code if
+      you are interested.
+
+I have a simple bug tracking database at http://www.peppler.org/cgi-bin/bug.cgi
+You can use it to check for known problems, and to report new ones. Keep
+in mind that peppler.org lives on the end of a K56 dialup line, so it
+may be slow.
+
+See perldoc DBD::Sybase for details about the package.
+
+Comments, criticism, etc. welcome!
+
+Michael
+--
+Michael Peppler, Data Migrations, Inc.
+mpeppler@peppler.org - http://www.mbay.net/~mpeppler
+
