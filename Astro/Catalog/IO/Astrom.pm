@@ -82,10 +82,13 @@ sub _write_catalog {
   my $output_line;
 
 # Write the approximate field centre.
-  my $ra_cen = $catalog->get_coords->ra2000;
-  my $dec_cen = $catalog->get_coords->dec2000;
-  $ra_cen->str_delim(' ');
-  $dec_cen->str_delim(' ');
+  my $ra_cen = $catalog->get_coords->ra( format => 's' );
+  my $dec_cen = $catalog->get_coords->dec( format => 's' );
+
+# Strip out colons or dms/hms and replace them with spaces.
+  $ra_cen =~ s/[:dhms]/ /g;
+  $dec_cen =~ s/[:dhms]/ /g;
+
   push @output, "~ $ra_cen $dec_cen J2000 2000.0";
 
 # For each star, write the RA, Dec, epoch, X and Y coordinates.
@@ -97,10 +100,13 @@ sub _write_catalog {
               ! defined( $star->y ) );
 
     my $coords = $star->coords;
-    my $ra = $coords->ra2000;
-    my $dec = $coords->dec2000;
-    $ra->str_delim(' ');
-    $dec->str_delim(' ');
+    my $ra = $coords->ra( format => 's' );
+    my $dec = $coords->dec( format => 's' );
+
+# Strip out colons or dms/hms and replace them with spaces.
+    $ra =~ s/[:dhms]/ /g;
+    $dec =~ s/[:dhms]/ /g;
+
     $output_line = "$ra $dec J2000 2000.0";
     push @output, $output_line;
 
@@ -118,7 +124,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: Astrom.pm,v 1.1 2005/01/14 02:51:33 cavanagh Exp $
+ $Id: Astrom.pm,v 1.2 2005/02/02 20:07:52 cavanagh Exp $
 
 =head1 SEE ALSO
 
