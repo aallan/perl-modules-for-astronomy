@@ -1,0 +1,45 @@
+2003-07-16  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * WaveBand.pm: Added three static methods has_instrument(),
+          has_filter() and is_observable() which pretty much do exactly
+          what it says on the box. Check the inline POD for details.
+          Added a %TELESCOPE lookup hash to go along with the existing
+          %FILTERS lookup hash.
+          
+2003-05-30  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* WaveBand.pm: Update UIST filters.
+
+2003-01-31  Tim Jenness  <tjenness@cpan.org>
+
+	* WaveBand.pm: Add support for JCMT heterodyne instruments
+
+2002-08-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* WaveBand.pm: Add UIST support
+
+2002-06-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* WaveBand.pm: Add Blank for UFTI and add SCUBA filters. Still a
+	problem with multiple wavelengths associated with a single filter.
+
+2002-05-28  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* WaveBand.pm: New CPAN release 0.04 (with README!)
+
+2002-05-27  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* WaveBand.pm: Add licence statement 
+
+2002-05-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* CPAN release 0.03
+
+2001-12-05  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* WaveBand.pm (_convert_to): Make sure that we do no require full
+	precision when matching wavelength against filter.
+
+2001-11-27  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* First version

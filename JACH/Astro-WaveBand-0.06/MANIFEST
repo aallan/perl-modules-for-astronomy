@@ -1,0 +1,6 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+WaveBand.pm
+t/waveband.t
+README
