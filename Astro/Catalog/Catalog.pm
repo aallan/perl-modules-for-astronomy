@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.50 2005/02/25 21:40:17 timj Exp $
+#     $Id: Catalog.pm,v 1.51 2005/03/31 01:28:08 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.50 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.51 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.50 2005/02/25 21:40:17 timj Exp $
+$Id: Catalog.pm,v 1.51 2005/03/31 01:28:08 cavanagh Exp $
 
 =head1 METHODS
 
@@ -390,8 +390,8 @@ sub popstarbyid {
   # twice and we generate a whole new array internally
   # Do not force copy of allstars array yet
   my @current = $self->stars;
-  my @match = grep { defined $_ && defined $_->id && $_->id == $id } @current;
-  my @unmatched = grep { defined $_ && defined $_->id && $_->id != $id } 
+  my @match = grep { defined $_ && defined $_->id && $_->id eq $id } @current;
+  my @unmatched = grep { defined $_ && defined $_->id && $_->id ne $id } 
     @current;
 
   @{ $self->stars } = @unmatched;
@@ -850,67 +850,11 @@ sub configure {
     my $ioclass = _load_io_plugin( $args{format} );
     return unless defined $ioclass;
 
-    # Lines for the content
-    my @lines;
-
-    # Now need to either look for some data or read a file
-    if ( defined $args{data}) {
-
-      # Need to extract the data from this and convert to array
-      if (not ref($args{data})) {
-	# must be a scalar
-	@lines = split /\n/, $args{data};
-      } else {
-	if (ref($args{data}) eq 'GLOB') {
-	  # A file handle
-	  local $/ = "\n";
-	  # For some reason <$args{data}> does not do the right thing
-	  my $fh = $args{data};
-	  @lines = <$fh>;
-	} elsif (ref($args{data}) eq 'ARRAY') {
-	  # An array of lines
-	  @lines = @{ $args{data} };
-	} else {
-	  # Who knows
-	  croak "Can not extract catalog information from scalar of type ".
-	    ref($args{data}) ."\n";
-	}
-      }
-
-    } else {
-      # Look for a filename or the default file
-      my $file;
-      if ( defined $args{file} ) {
-	$file = $args{file};
-      } else {
-	# Need to ask for the default file
-	$file = $ioclass->_default_file()
-	  if $ioclass->can( '_default_file' );
-	croak "Unable to read catalogue since no file specified and ".
-	  "no default known." unless defined $file;
-      }
-
-      # Open the file
-      my $CAT;
-      croak("Astro::Catalog - Cannot open catalogue file $file: $!")
-	unless open( $CAT, "< $file" );
-
-      # read from file
-      local $/ = "\n";
-      @lines = <$CAT>;
-      close($CAT);
-
-    }
-
-    # remove new lines
-    chomp @lines;
-
-    # Read Catalog options passed in from caller
-    my $readopt = (defined $args{readopt} ? $args{readopt} : {} );
-
     # Now read the catalog (overwriting $self)
     print "# READING CATALOG $ioclass \n" if $DEBUG;
-    $self =  $ioclass->_read_catalog( \@lines, %$readopt);
+    $self = $ioclass->read_catalog( File => $args{file},
+                                    Data => $args{data},
+                                    ReadOpt => $args{readopt} );
 
     croak "Error reading catalog of class $ioclass\n"
       unless defined $self;
@@ -1452,6 +1396,7 @@ sub _load_io_plugin {
   $format = 'UKIRTBS' if $format eq 'Ukirtbs';
   $format = 'SExtractor' if $format eq 'Sextractor';
   $format = 'FINDOFF' if $format eq 'Findoff';
+  $format = 'FITSTable' if $format eq 'Fitstable';
 
   my $class = "Astro::Catalog::IO::" . $format;
 
