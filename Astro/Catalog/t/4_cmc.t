@@ -12,7 +12,7 @@ BEGIN {
   # load modules
   use_ok("Astro::Catalog::Star");
   use_ok("Astro::Catalog");
-  use_ok("Astro::Catalog::Query::BSC");
+  use_ok("Astro::Catalog::Query::CMC");
 }
 
 # Load the generic test code
@@ -23,15 +23,19 @@ do $p."helper.pl" or die "Error reading test functions: $!";
 
 # Grab catalogue from Vizier
 
-my $bsc = new Astro::Catalog::Query::BSC( RA     => "01 10 13.0",
+my $bsc = new Astro::Catalog::Query::CMC( RA     => "01 10 13.0",
                                           Dec    => "+60 04 36",
-                                          Radius => '120' );
+                                          Radius => '60' );
 
-print "# Connecting to Vizier Catalogue\n";
+print "# Connecting to Vizier CMC/11 Catalogue\n";
 my $catalog = $bsc->querydb();
 print "# Continuing tests\n";
 
 print Dumper( $catalog );
+my $buffer;
+$catalog->write_catalog( File => \$buffer, Format => 'Cluster' );
+print "\n" . $buffer . "\n";                         
+
 
 
 exit;
