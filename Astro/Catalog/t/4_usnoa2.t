@@ -4,20 +4,16 @@
 use strict;
 
 #load test
-use Test;
+use Test::More tests => 38;
 
 use Data::Dumper;
-BEGIN { plan tests => 36 };
 
 # load modules
-use Astro::Catalog;
-use Astro::Catalog::Star;
-use Astro::Catalog::Query::USNOA2;
+require_ok("Astro::Catalog::Star");
+require_ok("Astro::Catalog");
+require_ok("Astro::Catalog::Query::USNOA2");
 
 # T E S T   H A R N E S S --------------------------------------------------
-
-# test the test system
-ok(1);
 
 # Grab USNO-A2 sample from the DATA block
 # ---------------------------------------
@@ -29,25 +25,25 @@ my $catalog_data = new Astro::Catalog();
 
 # create a temporary object to hold stars
 my $star;
-  
+
 # Parse data block
 # ----------------
 foreach my $line ( 0 .. $#buffer ) {
-                      
+
    # split each line
    my @separated = split( /\s+/, $buffer[$line] );
-            
+
    # check that there is something on the line
    if ( defined $separated[0] ) {
-              
+
        # create a temporary place holder object
-       $star = new Astro::Catalog::Star();            
-           
+       $star = new Astro::Catalog::Star();
+
        # ID
        my $id = $separated[2];
        $star->id( $id );
-       #print "# ID $id star $line\n";      
-       
+       #print "# ID $id star $line\n";
+
        # RA
        my $objra = "$separated[3] $separated[4] $separated[5]";
 
@@ -64,19 +60,19 @@ foreach my $line ( 0 .. $#buffer ) {
        # R Magnitude
        my %r_mag = ( R => $separated[9] );
        $star->magnitudes( \%r_mag );
-              
+
        # B Magnitude
        my %b_mag = ( B => $separated[10] );
        $star->magnitudes( \%b_mag );
-              
+
        # Quality
        my $quality = $separated[11];
        $star->quality( $quality );
-              
+
        # Field
        my $field = $separated[12];
        $star->field( $field );
-              
+
        # GSC
        my $gsc = $separated[13];
        if ( $gsc eq "+" ) {
@@ -84,51 +80,50 @@ foreach my $line ( 0 .. $#buffer ) {
        } else {
           $star->gsc( "FALSE" );
        }
-              
+
        # Distance
        my $distance = $separated[14];
        $star->distance( $distance );
-              
+
        # Position Angle
        my $pos_angle = $separated[15];
        $star->posangle( $pos_angle );
 
     }
-             
+
     # Push the star into the catalog
     # ------------------------------
     $catalog_data->pushstar( $star );
-           
-           
+
     # Calculate error
     # ---------------
-    
+
     my ( $power, $delta_r, $delta_b );
-                      
+
     # delta.R
     $power = 0.8*( $star->get_magnitude( 'R' ) - 19.0 );
     $delta_r = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
-           
+
     # delta.B
     $power = 0.8*( $star->get_magnitude( 'B' ) - 19.0 );
     $delta_b = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
-           
+
     # mag errors
     my %mag_errors = ( B => $delta_b,  R => $delta_r );
     $star->magerr( \%mag_errors );
-           
+
     # calcuate B-R colour and error
     # -----------------------------
-           
+
     my $b_minus_r = $star->get_magnitude( 'B' ) - 
                     $star->get_magnitude( 'R' );
-                           
+
     my %colours = ( 'B-R' => $b_minus_r );
     $star->colours( \%colours );
-           
+
     # delta.(B-R)
     my $delta_bmr = ( ( $delta_r ** 2.0 ) + ( $delta_b ** 2.0 ) ) ** (1.0/2.0);
-           
+
     # col errors
     my %col_errors = ( 'B-R' => $delta_bmr );
     $star->colerr( \%col_errors );
@@ -155,80 +150,61 @@ print "# Continuing tests\n";
 print "# DAT has " . $catalog_data->sizeof() . " stars\n";
 print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
-ok( $catalog_data->sizeof(), $catalog_byname->sizeof() );
+is( $catalog_data->sizeof(), $catalog_byname->sizeof(), "compare star count" );
 
 # grab the 1st star in both catalogues
 # ------------------------------------
 my $star_dat = $catalog_data->starbyindex( 0 );
 my $star_net = $catalog_byname->starbyindex( 0 );
 
-ok( $star_dat->id(), $star_net->id() );
-ok( $star_dat->ra(), $star_net->ra() );
-ok( $star_dat->dec(), $star_net->dec() );
-
-my @dat_filters = $star_dat->what_filters();
-my @net_filters = $star_net->what_filters();
-foreach my $filter ( 0 ... $#net_filters ) {
-   ok( $dat_filters[$filter], $net_filters[$filter] );
-   ok( $star_dat->get_magnitude($dat_filters[$filter]),
-       $star_net->get_magnitude($net_filters[$filter]) );
-   ok( $star_dat->get_errors($dat_filters[$filter]),
-       $star_net->get_errors($net_filters[$filter]) );   
-}   
-  
-my @dat_cols = $star_dat->what_colours();
-my @net_cols = $star_net->what_colours();
-foreach my $col ( 0 ... $#net_cols ) {
-   ok( $dat_cols[$col], $net_cols[$col] );
-   ok( $star_dat->get_colour($dat_cols[$col]), 
-       $star_net->get_colour($net_cols[$col]) );
-   ok( $star_dat->get_colourerr($dat_cols[$col]), 
-       $star_net->get_colourerr($net_cols[$col]) );
-}    
-  
-ok( $star_dat->quality(), $star_net->quality() );
-ok( $star_dat->field(), $star_net->field() );
-ok( $star_dat->gsc(), $star_net->gsc() );
-ok( $star_dat->distance(), $star_net->distance() );
-ok( $star_dat->posangle(), $star_net->posangle() );
+compare_star( $star_dat, $star_net );
 
 # grab the last star in both catalogues
 # ------------------------------------
 $star_dat = $catalog_data->starbyindex( $catalog_data->sizeof() - 1 );
 $star_net = $catalog_byname->starbyindex( $catalog_byname->sizeof() - 1 );
 
-ok( $star_dat->id(), $star_net->id() );
-ok( $star_dat->ra(), $star_net->ra() );
-ok( $star_dat->dec(), $star_net->dec() );
-
-@dat_filters = $star_dat->what_filters();
-@net_filters = $star_net->what_filters();
-foreach my $filter ( 0 ... $#net_filters ) {
-   ok( $dat_filters[$filter], $net_filters[$filter] );
-   ok( $star_dat->get_magnitude($dat_filters[$filter]),
-       $star_net->get_magnitude($net_filters[$filter]) );
-   ok( $star_dat->get_errors($dat_filters[$filter]),
-       $star_net->get_errors($net_filters[$filter]) );   
-}   
-  
-@dat_cols = $star_dat->what_colours();
-@net_cols = $star_net->what_colours();
-foreach my $col ( 0 ... $#net_cols ) {
-   ok( $dat_cols[$col], $net_cols[$col] );
-   ok( $star_dat->get_colour($dat_cols[$col]), 
-       $star_net->get_colour($net_cols[$col]) );
-   ok( $star_dat->get_colourerr($dat_cols[$col]), 
-       $star_net->get_colourerr($net_cols[$col]) );
-}    
-  
-ok( $star_dat->quality(), $star_net->quality() );
-ok( $star_dat->field(), $star_net->field() );
-ok( $star_dat->gsc(), $star_net->gsc() );
-ok( $star_dat->distance(), $star_net->distance() );
-ok( $star_dat->posangle(), $star_net->posangle() );
-
+compare_star( $star_dat, $star_net );
 
 exit;
+
+sub compare_star {
+  my ($refstar, $newstar) = @_;
+
+  is( $refstar->id(), $newstar->id(), "compare star ID" );
+  is( $refstar->ra(), $newstar->ra(), "compare star RA" );
+  is( $refstar->dec(), $newstar->dec(), "Compare star Dec" );
+
+  my @dat_filters = $refstar->what_filters();
+  my @net_filters = $newstar->what_filters();
+  foreach my $filter ( 0 ... $#net_filters ) {
+    is( $dat_filters[$filter], $net_filters[$filter],"compare filter $filter" );
+    is( $refstar->get_magnitude($dat_filters[$filter]),
+	$newstar->get_magnitude($net_filters[$filter]),
+	"compare magnitude $filter");
+    is( $refstar->get_errors($dat_filters[$filter]),
+	$newstar->get_errors($net_filters[$filter]),
+	"compare magerr $filter");
+  }
+
+  my @dat_cols = $refstar->what_colours();
+  my @net_cols = $newstar->what_colours();
+  foreach my $col ( 0 ... $#net_cols ) {
+    is( $dat_cols[$col], $net_cols[$col],"compare color $col" );
+    is( $refstar->get_colour($dat_cols[$col]), 
+	$newstar->get_colour($net_cols[$col]),
+	"compare value of color $col");
+    is( $refstar->get_colourerr($dat_cols[$col]), 
+	$newstar->get_colourerr($net_cols[$col]),"compare color error $col" );
+  }
+
+  is( $refstar->quality(), $newstar->quality(), "check quality" );
+  is( $refstar->field(), $newstar->field(), "check field" );
+  is( $refstar->gsc(), $newstar->gsc() , "check GSC flag");
+  is( $refstar->distance(), $newstar->distance() ,"check distance");
+  is( $refstar->posangle(), $newstar->posangle(), "check posangle" );
+
+}
 
 # D A T A   B L O C K  -----------------------------------------------------
 
