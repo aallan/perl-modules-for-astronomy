@@ -25,6 +25,7 @@ use warnings::register;
 use Carp;
 use strict;
 
+use Astro::Telescope;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
