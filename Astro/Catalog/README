@@ -19,7 +19,6 @@ associated classes
    LWP::UserAgent
    Net::Domain 
    File::Spec
-   Math::Libm
    Carp
    
 all these modules, if not already installed, are available from CPAN. 

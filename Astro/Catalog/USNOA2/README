@@ -20,7 +20,6 @@ to function
    LWP::UserAgent
    Net::Domain 
    File::Spec
-   Math::Libm
    Carp
    
 all of these modules are available from CPAN <http://www.cpan.org/>.

@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-use Math::Libm qw(:all);
+#use Math::Libm qw(:all);
 use Data::Dumper;
 BEGIN { plan tests => 24 };
 

@@ -19,7 +19,7 @@ package Astro::Catalog::GSC::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.1 2002/01/14 10:05:33 aa Exp $
+#     $Id: Query.pm,v 1.2 2002/05/31 12:20:59 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -63,20 +63,20 @@ use vars qw/ $VERSION /;
 use LWP::UserAgent;
 use Net::Domain qw(hostname hostdomain);
 use File::Spec;
-use Math::Libm qw(:all);
+#use Math::Libm qw(:all);
 use Carp;
 
 # generic catalog objects
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.1 2002/01/14 10:05:33 aa Exp $
+$Id: Query.pm,v 1.2 2002/05/31 12:20:59 aa Exp $
 
 =head1 METHODS
 

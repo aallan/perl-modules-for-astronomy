@@ -1,3 +1,8 @@
+2002-05-31  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Removed references to Math::libm from the GSC modules, these
+          references seemed to have been missed by the previous patch.
+          
 2002-05-29  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Applied patch provided by Stephen Quiney <S.J.Quinney@durham.ac.uk>,
