@@ -1,3 +1,10 @@
+2002-03-13  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Working server implementation using the mono-threaded
+          server. Some problems with connection contexts remain.
+        
+        * Tested server code against LJM send_command and send_file.
+ 
 2002-03-11  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Updated to use the new eSTAR IO library which
@@ -13,9 +20,9 @@
 
         * Total re-write due to unforseen problems with
           threading and GLOBUS loosing I/O handles when
-          the temporarily pass out of scope. Working Client,
-          tested against the LJM C test_server, but don't
-          have a working Server yet.
+          the temporarily pass out of scope. 
+          
+        * Tested client code against the LJM test_server.
           
 2002-03-04  Alasdair Allan <aa@astro.ex.ac.uk>
 

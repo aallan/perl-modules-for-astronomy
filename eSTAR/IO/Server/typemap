@@ -1,1 +1,2 @@
 globus_io_handle_t *    T_PTROBJ
+eSTAR_IO_Server_Context_T *   T_PTROBJ
