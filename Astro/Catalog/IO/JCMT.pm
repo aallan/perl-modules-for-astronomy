@@ -120,7 +120,9 @@ sub _read_catalog {
   }
 
   # Create the catalog object
-  return new Astro::Catalog( Stars => \@stars );
+  return new Astro::Catalog( Stars => \@stars,
+			     Origin => 'JCMT',
+			   );
 
 }
 
@@ -262,8 +264,9 @@ sub _write_catalog {
 
   # Write a header
   push @lines, "*\n";
-  push @lines, "* Catalog written automatically by SrcCatalog::JCMT\n";
+  push @lines, "* Catalog written automatically by class ". __PACKAGE__ ."\n";
   push @lines, "* on date " . gmtime . "UT\n";
+  push @lines, "* Origin of catalogue: ". $cat->origin ."\n";
   push @lines, "*\n";
 
   # Now need to go through the targets and write them to disk
@@ -418,11 +421,15 @@ sub _parse_line {
   $source->telescope( $tel ) if $tel;
   $source->comment($comment);
 
+  # Field name should simply be linked to the telescope
+  my $field = (defined $tel ? $tel->name : '<UNKNOWN>' );
+
   print "Created a new source in getsourcefromfile\n" if $DEBUG;
 
   # Now create the star object
   return new Astro::Catalog::Star( id => $target,
 				   coords => $source,
+				   field => $field,
 				 );
 
 }
