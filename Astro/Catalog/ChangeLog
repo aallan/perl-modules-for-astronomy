@@ -1,3 +1,9 @@
+2003-08-01  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Transport/REST.pm (useragent): Instantiate useragent on demand
+	rather than via configure (useful for skycat interface). Separate
+	construction of URL from retrieval of URL to allow simpler subclassing.
+
 2003-07-30  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* IO/TST.pm: Add TST format reader. Still has debug.

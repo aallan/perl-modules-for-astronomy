@@ -33,11 +33,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: REST.pm,v 1.3 2003/07/29 20:15:12 aa Exp $
+$Id: REST.pm,v 1.4 2003/08/02 10:44:12 timj Exp $
 
 =head1 METHODS
 
@@ -90,6 +90,10 @@ sub new {
 
 The LWP user agent mediating the web transaction.
 
+  $ua = $q->useragent();
+
+Created automatically the first time it is requested.
+
 =cut
 
 sub useragent {
@@ -99,7 +103,22 @@ sub useragent {
      croak "Must be a LWP::UserAgent"
        unless UNIVERSAL::isa($ua, "LWP::UserAgent");
      $self->{USERAGENT} = $ua;
-  }
+   } else {
+     # If we have no UA but we have requested one, create it ourself
+     # This overcomes a chicken and egg situation if a subclass
+     # wants to go out on the net during object instantiation
+     # before configure() has been called
+
+     # Setup the LWP::UserAgent
+     my $ua = new LWP::UserAgent( timeout => 30 );
+
+     $self->useragent( $ua );
+     $ua->agent( $self->_default_useragent_id );
+
+     # Grab Proxy details from local environment
+     $ua->env_proxy();
+
+   }
   return $self->{USERAGENT};
 }
 
@@ -276,35 +295,6 @@ sub agent {
 
 =over 4
 
-=item B<configure>
-
-Configures the object, takes an options hash as an argument
-
-  $dss->configure( %options );
-
-Does nothing if the array is not supplied.
-
-=cut
-
-sub configure {
-  my $self = shift;
-
-  # CONFIGURE DEFAULTS
-  # ------------------
-
-  # Setup the LWP::UserAgent
-  my $ua = new LWP::UserAgent( timeout => 30 );
-
-  $self->useragent( $ua );
-  $ua->agent( $self->_default_useragent_id );
-
-  # Grab Proxy details from local environment
-  $ua->env_proxy();
-
-  # pass control back to the SUPER class
-  $self->SUPER::configure( @_ );
-
-}
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 
@@ -372,7 +362,7 @@ sub _default_useragent_id {
 =item B<_make_query>
 
 Private function used to make an query. Should not be called directly,
-since it does not parse the results. Instead use the querydb() assessor 
+since it does not parse the results. Instead use the querydb()
 method.
 
 =cut
@@ -380,55 +370,97 @@ method.
 sub _make_query {
    my $self = shift;
 
-   # grab the user agent
-   my $ua = $self->useragent;
-
    # clean out the buffer
    $self->{BUFFER} = "";
 
-   # grab the base URL
-   my $URL = $self->query_url;
-   my $options = "";
+   # Build the query URL
+   my $URL = $self->_build_query();
 
-   # loop round all the options keys and build the query
-   my %allow = $self->_get_allowed_options;
-   foreach my $key ( keys %allow ) {
-     # Need to translate them...
-     my $cvtmethod = "_from_" . $key;
-     my ($outkey, $outvalue);
-     if ($self->can($cvtmethod)) {
-       ($outkey, $outvalue) = $self->$cvtmethod();
-     } else {
-       # Currently assume everything is one to one
-       warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping");
-       $outkey = $key;
-       $outvalue = $self->query_options($key);
-     }
+   # Run the actual HTTP query
+   # and get the retrieved buffer
+   $self->{BUFFER} = $self->_fetch_url( $URL );
 
-     $options .= "&$outkey=". $outvalue
-       if defined $outvalue;
-   }
-
-   # build final query URL
-   $URL = $URL . $options;
-
-   # build request
-   my $request = new HTTP::Request('GET', $URL);
-
-   # grab page from web
-   my $reply = $ua->request($request);
-
-   # declare file name
-   my $file_name;
-
-   if ( ${$reply}{"_rc"} eq 200 ) {
-      # stuff the page contents into the buffer
-      $self->{BUFFER} = ${$reply}{"_content"};
-   } else {
-      croak("Error ${$reply}{_rc}: Failed to establish network connection");
-   }
+   return;
 }
 
+=item B<_fetch_url>
+
+Simple wrapper around LWP to retrieve content from a remote
+URL and return it as a single string.
+
+ $result = $q->_fetch_url( $URL );
+
+=cut
+
+sub _fetch_url {
+  my $self = shift;
+  my $URL = shift;
+
+  # grab the user agent
+  my $ua = $self->useragent;
+
+  # build request
+  my $request = new HTTP::Request('GET', $URL);
+
+  # grab page from web
+  my $reply = $ua->request($request);
+
+  # Look at the result to see if it worked
+  if ( ${$reply}{"_rc"} eq 200 ) {
+    # stuff the page contents into the buffer
+    return  ${$reply}{"_content"};
+  } else {
+    croak("Error ${$reply}{_rc}: Failed to establish network connection using url $URL");
+  }
+
+}
+
+=item B<_build_query>
+
+Build the URL to be sent to the remote service. The default method
+concatenates the C<query_url> along with all the defined query options
+combined using key=value pairs separated by &.
+
+  $url = $q->_build_query();
+
+If the URL can not be built simply by concatenation (eg it requires
+token replacement), then a subclassed method will be required.
+
+=cut
+
+sub _build_query {
+  my $self = shift;
+
+  # grab the base URL
+  my $URL = $self->query_url;
+  my $options = "";
+
+  # loop round all the options keys and build the query
+  my %allow = $self->_get_allowed_options;
+  foreach my $key ( keys %allow ) {
+    # Need to translate them...
+    my $cvtmethod = "_from_" . $key;
+    my ($outkey, $outvalue);
+    if ($self->can($cvtmethod)) {
+      ($outkey, $outvalue) = $self->$cvtmethod();
+    } else {
+      # Currently assume everything is one to one
+      warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping");
+      $outkey = $key;
+      $outvalue = $self->query_options($key);
+    }
+
+    $options .= "&$outkey=". $outvalue
+      if defined $outvalue;
+  }
+
+  # build final query URL
+  $URL = $URL . $options;
+
+  return $URL;
+}
+
+=back
 
 =head1 COPYRIGHT
 
