@@ -19,7 +19,7 @@ use Astro::Catalog::Star;
 ok(1);
 
 # setup environemt
-$ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
+my dir = File::Spec->tmpdir();
 
 my @star;
 
@@ -80,7 +80,7 @@ my $catalog = new Astro::Catalog( RA     => '01 10 12.9',
 # Write Catalog to Cluster File
 # -----------------------------
 
-my $file_name = File::Spec->catfile( $ENV{"ESTAR_DATA"}, "temporary.cat" );
+my $file_name = File::Spec->catfile( $dir, "temporary.cat" );
 
 # write it to /tmp/temporary.cat under UNIX
 $catalog->write_catalog( Format => 'Cluster', File => $file_name );
@@ -115,7 +115,7 @@ my $cluster = new Astro::Catalog( RA      => '01 10 12.9',
 # Write Catalog to Cluster File
 # -----------------------------
 
-$file_name = File::Spec->catfile( $ENV{"ESTAR_DATA"}, "other.cat" );
+$file_name = File::Spec->catfile( $dir, "other.cat" );
 
 # write it to /tmp/other.cat under UNIX
 $cluster->write_catalog( Format => 'Cluster', File => $file_name );
