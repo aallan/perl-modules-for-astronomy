@@ -2,7 +2,7 @@ package Astro::ADS::Result::Paper;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::ADS::Result:;Paper
 
@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.8 2001/11/02 16:38:16 aa Exp $
+#     $Id: Paper.pm,v 1.9 2001/11/08 03:46:27 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -64,13 +64,13 @@ use strict;
 use vars qw/ $VERSION /;
 
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.8 2001/11/02 16:38:16 aa Exp $
+$Id: Paper.pm,v 1.9 2001/11/08 03:46:27 timj Exp $
 
 =head1 METHODS
 
@@ -124,7 +124,7 @@ sub new {
 
   return $block;
 
-} 
+}
 
 # A C C E S S O R  --------------------------------------------------------
 
@@ -145,7 +145,7 @@ Return (or set) the bibcode for the paper
 
 sub bibcode {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{BIBCODE} = shift;
   }
   return $self->{BIBCODE};
@@ -162,7 +162,7 @@ Return (or set) the title for the paper
 
 sub title {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{TITLE} = shift;
   }
   return $self->{TITLE};
@@ -184,7 +184,7 @@ sub authors {
   my $self = shift;
   if (@_) { 
     $self->{AUTHORS} = shift;
-  }  
+  }
   my @authors = @{$self->{AUTHORS}};
   return wantarray ? @authors : $authors[0];
 }
@@ -222,7 +222,7 @@ Return (or set) the journal reference for the paper
 
 sub journal {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{JOURNAL} = shift;
   }
   return $self->{JOURNAL};
@@ -239,7 +239,7 @@ Return (or set) the month and year when the paper was published.
 
 sub published {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{PUBLISHED} = shift;
   }
   return $self->{PUBLISHED};
@@ -259,7 +259,7 @@ if called in a scalar context it will return the number of keywords.
 
 sub keywords {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{KEYWORDS} = shift;
   }
   return wantarray ? @{$self->{KEYWORDS}} : $#{$self->{KEYWORDS}};
@@ -278,7 +278,7 @@ set to AUTHOR, ADS or SIMBAD for instance.
 
 sub origin {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{ORIGIN} = shift;
   }
   return $self->{ORIGIN};
@@ -300,7 +300,7 @@ available.
 
 sub links {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{LINKS} = shift;
   }
   return wantarray ? @{$self->{LINKS}} : $#{$self->{LINKS}};
@@ -317,7 +317,7 @@ Return (or set) the URL pointing to the paper at the ADS
 
 sub url {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{URL} = shift;
   }
   return $self->{URL};
@@ -338,7 +338,7 @@ the abstract.
 
 sub abstract {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{ABSTRACT} = shift;
   }
   return wantarray ? @{$self->{ABSTRACT}} : $#{$self->{ABSTRACT}};
@@ -355,7 +355,7 @@ Return (or set) the object tag for the paper.
 
 sub object {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{OBJECT} = shift;
   }
   return $self->{OBJECT};
@@ -373,7 +373,7 @@ the different query criteria.
 
 sub score {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{SCORE} = shift;
   }
   return $self->{SCORE};
@@ -399,22 +399,22 @@ returns undef if this external link type is not available for this paper.
 
 sub references {
   my $self = shift;
-  
+
   # check to see if link is defined
   my $flag = undef;
   for my $i ( 0 ... $#{$self->{LINKS}} ) {
      $flag = 1 if ${$self->{LINKS}}[$i] eq "REFERENCES";
   }
-  
+
   # return if keyword has not been flagged
   return undef unless defined $flag;
-  
-  # grab the bibcode of the paper  
+
+  # grab the bibcode of the paper
   my $bibcode = $self->{BIBCODE};
-  
+
   # build a query object
   my $query = new Astro::ADS::Query();
-                                      
+
   return $query->followup( $bibcode, "REFERENCES" );
 }
 
@@ -430,22 +430,22 @@ returns undef if this external link type is not available for this paper.
 
 sub citations {
   my $self = shift;
-  
+
   # check to see if link is defined
   my $flag = undef;
   for my $i ( 0 ... $#{$self->{LINKS}} ) {
      $flag = 1 if ${$self->{LINKS}}[$i] eq "CITATIONS";
   }
-  
+
   # return if keyword has not been flagged
   return undef unless defined $flag;
-    
-  # grab the bibcode of the paper  
+
+  # grab the bibcode of the paper
   my $bibcode = $self->{BIBCODE};
-  
+
   # build a query object
   my $query = new Astro::ADS::Query();
-                                      
+
   return $query->followup( $bibcode, "CITATIONS" );
 }
 
@@ -462,22 +462,22 @@ returns undef if this external link type is not available for this paper.
 
 sub alsoread {
   my $self = shift;
-  
+
   # check to see if link is defined
   my $flag = undef;
   for my $i ( 0 ... $#{$self->{LINKS}} ) {
      $flag = 1 if ${$self->{LINKS}}[$i] eq "AR";
   }
-  
+
   # return if keyword has not been flagged
   return undef unless defined $flag;
-   
-  # grab the bibcode of the paper  
+
+  # grab the bibcode of the paper
   my $bibcode = $self->{BIBCODE};
-  
+
   # build a query object
   my $query = new Astro::ADS::Query();
-                                      
+
   return $query->followup( $bibcode, "AR" );
 }
 
@@ -495,22 +495,22 @@ returns undef if this external link type is not available for this paper.
 
 sub tableofcontents {
   my $self = shift;
-  
+
   # check to see if link is defined
   my $flag = undef;
   for my $i ( 0 ... $#{$self->{LINKS}} ) {
      $flag = 1 if ${$self->{LINKS}}[$i] eq "TOC";
   }
-  
+
   # return if keyword has not been flagged
   return undef unless defined $flag;
-   
-  # grab the bibcode of the paper  
+
+  # grab the bibcode of the paper
   my $bibcode = $self->{BIBCODE};
-  
+
   # build a query object
   my $query = new Astro::ADS::Query();
-                                      
+
   return $query->followup( $bibcode, "TOC" );
 }
 
@@ -592,7 +592,7 @@ circulars and other similar articles.
 
 Weighting of the paper based on query criteria, the highest weighted paper
 is the ``most relevant'' to your search terms.
- 
+
 =back
 
 Does nothing if these keys are not supplied.
@@ -609,20 +609,18 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys storing the values
-  # in the object if they exist  
+  # in the object if they exist
   for my $key (qw / Bibcode Title Authors Affil Journal Published
                     Keywords Origin Links URL Abstract Object Score /) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
-  }  
+  }
 
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 
 =back
-
-=end __PRIVATE_METHODS__
 
 =head1 COPYRIGHT
 

@@ -2,7 +2,7 @@ package Astro::ADS::Result;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::ADS::Result
 
@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.10 2001/11/02 17:13:16 aa Exp $
+#     $Id: Result.pm,v 1.11 2001/11/08 03:46:27 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.10 2001/11/02 17:13:16 aa Exp $
+$Id: Result.pm,v 1.11 2001/11/08 03:46:27 timj Exp $
 
 =head1 METHODS
 
@@ -125,8 +125,8 @@ sub pushpaper {
   my $self = shift;
 
   # return unless we have arguments
-  return undef unless @_;  
-  
+  return undef unless @_;
+
   my $paper = shift;
   my $bibcode = $paper->bibcode();
 
@@ -167,10 +167,10 @@ sub paperbyindex {
   my $self = shift;
 
   # return unless we have arguments
-  return undef unless @_;  
-  
+  return undef unless @_;
+
   my $index = shift;
-  
+
   return ${$self->{RESULTS}}[$index];
 }
 
@@ -214,7 +214,7 @@ sub configure {
   my %args = @_;
 
   if (defined $args{Papers}) {
-   
+
      # Go through each of the supplied paper objects
      for my $i ( 0 ...$#{$args{Papers}} ) {
         ${$self->{RESULTS}}[$i] = ${$args{Papers}}[$i];
@@ -226,8 +226,6 @@ sub configure {
 # T I M E   A T   T H E   B A R  --------------------------------------------
 
 =back
-
-=end __PRIVATE_METHODS__
 
 =head1 COPYRIGHT
 
@@ -245,4 +243,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

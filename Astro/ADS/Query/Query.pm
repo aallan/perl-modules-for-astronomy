@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.14 2001/11/07 17:56:38 aa Exp $
+#     $Id: Query.pm,v 1.15 2001/11/08 03:46:27 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -38,7 +38,7 @@ Astro::ADS::Query - Object definining an prospective ADS query.
                                   AuthorLogic => $aut_logic,
                                   Objects     => \@objects,
                                   ObjectLogic => $obj_logic  );
-  
+
   my $results = $query->querydb();
 
 =head1 DESCRIPTION
@@ -62,13 +62,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.14 2001/11/07 17:56:38 aa Exp $
+$Id: Query.pm,v 1.15 2001/11/08 03:46:27 timj Exp $
 
 =head1 METHODS
 
@@ -131,9 +131,9 @@ sub querydb {
 
   # check for failed connect
   return undef unless defined $self->{BUFFER};
-   
-  # return an Astro::ADS::Result object 
-  return $self->_parse_query(); 
+
+  # return an Astro::ADS::Result object
+  return $self->_parse_query();
 
 }
 
@@ -152,10 +152,10 @@ CITATIONS, REFERENCES and TOC.
 
 sub followup {
   my $self = shift;
-  
+
   # return unless we have arguments
   return undef unless @_;
-  
+
   my $bibcode = shift;
   my $link_type = shift;
 
@@ -164,9 +164,9 @@ sub followup {
 
   # check for failed connect
   return undef unless defined $self->{BUFFER};
-   
-  # return an Astro::ADS::Result object 
-  return $self->_parse_query(); 
+
+  # return an Astro::ADS::Result object
+  return $self->_parse_query();
 
 }
 
@@ -184,15 +184,15 @@ sub proxy {
 
    # grab local reference to user agent
    my $ua = $self->{USERAGENT};
-   
-   if (@_) {   
+
+   if (@_) {
       my $proxy_url = shift;
       $ua->proxy('http', $proxy_url );
    }
-   
+
    # return the current proxy
    return $ua->proxy('http');
-    
+
 }
 
 =item B<timeout>
@@ -209,15 +209,15 @@ sub timeout {
 
    # grab local reference to user agent
    my $ua = $self->{USERAGENT};
-   
-   if (@_) {   
+
+   if (@_) {
       my $time = shift;
       $ua->timeout( $time );
    }
-   
+
    # return the current timeout
    return $ua->timeout();
-    
+
 }
 
 # O T H E R   M E T H O D S ------------------------------------------------
@@ -236,23 +236,23 @@ if called in a scalar context it will return the first author.
 
 sub authors {
   my $self = shift;
-  
+
   # SETTING AUTHORS
   if (@_) { 
 
     # clear the current author list   
     ${$self->{OPTIONS}}{"author"} = "";
-    
+
     # grab the new list from the arguements
     my $author_ref = shift;
-    
+
     # make a local copy to use for regular expressions
     my @author_list = @$author_ref;
 
     # mutilate it and stuff it into the author list OPTION
     for my $i ( 0 ... $#author_list ) {
        $author_list[$i] =~ s/\s/\+/g;
-       
+
        if ( $i eq 0 ) {
           ${$self->{OPTIONS}}{"author"} = $author_list[$i];
        } else {
@@ -261,7 +261,7 @@ sub authors {
        }
     }
   }
-  
+
   # RETURNING AUTHORS 
   my $author_line =  ${$self->{OPTIONS}}{"author"};
   $author_line =~ s/\+/ /g;
@@ -287,7 +287,7 @@ sub authorlogic {
   my $self = shift;
 
   if (@_) {
-  
+
      my $logic = shift; 
      if ( $logic eq "OR"   || $logic eq "AND" || $logic eq "SIMPLE" ||
           $logic eq "BOOL" || $logic eq "FULLMATCH" ) {
@@ -296,10 +296,10 @@ sub authorlogic {
         ${$self->{OPTIONS}}{"aut_logic"} = $logic;
      }
   }
-  
+
   return ${$self->{OPTIONS}}{"aut_logic"};
 }
-  
+
 =item B<Objects>
 
 Return (or set) the current objects defined for the ADS query.
@@ -311,39 +311,39 @@ Return (or set) the current objects defined for the ADS query.
 
 sub objects {
   my $self = shift;
-  
-  # SETTING AUTHORS
-  if (@_) {   
 
-    # clear the current object list   
+  # SETTING AUTHORS
+  if (@_) {
+
+    # clear the current object list
     ${$self->{OPTIONS}}{"object"} = "";
-    
+
     # grab the new list from the arguements
     my $object_ref = shift;
-    
+
     # make a local copy to use for regular expressions
     my @object_list = @$object_ref;
 
     # mutilate it and stuff it into the object list OPTION
     for my $i ( 0 ... $#object_list ) {
        $object_list[$i] =~ s/\s/\+/g;
-       
+
        if ( $i eq 0 ) {
           ${$self->{OPTIONS}}{"object"} = $object_list[$i];
        } else {
           ${$self->{OPTIONS}}{"object"} = 
-               ${$self->{OPTIONS}}{"object"} . ";" . $object_list[$i]; 
+               ${$self->{OPTIONS}}{"object"} . ";" . $object_list[$i];
        }
     }
   }
-  
+
   # RETURNING OBJECTS 
   my $object_line =  ${$self->{OPTIONS}}{"object"};
   $object_line =~ s/\+/ /g;
   my @objects = split(/;/, $object_line);
 
   return @objects;
-  
+
 }
 
 =item B<ObjectLogic>
@@ -363,7 +363,7 @@ sub objectlogic {
   my $self = shift;
 
   if (@_) {
-  
+
      my $logic = shift; 
      if ( $logic eq "OR"   || $logic eq "AND" || $logic eq "SIMPLE" ||
           $logic eq "BOOL" || $logic eq "FULLMATCH" ) {
@@ -372,10 +372,10 @@ sub objectlogic {
         ${$self->{OPTIONS}}{"obj_logic"} = $logic;
      }
   }
-  
+
   return ${$self->{OPTIONS}}{"obj_logic"};
 }
-   
+
 # C O N F I G U R E -------------------------------------------------------
 
 =back
@@ -411,14 +411,14 @@ sub configure {
 
   # CONFIGURE DEFAULTS
   # ------------------
-  
+
   # define the default base URLs
   $self->{URL} = "http://cdsads.u-strasbg.fr/cgi-bin/nph-abs_connect?";
   $self->{FOLLOWUP} = "http://cdsads.u-strasbg.fr/cgi-bin/nph-ref_query?";
-    
+
   # Setup the LWP::UserAgent
   $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
-  
+
   # Grab Proxy details from local environment
   $self->{USERAGENT}->env_proxy();
 
@@ -476,12 +476,12 @@ sub configure {
 
   # grab the argument list
   my %args = @_;
-  
+
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Authors AuthorLogic Objects ObjectLogic / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
-  }  
+  }
 
 }
 
@@ -489,7 +489,7 @@ sub configure {
 
 =back
 
-=end __PRIVATE_METHODS__
+=begin __PRIVATE_METHODS__
 
 =head2 Private methods
 
@@ -506,31 +506,31 @@ since it does not parse the results. Instead use the querydb() assessor method.
 
 sub _make_query {
    my $self = shift;
-   
+
    # grab the user agent
    my $ua = $self->{USERAGENT};
-   
+
    # clean out the buffer
    $self->{BUFFER} = "";
-   
+
    # grab the base URL
    my $URL = $self->{URL};
    my $options = "";
-   
-   # loop round all the options keys and build the query   
+
+   # loop round all the options keys and build the query
    foreach my $key ( keys %{$self->{OPTIONS}} ) {
-      $options = $options . "&$key=${$self->{OPTIONS}}{$key}"; 
+      $options = $options . "&$key=${$self->{OPTIONS}}{$key}";
    }
-     
+
    # build final query URL
    $URL = $URL . $options;
-   
+
    # build request
    my $request = new HTTP::Request('GET', $URL);
-   
+
    # grab page from web
    my $reply = $ua->request($request);
-   
+
    if ( ${$reply}{"_rc"} eq 200 ) {
       # stuff the page contents into the buffer
       $self->{BUFFER} = ${$reply}{"_content"};
@@ -549,44 +549,44 @@ from the followup() assessor method. Should not be called directly.
 
 sub _make_followup {
    my $self = shift;
-   
+
    # grab the user agent
    my $ua = $self->{USERAGENT};
-   
+
    # clean out the buffer
    $self->{BUFFER} = "";
-   
+
    # grab the base URL
    my $URL = $self->{FOLLOWUP};
-   
+
    # which paper?
    my $bibcode = shift;
-   
+
    # which followup?
    my $refs = shift;
-   
+
    # which database?
    my $db_key = ${$self->{OPTIONS}}{"db_key"};
    my $data_type = ${$self->{OPTIONS}}{"data_type"};
-   
+
    # build the final query URL
    $URL = $URL .
           "bibcode=$bibcode&refs=$refs&db_key=$db_key&data_type=$data_type"; 
-      
+
    # build request
    my $request = new HTTP::Request('GET', $URL);
-   
+
    # grab page from web
    my $reply = $ua->request($request);
-   
+
    if ( ${$reply}{"_rc"} eq 200 ) {
       # stuff the page contents into the buffer
       $self->{BUFFER} = ${$reply}{"_content"};
    } else {
       $self->{BUFFER} = undef;
       croak("Error ${$reply}{_rc}: Failed to establish network connection");
-   }   
-}   
+   }
+}
 
 =item B<_parse_query>
 
@@ -598,17 +598,17 @@ parse the results.
 
 sub _parse_query {
   my $self = shift;
-   
+
   # get a local copy of the current BUFFER
   my @buffer = split( /\n/,$self->{BUFFER});
   chomp @buffer;
- 
+
   # create an Astro::ADS::Result object to hold the search results
   my $result = new Astro::ADS::Result();
-  
+
   # create a temporary object to hold papers
   my $paper;
-  
+
   # loop round the returned buffer and stuff the contents into Paper objects
   my ( $line, $next, $counter );
   $next = $counter = 0;
@@ -627,344 +627,344 @@ sub _parse_query {
      #     O     Object name
      #     B     Abstract
      #     S     Score
-            
+
      # NO ABSTRACTS
      if( $buffer[$line] =~ "Retrieved 0 abstracts" ) {
-     
+
         # increment the counter and drop out of the loop
         $line = $#buffer;
      }
-            
+
      # NEW PAPER
      if( substr( $buffer[$line], 0, 2 ) eq "%R" ) {
-                    
+
         $counter = $line;
         my $tag = substr( $buffer[$counter], 1, 1 );
-        
+
         # grab the bibcode
         my $bibcode = substr( $buffer[$counter], 2 );
-        
+
         # New Astro::ADS::Result::Paper object
         $paper = new Astro::ADS::Result::Paper( Bibcode => $bibcode );
-                       
+
         $counter++;
-                
+
         # LOOP THROUGH PAPER
         my ( @title, @authors, @affil, @journal, @pubdate, @keywords, 
              @origin, @links, @url, @object, @abstract, @score );
         while ( substr( $buffer[$counter], 0, 2 ) ne "%R" &&
                 $counter < $#buffer ) {
-                         
+
            # grab the tags
            if( substr( $buffer[$counter], 0, 1 ) eq "%" ) {
               $tag = substr( $buffer[$counter], 1, 1 );
            }
-           
+
            # ckeck for each tag and stuff the contents into the paper object
-           
+
            # TITLE
            # -----
            if( $tag eq "T" ) {
-             
+
               #do we have the start of an title block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @title, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@title, $buffer[$counter] );
-                
-              }  
+
+              }
            }
-           
+
            # AUTHORS
            # -------
            if( $tag eq "A" ) {
-           
+
               #do we have the start of an author block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @authors, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@authors, $buffer[$counter] );
-                
+
               }
            }
-           
+
            # AFFILIATION
            # -----------
            if( $tag eq "F" ) {
-           
+
               #do we have the start of an affil block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @affil, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@affil, $buffer[$counter] );
-                
+
               }
            }
-           
+
            # JOURNAL REF
            # -----------
            if( $tag eq "J" ) {
-             
+
               #do we have the start of an journal block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @journal, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@journal, $buffer[$counter] );
-                
-              }  
+
+              }
            }
-           
+
            # PUBLICATION DATE
            # ----------------
            if( $tag eq "D" ) {
-             
+
               #do we have the start of an publication date block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @pubdate, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@pubdate, $buffer[$counter] );
-                
-              }  
+
+              }
            }
-           
+
            # KEYWORDS
            # --------
            if( $tag eq "K" ) {
-             
+
               #do we have the start of an keyword block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @keywords, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@keywords, $buffer[$counter] );
-                
-              }  
+
+              }
            }
-           
+
            # ORIGIN
            # ------
            if( $tag eq "G" ) {
-             
+
               #do we have the start of an origin block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @origin, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@origin, $buffer[$counter] );
-                
-              }  
+
+              }
            }
 
            # LINKS
            # -----
            if( $tag eq "I" ) {
-           
+
               #do we have the start of an author block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @links, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@links, $buffer[$counter] );
-                
+
               }
            }
 
            # URL
            # ---
            if( $tag eq "U" ) {
-           
+
               #do we have the start of an URL block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @url, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@url, $buffer[$counter] );
-                
+
               }
            }
 
            # OBJECT
            # ------
            if( $tag eq "O" ) {
-             
+
               #do we have the start of an title block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @object, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@object, $buffer[$counter] );
-                
-              }  
+
+              }
            }
 
            # ABSTRACT
            # --------
            if( $tag eq "B" ) {
-             
+
               #do we have the start of an title block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @abstract, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@abstract, $buffer[$counter] );
-                
-              }  
+
+              }
            }
-           
+
            # SCORE
            # -----
            if( $tag eq "S" ) {
-             
+
               #do we have the start of an title block?
               if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
-              
+
                  # push the end of line substring onto array
                  push ( @score, substr( $buffer[$counter], 3 ) );
-                 
+
               } else {
-                 
+
                  # push the entire line onto the array
                  push (@score, $buffer[$counter] );
-                
-              }  
+
+              }
            }
-           
-                      
+
+
            # increment the line counter
-           $counter = $counter + 1;
+           $counter++;
            # set the next paper increment
-           $next = $counter - 1;            
-              
+           $next = $counter - 1;
+
         }
-        
+
         # PUSH TITLE INTO PAPER OBJECT
         # ----------------------------
         chomp @title;
         my $title_line = "";
         for my $i ( 0 ... $#title ) {
            # drop it onto one line
-           $title_line = $title_line . $title[$i];      
+           $title_line = $title_line . $title[$i];
         }
         $paper->title( $title_line ) if defined $title[0];
-        
+
         # PUSH AUTHORS INTO PAPER OBJECT
         # ------------------------------
         chomp @authors;
         my $author_line = "";
         for my $i ( 0 ... $#authors ) {
            # drop it onto one line
-           $author_line = $author_line . $authors[$i];      
+           $author_line = $author_line . $authors[$i];
         }
         # get rid of leading spaces before author names
         $author_line =~ s/;\s+/;/g;
-        
+
         my @paper_authors = split( /;/, $author_line );
         $paper->authors( \@paper_authors ) if defined $authors[0];
-        
+
         # PUSH AFFILIATION INTO PAPER OBJECT
         # ----------------------------------
         chomp @affil;
         my $affil_line = "";
         for my $i ( 0 ... $#affil ) {
            # drop it onto one line
-           $affil_line = $affil_line . $affil[$i];      
+           $affil_line = $affil_line . $affil[$i];
         }
         # grab each affiliation from its brackets
         $affil_line =~ s/\w\w\(//g;
-        
+
         my @paper_affil = split( /\), /, $affil_line );
         $paper->affil( \@paper_affil ) if defined $affil[0];
-        
+
         # PUSH JOURNAL INTO PAPER OBJECT
         # ------------------------------
         chomp @journal;
         my $journal_ref = "";
         for my $i ( 0 ... $#journal ) {
            # drop it onto one line
-           $journal_ref = $journal_ref . $journal[$i];      
+           $journal_ref = $journal_ref . $journal[$i];
         }
         $paper->journal( $journal_ref ) if defined $journal[0];
-        
+
         # PUSH PUB DATE INTO PAPER OBJECT
         # -------------------------------
         chomp @pubdate;
         my $pub_date = "";
         for my $i ( 0 ... $#pubdate ) {
            # drop it onto one line
-           $pub_date = $pub_date . $pubdate[$i];      
+           $pub_date = $pub_date . $pubdate[$i];
         }
-        $paper->published( $pub_date ) if defined $pubdate[0]; 
-        
+        $paper->published( $pub_date ) if defined $pubdate[0];
+
         # PUSH KEYWORDS INTO PAPER OBJECT
         # -------------------------------
         chomp @keywords;
         my $key_line = "";
         for my $i ( 0 ... $#keywords ) {
            # drop it onto one line
-           $key_line = $key_line . $keywords[$i];      
+           $key_line = $key_line . $keywords[$i];
         }
         # get rid of excess spaces
         $key_line =~ s/, /,/g;
-        
+
         my @paper_keys = split( /,/, $key_line );
         $paper->keywords( \@paper_keys ) if defined $keywords[0];
-        
+
         # PUSH ORIGIN INTO PAPER OBJECT
         # -----------------------------
         chomp @origin;
         my $origin_line = "";
         for my $i ( 0 ... $#origin) {
            # drop it onto one line
-           $origin_line = $origin_line . $origin[$i];      
+           $origin_line = $origin_line . $origin[$i];
         }
         $paper->origin( $origin_line ) if defined $origin[0];
 
@@ -974,11 +974,11 @@ sub _parse_query {
         my $links_line = "";
         for my $i ( 0 ... $#links ) {
            # drop it onto one line
-           $links_line = $links_line . $links[$i];      
+           $links_line = $links_line . $links[$i];
         }
         # annoying complex reg exp to get rid of formatting
         $links_line =~ s/:.*?;\s*/;/g;
-        
+
         my @paper_links = split( /;/, $links_line );
         $paper->links( \@paper_links ) if defined $links[0];
 
@@ -988,7 +988,7 @@ sub _parse_query {
         my $url_line = "";
         for my $i ( 0 ... $#url ) {
            # drop it onto one line
-           $url_line = $url_line . $url[$i];      
+           $url_line = $url_line . $url[$i];
         }
         # get rid of trailing spaces
         $url_line =~ s/\s+$//;
@@ -1000,7 +1000,7 @@ sub _parse_query {
         my $object_line = "";
         for my $i ( 0 ... $#object ) {
            # drop it onto one line
-           $object_line = $object_line . $object[$i];      
+           $object_line = $object_line . $object[$i];
         }
         $paper->object( $object_line ) if defined $object[0];
 
@@ -1009,32 +1009,32 @@ sub _parse_query {
         chomp @abstract;
         for my $i ( 0 ... $#abstract ) {
            # get rid of trailing spaces
-           $abstract[$i] =~ s/\s+$//;      
+           $abstract[$i] =~ s/\s+$//;
         }
         $paper->abstract( \@abstract ) if defined $abstract[0];
-        
+
         # PUSH SCORE INTO PAPER OBJECT
         # ----------------------------
         chomp @score;
         my $score_line = "";
         for my $i ( 0 ... $#score ) {
            # drop it onto one line
-           $score_line = $score_line . $score[$i];      
+           $score_line = $score_line . $score[$i];
         }
         $paper->score( $score_line ) if defined $score[0];
-        
-          
+
+
      }
-        
+
      # Increment the line counter to the correct index for the next paper
-     $line = $line + $next;
-  
+     $line += $next;
+
      # Push the new paper onto the Astro::ADS::Result object
      # -----------------------------------------------------
      $result->pushpaper($paper) if defined $paper;
      $paper = undef;
-     
-   }   
+
+   }
 
    # return an Astro::ADS::Result object, or undef if no abstracts returned
    return $result;
@@ -1050,11 +1050,11 @@ the raw output of the last ADS query made using querydb().
 
 sub _dump_raw {
    my $self = shift;
-   
+
    # split the BUFFER into an array
    my @portable = split( /\n/,$self->{BUFFER});
    chomp @portable;
-   
+
    return @portable;
 }
 
@@ -1067,9 +1067,13 @@ the current query options as a hash.
 
 sub _dump_options {
    my $self = shift;
-   
+
    return %{$self->{OPTIONS}};
 }
+
+=back
+
+=end __PRIVATE_METHODS__
 
 =head1 COPYRIGHT
 
