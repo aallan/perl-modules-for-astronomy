@@ -6,5 +6,7 @@
 #include "globus_io.h"
 #include "../src/estar_io.h"
 
-MODULE = eSTAR::IO::Server		PACKAGE = eSTAR::IO::Server		
+MODULE = eSTAR::IO::Server  PACKAGE = eSTAR::IO::Server	  PREFIX = eSTAR_IO_	
 
+int
+Close_Server()

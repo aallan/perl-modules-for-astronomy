@@ -1,3 +1,4 @@
 2002-03-04  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Inital framework.
+        * Inital framework, most functions in place, missing
+          Start_Server() Read_Message() and Write_Binary()
