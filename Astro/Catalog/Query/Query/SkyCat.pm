@@ -32,7 +32,7 @@ $DEBUG = 1;
 
 # Controls whether we follow 'directory' config entries and recursively
 # expand those. Default to false at the moment.
-$FOLLOW_DIRS = 0;
+$FOLLOW_DIRS = 1;
 
 # This is the name of the config file that was used to generate
 # the content in %CONFIG. Can be different to the contents ofg_file
@@ -238,18 +238,24 @@ sub _parse_query {
   my $cat = $self->_selected_catalog();
 
   # and extract formatting information needed by the TST parser
-  my %format;
+  my %params;
   for my $key (keys %{ $CONFIG{$cat} }) {
     if ($key =~ /_col$/) {
       print "FOUND $key\n";
-      $format{$key} = $CONFIG{$cat}->{$key};
+      $params{$key} = $CONFIG{$cat}->{$key};
     }
   }
 
+  # If this catalogue is a GSC, pass in a GSC parameter
+  $params{gsc} = 1 if $cat =~ /^gsc/i;
+
   print $self->{BUFFER} ."\n";
 
-  my $newcat = new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER},
-				   ReadOpt => \%format,
+  # Make sure we set origin and field centre if we know it
+  my $newcat = new Astro::Catalog( 
+				  Format => 'TST', Data => $self->{BUFFER},
+				  ReadOpt => \%params,
+				  Origin => $CONFIG{$cat}->{long_name},
 				 );
 
   # set the field centre
@@ -737,24 +743,13 @@ sub _from_dec {
   my $dec = $self->query_options("dec");
   my %allow = $self->_get_allowed_options();
 
-  my $c = new Astro::Coords( ra => 0, dec => $dec,
-			     type => 'J2000'
-			   );
+  # Need colons
+  $dec =~ s/\s+/:/g;
 
-  $dec = $c->dec(format => 'deg');
-
-#  if (defined $dec) {
-    $dec = "+" . $dec if $dec !~ /^[\+\-]/;
-
-    # Must replace + with %2B
-#    $dec =~ s/\+/%2B/g;
-
-    # Must replace spaces with +
-#    $dec =~ s/\s/\+/g;
-#  }
+  # Need a + preprended
+  $dec = "+" . $dec if $dec !~ /^[\+\-]/;
 
   return ($allow{dec},$dec);
-
 }
 
 sub _from_ra {
@@ -762,16 +757,21 @@ sub _from_ra {
   my $ra = $self->query_options("ra");
   my %allow = $self->_get_allowed_options();
 
-  my $c = new Astro::Coords( dec => 0, ra => $ra,
-			     type => 'J2000'
-			   );
-
-  $ra =$c->ra(format => 'h');
+  # need colons
+  $ra =~ s/\s+/:/g;
 
   return ($allow{ra},$ra);
-
-
 }
+
+# Do not know what cond does yet
+sub _from_cond {
+  my $self = shift;
+  my $key = "cond";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
 
 =end __PRIVATE_METHODS__
 
