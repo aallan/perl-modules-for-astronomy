@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( 
                'NAME'           => 'Astro::Catalog',
-	       'VERSION_FROM'   => 'Catalog.pm',
+	       'VERSION'        => '1.3',
                'PREREQ_PM'      => { LWP         => 5.53,
                                      Net::Domain => 2.13,
                                      Pod::Usage  => 1.14 },

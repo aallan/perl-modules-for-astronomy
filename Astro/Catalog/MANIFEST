@@ -14,5 +14,13 @@ USNOA2/ChangeLog
 USNOA2/Query/Query.pm
 USNOA2/Query/Makefile.PL
 USNOA2/t/query.t
+GSC/README
+GSC/MANIFEST
+GSC/Makefile.PL
+GSC/GPL
+GSC/ChangeLog
+GSC/Query/Query.pm
+GSC/Query/Makefile.PL
+GSC/t/query.t
 t/star.t
 t/catalog.t
