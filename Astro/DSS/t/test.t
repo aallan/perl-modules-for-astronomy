@@ -19,32 +19,34 @@ use Data::Dumper;
 # test the test system
 ok(1);
 
+# declare file names
+my ( $gif_file, $fit_file );
+
 $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 
 my $dss_gif = new Astro::DSS( Target => 'HT Cas' );
 print "# Connecting to ESO-ECF Archive\n";
-my $gif_file = $dss_gif->querydb();
+$gif_file = $dss_gif->querydb();
 print "# Continuing Tests\n";
 
-ok( $gif_file = File::Spec->catfile( $ENV{"ESTAR_DATA"}, 
+ok( $gif_file, File::Spec->catfile( $ENV{"ESTAR_DATA"}, 
                                      "dss.01.10.12.9+60.04.35.9.gif" ) );
                                      
 my $dss_fit = new Astro::DSS( Target => 'HT Cas',
                               Format => 'FITS' );
 print "# Connecting to ESO-ECF Archive\n";
-my $fit_file = $dss_fit->querydb();
+$fit_file = $dss_fit->querydb();
 print "# Continuing Tests\n";
 
-ok( $fit_file = File::Spec->catfile( $ENV{"ESTAR_DATA"}, 
+ok( $fit_file, File::Spec->catfile( $ENV{"ESTAR_DATA"}, 
                                      "dss.01.10.12.9+60.04.35.9.fits" ) );
                                      
 END {
   # clean up after ourselves
   print "# Cleaning up temporary files\n";
-  my @list = (  File::Spec->catfile( $ENV{"ESTAR_DATA"},
-                       "dss.01.10.12.9+60.04.35.9.gif" ),
-                File::Spec->catfile( $ENV{"ESTAR_DATA"}, 
-                       "dss.01.10.12.9+60.04.35.9.fits" ) );
+  print "# Deleting: $gif_file\n";
+  print "# Deleting: $fit_file\n";
+  my @list = ( $gif_file, $fit_file );
 
   unlink(@list); 
 }                                           

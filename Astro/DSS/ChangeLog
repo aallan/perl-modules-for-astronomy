@@ -1,8 +1,11 @@
-
 2001-12-11  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Release version, fully functional, minimal test suite.
+        * DSS.pm: Modified directory handling, is ESTAR_DATA is not
+          defined module will dump files in /tmp by default.
+        
+        * t/test.t: Fixed bug in test suite.
 
 2001-12-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Original version.
+        * Original version, fully functional, minimal test suite.
+

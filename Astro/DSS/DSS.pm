@@ -19,7 +19,7 @@ package Astro::DSS;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: DSS.pm,v 1.2 2001/12/11 01:31:27 aa Exp $
+#     $Id: DSS.pm,v 1.3 2001/12/11 02:27:04 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -54,6 +54,8 @@ The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
+It will save returned files into the ESTAR_DATA directory,
+
 =cut
 
 # L O A D   M O D U L E S --------------------------------------------------
@@ -63,16 +65,16 @@ use vars qw/ $VERSION /;
 
 use LWP::UserAgent;
 use Net::Domain qw(hostname hostdomain);
-use File::Spec;
+use File::Spec qw(tmpdir);
 use Carp;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: DSS.pm,v 1.2 2001/12/11 01:31:27 aa Exp $
+$Id: DSS.pm,v 1.3 2001/12/11 02:27:04 aa Exp $
 
 =head1 METHODS
 
@@ -105,7 +107,8 @@ sub new {
   my $block = bless { OPTIONS   => {},
                       URL       => undef,
                       QUERY     => undef,
-                      USERAGENT => undef, }, $class;
+                      USERAGENT => undef,
+                      DATADIR   => undef }, $class;
 
   # Configure the object
   $block->configure( @_ );
@@ -416,7 +419,7 @@ The survey to return
 
 valid choices are DSS1, DSS2-red, DSS2-blue, DSS2-infrared. The entire DSS1 data is stored on magnetic disks at the ESO-ECF Archive. DSS2 is stored on DVD-ROM in a juke box. Retrieval time takes about less than 5 seconds for a DSS1 field and less than 20 seconds for a random DSS2 field in the juke box. 
 
-The DSS1 survey is 100% complete, while the DSS2-red now covers 98% of the sky; DSS2-blue 45% of the sky and DSS2-infrared27% of the sky.
+The DSS1 survey is 100% complete, while the DSS2-red now covers 98% of the sky; DSS2-blue 45% of the sky and DSS2-infrared 27% of the sky.
 
 =cut
 
@@ -499,14 +502,26 @@ sub configure {
   $self->{USERAGENT}->agent("Astro::DDS/$VERSION ($HOST.$DOMAIN)");
 
   # Grab Proxy details from local environment
-  $self->{USERAGENT}->env_proxy();
-
-  # Grab data directory from local environment
-  $self->{DATADIR} = $ENV{"ESTAR_DATA"} if exists $ENV{"ESTAR_DATA"};
-  unless ( opendir (DIR, File::Spec->catdir($ENV{"ESTAR_DATA"}) ) ) {
-     croak("Cannot open ESTAR_DATA directory, set environment variable");
+  $self->{USERAGENT}->env_proxy();  
+  
+  # Grab something for DATA directory
+  if ( defined $ENV{"ESTAR_DATA"} ) {
+     if ( opendir (DIR, File::Spec->catdir($ENV{"ESTAR_DATA"}) ) ) {
+        # default to the ESTAR_DATA directory
+        $self->{DATADIR} = File::Spec->catdir($ENV{"ESTAR_DATA"});
+        closedir DIR;
+     } else {
+        # Shouldn't happen?
+       croak("Cannot open $ENV{ESTAR_DATA} for incoming files.");
+     }        
+  } elsif ( opendir(TMP, File::Spec->tmpdir() ) ) {
+        # fall back on the /tmp directory
+        $self->{DATADIR} = File::Spec->tmpdir();
+        closedir TMP;
+  } else {
+     # Shouldn't happen?
+     croak("Cannot open any directory for incoming files.");
   }   
-  closedir DIR;
   
   # configure the default options
   ${$self->{OPTIONS}}{"ra"}          = undef;
@@ -597,7 +612,8 @@ sub _make_query {
          my $last_index = rindex( $file_name, q/"/ );
          $file_name = substr( $file_name, $start_index+1, 
                               $last_index-$start_index-1);
-         $file_name = File::Spec->catfile( $ENV{"ESTAR_DATA"}, $file_name);                       
+         
+         $file_name = File::Spec->catfile( $self->{DATADIR}, $file_name);                       
          # Open output file
          unless ( open ( FH, ">$file_name" )) {
             croak("Error: Cannont open output file $file_name");
