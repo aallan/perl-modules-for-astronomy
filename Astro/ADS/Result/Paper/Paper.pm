@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.5 2001/11/01 18:57:09 aa Exp $
+#     $Id: Paper.pm,v 1.6 2001/11/02 01:32:28 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -63,13 +63,13 @@ use strict;
 use vars qw/ $VERSION /;
 
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.5 2001/11/01 18:57:09 aa Exp $
+$Id: Paper.pm,v 1.6 2001/11/02 01:32:28 aa Exp $
 
 =head1 METHODS
 
@@ -356,6 +356,34 @@ sub object {
     $self->{OBJECT} = shift;
   }
   return $self->{OBJECT};
+}
+
+# F O L L O W U P   M E T H O D S ---------------------------------------
+
+=back
+
+=head2 Followup Queries
+
+=over 4
+
+=item B<references>
+
+Returns an Astro::ADS::Result object containing the references for the paper.
+
+   $result = $paper->references();
+
+=cut
+
+sub references {
+  my $self = shift;
+  
+  # grab the bibcode of the paper  
+  my $bibcode = $self->{BIBCODE};
+  
+  # build a query object
+  my $query = new Astro::ADS::Query();
+                                      
+  return $query->followup( $bibcode, "REFERENCES" );
 }
 
 # C O N F I G U R E -------------------------------------------------------

@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.7 2001/11/02 00:45:57 aa Exp $
+#     $Id: Query.pm,v 1.8 2001/11/02 01:32:28 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -55,13 +55,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.7 2001/11/02 00:45:57 aa Exp $
+$Id: Query.pm,v 1.8 2001/11/02 01:32:28 aa Exp $
 
 =head1 METHODS
 
@@ -89,14 +89,14 @@ sub new {
                       USERAGENT => undef,
                       BUFFER    => undef }, $class;
 
-  # If we have arguments configure the object
-  $block->configure( @_ ) if @_;
+  # Configure the object
+  $block->configure( @_ );
 
   return $block;
 
 }
 
-# Q U E R Y D B ( ) ------------------------------------------------------
+# Q U E R Y  M E T H O D S ------------------------------------------------
 
 =back
 
@@ -106,7 +106,7 @@ sub new {
 
 =item B<querydb>
 
-Returns an Astro::ADS::Result object
+Returns an Astro::ADS::Result object for an inital ADS query
 
    $results = $query->querydb();
 
@@ -117,6 +117,38 @@ sub querydb {
 
   # call the private method to make the actual ADS query
   $self->_make_query();
+
+  # check for failed connect
+  return undef unless defined $self->{BUFFER};
+   
+  # return an Astro::ADS::Result object 
+  return $self->_parse_query(); 
+
+}
+
+=item B<followup>
+
+Returns an Astro::ADS::Result object for a followup query, e.g. CITATIONS,
+normally called using accessor methods from an Astro::ADS::Paper object, but
+can be called directly.
+
+   $results = $query->followup( $bibcode, $link_type );
+
+returns undef if no arguements passed.
+
+=cut
+
+sub followup {
+  my $self = shift;
+  
+  # return unless we have arguments
+  return undef unless @_;
+  
+  my $bibcode = shift;
+  my $link_type = shift;
+
+  # call the private method to make the actual ADS query
+  $self->_make_followup( $bibcode, $link_type );
 
   # check for failed connect
   return undef unless defined $self->{BUFFER};
@@ -236,11 +268,14 @@ the search, is set to OR. Other options include; AND, combine with AND; SIMPLE, 
 sub configure {
   my $self = shift;
 
-  # return unless we have arguments
-  return undef unless @_;
-
-  # define the base URL
+  # CONFIGURE DEFAULTS
+  # ------------------
+  
+  # define the default base URL
   $self->{URL} = "http://cdsads.u-strasbg.fr/cgi-bin/nph-abs_connect?";
+  
+  # Setup the LWP::UserAgent
+  $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
 
   # configure the default options
   ${$self->{OPTIONS}}{"db_key"}           = "AST";
@@ -288,6 +323,12 @@ sub configure {
   # Set the data_type option to PORTABLE so our regular expressions work!
   ${$self->{OPTIONS}}{"data_type"}        = "PORTABLE";
 
+  # CONFIGURE FROM ARGUEMENTS
+  # -------------------------
+
+  # return unless we have arguments
+  return undef unless @_;
+
   # grab the argument list
   my %args = @_;
   
@@ -296,9 +337,6 @@ sub configure {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }  
-  
-  # Setup the LWP::UserAgent
-  $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
 
 }
 
@@ -356,6 +394,54 @@ sub _make_query {
       croak("Error ${$reply}{_rc}: Failed to establish network connection");
    }
 }
+
+=item B<_make_followup>
+
+Private function used to make a followup ADS query, e.g. REFERNCES, called
+from the followup() assessor method. Should not be called directly.
+
+=cut
+
+sub _make_followup {
+   my $self = shift;
+   
+   # grab the user agent
+   my $ua = $self->{USERAGENT};
+   
+   # clean out the buffer
+   $self->{BUFFER} = "";
+   
+   # grab the base URL
+   my $URL = $self->{URL};
+   
+   # which paper?
+   my $bibcode = shift;
+   
+   # which followup?
+   my $refs = shift;
+   
+   # which database?
+   my $db_key = ${$self->{OPTIONS}}{"db_key"};
+   my $data_type = ${$self->{OPTIONS}}{"data_type"};
+   
+   # build the final query URL
+   $URL = "http://cdsads.u-strasbg.fr/cgi-bin/nph-ref_query?" .
+          "bibcode=$bibcode&refs=$refs&db_key=$db_key&data_type=$data_type"; 
+      
+   # build request
+   my $request = new HTTP::Request('GET', $URL);
+   
+   # grab page from web
+   my $reply = $ua->request($request);
+   
+   if ( ${$reply}{"_rc"} eq 200 ) {
+      # stuff the page contents into the buffer
+      $self->{BUFFER} = ${$reply}{"_content"};
+   } else {
+      $self->{BUFFER} = undef;
+      croak("Error ${$reply}{_rc}: Failed to establish network connection");
+   }   
+}   
 
 =item B<_parse_query>
 

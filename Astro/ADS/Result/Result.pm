@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.7 2001/11/02 00:46:14 aa Exp $
+#     $Id: Result.pm,v 1.8 2001/11/02 01:32:28 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.7 2001/11/02 00:46:14 aa Exp $
+$Id: Result.pm,v 1.8 2001/11/02 01:32:28 aa Exp $
 
 =head1 METHODS
 
@@ -97,21 +97,18 @@ sub new {
 
 =over 4
 
-=item B<paperbyauthor>
+=item B<sizeof>
 
-Return an Astro::ADS::Result::Paper object by author.
+Return the number of papers in the Astro::ADS::Result objec.
 
-   $paper = $result->paperbyauthor("Allan, A.");
+   $paper = $result->sizeof();
 
 =cut
 
-sub paperbyauthor {
+sub sizeof {
   my $self = shift;
 
-  # return unless we have arguments
-  return undef unless @_;
- 
-    
+  return scalar( @{$self->{RESULTS}} );
 }
 
 =item B<pushpaper>
@@ -149,10 +146,6 @@ the method deletes the paper and returns the deleted paper object.
 
 sub poppaper {
   my $self = shift;
-
-  # return unless we have arguments
-  return undef unless @_;  
-  
   my $bibcode = shift;
 
   # pop the paper out of the stack

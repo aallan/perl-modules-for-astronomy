@@ -5,9 +5,11 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 45 };
+BEGIN { plan tests => 46 };
 
 # load modules
+use Astro::ADS::Query;
+use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 
 # T E S T   H A R N E S S --------------------------------------------------
@@ -139,6 +141,12 @@ for my $m (0 .. $#abstract) {
 # check scalar context call
 my $lines = $paper->abstract();
 ok( $lines, $#abstract );
+
+# do a followup query
+my $refs = $paper->references();
+
+# should be 27 references on ADS for this paper
+ok( $refs->sizeof(), 27 );
 
 exit;
 
