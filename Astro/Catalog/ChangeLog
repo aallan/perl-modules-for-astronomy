@@ -1,3 +1,13 @@
+2005-02-02  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+        * t/2_astrom.t: __DATA__ section needed updating to use publically-
+          available Astro::Coords.
+        * IO/Astrom.pm: Use Astro::Coords v0.05 methods instead of v0.06.
+        * t/helper.pl: Add compare_mpc_catalog and compare_mpc_star for
+          MPC checking.
+        * t/4_mpc.t: Use compare_mpc_catalog comparison method, update
+          asteroid positions.
+
 2005-02-01  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
         * IO/FINDOFF.pm: Fix regex bug, clarify documentation, only write
