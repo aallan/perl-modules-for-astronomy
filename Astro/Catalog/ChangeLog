@@ -1,3 +1,10 @@
+2004-08-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* IO/JCMT.pm: Publish a method for cleaning the target name (so
+	that the JCMT VAX control system will not get upset) and use that
+	method in the JCMT catalog writer (so that a "use this target"
+	message) is guaranteed to agree with the name in the catalogue.
+
 2004-05-20  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.7.0)
 
         * Updated documentation ready for release.

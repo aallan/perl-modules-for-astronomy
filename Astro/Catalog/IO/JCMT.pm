@@ -32,7 +32,7 @@ use Astro::Catalog::Star;
 
 use vars qw/$VERSION $DEBUG /;
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 $DEBUG   = 0;
 
 # Name must be limited to 15 characters on write
@@ -45,6 +45,48 @@ my $defaultCatalog = "/local/progs/etc/poi.dat";
 my @PLANETS = qw/ mars uranus saturn jupiter venus neptune /;
 
 =over 4
+
+=item B<clean_target_name>
+
+Method to take a general target name and clean it up
+so that it is suitable for writing in a JCMT source catalog.
+This routine is used by the catalog writing code but can also
+be used publically in order to make sure that a target name
+to be written to the catalogue is guaranteed to match that used
+in another location (e.g. when writing an a document to accompany
+the catalogue which refers to targets within it).
+
+The source name can be truncated.
+
+  $cleaned = Astro::Catalog::IO::JCMT->clean_target_name( $dirty );
+
+Will return undef if the argument is not defined.
+
+Punctuation such as "," and ";" are replaced with underscores.
+".", "()" and "+-" are allowed.
+
+=cut
+
+sub clean_target_name {
+  my $class = shift;
+  my $dirty = shift;
+  return unless defined $dirty;
+
+  # Remove spaces [compress]
+  $dirty =~ s/\s+//g;
+
+  # Remove disallowed characters
+  # and replace with dashes
+  $dirty =~ s/[,;:'"`]/-/g;
+
+  # Truncate it to the allowed length
+  # Name must be limited to MAX_SRC_LENGTH characters
+  $dirty = substr($dirty,0,MAX_SRC_LENGTH);
+
+  # Return the cleaned name
+  return $dirty;
+}
+
 
 =item B<_default_file>
 
@@ -159,6 +201,13 @@ sub _write_catalog {
   # so that we can search for duplicates
   my %targets;
 
+  # Create hash of all unique target names present
+  # after cleaning. We need this so that we can make sure
+  # a generated name derived from a duplication (with target mismatch)
+  # does not generate a name that already existed explicitly.
+  my %allnames = map { $class->clean_target_name($_->coords->name), undef } 
+                      @sources;
+
   # Loop over each source and extract catalog information
   # Make sure that we remove unique entries
   # BUT THAT WE RETAIN THE ORDER OF THE SOURCES IN THE CATALOG
@@ -176,10 +225,9 @@ sub _write_catalog {
     # Somewhere to store the extracted information
     my %srcdata;
 
-    # Store the name (stripped of spaces)
-    # Treat srcdata{name} as the primary name from here on
-    $name =~ s/\s+//g if defined $name;
-    $srcdata{name} = $name;
+    # Store the name (stripped of spaces) and
+    # treat srcdata{name} as the primary name from here on
+    $srcdata{name} = $class->clean_target_name( $name );
 
     # Store a comment
     $srcdata{comment} = $star->comment;
@@ -242,13 +290,55 @@ sub _write_catalog {
 	# have not used it before. Probably not the best approach and might have
 	# problems in edge cases but good enough for now
 	my $oldname = $srcdata{name};
-	$srcdata{name} .= "_$unk";
+
+	# loop for 100 times
+	my $count;
+	while (1) {
+	  # protection loop
+	  $count++;
+
+	  # Try to construct a new name based on a global counter
+	  # rather than a counter that starts at 1 for each root
+	  my $suffix = "_$unk";
+
+	  # increment $unk for next try
+	  $unk++;
+
+	  # Abort if we have gone round too many times
+	  # Making sure that $unk is incremented first
+	  if ($count > 100) {
+	    $srcdata{name} = substr($oldname,0,int(MAX_SRC_LENGTH/2)) . 
+	        int(rand(10000)+1000);
+	    warn "Uncontrollable looping (or unfeasibly large number of duplicate sources with different coordinates). Panicked and generated random source name of $srcdata{name}.\n";
+	    last;
+	  }
+
+	  # Assume the old name will do fine
+	  my $root = $oldname;
+
+	  # Do not want to truncate the _XX off the end later on
+	  if (length($oldname) > MAX_SRC_LENGTH - length($suffix)) {
+	    # This may well be confusing but we have no choice. Since _XX
+	    # is unique the only time we will get a name clash by simply chopping
+	    # the string is if we have a duplicate that is too long along with a
+	    # target name that includes _XX amd matches the truncated source name!
+	    $root = substr($oldname, 0, (MAX_SRC_LENGTH-length($suffix)) );
+
+	  }
+
+	  # Form the new name
+	  my $newname = $root . $suffix;
+
+	  # check to see if this name is in the existing target list
+	  next if exists $allnames{$newname};
+
+	  # Store it in the targets array and exit loop
+	  $srcdata{name} = $newname;
+	  last;
+	}
 
 	# different target
 	warn "Found target with the same name [$oldname] but with different coordinates, renaming it to $srcdata{name}!\n";
-
-	# increment the unknown counter
-	$unk++;
 
 	$targets{$srcdata{name}} = \%srcdata;
 
@@ -289,6 +379,8 @@ sub _write_catalog {
     $comment = '' unless defined $comment;
 
     # Name must be limited to MAX_SRC_LENGTH characters
+    # [this should be taken care of by clean_target_name but
+    # if we have appended _X....
     $name = substr($name,0,MAX_SRC_LENGTH);
 
     push @lines, 
