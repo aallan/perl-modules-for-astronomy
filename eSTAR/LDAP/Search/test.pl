@@ -1,10 +1,25 @@
+#!/home/globus/Perl/bin/perl -W 
 
-BEGIN { $| = 1; print "1..1\n"; }
-END {print "not ok 1\n" unless $loaded;}
+use lib "blib/arch";
+use lib "blib/lib";
+
+# strict
+use strict;
+
+# load test
+use Test;
+use Test::Harness qw(&runtests $verbose); 
+$verbose=1;
+
+BEGIN { plan tests => 2 };
 
 use eSTAR::LDAP::Search;
-$loaded = 1;
-print "ok 1\n";
+use Data::Dumper;
+
+# ---------------------------------------------------------------------------- 
+
+# test the test system
+ok( 1 );
 
 my $timeout = 120;
 my $host    = 'dn1.ex.ac.uk';
@@ -26,8 +41,9 @@ print $newgis->get_error() ."\n";
 
 my $entry;
 foreach $entry (@entries) {
-   my @atts = $entry->attributes;
+   my @atts = $entry->attributes();
    print "\n\n";
+   
    foreach(@atts) { 
       print "$_="; my $val = $entry->get_value($_); 
       print "$val\n"; 

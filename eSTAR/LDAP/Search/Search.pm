@@ -2,6 +2,7 @@ package eSTAR::LDAP::Search;
 
 require 5.005_62;
 use strict;
+use vars qw/ $VERSION /;
 use warnings;
 use Net::LDAP;
 
@@ -18,7 +19,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(
 	
 );
-our $VERSION = '0.01';
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 ####
