@@ -30,7 +30,7 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
-$DEBUG = 1;
+$DEBUG = 0;
 $VERSION = '0.03';
 
 =begin __PRIVATE_METHODS__
@@ -273,8 +273,6 @@ sub _read_catalog {
 		  quality => [ qw/ qual /, qw/ qflg / ],
 		  distance => [ "d'" ],
 		  posangle => [ qw/ pa /, qw/ _r / ],
-                  #ra => [ qw / raj2000 / ],
-                  #dec => [ qw / dej2000 / ], 
 		 );
 
 
@@ -325,7 +323,7 @@ sub _read_catalog {
 
     # DEBUGGING, prints out everything we've parsed from the catalogue
     #
-    print "\n\n\n" . Dumper( $star ) . "\n\n\n";
+    #print "\n\n\n" . Dumper( $star ) . "\n\n\n";
 
     # Assume that some field names are standardised. This is
     # probably rubbish (whoever heard of standards!).
@@ -457,7 +455,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.8 2003/09/24 17:54:31 aa Exp $
+ $Id: TST.pm,v 1.9 2003/09/24 18:07:19 aa Exp $
 
 =head1 FORMAT
 
