@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.39 2003/10/14 10:06:41 aa Exp $
+#     $Id: Catalog.pm,v 1.40 2003/10/17 11:35:35 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -37,8 +37,8 @@ Astro::Catalog - A generic API for stellar catalogues
   $catalog = new Astro::Catalog( Stars   => \@array );
   $catalog = new Astro::Catalog( Format => 'Cluster', File => $file_name );
   $catalog = new Astro::Catalog( Format => 'JCMT', Data => $scalar );
-  $catalog = new Astro::Catalog( Format => 'JCMT', Data => \*STDIN );
-  $catalog = new Astro::Catalog( Format => 'JCMT', Data => \@lines );
+  $catalog = new Astro::Catalog( Format => 'Simple', Data => \*STDIN );
+  $catalog = new Astro::Catalog( Format => 'VOTable', Data => \@lines );
 
 =head1 DESCRIPTION
 
@@ -47,6 +47,13 @@ with an array refernce as an argument. The array should contain a list
 of Astro::Catalog::Star objects. Alternatively it takes a catalog
 format and either the name of a catalogue file or a reference to a
 scalar, glob or array.
+
+=head1 FORMATS
+
+For input the C<Astro::Catalog> module understands Cluster, Simple, JCMT,
+TST and (a very simple parsing) of VOTable.
+
+The module can output all of these formats except TST (which is input only).
 
 =cut
 
@@ -64,7 +71,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.39 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.40 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -72,7 +79,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.39 2003/10/14 10:06:41 aa Exp $
+$Id: Catalog.pm,v 1.40 2003/10/17 11:35:35 aa Exp $
 
 =head1 METHODS
 
@@ -84,7 +91,7 @@ $Id: Catalog.pm,v 1.39 2003/10/14 10:06:41 aa Exp $
 
 Create a new instance from a hash of options 
 
-  $catalog = new Astro::Catalog( Stars       => \@array );
+  $catalog = new Astro::Catalog( Stars  => \@array );
   $catalog = new Astro::Catalog( Format => 'Cluster', File => $file_name );
   $catalog = new Astro::Catalog( Format => 'JCMT', Data => $scalar );
 
@@ -136,7 +143,7 @@ pluggable IO, see the C<Astro::Catalog::IO> classes
 returns zero on sucess and non-zero if the write failed (the reason
 can be obtained using the C<errstr> method). The C<%opts> are optional
 arguments and are dependant on the output format chosen.  Current
-valid output formats are 'Simple', 'Cluster' and 'JCMT'.
+valid output formats are 'Simple', 'Cluster', 'JCMT' and 'VOTable'.
 
 The File argument can refer to a file name on disk (simple scalar), 
 a glob (eg \*STDOUT), a reference to a scalar (\$content) or reference
@@ -1337,8 +1344,8 @@ sub _normalize_hash {
 =item B<_load_io_plugin>
 
 Given a file format, load the corresponding IO class. In general the
-IO class is lower case except for the first letter. JCMT is an exception.
-All plugins are in hierarchy C<Astro::Catalog::IO>.
+IO class is lower case except for the first letter. JCMT and VOTable
+are the exception. All plugins are in hierarchy C<Astro::Catalog::IO>.
 
 Returns the class name on successful load. If the class can not be found
 a warning is issued and false is returned.

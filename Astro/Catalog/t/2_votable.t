@@ -1,7 +1,7 @@
 #!perl
 
 # Astro::Catalog test harness
-use Test::More tests => 67;
+use Test::More tests => 129;
 
 # strict
 use strict;
@@ -13,6 +13,10 @@ use Data::Dumper;
 # load modules
 require_ok("Astro::Catalog");
 require_ok("Astro::Catalog::Star");
+
+# Load the generic test code
+my $p = ( -d "t" ?  "t/" : "");
+do $p."helper.pl" or die "Error reading test functions: $!";
 
 # T E S T   H A R N E S S --------------------------------------------------
 
@@ -80,8 +84,8 @@ my $catalog = new Astro::Catalog( RA     => '01 10 12.9',
 isa_ok($catalog, "Astro::Catalog");
 
 
-# WRITE IT OUT TO DISK
-# ====================
+# WRITE IT OUT TO DISK USING THE VOTABLE WRITER
+# =============================================
 my $tempfile = File::Spec->catfile( File::Spec->tmpdir(), "catalog.test" );
 
 ok( $catalog->write_catalog( Format => 'VOTable', File => $tempfile ),
@@ -106,15 +110,71 @@ chomp @buffer;
 # =======================
 
 foreach my $i ( 0 .. $#buffer ) {
-   print $buffer[$i] . "\n";
-   print $file[$i] . "\n";
+   #print $buffer[$i] . "\n";
+   #print $file[$i] . "\n";
    ok( $buffer[$i] eq $file[$i], "Line $i in \@buffer ok" );
 }
+
+# READ CATALOG IN FROM TEMPORARY FILE USING THE VOTABLE READER
+# ============================================================
+
+my $read_catalog = new Astro::Catalog( Format => 'VOTable', File => $tempfile );
+#print Dumper( $read_catalog );
+
+# GENERATE A CATALOG
+# ==================
+
+my @star2;
+
+# STAR 3
+# ------
+
+# magnitude and colour hashes
+my %mags3 = ( R => '16.1', B => '16.4', V => '16.3' );
+my %colours3 = ( 'B-V' => '0.1', 'B-R' => '0.3' );
+
+# create a star
+$star2[0] = new Astro::Catalog::Star( ID         => 'U1500_01194794',
+                                      RA         => '09 55 39',
+                                      Dec        => '+60 07 23.6',
+                                      Magnitudes => \%mags3,
+                                      Colours    => \%colours3,
+                                      Quality    => '0' );
+
+# STAR 3
+# ------
+
+# magnitude and colour hashes
+my %mags4 = ( R => '9.5', B => '9.3', V => '9.1' );
+my %colours4 = ( 'B-V' => '-0.2', 'B-R' => '0.2' );
+
+# create a star
+$star2[1] = new Astro::Catalog::Star( ID         => 'U1500_01194795',
+                                     RA         => '10 44 57',
+                                     Dec        => '+12 34 53.5',
+                                     Magnitudes => \%mags2,
+                                     Colours    => \%colours2,
+                                     Quality    => '0' );
+
+isa_ok( $star[1], "Astro::Catalog::Star");
+
+# Create Catalog Object
+# ---------------------
+
+my $catalog2 = new Astro::Catalog( Stars  => \@star2 );
+
+isa_ok($catalog2, "Astro::Catalog");
+
+
+# COMPARE CATALOGUES
+# ==================
+compare_catalog( $read_catalog, $catalog2 );
+
 
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
 END {
-  #unlink "$tempfile";
+  unlink "$tempfile";
 }
 
 
@@ -132,10 +192,11 @@ __DATA__
     <COOSYS ID="J2000" equinox="2000" epoch="2000" system="eq_FK5"/>
   </DEFINITIONS>
   <RESOURCE>
+    <LINK title="eSTAR Project" href="http://www.estar.org.uk/" content-role="doc"/>
     <TABLE>
       <FIELD name="Identifier" ucd="ID_MAIN" datatype="char" unit="" arraysize="*"/>
-      <FIELD name="RA" ucd="POS_EQ_RA_MAIN" datatype="char" unit="&quot;h:m:s&quot;" arraysize="*"/>
-      <FIELD name="Dec" ucd="POS_EQ_DEC_MAIN" datatype="char" unit="&quot;d:m:s&quot;" arraysize="*"/>
+      <FIELD name="RA" ucd="POS_EQ_RA_MAIN" datatype="char" unit="&quot;h:m:s.ss&quot;" arraysize="*"/>
+      <FIELD name="Dec" ucd="POS_EQ_DEC_MAIN" datatype="char" unit="&quot;d:m:s.ss&quot;" arraysize="*"/>
       <FIELD name="B Magnitude" ucd="PHOT_MAG_B" datatype="double" unit="mag"/>
       <FIELD name="B Error" ucd="CODE_ERROR" datatype="double" unit="mag"/>
       <FIELD name="R Magnitude" ucd="PHOT_MAG_R" datatype="double" unit="mag"/>

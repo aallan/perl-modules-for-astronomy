@@ -1,10 +1,19 @@
-2003-10-16  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.3.0)
+2003-10-17  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.5.0)
+
+        * IO/VOTable.pm: Very simple VOTable reader added, should
+          now get at least basic information into the Astro::Catalog
+          object if it is passed a VOTable.
+          
+        * t/2_votable.t: Added test harness for reading VOTables.  
+          
+2003-10-16  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.4.0)
 
         * IO/VOTable.pm: Fixed VOTable output to actually have some
           meta-data, now readable by treeview. Added DEFINITIONS
           element to the table and filled in various "default"
           meta-data. The tables are not bogus, but the epoch and
-          equinoxes may be incorrect in some cases.
+          equinoxes may be incorrect in some cases (SuperCOSMOS
+          catalogues for instance).
           
 2003-10-13  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.3.0)
 

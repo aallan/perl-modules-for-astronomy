@@ -34,14 +34,14 @@ use VOTable::Document;
 
 use Data::Dumper;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOTable.pm,v 1.5 2003/10/16 15:26:09 aa Exp $
+$Id: VOTable.pm,v 1.6 2003/10/17 11:35:35 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -62,29 +62,129 @@ Parses a reference to an array containing a simply formatted catalogue
 =cut
 
 sub _read_catalog {
+   #croak( 'Astro::IO::VOTable, _read_catalog() - Function not implemented' );
    croak( 'Usage: _read_catalog( \@lines )' ) unless scalar(@_) >= 1;
    my $class = shift;
    my $arg = shift;
    my @lines = @{$arg};
 
    # create an Astro::Catalog object;
-   #my $catalog = new Astro::Catalog();
+   my $catalog = new Astro::Catalog();
  
    # make the array a string
-   #my $string = "";
-   #foreach my $i ( 0 ... $#lines ) {
-   #  $string = $string . chomp( $lines[$i] );
-   #}
+   my $string = "";
+   foreach my $i ( 0 ... $#lines ) {
+     $string = $string . $lines[$i] . "\n";
+   }
+
+   #print Dumper( @lines );
+   #print Dumper( $string );
+   #return;
 
    # create a VOTable object from the string.
-   #my $doc = VOTable::Document->new_from_string($string);
+   my $doc = VOTable::Document->new_from_string($string);
+
+   # Get the VOTABLE element.
+   my $votable = ($doc->get_VOTABLE())[0];
+
+   # Get the RESOURCE element.
+   my $resource = ($votable->get_RESOURCE())[0];
+
+   # Get the DESCRIPTION element and its contents.
+   my $description = ($resource->get_DESCRIPTION())[0];   
+
+   # Get the TABLE element.
+   my $table = ($resource->get_TABLE())[0];
+
+   # Get the FIELD elements.
+   my (@field_names, @field_ucds, @field_datatypes, @field_units, @field_sizes);
+
+   foreach my $field ( $table->get_FIELD()) {
+       push @field_names, $field->get_name();
+       push @field_ucds, $field->get_ucd();
+       push @field_datatypes, $field->get_datatype();
+       push @field_units, $field->get_unit();
+       push @field_sizes, $field->get_arraysize();
+   }
+
+   # Get the DATA element.
+   my $data = ($table->get_DATA())[0];
+
+   # Get the TABLEDATA element.
+   my $tabledata = ($data->get_TABLEDATA())[0];
    
+   # loop round UCDs and try and figure out what everthing is so
+   # we can stuff the table contents into the relevant places
+   my %contents;
+   foreach my $i ( 0 ... $#field_ucds ) {
+  
+       $contents{"id"} = $i if $field_ucds[$i] =~ "ID_MAIN";
+       $contents{"ra"} = $i if $field_ucds[$i] =~ "POS_EQ_RA_MAIN";
+       $contents{"dec"} = $i if $field_ucds[$i] =~ "POS_EQ_DEC_MAIN";
+       $contents{"quality"} = $i if $field_ucds[$i] =~ "CODE_QUALITY";
+       if( $field_ucds[$i] =~ "PHOT_" ) {
+           $contents{ $field_ucds[$i] } = $i;  
+       }     
+   }
+   
+   #print "# CONTENTS\n";
+   #print Dumper( %contents );
+   
+   # loop over each row in the TABLEDATA (ie each star)
+   foreach my $j ( 0 ... $tabledata->get_num_rows()-1 ) {
+   
+      # grab a row
+      my @row = $tabledata->get_row($j);
+      #print "# ROW $j\n";
+      #print Dumper( @row ) . "\n";
+      
+      # loop around the contents and grab the magnitudes and colours
+      my ( %mags, %colours );
+      foreach my $key ( keys %contents ) {
+           
+         # drop through unless we have a magntiude
+         next unless $key =~ "PHOT";
+
+         my $identifier = $key;
+         $identifier =~ s/^PHOT_[A-Z]+_//;
+         
+         # okay we either have a magnitude or a colour, why did I ever
+         # make these two different things? Maybe I should re-engineer
+         # the Astro::Catalog::Star so that it hides the difference in
+         # some sort of meta API for both? Oh God this is so yuck...
+         
+         # colours
+         if ( $identifier =~ /^(\w+)-(\w+)$/ ) { # non-greedy
+      
+            # we might have a colour, who knows?
+            #print "COLOUR IN COLUMN $contents{$key}\n";
+            $colours{$identifier} = $row[$contents{$key}];
+         } else {
+            
+            # we might have a magnitude, who knows?
+            #print "MAGNITUDE IN COLUMN $contents{$key}\n";
+            $mags{$identifier} = $row[$contents{$key}];   
+         }
+         
+      }
+      
+      # create a star
+      my $star = new Astro::Catalog::Star( 
+                           id  => $row[$contents{"id"}],
+                           ra  => $row[$contents{"ra"}],
+                           dec => $row[$contents{"dec"}],
+                           magnitudes => \%mags,
+                           colours => \%colours,
+                           quality => $row[$contents{"quality"}] );
+      
+      # push the star onto the catalog
+      $catalog->pushstar( $star );
+   }
    
    # return the catalogue
-   #$catalog->origin( 'IO::VOTable' );
-   #return $catalog;
+   $catalog->origin( 'IO::VOTable' );
+   return $catalog;
 
-   croak( 'Astro::IO::VOTable, _read_catalog() - Function not implemented' );
 }
 
 =item B<_write_catalog>
@@ -177,8 +277,8 @@ sub _write_catalog {
 
   # field units
   push @field_units, "";
-  push @field_units, '"h:m:s"';
-  push @field_units, '"d:m:s"';
+  push @field_units, '"h:m:s.ss"';
+  push @field_units, '"d:m:s.ss"';
   foreach my $i ( 0 .. $#mags ) {
     push @field_units, "mag";
     push @field_units, "mag";
@@ -282,10 +382,16 @@ sub _write_catalog {
   my $resource = new VOTable::RESOURCE();
   $votable->set_RESOURCE($resource);
 
+  #create the LINK element and its contents, and add it to the VOTABLE
+  my $link = new VOTable::LINK();
+  $link->set_title('eSTAR Project');
+  $link->set_href('http://www.estar.org.uk/');
+  $link->set_content_role('doc');
+  $resource->set_LINK($link);
+  
   # Create the TABLE element and add it to the RESOURCE.
   my $table = new VOTable::TABLE();
   $resource->set_TABLE($table);
-
   
   # Create and add the FIELD elements to the TABLE.
   my($i);
@@ -355,7 +461,7 @@ sub _default_file {
 =head1 FORMAT
 
 This class implements an interface to VOTable documents. This uses the
-GSFC VOTable class which inherits from XML::LibXML:Document.
+GSFC VOTable classes which inherits from XML::LibXML::Document class.
 
 =head1 COPYRIGHT
 
