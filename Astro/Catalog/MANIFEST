@@ -10,6 +10,9 @@ ChangeLog
 Catalog.pm
 Star/Star.pm
 Star/Makefile.PL
+IO/JCMT.pm
+IO/Cluster.pm
+IO/Makefile.PL
 BaseQuery/BaseQuery.pm
 BaseQuery/Makefile.PL
 USNOA2/README
