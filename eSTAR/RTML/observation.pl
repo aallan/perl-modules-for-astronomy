@@ -44,7 +44,7 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 use Data::Dumper;
 
 # CVS revision tag
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # T E S T   H A R N E S S ---------------------------------------------------
 
@@ -96,7 +96,7 @@ my $hostname = hostname() . "." . hostdomain();
 my $message = new eSTAR::RTML::Build( 
              Port        => $server_port,
              Host        => $hostname,
-             ID          => "IA:aa\@$hostname:$opt{server_port}:$opt{number}",
+             ID          => "IA:aa\@$hostname:$server_port:$opt{number}",
              User        => 'aa',
              Name        => 'Alasdair Allan',
              Institution => 'University of Exeter',
