@@ -1,0 +1,17 @@
+ChangeLog
+IO.pm
+IO.xs
+MANIFEST
+Makefile.PL
+typemap
+t/io.t
+t/server.t
+t/client.t
+Client/Makefile.PL
+Client/Client.pm
+Client/Client.xs
+Client/typemap
+Server/Makefile.PL
+Server/Server.pm
+Server/Server.xs
+Server/typemap
