@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.16 2003/07/27 00:33:52 timj Exp $
+#     $Id: Catalog.pm,v 1.17 2003/07/27 00:46:34 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.16 2003/07/27 00:33:52 timj Exp $
+$Id: Catalog.pm,v 1.17 2003/07/27 00:46:34 timj Exp $
 
 =head1 METHODS
 
@@ -709,11 +709,14 @@ sub _load_io_plugin {
 
   # Horrible kluge since I prefer "JCMT" to "Jcmt".
   # Maybe we should not try to fudge case at all?
-  $format = 'JCMT' if $format eq 'Jcmt'; 
+  $format = 'JCMT' if $format eq 'Jcmt';
 
   my $class = "Astro::Catalog::IO::" . $format;
 
-  eval { require $class; };
+  # For some reason eval require does not work for us. Use string eval
+  # instead.
+  #  eval { require $class; };
+  eval "use $class;";
   if ($@) {
     warnings::warnif("Error reading IO plugin $class: $@");
     return;
