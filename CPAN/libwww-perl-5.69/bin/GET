@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# $Id: GET,v 1.1 2003/05/01 14:13:48 aa Exp $
+# $Id: GET,v 1.2 2003/06/05 13:14:03 aa Exp $
 #
 # Simple user agent using LWP library.
 
@@ -178,7 +178,7 @@ $progname = $0;
 $progname =~ s,.*[\\/],,;  # use basename only
 $progname =~ s/\.\w*$//;   # strip extension, if any
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/);
 
 
 require LWP;

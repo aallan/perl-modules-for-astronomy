@@ -1,0 +1,59 @@
+0.10 - January 31, 2000
+
+XS_GTop_field_##type didnt work under solaris, 
+Makefile.PL will now generate working code
+
+various GTop::Server fixups
+
+0.09 - November 28, 1999
+
+GTop->new now accepts option host,port args for talking to a
+GTop::Server
+
+added new GTop::Server module (see examples/server)
+
+plugged a few potential memory leaks
+
+0.08 - November 16, 1999
+
+added proc_uid interface
+
+added proc_args interface (see examples/proclist)
+
+added proclist method and proc_state interface (see examples/proclist)
+
+0.07 - November 10, 1999
+
+added $ENV{GTOP_LIB} and $ENV{GTOP_INCLUDE} options in Makefile.PL
+
+added GTop::size_string function
+
+0.06 - October 14, 1999
+
+added uptime and loadavg interfaces
+
+corrected generated test and docs for several methods (had too many args)
+
+added GTop::Netload::address_string method
+
+0.05 - October 4, 1999
+
+malloc/free glibtop_* objects instead of using a glibtop_union
+
+0.04 - October 4, 1999
+
+added a few examples/
+
+added mountlist, mountentry, proc_map, map_entry interfaces
+
+0.03 - October 3, 1999
+
+added swap, proc_segment, netload, mountlist and fsusage interfaces
+
+0.02 - August 5, 1999
+
+mortalize return value of XS_GTop_field
+
+0.01 - August 5, 1999
+
+first release
