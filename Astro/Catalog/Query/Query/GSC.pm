@@ -47,11 +47,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: GSC.pm,v 1.3 2003/08/04 05:31:38 timj Exp $
+$Id: GSC.pm,v 1.4 2003/09/12 22:38:59 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -239,7 +239,8 @@ sub _parse_query {
               $star->magerr( \%mag_errors );
 
               # Quality
-              my $quality = $separated[11];
+              my $quality = $separated[13];
+              $quality = 1 if $quality == 3; # 3 == non-stellar
               $star->quality( $quality );
 
               # Field

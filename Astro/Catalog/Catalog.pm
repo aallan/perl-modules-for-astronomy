@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.36 2003/08/27 01:08:25 timj Exp $
+#     $Id: Catalog.pm,v 1.37 2003/09/12 22:38:59 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,7 +64,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.36 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.37 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -72,7 +72,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.36 2003/08/27 01:08:25 timj Exp $
+$Id: Catalog.pm,v 1.37 2003/09/12 22:38:59 aa Exp $
 
 =head1 METHODS
 
@@ -101,7 +101,7 @@ sub new {
   my $block = bless { ALLSTARS  => [],
 		      CURRENT   => undef, # undefined until we copy
 		      ERRSTR => '',
-		      ORIGIN => '<UNKNOWN>',
+		      ORIGIN => 'UNKNOWN',
 		      COORDS => undef,
                       RADIUS => undef,
 		      REFPOS => undef,

@@ -46,11 +46,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: USNOA2.pm,v 1.6 2003/08/26 19:53:02 aa Exp $
+$Id: USNOA2.pm,v 1.7 2003/09/12 22:38:59 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -221,7 +221,7 @@ sub _parse_query {
               # dec isn't 60.0, if it is, lets just dump this star as
               # currently the Astro::Coords object gives totally bogus
               # answers due to the bogus answers its getting from SLALIB.
-              unless ( $separated[7] == 60 ) {
+              unless ( $separated[7] == 60 || $separated[4] == 60 ) {
                   $star->coords( new Astro::Coords(  ra => $objra,
 		   			             dec => $objdec,
 					             units => 'sex',

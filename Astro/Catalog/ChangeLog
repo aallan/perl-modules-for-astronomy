@@ -1,3 +1,20 @@
+2003-09-12  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query/Sesame.pm: Modified to copy with change in return
+          format by CDS.
+
+        * Query/Query/USNOA2.pm: Fixed problem with USNO-A2 having bogus
+          RA and Dec seconds fields (= 60.0) which breaks Astro::Catalog.
+          The query module now silently discards these objects (for now!).
+
+        * Query/Query/GSC.pm: Fixed problem with GSC which dropped the
+          B magnitude error into the quality flag. Fix breaks the t/4_gsc.t 
+          test harness.
+        
+        * Catalog.pm: Changed default origin of <UNKNOWN> to UNKNOWN to
+          avoid parsing problems when the results of a query are displayed
+          as part of an HTML page.
+                     
 2003-08-26  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Star/Star.pm: Modified quality() routine so it knows about
