@@ -88,13 +88,6 @@ $author_logic = $query->authorlogic("OR");
 # check logic okay
 ok( $author_logic, "OR" );
 
-# query ADS
-#my $other_result = $query->querydb();
-
-
-
-
-
 exit;
 
 # D A T A   B L O C K  ----------------------------------------------------

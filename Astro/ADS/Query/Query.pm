@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.5 2001/11/01 19:35:06 aa Exp $
+#     $Id: Query.pm,v 1.6 2001/11/02 00:03:24 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -55,13 +55,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.5 2001/11/01 19:35:06 aa Exp $
+$Id: Query.pm,v 1.6 2001/11/02 00:03:24 aa Exp $
 
 =head1 METHODS
 
@@ -165,13 +165,9 @@ sub querydb {
                 
         # LOOP THROUGH PAPER
         my ( @title, @authors, @affil, @journal, @pubdate,
-             @keywords );
+             @keywords, @origin, @links, @url, @object, @abstract );
         while ( substr( $buffer[$counter], 0, 2 ) ne "%R" &&
                 $counter < $#buffer ) {
-           
-           #print "counter $counter\n";
-           #print "substring " . substr( $buffer[$counter], 0, 2 ) . "\n";
-           #print "buffer: $buffer[$counter]\n";
                          
            # grab the tags
            if( substr( $buffer[$counter], 0, 1 ) eq "%" ) {
@@ -288,8 +284,96 @@ sub querydb {
               }  
            }
            
-           
+           # ORIGIN
+           # ------
+           if( $tag eq "G" ) {
+             
+              #do we have the start of an origin block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @origin, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@origin, $buffer[$counter] );
+                
+              }  
+           }
 
+           # LINKS
+           # -----
+           if( $tag eq "I" ) {
+           
+              #do we have the start of an author block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @links, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@links, $buffer[$counter] );
+                
+              }
+           }
+
+           # URL
+           # ---
+           if( $tag eq "U" ) {
+           
+              #do we have the start of an URL block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @url, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@url, $buffer[$counter] );
+                
+              }
+           }
+
+           # OBJECT
+           # ------
+           if( $tag eq "O" ) {
+             
+              #do we have the start of an title block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @object, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@object, $buffer[$counter] );
+                
+              }  
+           }
+
+           # ABSTRACT
+           # --------
+           if( $tag eq "B" ) {
+             
+              #do we have the start of an title block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @abstract, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@abstract, $buffer[$counter] );
+                
+              }  
+           }
+                      
            # increment the line counter
            $counter = $counter + 1;
            # set the next paper increment
@@ -298,14 +382,14 @@ sub querydb {
         }
         
         # PUSH TITLE INTO PAPER OBJECT
-        # ------------------------------
+        # ----------------------------
         chomp @title;
         my $title_line = "";
         for my $i ( 0 ... $#title ) {
            # drop it onto one line
            $title_line = $title_line . $title[$i];      
         }
-        $paper->title( $title_line );
+        $paper->title( $title_line ) if defined $title[0];
         
         # PUSH AUTHORS INTO PAPER OBJECT
         # ------------------------------
@@ -319,7 +403,7 @@ sub querydb {
         $author_line =~ s/;\s+/;/g;
         
         my @paper_authors = split( /;/, $author_line );
-        $paper->authors( \@paper_authors );
+        $paper->authors( \@paper_authors ) if defined $authors[0];
         
         # PUSH AFFILIATION INTO PAPER OBJECT
         # ----------------------------------
@@ -329,11 +413,11 @@ sub querydb {
            # drop it onto one line
            $affil_line = $affil_line . $affil[$i];      
         }
-        # get rid of leading spaces before author names
+        # grab each affiliation from its brackets
         $affil_line =~ s/\w\w\(//g;
         
         my @paper_affil = split( /\), /, $affil_line );
-        $paper->affil( \@paper_affil );
+        $paper->affil( \@paper_affil ) if defined $affil[0];
         
         # PUSH JOURNAL INTO PAPER OBJECT
         # ------------------------------
@@ -343,7 +427,7 @@ sub querydb {
            # drop it onto one line
            $journal_ref = $journal_ref . $journal[$i];      
         }
-        $paper->journal( $journal_ref );
+        $paper->journal( $journal_ref ) if defined $journal[0];
         
         # PUSH PUB DATE INTO PAPER OBJECT
         # -------------------------------
@@ -353,7 +437,7 @@ sub querydb {
            # drop it onto one line
            $pub_date = $pub_date . $pubdate[$i];      
         }
-        $paper->published( $pub_date ); 
+        $paper->published( $pub_date ) if defined $pubdate[0]; 
         
         # PUSH KEYWORDS INTO PAPER OBJECT
         # -------------------------------
@@ -363,21 +447,72 @@ sub querydb {
            # drop it onto one line
            $key_line = $key_line . $keywords[$i];      
         }
-        # get rid of leading spaces before author names
+        # get rid of excess spaces
         $key_line =~ s/, /,/g;
         
         my @paper_keys = split( /,/, $key_line );
-        $paper->keywords( \@paper_keys );
+        $paper->keywords( \@paper_keys ) if defined $keywords[0];
         
+        # PUSH ORIGIN INTO PAPER OBJECT
+        # -----------------------------
+        chomp @origin;
+        my $origin_line = "";
+        for my $i ( 0 ... $#origin) {
+           # drop it onto one line
+           $origin_line = $origin_line . $origin[$i];      
+        }
+        $paper->origin( $origin_line ) if defined $origin[0];
+
+        # PUSH LINKS INTO PAPER OBJECT
+        # ----------------------------
+        chomp @links;
+        my $links_line = "";
+        for my $i ( 0 ... $#links ) {
+           # drop it onto one line
+           $links_line = $links_line . $links[$i];      
+        }
+        # annoying complex reg exp to get rid of formatting
+        $links_line =~ s/:.*?;\s*/;/g;
+        
+        my @paper_links = split( /;/, $links_line );
+        $paper->links( \@paper_links ) if defined $links[0];
+
+        # PUSH URL INTO PAPER OBJECT
+        # --------------------------
+        chomp @url;
+        my $url_line = "";
+        for my $i ( 0 ... $#url ) {
+           # drop it onto one line
+           $url_line = $url_line . $url[$i];      
+        }
+        # get rid of trailing spaces
+        $url_line =~ s/\s+$//;
+        $paper->url( $url_line ) if defined $url[0];
+
+        # PUSH OBJECT INTO PAPER OBJECT
+        # -----------------------------
+        chomp @object;
+        my $object_line = "";
+        for my $i ( 0 ... $#object ) {
+           # drop it onto one line
+           $object_line = $object_line . $object[$i];      
+        }
+        $paper->object( $object_line ) if defined $object[0];
+
+        # PUSH ABSTRACT INTO PAPER OBJECT
+        # -------------------------------
+        chomp @abstract;
+        for my $i ( 0 ... $#abstract ) {
+           # get rid of trailing spaces
+           $abstract[$i] =~ s/\s+$//;      
+        }
+        $paper->abstract( \@abstract ) if defined $abstract[0];
         
           
      }
         
      # increment the line counter to the correct index for the next paper
      $line = $line + $next;
-
-     #print "line $line, next $next, counter $counter, #buffer $#buffer\n";
-     #print Dumper($paper);
   
      # push the new paper onto the Astro::ADS::Result object
      $result->pushpaper($paper) if defined $paper;
