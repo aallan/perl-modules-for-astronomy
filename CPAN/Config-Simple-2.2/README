@@ -1,0 +1,88 @@
+.:NAME:.
+
+Config::Simple - Simple Configuration Class
+
+.:SYNPOSIS:.
+
+in the app.cfg configuration file:
+
+    [mysql]
+    host=ultracgis.com
+    login=sherzodr
+    password=secret
+
+    [profile]
+    first name=Sherzod
+    last name=Ruzmetov
+    email=sherzodr@cpan.org
+
+
+in your Perl application:
+
+    use Config::Simple;
+    my $cfg = new Config::Simple(filename=>"app.cfg");
+
+    print "MySQL host: ", $config->param("mysql.host"), "\n";
+    print "MySQL login: ", $config->param("mysql.login"), "\n";
+
+
+.:NOTE:.
+
+This documentation refers to version 2.0 of Config::Simple. If you have a version
+older than this, please update it to the latest release ASAP (before you get burned).
+
+.:DESCRIPTION:.
+
+This Perl5 library  makes it very easy to parse INI-styled configuration files
+and create once on the fly. It optionally requires L<Digest::MD5|Digest::MD5> module
+
+.:CONFIGURATION FILE:.
+
+Configuration file that Config::Simple uses is similar to Window's *.ini file syntax.
+Example.,
+
+    ; sample.cfg
+
+    [block1]
+    key1=value1
+    key2=value2
+    ...
+
+    [block2]
+    key1=value1
+    key2=value2
+    ...
+
+It can have infinite number of blocks and infinite number of key/value pairs in each block.
+Block and key names are case sensitive. i.e., [block1] and [Block1] are two completely different
+blocks. But this might change in the subsequent releases of the library. So please use with caution!
+
+Lines that start with either ';' (semi colon) or '#' (pound) are assumed to be comments
+till the end of the line. If a line consists of a sole '.' (dot), then all the lines
+till eof are ignored (it's like __END__ Perl token)
+
+When you create Config::Simple object with $cfg = new Config::Simple(filename=>"sample.cfg")
+syntax, it reads the above sample.cfg config file, parses the contents, and creates
+required data structure, which you can access through its public L<methods|/"METHODS">.
+
+In this documenation when I mention "name", I'll be refering to block name and key delimited with a dot (.).
+Forexample, from the above sample.cfg file, following names could be retrieved:
+block1.key1, block1.key2, block2.key1 and block2.key2 etc.
+
+Here is the configuration file that I use in most of my CGI applications, and I'll be using it
+in most of the examples throughout this manual:
+
+    ;app.cfg
+
+    [mysql]
+    host=ultracgis
+    login=sherzodr
+    password=secret
+    db_name=test
+    RaiseError=1
+    PrintError=1
+
+
+ .:AUTHOR:.
+
+ Sherzod Ruzmetov <sherzodr@cpan.org>
