@@ -401,6 +401,9 @@ sub _read_catalog {
     #
     # This is for 2MASS catalogues, and we need something a bit more
     # generic here. Yes Tim, I'll fix it later.
+
+    # TJ: Indeed - this should go in Astro::Catalog::Star itself
+    # and be dynamic depending on the stored magnitudes....
     
     # generate the colours
     my $j_minus_h = $star->get_magnitude( 'J' ) -
@@ -508,7 +511,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.4 2003/08/26 19:53:02 aa Exp $
+ $Id: TST.pm,v 1.5 2003/08/27 01:33:08 timj Exp $
 
 =head1 FORMAT
 
