@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.3 2001/11/01 18:02:53 aa Exp $
+#     $Id: Query.pm,v 1.4 2001/11/01 18:57:46 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -55,13 +55,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.3 2001/11/01 18:02:53 aa Exp $
+$Id: Query.pm,v 1.4 2001/11/01 18:57:46 aa Exp $
 
 =head1 METHODS
 
@@ -165,7 +165,7 @@ sub querydb {
         $counter++;
                 
         # LOOP THROUGH PAPER
-        my ( @title, @authors );
+        my ( @title, @authors, @affil );
         while ( substr( $buffer[$counter], 0, 2 ) ne "%R" &&
                 $counter < $#buffer ) {
            
@@ -216,7 +216,23 @@ sub querydb {
               }
            }
            
+           # AFFILIATION
+           # -----------
+           if( $tag eq "F" ) {
            
+              #do we have the start of an affil block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @affil, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@affil, $buffer[$counter] );
+                
+              }
+           }
            
 
            # increment the line counter
@@ -249,6 +265,21 @@ sub querydb {
         
         my @paper_authors = split( /;/, $author_line );
         $paper->authors( \@paper_authors );
+        
+        # PUSH AFFILIATION INTO PAPER OBJECT
+        # ----------------------------------
+        chomp @affil;
+        my $affil_line = "";
+        for my $i ( 0 ... $#affil ) {
+           # drop it onto one line
+           $affil_line = $affil_line . $affil[$i];      
+        }
+        # get rid of leading spaces before author names
+        $affil_line =~ s/\w\w\(//g;
+        
+        my @paper_affil = split( /\), /, $affil_line );
+        $paper->affil( \@paper_affil );
+        
         
            
      }
