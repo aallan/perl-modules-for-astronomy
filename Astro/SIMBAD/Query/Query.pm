@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.12 2002/01/24 22:16:34 aa Exp $
+#     $Id: Query.pm,v 1.13 2002/05/30 16:53:10 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -75,13 +75,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.12 2002/01/24 22:16:34 aa Exp $
+$Id: Query.pm,v 1.13 2002/05/30 16:53:10 aa Exp $
 
 =head1 METHODS
 
@@ -897,8 +897,13 @@ sub _parse_query {
      my @radec = split( /\s+/, $coords );
      
      # ...and then rebuild it
-     my $ra = "$radec[0] $radec[1] $radec[2]";
-
+     my $ra;
+     unless( $radec[2] =~ '\+' || $radec[2] =~ '-' ) {
+       $ra = "$radec[0] $radec[1] $radec[2]";
+     } else {
+       $ra = "$radec[0] $radec[1] 00.0";
+     }
+      
      # push it into the object
      $object->ra($ra);
      
@@ -906,8 +911,13 @@ sub _parse_query {
      # ---
      
      # ...and rebuild the Dec
-     my $dec = "$radec[3] $radec[4] $radec[5]";
-
+     my $dec;
+     unless ( $radec[2] =~ '\+' || $radec[2] =~ '-' ) {
+       $dec = "$radec[3] $radec[4] $radec[5]";
+     } else {
+       $dec = "$radec[2] $radec[3] 00.0";
+     }
+       
      # push it into the object
      $object->dec($dec);
     

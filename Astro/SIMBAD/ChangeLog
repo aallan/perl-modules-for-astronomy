@@ -1,4 +1,8 @@
+2002-05-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Query/Query.pm: Modification for special case RA and Dec 
+          returned by SIMBAD for large objects.
+          
 2001-12-03  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query.pm: Added conditional test to see if $base_url is
