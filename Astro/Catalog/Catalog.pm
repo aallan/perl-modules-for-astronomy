@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.32 2003/07/30 23:34:34 timj Exp $
+#     $Id: Catalog.pm,v 1.33 2003/07/31 00:08:08 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,7 +64,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.32 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.33 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -72,7 +72,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.32 2003/07/30 23:34:34 timj Exp $
+$Id: Catalog.pm,v 1.33 2003/07/31 00:08:08 timj Exp $
 
 =head1 METHODS
 
@@ -603,7 +603,7 @@ sub get_radius {
   return $self->{RADIUS};
 }
 
-=item reference
+=item B<reference>
 
 If set this must contain an C<Astro::Coords> object that can be
 used as a reference position. When a reference is supplied
@@ -637,7 +637,7 @@ sub reference {
   return (defined $self->{REFPOS} ? $self->{REFPOS} : $self->get_coords );
 }
 
-=item reftime
+=item B<reftime>
 
 The reference time used for coordinate calculations. Extracted
 from the reference coordinate object if one exists and no override
@@ -943,16 +943,23 @@ sub filter_by_observability {
 =item B<filter_by_id>
 
 Given a source name filter the source list such that the
-star ID matches the supplied name.
+supplied ID is a substring of the star ID (case insensitive).
 
   @stars = $catalog->filter_by_id( "IRAS" );
 
-This is just a convenient alternative to C<filter_by_cb>.
-There is no convenient wrapper for pattern matches. Just use:
+Would result in a catalog with all the stars with "IRAS"
+in their name. This is just a convenient alternative to C<filter_by_cb>
+and is equivalent to
 
-  @stars = $catalog->filter_by_cb( sub { $_[0] =~ /^IRAS/; } );
+  @stars = $catalog->filter_by_cb( sub { $_[0]->id =~ /IRAS/i; } );
 
-The match is case sensitive.
+A regular expression can be supplied explicitly using qr//:
+
+  @stars = $catalog->filter_by_id( qr/^IRAS/i );
+
+See C<popstarbyid> for a similar method that returns stars
+that are an exact match to ID and removes them from the current
+list.
 
 =cut
 
@@ -960,7 +967,11 @@ sub filter_by_id {
   my $self = shift;
   my $id = shift;
 
-  return $self->filter_by_cb( sub { $_[0] == $id } );
+  # Convert to regex if required
+  $id = qr/$id/i unless ref $id;
+
+  return $self->filter_by_cb( sub { $_[0]->id =~ $id; });
+
 }
 
 =item B<filter_by_distance>
@@ -994,6 +1005,9 @@ sub filter_by_distance {
   croak "Reference position not defined"
     if not defined $refpos;
 
+  croak "Reference must be an Astro::Coords object"
+    unless UNIVERSAL::isa( $refpos, "Astro::Coords" );
+
   # Calculate distance and throw away outliers
   return $self->filter_by_cb( sub {
 				my $star = shift;
@@ -1012,7 +1026,7 @@ to a subroutine). The callback should expect a star object and should
 return a boolean.
 
   @selected = $catalog->filter_by_cb( sub { $_[0]->id == "HLTau" } );
-  @selected = $catalog->filter_by_cb( sub { $_[0] =~ /^IRAS/; } );
+  @selected = $catalog->filter_by_cb( sub { $_[0]->id =~ /^IRAS/;} );
 
 =cut
 
@@ -1020,8 +1034,8 @@ sub filter_by_cb {
   my $self = shift;
   my $cb = shift;
 
-  croak "Callback was be a reference to a subroutine"
-    unless ref($cb) == "CODE";
+  croak "Callback has to be a reference to a subroutine"
+    unless ref($cb) eq "CODE";
 
   # Get reference to array (force copy)
   my $ref = $self->stars;
