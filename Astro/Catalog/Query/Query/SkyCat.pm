@@ -19,7 +19,7 @@ use 5.006;
 use strict;
 use warnings;
 use warnings::register;
-use vars qw/ $VERSION $FOLLOW_DIRS /;
+use vars qw/ $VERSION $FOLLOW_DIRS $DEBUG /;
 
 use Carp;
 use File::Spec;
@@ -27,8 +27,8 @@ use LWP::UserAgent;
 use Net::Domain qw(hostname hostdomain);
 
 
-
 $VERSION = '0.01';
+$DEBUG = 1;
 
 # Controls whether we follow 'directory' config entries and recursively
 # expand those. Default to false at the moment.
@@ -148,7 +148,7 @@ sub _load_config {
     # since we can trivially replace the tokens without having to
     # reconstruct the url. Of course, this does allow us to provide
     # mandatory keywords. $url =~ s/\%ra/$ra/;
-    if ($entry->{url} =~ /^http:\/\/([\w\.]+)\/([\w\/-]+\?)(.*)\s*/) {
+    if ($entry->{url} =~ /^http:\/\/([\w\.]+(?::\d+)?)\/([\w\/-]+\?)(.*)\s*/) {
       $entry->{remote_host} = $1;
       $entry->{url_path} = $2;
       my $options = $3;
@@ -256,8 +256,13 @@ catalogue server configs.
 Returns the supplied argument, additional configs derived from
 that argument or nothing at all.
 
+Do not follow a 'directory' link if we have already followed a link with
+the same short name. This prevents infinite recursion when the catalog
+pointed to by 'catalogs@eso' itself contains a reference to 'catalogs@eso'.
+
 =cut
 
+my %followed_dirs;
 sub _dir_check {
   my $class = shift;
   my $current = shift;
@@ -266,11 +271,18 @@ sub _dir_check {
     if ($current->{serv_type} eq 'directory') {
       # Get the content of the URL unless we are not
       # reading directories
-      if ($FOLLOW_DIRS && defined $current->{url} ) {
-	print "******************************\n";
+      if ($FOLLOW_DIRS && defined $current->{url} && 
+	  !exists $followed_dirs{$current->{short_name}}) {
+	print "Following directory link to ". $current->{short_name}."\n" if $DEBUG;
+
+	# Indicate that we have followed this link
+	$followed_dirs{$current->{short_name}} = $current->{url};
+
 	# Retrieve the url, pass that array to the raw parser and then
 	# return any new configs to our caller
-	return $class->_extract_raw_info($class->_get_url( $current->{url} ));
+	# Must force scalar context to get array ref
+	# back rather than a simple list.
+	return $class->_extract_raw_info(scalar $class->_get_url( $current->{url} ));
       }
     } else {
       # Not a 'directory' so this is a simple config entry. Simply return it.
