@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.10 2003/07/27 02:31:54 timj Exp $
+#     $Id: Star.pm,v 1.11 2003/07/27 02:44:41 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -79,14 +79,14 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.10 2003/07/27 02:31:54 timj Exp $
+$Id: Star.pm,v 1.11 2003/07/27 02:44:41 aa Exp $
 
 =head1 METHODS
 
@@ -853,18 +853,6 @@ sub configure {
     $self->$method( $check{$key} ) if $self->can( $method );
   }
   return;
-}
-
-=item B<freeze>
-
-Method to return a blessed reference to the object so that we can store
-ths object on disk using Data::Dumper module.
-
-=cut
-
-sub freeze {
-  my $self = shift;
-  return bless $self, 'Astro::Catalog::Star';
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
