@@ -1,8 +1,14 @@
 2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Query/Query/SIMBAD.pm: Removed debugging statements which 
+          generated a file containing a copy of the retrieved HTML in 
+          the current working directory.
+
+2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
+
         * Query/Query/CMC.pm: Added a Vizier Carlsberg Meridian Catalogue
           (CMC/11) query sub-class to try and figure out how Tim had written 
-          the 2MASS (Vizier generic) class.
+          the 2MASS (Vizier generic) class. RA & Dec incorrect.
 
         * Query/Query/2MASS.pm: Moved colour generation for 2MASS catalogue
           from the more generic IO/TST.pm module.

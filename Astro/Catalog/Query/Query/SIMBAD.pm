@@ -181,9 +181,9 @@ sub _parse_query {
   my @buffer = split( /\n/,$self->{BUFFER});
   chomp @buffer;
 
-  open my $fh, ">xxx.html";
-  print $fh $self->{BUFFER}. "\n";
-  close($fh);
+  #open my $fh, ">xxx.html";
+  #print $fh $self->{BUFFER}. "\n";
+  #close($fh);
 
   # create an Astro::Catalog object to hold the search results
   my $catalog = new Astro::Catalog();
@@ -350,7 +350,7 @@ sub _translate_one_to_one {
 
 =head1 REVISION
 
- $Id: SIMBAD.pm,v 1.1 2003/08/04 05:33:17 timj Exp $
+ $Id: SIMBAD.pm,v 1.2 2003/09/25 11:38:50 aa Exp $
 
 =head1 SEE ALSO
 

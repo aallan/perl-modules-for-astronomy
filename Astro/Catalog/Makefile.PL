@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( 
                'NAME'           => 'Astro::Catalog',
-	       'VERSION'        => '3.1.3',
+	       'VERSION'        => '3.1.4',
                'EXE_FILES'      => [  ],
                'PREREQ_PM'      => { LWP              => 5.53,
                                      Net::Domain      => 2.13,
