@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.13 2003/07/26 23:17:20 aa Exp $
+#     $Id: Catalog.pm,v 1.14 2003/07/26 23:30:43 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.13 2003/07/26 23:17:20 aa Exp $
+$Id: Catalog.pm,v 1.14 2003/07/26 23:30:43 timj Exp $
 
 =head1 METHODS
 
@@ -94,6 +94,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { STARS  => [],
+		      ORIGIN => '<UNKNOWN>',
 		      COORDS => undef,
                       RADIUS => undef }, $class;
 
@@ -271,6 +272,25 @@ sub write_catalog {
 =head2 Accessor Methods
 
 =over 4
+
+=item B<origin>
+
+Return (or set) the origin of the data. For example, USNOA2, GSC
+for catalogue queries, or 'JCMT' for the JCMT pointing catalogue.
+No constraint is placed on the content of this parameter.
+
+  $catalog->origin( 'JCMT' );
+  $origin = $catalog->origing;
+
+=cut
+
+sub origin {
+  my $self = shift;
+  if (@_) {
+    $self->{ORIGIN} = shift;
+  }
+  return $self->{ORIGIN};
+}
 
 =item B<sizeof>
 
