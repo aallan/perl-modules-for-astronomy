@@ -1,0 +1,209 @@
+Release notes for PDL 2.4.0 -------------------------------
+
+General Notes:
+     - Perl 5.6.0 or later is now required, along with the modules
+       Filter and Text::Balanced.
+
+     - After installing PDL 2.4.0 external PDL modules will need to re-built.
+       (any such modules will refuse to load until they have been re-built)
+       
+     - New demos of the PDL::Transform and PDL::Transform::Cartography
+	modules have been added to perldl.
+       Type 'demo transform' or 'demo cartography' in the perldl shell. 
+	( Note that PGPLOT is required to run )
+
+Summary of Changes:
+
+     - The NiceSlice syntax comes of age
+       (Nice slicing has been around a while, but really needs to be 
+	acknowledged as the main way of slicing PDLs...)
+
+     - New GSL functionality: greatly improved access to the Gnu Scientific
+       Library, including interpolation, finite-difference, random
+       variable, and other routines.
+
+     - New, very powerful indexing and slicing operators allow boundary 
+	  conditions   (range, indexND)
+
+     - N-dimensional indexing (indexND) and selection (whichND) methods
+
+     - Powerful syntax for coordinate transformation and arbitrary image
+       resampling and coordinate transformations -- including high powered
+       spatially-variable filtering (PDL::Transform module)
+
+     - Support for major cartographic transformations
+       (PDL::Transform::Cartography module)
+
+     - New PLPlot graphics interface ( cleaner and faster than PGPLOT )
+
+     - Many improvements to the PGPlot interface:
+       * Strong FITS support (easy display of images, vectors, & contours in
+            science coordinates)
+       * Better vector graphic support [including improvements to line() and
+	 a new routine, lines()]
+       * Much cleanup of errors and bugs
+       * Spinlocks prevent interrupt-related PGPLOT crashes (requires Perl 5.8)
+       * RGB output to truecolor devices (requires PGPLOT-5.3devel)
+
+     - Improvements to the perldl shell:
+       * Many bug fixes
+       * Multi-line inputs to the perldl shell for easier cut-n-paste
+       * ^D blocking on demand (controlled by perl variable or command-line 
+	  switch)
+       * Autoloading detects error conditions on compile
+       * New demos
+
+    - Header copying is now explicit rather than by reference -- so that,
+      e.g., FITS file manipulation is more intuitive and natural.
+
+    - Improved support for Astro::FITS::Header
+
+    - Bad value support is improved
+
+    - Several new utility routines, including glue(), zcheck(), and ndcoords().
+
+    - Better matrix operation support: matrix operations are now in 
+	PDL::MatrixOps, and are all threadable.  Singular value decomposition,
+	determinant, linear equation solving, matrix inversion, 
+	eigenvalue decomposition, and LU-decomposition.
+
+Release notes for PDL 2.3.4 -------------------------------
+
+     - Now should compile using perl 5.8.0
+     - Improved speed for generating PDL's from a perl array ref
+     - Added PDL::IO::Storable, which enables PDL storage/retrieval
+       using the Storable package.
+     - Added  PDL::GSL::SF (Gnu Scientific Library, Special Functions) hierarchy
+     - New % operator follows (mathematically correct) perl % operator behavior
+     - Numerous Bug Fixes
+	
+  See the Changes file for a detailed list of changes.
+
+Release notes for PDL 2.3.3 -------------------------------
+  
+  Mainly a bugfix release with some nice little additions:
+     - PDL::IO::Dumper: Cleanly save and restore complex
+        data structures including PDLs.  
+     - Support for the new Astro::FITS::Header module
+       (availiable on CPAN).
+	
+  See the Changes file for a detailed list of changes.
+
+Release notes for PDL 2.3.2 ------------------------------
+
+A pure bugfix release to fix compilation problems with gimp-perl
+(part of the gimp distribution). The following notes from
+2.3 and 2.3.1 still apply:
+
+Release notes for PDL 2.3.1 ------------------------------
+
+A bugfix release to fix some compilation problems seen with
+2.3. The following notes from 2.3 still apply:
+
+Release notes for PDL 2.3 -------------------------------
+ 
+ Summary of Changes
+   - A nicer slicing syntax for PDL added via the new 
+     PDL::NiceSlice module.
+   - Inline::Pdlpp module added, which enables in-line
+     PDL::PP definitions. (i.e. no Makefiles, building
+      hassles for creating PP code)
+   - A Multitude of bug fixes, doc updates, and other
+     changes.
+     
+  Note:Support for perl version 5.005 and previous is 
+  limited in this release. Perl 5.6.0 or greater is
+  recommended for full PDL functionality.
+	
+  See the Changes file for a detailed list of changes.
+  
+Release notes for PDL 2.2.1 -------------------------------
+ 
+ Summary of Changes
+    Bugs Fixed:
+	  - 'pow' function fixed in math.pd
+  	  - Misc memory leaks fixed.
+  	  - PGPLOT 'undefined window size' 
+	     bug fixed.
+	  - Test failures with opengl.t fixed.
+	  - Error in output of 'minimum_n_ind' function
+	    fixed.
+	    
+    Misc Changes:
+  	- Documentation updates.
+	- Updates to work with perl5.6.1
+	
+  See the Changes file for a detailed list of changes.
+  
+Release notes for PDL 2.2 -------------------------------
+
+Major Changes:
+
+  - 'Bad' Value Support added. With this option compiled-in, certain
+     values in a PDL can be designated as 'Bad' (i.e. missing, empty, 
+     etc). With this designation, most PDL functions will properly 
+     ignore the 'Bad' values. See PDL::BadValues for details.
+     
+  - PGPLOT interface rewritten. New Features:
+      - Interactive cursors (cursor)
+      - Text on plots       (text)
+      - Legends             (legend)
+      - Circles, Rectangles, Ellipses
+      - Multiple plot windows, one can jump from panel to panel when
+        the window is divided in several.
+      - More control over options - see PDL::Graphics::PGPLOTOptions for
+        details.
+      - New Examples in Example/PGPLOT.
+
+   - Major updates to the Tri-D Code. Now requires perl 5.6 for TriD.
+    
+   - 'Reduce' function added. This provides a consistent interface to the
+     projection routines (sumover, average, etc). See PDL::Reduce.
+     
+   - Improved OpenGL detection during 'perl Makefile.PL
+
+   - pdldoc command added. This allows you to look up PDL 
+     documentation similar to the perldoc command. 
+     
+   - Perl 5.6 is now recommended for PDL 2.2. It will still work 
+     with perl 5.005, but some of the extra libs won't be compiled
+     ( like Graphics/TriD).
+  
+Many other changes. See the Changes file for a detailed list of changes.
+
+Release notes for PDL 2.1 -------------------------------
+
+Major Changes:
+  - Speed Increase. Most PDL functions are now done totally
+    in C-code, without any perl wrapper functions as was done
+    with previous versions. The speedup will be most noticeable
+    for operations on many small PDL arrays.
+  - Mem Leaks Fixed.
+  - Added a consistent, Object-Oriented interface to the 
+    various interpolate functions in PDL. (PDL::Func, 
+    See Lib/Func.pm).
+    
+See the Changes file for a detailed list of changes.
+
+
+
+Release notes for PDL 2.005 -----------------------------
+
+A bugfix release to fix 2.004 problems with PGPLOT changes
+and perl 5.6.0.
+
+The following notes from 2.004 still apply:
+                                             
+*IMPORTANT NOTE*: Due to changes to the PGPLOT module, 'use
+PDL::Graphics::PGPLOT' has been removed from PDL.pm (i.e. in scripts
+and within perldl you now need to explicitly say 'use
+PDL::Graphics::PGPLOT'). Additionally, it needs Karl's new 2.16
+release of the PGPLOT module (available from CPAN).
+
+Notable additions are a module for operations on complex piddles
+(PDL::Complex), a subtype of PDL which allows manipulation of byte
+type PDLs as N dimensional arrays of fixed length strings (PDL::Char)
+and a Levenberg-Marquardt fitting module (PDL::Fit::LM).
+
+Bug reports and patches to the relevant places on sourceforge, please.
+

@@ -1,0 +1,188 @@
+
+INSTALLATION
+------------
+
+To install PDL on your machine, first check that you have a high
+enough version of Perl. 5.005 is adequate for most of PDL, however the
+OpenGL, TriD and Lvalue packages now require 5.6.x, if you need to
+upgrade get at least this version.
+
+See win32/INSTALL for details on installing PDL on windows platforms.
+
+The file DEPENDENCIES summarizes the dependencies of various
+PDL modules on libraries/other packages. The location of
+some of these files needs to be specified in the file perldl.conf.
+
+PDL depends on a number of other Perl modules for feature complete
+operation. These modules are generally available at the CPAN. The
+easiest way to resolve these dependencies is to use the CPAN module to
+install PDL. Installation should be as simple as
+
+  cpan install PDL   # if the cpan script is in your path
+
+or if you don't have the cpan script try
+
+  perl -MCPAN -e shell
+  cpan> install PDL
+
+perldl.conf
+-----------
+
+Edit the file perldl.conf in the current directory to specify
+configuration options for building PDL. This file is
+self-documenting.
+
+Note: If you are happy with your perldl.conf you can keep the file
+handy for future reference. Place it in ~/.perldl.conf where
+it will be picked up automatically or use 
+
+    perl Makefile.PL PDLCONF=your_conf_file
+
+next time. However, check if new config flags were introduced
+when installing a new version of PDL by consulting its perldl.conf .
+
+After editing the configuration options just say
+
+	perl Makefile.PL
+
+in the directory this file is in. (See 'perldoc ExtUtils::MakeMaker'
+for info on how to configure the installation location, etc.)
+and if that seems ok, try:
+
+	make
+
+If there are any strange error messages, please contact the developers
+with a full bug report; response is often rapid (we really like to have
+PDL work right out of the box on as many platforms as possible).
+
+If make worked correctly, try
+
+	make test
+
+to run the regression tests. Again, if there are errors, please contact
+the developers (via the pdl-porters mailing list, see Basic/Pod/FAQ.pod).
+
+If everything works and you wish to install PDL type
+
+   make install
+
+There is also another make item:
+
+   make doctest
+
+creates the documentation database for use in the perldl shell.
+
+f77 configuration
+-----------------
+
+f77 configuration information is normally picked up from ExtUtils::F77
+to build modules like PDL::Slatec that rely on a working fortran compiler.
+In cases where you don't want to rely on ExtUtils::F77 for one reason
+or another (win32 build) there is now the config variable F77CONF.
+It is supposed to point to a perl file that implements a minimal F77Conf
+class (see debian/f77conf.pl for an example). The use of F77CONF is
+similar to the PDLCONF variable, e.g.
+
+   perl Makefile.PL F77CONF=debian/f77conf.pl
+
+Note that almost always it is better to use ExtUtils::F77. Only use the
+F77CONF mechanism if you have a good reason to. Win32 is special. See
+win32/INSTALL.
+
+COMMON PROBLEMS
+---------------
+
+There are some more common error messages and problems, which
+are included here for your convenience
+
+Q: "Can't find include file GL.h" or somesuch.
+
+A: If you dont' have either OpenGL or Mesa installed, you need to
+edit perldl.conf (see above) and set WITH_3D to 0. Then, start the
+build process again as described above (from the toplevel):
+
+   perl Makefile.PL
+
+etc...
+
+Q: I want TriD, but include files are not found.
+
+A: You need to add -I/usr/openwin/include etc. (or whatever is appropriate
+on your platform) to the relevant entry in perldl.conf (see above),
+i.e. something like
+
+      OPENGL_INC => '-I/usr/openwin/include',
+
+Additionally, you might have to specify name and location of the appropriate
+library on your platform, e.g.
+
+      OPENGL_LIBS =>
+	   '-L/usr/openwin/lib -L/usr/X11R6/lib -L/usr/lib/mesa -lGL'.
+	 ' -lGLU -lXext -lX11',
+
+You may also need to pass some flags to cpp, see the README in the
+PDL/Graphics/TriD/OpenGL directory for details.
+
+      OPENGL_DEFINE => '-DGL_GLEXT_LEGACY',
+
+Then, start the build process again as described above
+(from the toplevel):
+
+   perl Makefile.PL
+
+etc...
+
+Q: Compilation of TriD complains about undefined functions or somesuch.
+
+A: Please see the file Graphics/TriD/OpenGL/README.  If that doesn't help
+   please report this problem to pdl-porters@jach.hawaii.edu, include the
+   appropriate platform and GL version information.
+
+
+Q: When running tests, complaints about pthread_* symbols not
+being defined
+
+A: This shouldn't happen any more. If it does, please inform the mailing
+list. However, on certain platforms (notably Digital and IRIX), you will
+not get pthread support in PDL unless your perl executable was linked
+with -lpthread.
+
+
+Q: Make fails at some point with "can't find pdl.h" or somesuch or
+alternatively everything compiles fine and then, when trying to do
+something, PDL complains about finding a "PDL/Primitive/assgn.al"
+for autoloading.
+
+A: Please try recompiling, turning off all make options that parallelize
+the compilations - sometimes something is not correctly done in sequence
+and that bothers other parts. We're working on a fix. Also, please report
+this condition.
+
+Also, it might be worth a try to get a different 'make' - gmake seems
+to work well.
+
+
+Q: What does
+> Converting input file
+> Doc/mkhtmldoc.pl: /usr/lib/perl5/site_perl/PDL/PP.pod: cannot resolve
+> L<PDL::Indexing> in paragraph 8: no such page 'PDL/Indexing'
+> Doc/mkhtmldoc.pl: /usr/lib/perl5/site_perl/PDL/PP.pod: cannot resolve
+> L<perlxs> in paragraph 9: no such page 'perlxs'
+> Doc/mkhtmldoc.pl: /usr/lib/perl5/site_perl/PDL/PP.pod: cannot resolve
+> L<PDL::Indexing> in paragraph 11: no such page 'PDL/Indexing'
+>
+> [....]
+>
+> loading directory cache
+> Converting input file
+> Doc/mkhtmldoc.pl: /usr/lib/perl5/site_perl/PDL/Indexing.pod: cannot
+> resolve L<PDL> in paragraph 4: no such page 'PDL'
+> Doc/mkhtmldoc.pl: /usr/lib/perl5/site_perl/PDL/Indexing.pod: cannot
+> resolve L<PDL::FAQ> in paragraph 6: no such page 'PDL/FAQ'
+> Doc/mkhtmldoc.pl: /usr/lib/perl5/site_perl/PDL/Indexing.pod: cannot
+> resolve L<PDL::Internals> in paragraph 35: no such page 'PDL/Internals'
+mean?
+
+A: the html documentation is experimental - nothing is wrong
+with your system.
+
