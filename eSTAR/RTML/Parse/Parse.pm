@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.4 2002/03/18 05:46:26 aa Exp $
+#     $Id: Parse.pm,v 1.5 2002/03/18 12:24:48 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.4 2002/03/18 05:46:26 aa Exp $
+$Id: Parse.pm,v 1.5 2002/03/18 12:24:48 aa Exp $
 
 =head1 METHODS
 
@@ -87,14 +87,7 @@ sub new {
   # bless the query hash into the class
   my $block = bless { BUFFER      => undef,
                       DTD         => undef,
-                      TYPE        => undef,
-                      CONTACT     => {},
-                      IA          => {},
-                      PROJECT     => {},
-                      TELESCOPE   => {},
-                      LOCATION    => {},
-                      OBSERVATION => {}, 
-                                            }, $class;
+                      TYPE        => undef  }, $class;
 
   # Configure the object
   $block->configure( @_ );
@@ -242,6 +235,7 @@ rtml() method directly during construction of the object.
 =cut
 
 sub _parse_rtml {
+   print "# Parsing RTML document\n#\n";
    
    # grab the RTML document from inside the XML tags
    my @document = @{${$SELF->{BUFFER}}[1]};
@@ -281,7 +275,7 @@ need to pass in.
 sub _parse_tag {
   croak 'Parse.pm: _parse_tag() usage error'
     unless scalar(@_) == 2 ;
-
+    
   # read arguements
   my ( $name, $array_reference ) = @_;
   my @array = @$array_reference;

@@ -1,4 +1,9 @@
-2002-03-18  Alasdair Allan <aa@astro.ex.ac.uk>
+2002-03-17  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Build.pm: Basic RTML construction for "score" and "request"
+          documents in place.
+
+2002-03-17  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Parse.pm: Parsing routine folded back so that no tags need mentioned
           specifically by name, should now parse RTML reliably without missing
