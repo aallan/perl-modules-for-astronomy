@@ -17,7 +17,7 @@ Query/GSC.pm
 Query/SuperCOSMOS.pm
 Query/Makefile.PL
 Transport/REST.pm
-Transport/Makefile.pm
+Transport/Makefile.PL
 t/1_compile.t
 t/2_cluster.t
 t/2_simple.t
