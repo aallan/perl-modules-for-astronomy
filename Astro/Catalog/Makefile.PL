@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile( 
                'NAME'           => 'Astro::Catalog',
 	       'VERSION'        => '2.2',
-               'EXE_FILES'      => [ 'catalogs', 'supercosmos', 'finder' ],
+               'EXE_FILES'      => [  ],
                'PREREQ_PM'      => { LWP         => 5.53,
                                      Net::Domain => 2.13,
                                      Pod::Usage  => 1.14,
