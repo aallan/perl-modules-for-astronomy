@@ -95,8 +95,13 @@ sub _write_catalog {
   my $epoch_star = $catalog->popstar;
   my $wcs = $epoch_star->wcs;
   $catalog->pushstar( $epoch_star );
-  my $epoch = $wcs->GetC("Epoch");
-  if( ! defined( $epoch ) ) {
+  my $epoch;
+  if( defined( $wcs ) ) {
+    $epoch = $wcs->GetC("Epoch");
+    if( ! defined( $epoch ) ) {
+      $epoch = "2000.0";
+    }
+  } else {
     $epoch = "2000.0";
   }
 
@@ -119,12 +124,17 @@ sub _write_catalog {
     $dec =~ s/[:dhms]/ /g;
 
 # Get the star's epoch.
-    $epoch = $star->wcs->GetC("Epoch");
-    if( ! defined( $epoch ) ) {
-      $epoch = "2000.0";
+    my $star_epoch;
+    if( defined( $star->wcs ) ) {
+      $star_epoch = $star->wcs->GetC("Epoch");
+      if( ! defined( $star_epoch ) ) {
+        $star_epoch = "2000.0";
+      }
+    } else {
+      $star_epoch = "2000.0";
     }
 
-    $output_line = "$ra $dec J2000 $epoch";
+    $output_line = "$ra $dec J2000 $star_epoch";
     push @output, $output_line;
 
     my $x = $star->x;
@@ -141,7 +151,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: Astrom.pm,v 1.3 2005/02/15 20:10:40 cavanagh Exp $
+ $Id: Astrom.pm,v 1.4 2005/02/15 22:52:48 cavanagh Exp $
 
 =head1 SEE ALSO
 
