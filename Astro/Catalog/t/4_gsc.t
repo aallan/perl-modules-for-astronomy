@@ -5,18 +5,20 @@
 use strict;
 
 #load test
-use Test::More tests => 24;
+use Test::More tests => 132;
 use Data::Dumper;
 
+# Load the generic test code
+chdir "t" if -d "t";
+do "helper.pl" or die "Error reading test functions: $!";
+
 # load modules
-use Astro::Catalog;
-use Astro::Catalog::Star;
-use Astro::Catalog::Query::GSC;
+require_ok("Astro::Catalog::Star");
+require_ok("Astro::Catalog");
+require_ok("Astro::Catalog::Query::GSC");
+
 
 # T E S T   H A R N E S S --------------------------------------------------
-
-# test the test system
-ok(1);
 
 # Grab GSC sample from the DATA block
 # -----------------------------------
@@ -119,84 +121,8 @@ print "# Continuing tests\n";
 print "# DAT has " . $catalog_data->sizeof() . " stars\n";
 print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
-is( $catalog_data->sizeof(), $catalog_byname->sizeof(), "compare size" );
-
-# grab the 1st star in both catalogues
-# ------------------------------------
-my $star_dat = $catalog_data->starbyindex( 0 );
-my $star_net = $catalog_byname->starbyindex( 0 );
-
-is( $star_dat->id(), $star_net->id(), "compare ID" );
-is( $star_dat->ra(), $star_net->ra(), "compare RA" );
-is( $star_dat->dec(), $star_net->dec(), "comapre dec" );
-
-my @dat_filters = $star_dat->what_filters();
-my @net_filters = $star_net->what_filters();
-foreach my $filter ( 0 ... $#net_filters ) {
-   is( $dat_filters[$filter], $net_filters[$filter], "compare filter $filter" );
-   is( $star_dat->get_magnitude($dat_filters[$filter]),
-       $star_net->get_magnitude($net_filters[$filter]),
-       "compare magnitude in filter $filter"
-     );
-   is( $star_dat->get_errors($dat_filters[$filter]),
-       $star_net->get_errors($net_filters[$filter]),
-     "compare magerr in filter $filter");   
-}   
-  
-my @dat_cols = $star_dat->what_colours();
-my @net_cols = $star_net->what_colours();
-foreach my $col ( 0 ... $#net_cols ) {
-   is( $dat_cols[$col], $net_cols[$col],"compare color $col" );
-   is( $star_dat->get_colour($dat_cols[$col]), 
-       $star_net->get_colour($net_cols[$col]),
-     "compare value of color $col");
-   is( $star_dat->get_colourerr($dat_cols[$col]), 
-       $star_net->get_colourerr($net_cols[$col]), "compare color error $col" );
-}    
-  
-is( $star_dat->quality(), $star_net->quality(), "check quality" );
-is( $star_dat->field(), $star_net->field(), "check field" );
-is( $star_dat->gsc(), $star_net->gsc(), "check GSC flag" );
-is( $star_dat->distance(), $star_net->distance(), "check distance" );
-is( $star_dat->posangle(), $star_net->posangle(), "check posangle" );
-
-# grab the last star in both catalogues
-# ------------------------------------
-$star_dat = $catalog_data->starbyindex( $catalog_data->sizeof() - 1 );
-$star_net = $catalog_byname->starbyindex( $catalog_byname->sizeof() - 1 );
-
-is( $star_dat->id(), $star_net->id(), "compare star ID" );
-is( $star_dat->ra(), $star_net->ra(), "compare star RA" );
-is( $star_dat->dec(), $star_net->dec(), "Compare star Dec" );
-
-@dat_filters = $star_dat->what_filters();
-@net_filters = $star_net->what_filters();
-foreach my $filter ( 0 ... $#net_filters ) {
-   is( $dat_filters[$filter], $net_filters[$filter],"compare filter $filter" );
-   is( $star_dat->get_magnitude($dat_filters[$filter]),
-       $star_net->get_magnitude($net_filters[$filter]),
-       "compare magnitude $filter");
-   is( $star_dat->get_errors($dat_filters[$filter]),
-       $star_net->get_errors($net_filters[$filter]),
-     "compare magerr $filter");   
-}   
-  
-@dat_cols = $star_dat->what_colours();
-@net_cols = $star_net->what_colours();
-foreach my $col ( 0 ... $#net_cols ) {
-   is( $dat_cols[$col], $net_cols[$col],"compare color $col" );
-   is( $star_dat->get_colour($dat_cols[$col]), 
-       $star_net->get_colour($net_cols[$col]),
-     "compare value of color $col");
-   is( $star_dat->get_colourerr($dat_cols[$col]), 
-       $star_net->get_colourerr($net_cols[$col]),"compare color error $col" );
-}    
-  
-is( $star_dat->quality(), $star_net->quality(), "check quality" );
-is( $star_dat->field(), $star_net->field(), "check field" );
-is( $star_dat->gsc(), $star_net->gsc() , "check GSC flag");
-is( $star_dat->distance(), $star_net->distance() ,"check distance");
-is( $star_dat->posangle(), $star_net->posangle(), "check posangle" );
+# Compare catalogues
+compare_catalog( $catalog_data, $catalog_byname );
 
 # quitting time
 exit;
