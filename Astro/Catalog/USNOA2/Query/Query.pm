@@ -19,7 +19,7 @@ package Astro::Catalog::USNOA2::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.2 2002/01/10 03:18:04 aa Exp $
+#     $Id: Query.pm,v 1.3 2002/01/14 06:29:14 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -63,15 +63,20 @@ use vars qw/ $VERSION /;
 use LWP::UserAgent;
 use Net::Domain qw(hostname hostdomain);
 use File::Spec;
+use Math::Libm qw(:all);
 use Carp;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+# generic catalog objects
+use Astro::Catalog;
+use Astro::Catalog::Star;
+
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.2 2002/01/10 03:18:04 aa Exp $
+$Id: Query.pm,v 1.3 2002/01/14 06:29:14 aa Exp $
 
 =head1 METHODS
 
@@ -133,14 +138,14 @@ Returns an Astro::Catalog::USNOA2::Catalog object from a USNO-A2.0 query.
 sub querydb {
   my $self = shift;
 
-  # call the private method to make the actual ADS query
-  my $catalog = $self->_make_query();
+  # call the private method to make the actual USNO query
+  $self->_make_query();
 
   # check for failed connect
-  return undef unless defined $catalog;
+  return undef unless defined $self->{BUFFER};
 
-  # return the file name
-  return $catalog;
+  # return catalog
+  return $self->_parse_query();
 
 }
 
@@ -363,6 +368,129 @@ sub radius {
 }
 
 
+=item B<Faint>
+
+Set (or query) the faint magnitude limit for inclusion on the USNO-A2 results
+
+   $faint = $query->faint();
+   $query->faint( 50 );
+
+=cut
+
+sub faint {
+  my $self = shift;
+
+  if (@_) { 
+    ${$self->{OPTIONS}}{"magfaint"} = shift;
+  }
+  
+  return ${$self->{OPTIONS}}{"magfaint"};
+
+}
+
+=item B<Bright>
+
+Set (or query) the bright magnitude limit for inclusion on the USNO-A2 results
+
+   $faint = $query->bright();
+   $query->bright( 2 );
+
+=cut
+
+sub bright {
+  my $self = shift;
+
+  if (@_) { 
+    ${$self->{OPTIONS}}{"magbright"} = shift;
+  }
+  
+  return ${$self->{OPTIONS}}{"magbright"};
+
+}
+
+=item B<Sort>
+
+Set or query the order in which the stars are listed in the catalogue
+
+   $sort = $query->sort();
+   $query->sort( 'RA' );
+
+valid options are RA, DEC, RMAG, BMAG, DIST (distance to centre of the 
+requested field) and POS (the position angle to the centre of the field).  
+
+=cut
+
+sub sort {
+  my $self = shift;
+
+  if (@_) {
+     
+    my $option = shift;
+     
+    # pick an option
+    if( $option eq "RA" ) {
+    
+       # sort by RA
+       ${$self->{OPTIONS}}{"sort"} = "ra";
+       
+    } elsif ( $option eq "DEC" ) {
+    
+       # sort by Dec
+       ${$self->{OPTIONS}}{"sort"} = "dec";
+       
+    } elsif ( $option eq "RMAG" ) {
+    
+       # sort by R magnitude
+       ${$self->{OPTIONS}}{"sort"} = "mr";
+       
+    } elsif ( $option eq "BMAG" ) {
+    
+       # sort by B magnitude
+       ${$self->{OPTIONS}}{"sort"} = "mb";
+       
+    } elsif ( $option eq "DIST" ) {
+    
+       # sort by distance from field centre
+       ${$self->{OPTIONS}}{"sort"} = "d";
+       
+    } elsif ( $option eq "POS" ) {
+    
+       # sort by position angle to field centre
+       ${$self->{OPTIONS}}{"sort"} = "pos";
+       
+    } else {
+    
+       # in case there are no valid options sort by RA
+       ${$self->{OPTIONS}}{"sort"} = "ra";
+    }   
+  }
+  
+  # return the sort option
+  return ${$self->{OPTIONS}}{"sort"};
+
+}
+
+=item B<Nout>
+
+The number of objects to return, defaults to 20,000 which should hopefully
+be sufficent to return all objects of interest. This value should be increased
+if a (very) large sample radius is requested.
+
+   $num = $query->nout();
+   $query->nout( 100 );
+
+=cut
+
+sub nout {
+  my $self = shift;
+
+  if (@_) { 
+    ${$self->{OPTIONS}}{"nout"} = shift;
+  }
+  
+  return ${$self->{OPTIONS}}{"nout"};
+}
+
 # C O N F I G U R E -------------------------------------------------------
 
 =back
@@ -425,7 +553,7 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / RA Dec Object Radius Bright Faint Sort Number
+  for my $key (qw / RA Dec Target Radius Bright Faint Sort Number
                     URL Timeout Proxy / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
@@ -501,7 +629,169 @@ make and parse the results.
 
 sub _parse_query {
   my $self = shift;
+  
+  # get a local copy of the current BUFFER
+  my @buffer = split( /\n/,$self->{BUFFER});
+  chomp @buffer;
 
+  # create an Astro::Catalog object to hold the search results
+  my $catalog = new Astro::Catalog();
+
+  # create a temporary object to hold stars
+  my $star;
+
+  my ( $line, $counter );
+  my ( $ra, $dec, $radius );
+  # loop round the returned buffer and stuff the contents into star objects
+  foreach $line ( 0 ... $#buffer ) {
+      
+     # Parse field centre
+     # ------------------ 
+      
+     # RA
+     if( lc($buffer[$line]) =~ "<td>ra:" ) {
+        $_ = lc($buffer[$line]);
+        ( $ra ) = /^\s*<td>ra:\s+(.*)<\/td>/;
+        $catalog->fieldcentre( RA => $ra ); 
+     }
+     
+     # Dec
+     if( lc($buffer[$line]) =~ "<td>dec:" ) {
+        $_ = lc($buffer[$line]);
+        ( $dec ) = /^\s+<td>dec:\s+(.*)<\/td>/;
+        $catalog->fieldcentre( Dec => $dec ); 
+     }
+     
+     # Radius
+     if( lc($buffer[$line]) =~ "search radius:" ) {
+        $_ = lc($buffer[$line+1]);
+        ( $radius ) = />\s+(.*)\s\w/;
+        $catalog->fieldcentre( Radius => $radius ); 
+     }
+     
+     # Parse list of objects
+     # ---------------------
+     
+     if( lc($buffer[$line]) =~ "<pre>" ) {
+     
+        # reached the catalog block, loop through until </pre> reached
+        $counter = $line+2;
+        until ( lc($buffer[$counter+1]) =~ "</pre>" ) {
+                      
+           # split each line
+           my @separated = split( /\s+/, $buffer[$counter] );
+           
+           # debugging (leave in)
+           #foreach my $thing ( 0 .. $#separated ) {
+           #   print "   $thing # $separated[$thing] #\n";
+           #}
+           
+           # check that there is something on the line
+           if ( defined $separated[0] ) {
+              
+              # create a temporary place holder object
+              $star = new Astro::Catalog::Star(); 
+
+              # ID
+              my $id = $separated[2];
+              $star->id( $id );
+               
+              # debugging
+              #my $num = $counter - $line -2;
+              #print "# ID $id star $num\n";      
+              
+              # RA
+              my $objra = "$separated[3] $separated[4] $separated[5]";
+              $star->ra( $objra );
+              
+              # Dec
+              my $objdec = "$separated[6] $separated[7] $separated[8]";
+              $star->dec( $objdec );
+              
+              # R Magnitude
+              my %r_mag = ( R => $separated[9] );
+              $star->magnitudes( \%r_mag );
+              
+              # B Magnitude
+              my %b_mag = ( B => $separated[10] );
+              $star->magnitudes( \%b_mag );
+              
+              # Quality
+              my $quality = $separated[11];
+              $star->quality( $quality );
+              
+              # Field
+              my $field = $separated[12];
+              $star->field( $field );
+              
+              # GSC
+              my $gsc = $separated[13];
+              if ( $gsc eq "+" ) {
+                 $star->gsc( "TRUE" );
+              } else {
+                 $star->gsc( "FALSE" );
+              }
+              
+              # Distance
+              my $distance = $separated[14];
+              $star->distance( $distance );
+              
+              # Position Angle
+              my $pos_angle = $separated[15];
+              $star->posangle( $pos_angle );
+
+           }
+             
+           # Push the star into the catalog
+           # ------------------------------
+           $catalog->pushstar( $star );
+           
+           
+           # Calculate error
+           # ---------------
+           
+           my ( $power, $delta_r, $delta_b );
+                      
+           # delta.R
+           $power = 0.8*( $star->get_magnitude( 'R' ) - 19.0 );
+           $delta_r = 0.15*sqrt( 1.0 + pow( 10.0, $power ) );
+           
+           # delta.B
+           $power = 0.8*( $star->get_magnitude( 'B' ) - 19.0 );
+           $delta_b = 0.15*sqrt( 1.0 + pow( 10.0, $power ) );
+           
+           # mag errors
+           my %mag_errors = ( B => $delta_b,  R => $delta_r );
+           $star->magerr( \%mag_errors );
+           
+           # calcuate B-R colour and error
+           # -----------------------------
+           
+           my $b_minus_r = $star->get_magnitude( 'B' ) - 
+                           $star->get_magnitude( 'R' );
+                           
+           my %colours = ( 'B-R' => $b_minus_r );
+           $star->colours( \%colours );
+           
+           # delta.(B-R)
+           my $delta_bmr = sqrt( pow( $delta_r, 2.0 ) + pow( $delta_b, 2.0 ) );
+           
+           # col errors
+           my %col_errors = ( 'B-R' => $delta_bmr );
+           $star->colerr( \%col_errors );
+           
+           # increment counter
+           # -----------------
+           $counter = $counter + 1;
+        }
+        
+        # reset $line to correct place
+        $line = $counter;
+     }
+     
+  }
+
+  return $catalog;
 }
 
 

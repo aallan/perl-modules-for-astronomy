@@ -4,13 +4,26 @@ Astro::Catalog::USNOA2 module
 What is it?
 -----------
 
-The module is an object orientated interface to the USNO-A2 catalogue.
+The module is an object orientated interface to the online USNO-A2 catalogue
+at the ESO/ST-ECF archive site. Full POD documentation is available as part
+of the module itself.
 
 Requirements
 ------------
 
-The module requires the Astro::Catalog and Astro::Catalog::Star modules to
+The Astro::Catalog::USNOA2 module requires the following external modules
+to function
+   
+   Astro::Catalog
+   Astro::Catalog::Star
 
+   LWP::UserAgent
+   Net::Domain 
+   File::Spec
+   Math::Libm
+   Carp
+   
+all of these modules are available from CPAN <http://www.cpan.org/>.
 
 Provides
 --------
