@@ -1,3 +1,7 @@
+2004-03-01  Brad Cavanagh  <b.cavanahg@jach.hawaii.edu>
+
+	* IO/VOTable: added support for parallax and proper motions.
+	
 2004-02-25  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
 
 	* Catalog.pm: added fielddate method.
