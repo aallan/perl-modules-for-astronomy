@@ -2,7 +2,7 @@
 
 	* Added Query/MPC support along with associated test harness.
 
-2004-03-01  Brad Cavanagh  <b.cavanahg@jach.hawaii.edu>
+2004-03-01  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
 
 	* IO/VOTable: added support for parallax and proper motions.
 	
