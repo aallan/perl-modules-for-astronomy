@@ -3,7 +3,7 @@ MANIFEST
 Makefile.PL
 GPL
 ChangeLog
-adsquery.pl
+adsquery.PL
 Query/Query.pm
 Query/Makefile.PL
 Result/Result.pm

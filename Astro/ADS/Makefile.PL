@@ -3,6 +3,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile( 
                'NAME'           => 'Astro::ADS',
 	       'VERSION'        => '1.18',
+               'EXE_FILES'      => [ 'adsquery' ],
                'PREREQ_PM'      => { LWP         => 5.53,
                                      Net::Domain => 2.13,
                                      Pod::Usage  => 1.14 },

@@ -1,3 +1,7 @@
+2001-11-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* adsquery.PL: Turn adsquery.pl into a "proper" executable
+
 2001-11-14  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query.pm: Added user agent tag to module and allowed the user
