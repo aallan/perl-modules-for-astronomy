@@ -33,14 +33,14 @@ use Astro::Coords;
 
 use Data::Dumper;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.6 2003/07/27 02:02:33 aa Exp $
+$Id: Cluster.pm,v 1.7 2003/07/27 02:32:26 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -297,8 +297,17 @@ sub _write_catalog {
      $output_line = undef;
      
      # field, number, ra, dec and x&y position
-     $output_line = ${$stars}[$star]->field() . "  ";
-     $output_line = $output_line . $star . "  ";
+     if ( defined ${$stars}[$star]->field() ) {
+        $output_line = ${$stars}[$star]->field() . "  ";
+     } else {
+        $output_line = "0 ";
+     }
+     
+     if ( defined ${$stars}[$star]->id() ) {
+        $output_line = $output_line . ${$stars}[$star]->id() . "  ";
+     } else {
+        $output_line = $output_line . $star . " ";
+     }   
      $output_line = $output_line . ${$stars}[$star]->ra() . "  ";
      $output_line = $output_line . ${$stars}[$star]->dec() . "  ";
      
