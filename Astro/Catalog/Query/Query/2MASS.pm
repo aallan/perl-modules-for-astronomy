@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: 2MASS.pm,v 1.8 2003/09/24 17:03:51 aa Exp $
+$Id: 2MASS.pm,v 1.9 2003/09/24 17:12:36 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -141,10 +141,11 @@ sub _parse_query {
   $catalog->origin( $query->origin() );
   $catalog->set_coords( $query->get_coords() ) if defined $query->get_coords(); 
   
-  my @stars;  
+  my ( @oldstars, @newstars ); 
+  @oldstars = $query->allstars(); 
   foreach my $i ( 0 ... $query->sizeof() ) {
     
-    my $star = $query->popstar();
+    my $star = $oldstars[$i];
         
     # Ungodly hack warning...
     # -----------------------
@@ -200,10 +201,10 @@ sub _parse_query {
     $star->colours( \%colours ) if defined $star;
     $star->colerr( \%col_errors ) if defined $star;
 
-    push (@stars, $star ) if defined $star;
+    $newstars[$i] = $star if defined $star;
          
   }
-  $catalog->pushstar( @stars );  
+  $catalog->pushstar( @newstars );  
      
   # return the modified catalogue                         
   return $catalog;                         
