@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.26 2003/07/27 08:20:36 timj Exp $
+#     $Id: Catalog.pm,v 1.27 2003/07/27 08:26:56 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,14 +64,14 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.26 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.27 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.26 2003/07/27 08:20:36 timj Exp $
+$Id: Catalog.pm,v 1.27 2003/07/27 08:26:56 timj Exp $
 
 =head1 METHODS
 
@@ -410,7 +410,7 @@ sub stars {
     return $self->allstars;
   } else {
     # scalar context so we are forced to copy the array from allstars
-    @{ $self->{CURRENT} } = [ $self->allstars ];
+    @{ $self->{CURRENT} } = $self->allstars;
     return $self->{CURRENT};
   }
 
@@ -1083,7 +1083,6 @@ sub sort_catalog {
     # do it outside the sort. Create an array of hashes for the
     # sorting
     my @unsorted = map {
-      print "Underscore $_\n";
       my $c = $_->coords;
       return () unless defined $c;
       my %calc = (
