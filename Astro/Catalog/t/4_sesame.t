@@ -17,8 +17,8 @@ BEGIN {
 }
 
 # Load the generic test code
-my $path = ( -d "t" ?  "t/" : "");
-do $path."helper.pl" or die "Error reading test functions: $!";
+my $p = ( -d "t" ?  "t/" : "");
+do $p."helper.pl" or die "Error reading test functions: $!";
 
 
 # T E S T -----------------------------------------------------------------
