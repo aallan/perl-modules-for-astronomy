@@ -1,3 +1,8 @@
+2004-02-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* t/2_votable.t: Now attempt to skip VOtable tests if the VOTable
+	module is not installed.
+
 2004-02-05  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
         * Added STL support (read only) as a pluggable IO module

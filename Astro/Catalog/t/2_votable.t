@@ -1,7 +1,7 @@
 #!perl
 
 # Astro::Catalog test harness
-use Test::More tests => 129;
+use Test::More tests => 130;
 
 # strict
 use strict;
@@ -13,6 +13,12 @@ use Data::Dumper;
 # load modules
 require_ok("Astro::Catalog");
 require_ok("Astro::Catalog::Star");
+
+# Do a private require so that we can skip the tests if VOTable is missing
+eval {
+  require Astro::Catalog::VOTable;
+};
+my $hasvo = ($@ ? 0 : 1);
 
 # Load the generic test code
 my $p = ( -d "t" ?  "t/" : "");
@@ -47,6 +53,8 @@ $star[0] = new Astro::Catalog::Star( ID         => 'U1500_01194794',
                                       Distance   => '0.09',
                                       PosAngle   => '50.69',
                                       Field      => '00080' );
+
+isa_ok( $star[0], "Astro::Catalog::Star");
 
 # STAR 2
 # ------
@@ -83,21 +91,29 @@ my $catalog = new Astro::Catalog( RA     => '01 10 12.9',
 
 isa_ok($catalog, "Astro::Catalog");
 
+my $tempfile; # for cleanup
+SKIP: {
+
+  skip "VOTable module not found", 125 unless $hasvo;
 
 # WRITE IT OUT TO DISK USING THE VOTABLE WRITER
 # =============================================
-my $tempfile = File::Spec->catfile( File::Spec->tmpdir(), "catalog.test" );
+$tempfile = File::Spec->catfile( File::Spec->tmpdir(), "catalog.test" );
 
 ok( $catalog->write_catalog( Format => 'VOTable', File => $tempfile ),
   "Check catalog write");
- 
+ok(-e $tempfile, "Check file exists");
+
+
 # READ THE VOTABLE BACK FROM DISK INTO AN ARRAY
 # =============================================
 
-ok( open( CATALOG, $tempfile ), "Read catalog from disk" );
-my @file = <CATALOG>;
+my $opstat = open(my $CAT, $tempfile);
+ok( $opstat, "Read catalog from disk" );
+my @file;
+@file = <$CAT>;
 chomp @file;
-close(CATALOG); 
+ok(close($CAT),"Closing catalog file");
 
 
 # READ COMPARISON CATALOG FROM __DATA__
@@ -112,7 +128,7 @@ chomp @buffer;
 foreach my $i ( 0 .. $#buffer ) {
    #print $buffer[$i] . "\n";
    #print $file[$i] . "\n";
-   ok( $buffer[$i] eq $file[$i], "Line $i in \@buffer ok" );
+   is( $buffer[$i], $file[$i], "Line $i in \@buffer ok" );
 }
 
 # READ CATALOG IN FROM TEMPORARY FILE USING THE VOTABLE READER
@@ -140,6 +156,7 @@ $star2[0] = new Astro::Catalog::Star( ID         => 'U1500_01194794',
                                       Magnitudes => \%mags3,
                                       Colours    => \%colours3,
                                       Quality    => '0' );
+isa_ok( $star2[0], "Astro::Catalog::Star");
 
 # STAR 3
 # ------
@@ -156,7 +173,7 @@ $star2[1] = new Astro::Catalog::Star( ID         => 'U1500_01194795',
                                      Colours    => \%colours2,
                                      Quality    => '0' );
 
-isa_ok( $star[1], "Astro::Catalog::Star");
+isa_ok( $star2[1], "Astro::Catalog::Star");
 
 # Create Catalog Object
 # ---------------------
@@ -170,11 +187,12 @@ isa_ok($catalog2, "Astro::Catalog");
 # ==================
 compare_catalog( $read_catalog, $catalog2 );
 
+};
 
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
 END {
-  unlink "$tempfile";
+  unlink "$tempfile" if defined $tempfile;
 }
 
 
