@@ -27,11 +27,18 @@ print "# Connecting to SIMBAD\n";
 my $coord_result = $coord_query->querydb();
 print "# Continuing Tests\n";
 
-print Dumper($coord_result);
-
 my $ident_query = new Astro::SIMBAD::Query( Target    => "HT Cas",
                                             Error     => 10,
                                             Units     => "arcsec" );                                      
 print "# Connecting to SIMBAD\n";
 my $ident_result = $ident_query->querydb();
 print "# Continuing Tests\n";
+
+my $multi_query = new Astro::SIMBAD::Query( Target    => "3C273",
+                                            Error     => 10,
+                                            Units     => "arcsec" ); 
+print "# Connecting to SIMBAD\n";
+my $multi_result = $multi_query->querydb();
+print "# Continuing Tests\n"; 
+print Dumper($multi_result);
+                                              

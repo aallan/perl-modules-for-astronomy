@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.7 2001/11/28 03:02:12 aa Exp $
+#     $Id: Query.pm,v 1.8 2001/11/28 17:18:02 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.7 2001/11/28 03:02:12 aa Exp $
+$Id: Query.pm,v 1.8 2001/11/28 17:18:02 aa Exp $
 
 =head1 METHODS
 
@@ -96,7 +96,8 @@ sub new {
                       URL       => undef,
                       QUERY     => undef,
                       USERAGENT => undef,
-                      BUFFER    => undef }, $class;
+                      BUFFER    => undef,
+                      LOOKUP    => {} }, $class;
 
   # Configure the object
   $block->configure( @_ );
@@ -346,7 +347,6 @@ The error radius to be searched for SIMBAD objects around the target R.A.
 and Dec, the radius defaults to 10 arc seconds, with the radius unit being
 set using the units() method.
 
-
    $error = $query->error();
    $query->error( 20 );
 
@@ -390,12 +390,75 @@ sub units {
 
 }
 
-sub frame {}
+=item B<Frame>
 
-sub epoch {}
+The frame in which the R.A. and Dec co-ordinates are given
 
-sub equinox {}
+   $frame = $query->frame();
+   $query->frames( "FK5" );
 
+valid frames are "FK5" and "FK4", if not specified it will default to FK5.
+
+=cut
+
+sub frame {
+  my $self = shift;
+
+  if (@_) {
+  
+    my $frame = shift; 
+    if( $frame eq "FK5" || $frame eq "FK4"  ) {
+       ${$self->{OPTIONS}}{"CooFrame"} = $frame;
+    }   
+  }
+  
+  return ${$self->{OPTIONS}}{"CooFrame"};
+
+}
+
+=item B<Epoch>
+
+The epoch for the R.A. and Dec co-ordinates
+
+   $epoch = $query->epoch();
+   $query->epoch( "1950" );
+
+defaults to 2000
+
+=cut
+
+sub epoch {
+  my $self = shift;
+
+  if (@_) { 
+    ${$self->{OPTIONS}}{"CooEpoch"} = shift;
+  }
+  
+  return ${$self->{OPTIONS}}{"CooEpoch"};
+
+}
+
+=item B<Equinox>
+
+The equinox for the R.A. and Dec co-ordinates
+
+   $equinox = $query->equinox();
+   $query->equinox( "2000" );
+
+defaults to 2000
+
+=cut
+
+sub equinox {
+  my $self = shift;
+
+  if (@_) { 
+    ${$self->{OPTIONS}}{"CooEqui"} = shift;
+  }
+  
+  return ${$self->{OPTIONS}}{"CooEqui"};
+
+}
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -471,6 +534,148 @@ sub configure {
   ${$self->{OPTIONS}}{"Frame3"}             = "G";
   ${$self->{OPTIONS}}{"Equi3"}              = "2000.0";
   ${$self->{OPTIONS}}{"Epoch3"}             = "2000.0";
+
+  # TYPE LOOKUP HASH TABLE
+  # ----------------------
+ 
+  # build the data table
+  ${$self->{LOOKUP}}{"?"}    =     "Object of unknown nature";
+  ${$self->{LOOKUP}}{"Rad"}  =     "Radio-source";
+  ${$self->{LOOKUP}}{"mR"}   =     "metric Radio-source";
+  ${$self->{LOOKUP}}{"cm"}   =     "centimetric Radio-source";
+  ${$self->{LOOKUP}}{"mm"}   =     "millimetric Radio-source";
+  ${$self->{LOOKUP}}{"Mas"}  =     "Maser";
+  ${$self->{LOOKUP}}{"IR"}   =     "Infra-Red source";
+  ${$self->{LOOKUP}}{"IR1"}  =     "IR source at lambda > 10 microns";
+  ${$self->{LOOKUP}}{"IR0"}  =     "IR source at lambda < 10 microns";
+  ${$self->{LOOKUP}}{"red"}  =     "Very red source";
+  ${$self->{LOOKUP}}{"blu"}  =     "Blue object";
+  ${$self->{LOOKUP}}{"UV"}   =     "UV-emission source";
+  ${$self->{LOOKUP}}{"X"}    =     "X-ray source";
+  ${$self->{LOOKUP}}{"gam"}  =     "gamma-ray source";
+  ${$self->{LOOKUP}}{"gB"}   =     "gamma-ray Burster";
+  ${$self->{LOOKUP}}{"grv"}  =     "Gravitational Source";
+  ${$self->{LOOKUP}}{"Lev"}  =     "(Micro)Lensing Event";
+  ${$self->{LOOKUP}}{"mul"}  =     "Composite object";
+  ${$self->{LOOKUP}}{"reg"}  =     "Region defined in the sky";
+  ${$self->{LOOKUP}}{"vid"}  =     "Underdense region of the Universe";
+  ${$self->{LOOKUP}}{"SCG"}  =     "Supercluster of Galaxies";
+  ${$self->{LOOKUP}}{"ClG"}  =     "Cluster of Galaxies";
+  ${$self->{LOOKUP}}{"GrG"}  =     "Group of Galaxies";
+  ${$self->{LOOKUP}}{"CGG"}  =     "Compact Group of Galaxies";
+  ${$self->{LOOKUP}}{"PaG"}  =     "Pair of Galaxies";
+  ${$self->{LOOKUP}}{"Gl?"}  =     "Possible Globular Cluster";
+  ${$self->{LOOKUP}}{"Cl*"}  =     "Cluster of Stars";
+  ${$self->{LOOKUP}}{"GlC"}  =     "Globular Cluster";
+  ${$self->{LOOKUP}}{"OpC"}  =     "Open (galactic) Cluster";
+  ${$self->{LOOKUP}}{"As*"}  =     "Association of Stars";
+  ${$self->{LOOKUP}}{"**"}   =     "Double or multiple star";
+  ${$self->{LOOKUP}}{"EB*"}  =     "Eclipsing binary";
+  ${$self->{LOOKUP}}{"Al*"}  =     "Eclipsing binary of Algol type";
+  ${$self->{LOOKUP}}{"bL*"}  =     "Eclipsing binary of beta Lyr type";
+  ${$self->{LOOKUP}}{"WU*"}  =     "Eclipsing binary of W UMa type";
+  ${$self->{LOOKUP}}{"SB*"}  =     "Spectrocopic binary";
+  ${$self->{LOOKUP}}{"CV*"}  =     "Cataclysmic Variable Star";
+  ${$self->{LOOKUP}}{"DQ*"}  =     "Cataclysmic Var. DQ Her type";
+  ${$self->{LOOKUP}}{"AM*"}  =     "Cataclysmic Var. AM Her type";
+  ${$self->{LOOKUP}}{"NL*"}  =     "Nova-like Star";
+  ${$self->{LOOKUP}}{"No*"}  =     "Nova";
+  ${$self->{LOOKUP}}{"DN*"}  =     "Dwarf Nova";
+  ${$self->{LOOKUP}}{"XB*"}  =     "X-ray Binary";
+  ${$self->{LOOKUP}}{"LXB"}  =     "Low Mass X-ray Binary";
+  ${$self->{LOOKUP}}{"HXB"}  =     "High Mass X-ray Binary";
+  ${$self->{LOOKUP}}{"Neb"}  =     "Nebula of unknown nature";
+  ${$self->{LOOKUP}}{"PoC"}  =     "Part of Cloud";
+  ${$self->{LOOKUP}}{"PN?"}  =     "Possible Planetary Nebula";
+  ${$self->{LOOKUP}}{"CGb"}  =     "Cometary Globule";
+  ${$self->{LOOKUP}}{"EmO"}  =     "Emission Object";
+  ${$self->{LOOKUP}}{"HH"}   =     "Herbig-Haro Object";
+  ${$self->{LOOKUP}}{"Cld"}  =     "Cloud of unknown nature";
+  ${$self->{LOOKUP}}{"GNe"}  =     "Galactic Nebula";
+  ${$self->{LOOKUP}}{"BNe"}  =     "Bright Nebula";
+  ${$self->{LOOKUP}}{"DNe"}  =     "Dark Nebula";
+  ${$self->{LOOKUP}}{"RNe"}  =     "Reflection Nebula";
+  ${$self->{LOOKUP}}{"HI"}   =     "HI (neutral) region";
+  ${$self->{LOOKUP}}{"MoC"}  =     "Molecular Cloud";
+  ${$self->{LOOKUP}}{"HVC"}  =     "High-velocity Cloud";
+  ${$self->{LOOKUP}}{"HII"}  =     "HII (ionized) region";
+  ${$self->{LOOKUP}}{"PN"}   =     "Planetary Nebula";
+  ${$self->{LOOKUP}}{"sh"}   =     "HI shell";
+  ${$self->{LOOKUP}}{"SR?"}  =     "SuperNova Remnant Candidate";
+  ${$self->{LOOKUP}}{"SNR"}  =     "SuperNova Remnant";
+  ${$self->{LOOKUP}}{"*"}    =     "Star";
+  ${$self->{LOOKUP}}{"*iC"}  =     "Star in Cluster";
+  ${$self->{LOOKUP}}{"*iN"}  =     "Star in Nebula";
+  ${$self->{LOOKUP}}{"*iA"}  =     "Star in Association";
+  ${$self->{LOOKUP}}{"*i*"}  =     "Star in double system";
+  ${$self->{LOOKUP}}{"V*?"}  =     "Star suspected of Variability";
+  ${$self->{LOOKUP}}{"Pe*"}  =     "Peculiar Star";
+  ${$self->{LOOKUP}}{"HB*"}  =     "Horizontal Branch Star";
+  ${$self->{LOOKUP}}{"Em*"}  =     "Emission-line Star";
+  ${$self->{LOOKUP}}{"Be*"}  =     "Be Star";
+  ${$self->{LOOKUP}}{"WD*"}  =     "White Dwarf";
+  ${$self->{LOOKUP}}{"ZZ*"}  =     "Variable White Dwarf of ZZ Cet type";
+  ${$self->{LOOKUP}}{"C*"}   =     "Carbon Star";
+  ${$self->{LOOKUP}}{"S*"}   =     "S Star";
+  ${$self->{LOOKUP}}{"OH*"}  =     "Star with envelope of OH/IR type";
+  ${$self->{LOOKUP}}{"CH*"}  =     "Star with envelope of CH type";
+  ${$self->{LOOKUP}}{"pr*"}  =     "Pre-main sequence Star";
+  ${$self->{LOOKUP}}{"TT*"}  =     "T Tau-type Star";
+  ${$self->{LOOKUP}}{"WR*"}  =     "Wolf-Rayet Star";
+  ${$self->{LOOKUP}}{"PM*"}  =     "High proper-motion Star";
+  ${$self->{LOOKUP}}{"HV*"}  =     "High-velocity Star";
+  ${$self->{LOOKUP}}{"V*"}   =     "Variable Star";
+  ${$self->{LOOKUP}}{"Ir*"}  =     "Variable Star of irregular type";
+  ${$self->{LOOKUP}}{"Or*"}  =     "Variable Star in Orion Nebula";
+  ${$self->{LOOKUP}}{"V* RI*"} =   "Variable Star with rapid variations";
+  ${$self->{LOOKUP}}{"Er*"}  =     "Eruptive variable Star";
+  ${$self->{LOOKUP}}{"Fl*"}  =     "Flare Star";
+  ${$self->{LOOKUP}}{"FU*"}  =     "Variable Star of FU Ori type";
+  ${$self->{LOOKUP}}{"RC*"}  =     "Variable Star of R CrB type";
+  ${$self->{LOOKUP}}{"Ro*"}  =     "Rotationally variable Star";
+  ${$self->{LOOKUP}}{"a2*"}  =     "Variable Star of alpha2 CVn type";
+  ${$self->{LOOKUP}}{"El*"}  =     "Elliptical variable Star";
+  ${$self->{LOOKUP}}{"Psr"}  =     "Pulsars";
+  ${$self->{LOOKUP}}{"BY*"}  =     "Variable of BY Dra type";
+  ${$self->{LOOKUP}}{"RS*"}  =     "Variable of RS CVn type";
+  ${$self->{LOOKUP}}{"Pu*"}  =     "Pulsating variable Star";
+  ${$self->{LOOKUP}}{"Mi*"}  =     "Variable Star of Mira Cet type";
+  ${$self->{LOOKUP}}{"RR*"}  =     "Variable Star of RR Lyr type";
+  ${$self->{LOOKUP}}{"Ce*"}  =     "Classical Cepheid variable Star";
+  ${$self->{LOOKUP}}{"eg sr*"} =  "Semi-regular pulsating Star";
+  ${$self->{LOOKUP}}{"dS*"}  =     "Variable Star of delta Sct type";
+  ${$self->{LOOKUP}}{"RV*"}  =     "Variable Star of RV Tau type";
+  ${$self->{LOOKUP}}{"WV*"}  =     "Variable Star of W Vir type";
+  ${$self->{LOOKUP}}{"SN*"}  =     "SuperNova";
+  ${$self->{LOOKUP}}{"Sy*"}  =     "Symbiotic Star";
+  ${$self->{LOOKUP}}{"G"}    =     "Galaxy";
+  ${$self->{LOOKUP}}{"PoG"}  =     "Part of a Galaxy";
+  ${$self->{LOOKUP}}{"GiC"}  =     "Galaxy in Cluster of Galaxies";
+  ${$self->{LOOKUP}}{"GiG"}  =     "Galaxy in Group of Galaxies";
+  ${$self->{LOOKUP}}{"GiP"}  =     "Galaxy in Pair of Galaxies";
+  ${$self->{LOOKUP}}{"HzG"}  =     "Galaxy with high redshift";
+  ${$self->{LOOKUP}}{"ALS"}  =     "Absorption Line system";
+  ${$self->{LOOKUP}}{"LyA"}  =     "Ly alpha Absorption Line system";
+  ${$self->{LOOKUP}}{"DLy"}  =     "Dumped Ly alpha Absorption Line system";
+  ${$self->{LOOKUP}}{"mAL"}  =     "metallic Absorption Line system";
+  ${$self->{LOOKUP}}{"rG"}   =     "Radio Galaxy";
+  ${$self->{LOOKUP}}{"H2G"}  =     "HII Galaxy";
+  ${$self->{LOOKUP}}{"Q?"}   =     "Possible Quasar";
+  ${$self->{LOOKUP}}{"EmG"}  =     "Emission-line galaxy";
+  ${$self->{LOOKUP}}{"SBG"}  =     "Starburst Galaxy";
+  ${$self->{LOOKUP}}{"BCG"}  =     "Blue compact Galaxy";
+  ${$self->{LOOKUP}}{"LeI"}  =     "Gravitationnaly Lensed Image";
+  ${$self->{LOOKUP}}{"LeG"}  =     "Gravitationnaly Lensed Image of a Galaxy";
+  ${$self->{LOOKUP}}{"LeQ"}  =     "Gravitationnaly Lensed Image of a Quasar";
+  ${$self->{LOOKUP}}{"AGN"}  =     "Active Galaxy Nucleus";
+  ${$self->{LOOKUP}}{"LIN"}  =     "LINER-type Active Galaxy Nucleus";
+  ${$self->{LOOKUP}}{"SyG"}  =     "Seyfert Galaxy";
+  ${$self->{LOOKUP}}{"Sy1"}  =     "Seyfert 1 Galaxy";
+  ${$self->{LOOKUP}}{"Sy2"}  =     "Seyfert 2 Galaxy";
+  ${$self->{LOOKUP}}{"Bla"}  =     "Blazar";
+  ${$self->{LOOKUP}}{"BLL"}  =     "BL Lac - type object";
+  ${$self->{LOOKUP}}{"OVV"}  =     "Optically Violently Variable object";
+  ${$self->{LOOKUP}}{"QSO"}  =     "Quasar";
 
   # CONFIGURE FROM ARGUEMENTS
   # -------------------------
@@ -576,27 +781,26 @@ sub _parse_query {
      if( lc($buffer[$line]) =~ "objects: </b><pre>" ) {
         $_ = lc($buffer[$line]);
         ( $number ) = /^<b>(\d*)\s+/;
-        print "Number of Objects: $number\n";
     
         # GRAB EACH OBJECT
         foreach my $i ( $line+2 ... $line+$number+1 ) {
-           push ( @target, lc($buffer[$i]) );
+           push ( @target, $buffer[$i] );
         }
         
         # DROP OUT OF FIRST LOOP
         $line = $#buffer;
      }  
   }
-    
+   
   # ...and stuff the contents into Object objects
   my ( $star );
   foreach $star ( 0 ... $#target ) {
-
+     
      # create a temporary place holder object
      my $object = new Astro::SIMBAD::Result::Object();  
      
      # split each line using the "pipe" symbol sepearating the table columns
-     my @separated = split( /|/, $target[$star] );
+     my @separated = split( /\|/, $target[$star] );
      
      # FRAME
      # -----
@@ -605,29 +809,90 @@ sub _parse_query {
      my @coord_frame = ( ${$self->{OPTIONS}}{"CooFrame"},
                          ${$self->{OPTIONS}}{"CooEpoch"},
                          ${$self->{OPTIONS}}{"CooEqui"} );
+     # push it into the object
      $object->frame( \@coord_frame );
      
      # URL
      # ---
+ 
+     # grab the url based on quotes around the string
+     my $start_index = index( $separated[0], q/"/ );
+     my $last_index = rindex( $separated[0], q/"/ );
+     my $url = substr( $separated[0], $start_index+1, $last_index-$start_index);
+
+     # push it into the object
+     $object->url( $url );
      
      # NAME
      # ----
      
+     # get the object name from the same section
+     my $final_index = rindex( $separated[0], "A" );
+     my $name = substr($separated[0],$last_index+2,$final_index-$last_index-4);
+     
+     # push it into the object
+     $object->name( $name );
+    
      # TYPE
      # ----
+     my $type = $separated[1];
+     
+     # dump leading spaces
+     $type =~ s/^\s+//g;
+     
+     # push it into the object
+     $object->type( $type );
      
      # LONG TYPE
      # ---------
      
+     # do the lookup
+     for my $key (keys %{$self->{LOOKUP}}) {
+        
+        if( $object->type() eq $key ) {
+        
+           # push it into the object
+           my $long = ${$self->{LOOKUP}}{$key};
+           $object->long( $long );
+           last;
+        }
+     }     
+     
      # RA
      # --
+     
+     # remove leading spaces
+     my $coords = $separated[2];
+     $coords =~ s/^\s+//g;
+     
+     # split the RA and Dec line into an array elements
+     my @radec = split( /\s+/, $coords );
+     
+     # ...and then rebuild it
+     my $ra = "$radec[0] $radec[1] $radec[2]";
+
+     # push it into the object
+     $object->ra($ra);
      
      # DEC
      # ---
      
+     # ...and rebuild the Dec
+     my $dec = "$radec[3] $radec[4] $radec[5]";
+
+     # push it into the object
+     $object->dec($dec);
+    
      # SPECTRAL TYPE
      # -------------
-          
+     my $spectral = $separated[4];
+     
+     # remove leading and trailing spaces
+     $spectral =~ s/^\s+//g;
+     $spectral =~ s/\s+$//g;
+      
+     # push it into the object
+     $object->spec($spectral);
      
      # Add the target object to the Astro::SIMBAD::Result object
      # ---------------------------------------------------------
@@ -689,146 +954,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
-
-
-# D A T A   B L O C K  ----------------------------------------------------
-
-__DATA__
-?       Object of unknown nature
-Rad     Radio-source
-mR      metric Radio-source
-cm      centimetric Radio-source
-mm      millimetric Radio-source
-Mas     Maser
-IR      Infra-Red source
-IR1     IR source at lambda > 10 microns
-IR0     IR source at lambda < 10 microns
-red     Very red source
-blu     Blue object
-UV      UV-emission source
-X       X-ray source
-gam     gamma-ray source
-gB      gamma-ray Burster
-grv     Gravitational Source
-Lev     (Micro)Lensing Event
-mul     Composite object
-reg     Region defined in the sky
-vid     Underdense region of the Universe
-SCG     Supercluster of Galaxies
-ClG     Cluster of Galaxies
-GrG     Group of Galaxies
-CGG     Compact Group of Galaxies
-PaG     Pair of Galaxies
-Gl?     Possible Globular Cluster
-Cl*     Cluster of Stars
-GlC     Globular Cluster
-OpC     Open (galactic) Cluster
-As*     Association of Stars
-**      Double or multiple star
-EB*     Eclipsing binary
-Al*     Eclipsing binary of Algol type
-bL*     Eclipsing binary of beta Lyr type
-WU*     Eclipsing binary of W UMa type
-SB*     Spectrocopic binary
-CV*     Cataclysmic Variable Star
-DQ*     Cataclysmic Var. DQ Her type
-AM*     Cataclysmic Var. AM Her type
-NL*     Nova-like Star
-No*     Nova
-DN*     Dwarf Nova
-XB*     X-ray Binary
-LXB     Low Mass X-ray Binary
-HXB     High Mass X-ray Binary
-Neb     Nebula of unknown nature
-PoC     Part of Cloud
-PN?     Possible Planetary Nebula
-CGb     Cometary Globule
-EmO     Emission Object
-HH      Herbig-Haro Object
-Cld     Cloud of unknown nature
-GNe     Galactic Nebula
-BNe     Bright Nebula
-DNe     Dark Nebula
-RNe     Reflection Nebula
-HI      HI (neutral) region
-MoC     Molecular Cloud
-HVC     High-velocity Cloud
-HII     HII (ionized) region
-PN      Planetary Nebula
-sh      HI shell
-SR?     SuperNova Remnant Candidate
-SNR     SuperNova Remnant
-*       Star
-*iC     Star in Cluster
-*iN     Star in Nebula
-*iA     Star in Association
-*i*     Star in double system
-V*?     Star suspected of Variability
-Pe*     Peculiar Star
-HB*     Horizontal Branch Star
-Em*     Emission-line Star
-Be*     Be Star
-WD*     White Dwarf
-ZZ*     Variable White Dwarf of ZZ Cet type
-C*      Carbon Star
-S*      S Star
-OH*     Star with envelope of OH/IR type
-CH*     Star with envelope of CH type
-pr*     Pre-main sequence Star
-TT*     T Tau-type Star
-WR*     Wolf-Rayet Star
-PM*     High proper-motion Star
-HV*     High-velocity Star
-V*      Variable Star
-Ir*     Variable Star of irregular type
-Or*     Variable Star in Orion Nebula
-V* RI*  Variable Star with rapid variations
-Er*     Eruptive variable Star
-Fl*     Flare Star
-FU*     Variable Star of FU Ori type
-RC*     Variable Star of R CrB type
-Ro*     Rotationally variable Star
- a2*    Variable Star of alpha2 CVn type
-El*     Elliptical variable Star
-Psr     Pulsars
-BY*     Variable of BY Dra type
-RS*     Variable of RS CVn type
-Pu*     Pulsating variable Star
-Mi*     Variable Star of Mira Cet type
-RR*     Variable Star of RR Lyr type
-Ce*     Classical Cepheid variable Star
-eg sr*  Semi-regular pulsating Star
- dS*    Variable Star of delta Sct type
-RV*     Variable Star of RV Tau type
-WV*     Variable Star of W Vir type
-SN*     SuperNova
-Sy*     Symbiotic Star
-G       Galaxy
-PoG     Part of a Galaxy
-GiC     Galaxy in Cluster of Galaxies
-GiG     Galaxy in Group of Galaxies
-GiP     Galaxy in Pair of Galaxies
-HzG     Galaxy with high redshift
-ALS     Absorption Line system
-LyA     Ly alpha Absorption Line system
-DLy     Dumped Ly alpha Absorption Line system
-mAL     metallic Absorption Line system
-rG      Radio Galaxy
-H2G     HII Galaxy
-Q?      Possible Quasar
-EmG     Emission-line galaxy
-SBG     Starburst Galaxy
-BCG     Blue compact Galaxy
-LeI     Gravitationnaly Lensed Image
-LeG     Gravitationnaly Lensed Image of a Galaxy
-LeQ     Gravitationnaly Lensed Image of a Quasar
-AGN     Active Galaxy Nucleus
-LIN     LINER-type Active Galaxy Nucleus
-SyG     Seyfert Galaxy
-Sy1     Seyfert 1 Galaxy
-Sy2     Seyfert 2 Galaxy
-Bla     Blazar
-BLL     BL Lac - type object
-OVV     Optically Violently Variable object
-QSO     Quasar
+1;
