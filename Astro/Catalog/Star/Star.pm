@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.14 2003/07/27 04:00:19 aa Exp $
+#     $Id: Star.pm,v 1.15 2003/07/28 00:26:21 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -79,14 +79,14 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.14 2003/07/27 04:00:19 aa Exp $
+$Id: Star.pm,v 1.15 2003/07/28 00:26:21 timj Exp $
 
 =head1 METHODS
 
@@ -214,7 +214,7 @@ sub coords {
 
     # force the ID and comment to match
     $self->id( $c->name ) if defined $c->name;
-    $self->comment( $c->comment ) if defined $c->comment;
+    $self->comment( $c->comment ) if $c->comment;
 
     # Store the new coordinate object
     # Storing it late stops looping from the id and comment methods
