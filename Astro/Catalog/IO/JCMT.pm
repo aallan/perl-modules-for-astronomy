@@ -120,7 +120,9 @@ sub _read_catalog {
     push(@stars, map { new Astro::Catalog::Star( 
 						field => 'JCMT',
 						id => $_->name,
-						coords => $_ ) } @planets);
+						coords => $_,
+						comment => 'Added automatically',
+					       ) } @planets);
 
   }
 
@@ -180,7 +182,7 @@ sub _write_catalog {
     $srcdata{name} = $name;
 
     # Store a comment
-    $srcdata{comment} = $src->comment;
+    $srcdata{comment} = $star->comment;
 
     # Get the type of source
     my $type = $src->type;
@@ -438,6 +440,7 @@ sub _parse_line {
   return new Astro::Catalog::Star( id => $target,
 				   coords => $source,
 				   field => $field,
+				   comment => $comment,
 				 );
 
 }

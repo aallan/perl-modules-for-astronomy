@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.12 2003/07/27 02:51:01 aa Exp $
+#     $Id: Star.pm,v 1.13 2003/07/27 03:19:06 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -79,14 +79,14 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.12 2003/07/27 02:51:01 aa Exp $
+$Id: Star.pm,v 1.13 2003/07/27 03:19:06 timj Exp $
 
 =head1 METHODS
 
@@ -199,7 +199,8 @@ the Star will change.
 Returns undef if the coordinates have never been specified.
 
 If the name() field is defined in the Astro::Coords object
-the id() field is set in the current Star object.
+the id() field is set in the current Star object. Similarly for
+the comment field.
 
 =cut
 
@@ -209,10 +210,15 @@ sub coords {
     my $c = shift;
     croak "Coordinates must be an Astro::Coords object"
       unless UNIVERSAL::isa($c, "Astro::Coords");
+
+    # force the ID and comment to match
+    $self->id( $c->name ) if defined $c->name;
+    $self->comment( $c->comment ) if defined $c->comment;
+
+    # Store the new coordinate object
+    # Storing it late stops looping from the id and comment methods
     $self->{COORDS} = $c;
 
-    # force the ID
-    $self->id( $c->name ) if defined $c->name;
   }
   return $self->{COORDS};
 }
@@ -763,12 +769,18 @@ Return (or set) a comment associated with the star
    $comment = $star->comment();
    $star->comment( $comment_string );
 
+The comment is propogated to the underlying coordinate
+object (if one is present) if the comment is updated.
+
 =cut
 
 sub comment {
   my $self = shift;
   if (@_) {
     $self->{COMMENT} = shift;
+
+    my $c = $self->coords;
+    $c->comment( $self->{COMMENT} ) if defined $c;
   }
   return $self->{COMMENT};
 }
