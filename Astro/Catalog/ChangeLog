@@ -1,3 +1,7 @@
+2005-15-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+        * IO/Astrom.pm: Add epoch of observation support.
+
 2005-02-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
         * Query/Query/2MASS.pm: Tell TST which column the ID is in when
