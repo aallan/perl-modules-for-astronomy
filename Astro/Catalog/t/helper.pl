@@ -1,3 +1,10 @@
+
+use strict;
+
+# Loading these here defeats the purpose of the use_ok in
+# the caller
+use Astro::Catalog::Star; # for DR2AS
+
 =head1 NAME
 
 helper - Test helper routines
@@ -61,7 +68,23 @@ sub compare_star {
 
   is( $refstar->id(), $newstar->id(), "compare star ID" );
 
-  ok( $refstar->coords->distance( $newstar->coords ) < 0.001, "compare distance between stars" );
+  # Distance is okay if we are within 1 arcsec
+  my $maxsec = 1;
+  my $radsep = $refstar->coords->distance( $newstar->coords );
+
+  if (!defined $radsep) {
+    # did not get any value. Too far away
+    ok( 0, "Error calculating star separation. Too far?");
+  } else {
+    # check that DR2AS is defined, at one stage it was not
+    my $check = Astro::Catalog::Star::DR2AS;
+    die "Error obtaining DR2AS" if not defined $check;
+    my $assep = $radsep * Astro::Catalog::Star::DR2AS;
+    ok( $assep < $maxsec, "compare distance between stars ($assep<$maxsec arcsec)" );
+  }
+
+
+
   is( $refstar->ra(), $newstar->ra(), "compare star RA" );
   is( $refstar->dec(), $newstar->dec(), "Compare star Dec" );
 
