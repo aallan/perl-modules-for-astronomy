@@ -83,7 +83,7 @@ my $catalog = new Astro::Catalog( RA     => '01 10 12.9',
 my $file_name = File::Spec->catfile( $ENV{"ESTAR_DATA"}, "temporary.cat" );
 
 # write it to /tmp/temporary.cat under UNIX
-$catalog->write_catalog( $file_name );
+$catalog->write_catalog( Format => 'Cluster', File => $file_name );
 
 # Compare output file and DATA block
 # ----------------------------------
@@ -108,7 +108,9 @@ for my $i (0 .. $#buffer) {
 my $cluster = new Astro::Catalog( RA      => '01 10 12.9',
                                   Dec     => '+60 04 35.9',
                                   Radius  => '1',
-                                  Cluster => $file_name );
+                                  File => $file_name,
+				  Format => 'Cluster',
+				);
 
 # Write Catalog to Cluster File
 # -----------------------------
@@ -116,7 +118,7 @@ my $cluster = new Astro::Catalog( RA      => '01 10 12.9',
 $file_name = File::Spec->catfile( $ENV{"ESTAR_DATA"}, "other.cat" );
 
 # write it to /tmp/other.cat under UNIX
-$cluster->write_catalog( $file_name );
+$cluster->write_catalog( Format => 'Cluster', File => $file_name );
 
 # Compare output file and DATA block
 # ----------------------------------
@@ -160,5 +162,5 @@ __DATA__
 5 colours were created
 B R V B-R B-V
 A sub-set of USNO-A2: Field centre at RA 01 10 12.90, Dec +60 04 35.90, Search Radius 1 arcminutes 
-00080  0  09 55 39.00  +60 07 23.60  0.000  0.000  16.4  0.4  0  16.1  0.1  0  16.3  0.3  0  0.3  0.05  0  0.1  0.02  0  
-00081  1  10 44 57.00  +12 34 53.50  0.000  0.000  9.3  0.2  0  9.5  0.6  0  9.1  0.1  0  0.2  0.07  0  -0.2  0.05  0  
+00080  U1500_01194794  09 55 39.00  +60 07 23.60  0.000 0.000 16.4  0.4  0  16.1  0.1  0  16.3  0.3  0  0.3  0.05  0  0.1  0.02  0  
+00081  U1500_01194795  10 44 57.00  +12 34 53.50  0.000 0.000 9.3  0.2  0  9.5  0.6  0  9.1  0.1  0  0.2  0.07  0  -0.2  0.05  0  
