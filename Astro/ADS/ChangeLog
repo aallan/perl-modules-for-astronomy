@@ -1,3 +1,11 @@
+2001-11-10  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* Result/Paper/Paper.pm (summary): Deal with undefined values
+
+	* adsquery.pl: Add --bibcode
+
+	* Result/Result.pm (summary): Fix -w warning
+
 2001-11-10 Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query.pm: Added bibcode() method and associated $self->{OPTIONS}

@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.10 2001/11/08 08:13:26 timj Exp $
+#     $Id: Paper.pm,v 1.11 2001/11/10 20:58:43 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -69,13 +69,13 @@ use vars qw/ $VERSION /;
 # Overloading
 use overload '""' => "stringify";
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.10 2001/11/08 08:13:26 timj Exp $
+$Id: Paper.pm,v 1.11 2001/11/10 20:58:43 timj Exp $
 
 =head1 METHODS
 
@@ -708,11 +708,17 @@ sub summary {
       }
 
     } else {
-      # Only a single thing. Just print it
+      # Only a single thing. Just print it. Check for definedness
       if ($args{format} eq 'XML') {
-	push(@output, "  <$lcfield>$results[0]</$lcfield>");
+	if (defined $results[0]) {
+	  push(@output, "  <$lcfield>$results[0]</$lcfield>");
+	} else {
+	  push(@output, "  <$lcfield/>");
+	}
       } else {
-	push(@output, sprintf("%-15s %s", ucfirst($lcfield).":", $results[0]));
+	push(@output, sprintf("%-15s %s", ucfirst($lcfield).":", 
+			      (defined $results[0] ? 
+			       $results[0] : "undefined")));
       }
 
     }

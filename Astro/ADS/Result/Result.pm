@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.12 2001/11/08 08:13:26 timj Exp $
+#     $Id: Result.pm,v 1.13 2001/11/10 20:58:43 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -54,13 +54,13 @@ use overload '""' => "stringify";
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.12 2001/11/08 08:13:26 timj Exp $
+$Id: Result.pm,v 1.13 2001/11/10 20:58:43 timj Exp $
 
 =head1 METHODS
 
@@ -258,13 +258,15 @@ sub summary {
   my @output;
 
   # If we are in XML mode we need to add a wrapper
-  push(@output, "<ADSResult>") if $args{format} eq 'XML';
+  push(@output, "<ADSResult>") if exists $args{format} and 
+    $args{format} eq 'XML';
 
   # loop over papers
   push(@output, map { $_->summary(%args) } $self->papers);
 
   # If we are in XML mode we need to add a wrapper
-  push(@output, "</ADSResult>") if $args{format} eq 'XML';
+  push(@output, "</ADSResult>") if exists $args{format} and 
+    $args{format} eq 'XML';
 
   return join("\n", @output). "\n";
 }
