@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.18 2003/07/27 01:24:21 aa Exp $
+#     $Id: Catalog.pm,v 1.19 2003/07/27 01:50:45 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.18 2003/07/27 01:24:21 aa Exp $
+$Id: Catalog.pm,v 1.19 2003/07/27 01:50:45 timj Exp $
 
 =head1 METHODS
 
@@ -492,6 +492,9 @@ sub configure {
     # grab the array reference and stuff it into the object
     $self->pushstar( @{ $args{stars} } );
 
+    # Make sure we do not loop over this later
+    delete( $args{stars} );
+
   } elsif ( defined $args{format} ) {
 
     # Need to read the IO class
@@ -504,7 +507,24 @@ sub configure {
     # Now need to either look for some data or read a file
     if ( defined $args{data}) {
 
-
+      # Need to extract the data from this and convert to array
+      if (not ref($args{data})) {
+	# must be a scalar
+	@lines = split /\n/, $args{data};
+      } else {
+	if (ref($args{data}) eq 'GLOB') {
+	  # A file handle
+	  local $/ = "\n";
+	  @lines = <$args{data}>;
+	} elsif (ref($args{data}) eq 'ARRAY') {
+	  # An array of lines
+	  @lines = @{ $args{data} };
+	} else {
+	  # Who knows
+	  croak "Can not extract catalog information from scalar of type ".
+	    ref($args{data}) ."\n";
+	}
+      }
 
     } else {
       # Look for a filename or the default file
@@ -537,11 +557,28 @@ sub configure {
     # Now read the catalog (overwriting $self)
     $self =  $ioclass->_read_catalog( \@lines );
 
+    # Remove used args
+    delete $args{format};
+    delete $args{file};
+    delete $args{data};
+	
   }
 
   # Define the field centre if provided
   # -----------------------------------
   $self->fieldcentre( %args );
+
+  # Remove field centre args
+  delete $args{ra};
+  delete $args{dec};
+  delete $args{coords};
+
+
+  # Loop over any remaining args
+  for my $key ( keys %args ) {
+    my $method = lc($key);
+    $self->$method( $args{$key} ) if $self->can($method);
+  }
 
   return $self;
 }
