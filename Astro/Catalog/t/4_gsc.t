@@ -5,7 +5,7 @@
 use strict;
 
 #load test
-use Test::More tests => 150;
+use Test::More tests => 159;
 use Data::Dumper;
 
 # Catalog modules need to be loaded first
@@ -127,11 +127,13 @@ print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 # Compare catalogues
 compare_catalog( $catalog_byname, $catalog_data);
 
+#print join("\n",$gsc_byname->_dump_raw)."\n";
+
 # quitting time
 exit;
 
 # D A T A   B L O C K  -----------------------------------------------------
-
+# nr gsc_id     ra   (2000)   dec       pos-e  mag mag-e  b c  pl  mu    d'  pa
 __DATA__
    1 0403000551 01 09 55.34 +60 00 37.4   0.2 12.18 0.40  1 0 01MU F;   4.54 209
    2 0403000725 01 10 02.45 +60 01 05.6   0.3 13.94 0.40  1 0 01MU F;   3.74 200

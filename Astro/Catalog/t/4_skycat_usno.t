@@ -5,7 +5,7 @@
 use strict;
 
 #load test
-use Test::More tests => 336;
+use Test::More tests => 351;
 use Data::Dumper;
 
 BEGIN {
@@ -172,7 +172,7 @@ exit;
 
 
 # D A T A   B L O C K  -----------------------------------------------------
-
+# nr ID              ra           dec        r_mag b_mag  q field gsc    d'     pa
 __DATA__
    1 U1500_01193693  01 10 08.76 +60 05 10.2  16.2  18.8   0 00080  -   0.770 317.921
    2 U1500_01194083  01 10 10.31 +60 04 42.4  18.2  19.6   0 00080  -   0.341 288.524

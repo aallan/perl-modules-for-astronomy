@@ -93,6 +93,13 @@ sub compare_star {
       substr($refstar->dec(),0,9), 
       "Compare [truncated] star Dec" );
 
+  # Compare field if the reference has a field
+  if (defined $refstar->field) {
+    is($cmpstar->field, $refstar->field, "Compare field");
+  }
+
+
+  # Filter comparisons
   my @cmp_filters = $cmpstar->what_filters();
   my @ref_filters = $refstar->what_filters();
   is( scalar(@cmp_filters), scalar(@ref_filters), "compare filter count");
@@ -127,7 +134,8 @@ sub compare_star {
   is( $cmpstar->quality(), $refstar->quality(), "check quality" );
   is( $cmpstar->field(), $refstar->field(), "check field" );
   is( $cmpstar->gsc(), $refstar->gsc() , "check GSC flag");
-  is( $cmpstar->distance(), $refstar->distance() ,"check distance");
+  is( $cmpstar->distance(), $refstar->distance() ,
+      "check distance from field centre");
   is( $cmpstar->posangle(), $refstar->posangle(), "check posangle" );
 
 }
