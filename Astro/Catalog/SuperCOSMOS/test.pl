@@ -13,12 +13,25 @@
   use threads::shared;
 
   # load modules
-  use Astro::Aladin;
-  use Astro::Aladin::LowLevel;
+  eval "use Astro::Aladin";
+  if ($@) {
+    print "Astro::Aladin module not installed";
+    exit;
+  }
+  
+  eval "use Astro::Aladin::LowLevel";
+  if ($@) {
+    print "Astro::Aladin::LowLevel module not installed";
+    exit;
+  }
   use Astro::Catalog;
   use Astro::Catalog::Star;
-  use Astro::Catalog::SuperCOSMOS::Query;
-
+  eval "use Astro::Catalog::SuperCOSMOS::Query";
+  if ($@) {
+    print "Astro::Catalog::SuperCOSMOS::Query module not installed";
+    exit;
+  }
+  
   # debugging
   use Data::Dumper;
 

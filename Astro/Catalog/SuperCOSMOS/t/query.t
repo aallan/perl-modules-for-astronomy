@@ -12,7 +12,7 @@ BEGIN { plan tests => 1 };
 # Load Astro::Catalog;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-use Astro::Catalog::SuperCOSMOS::Query;
+eval "use Astro::Catalog::SuperCOSMOS::Query";
 if ($@) {
   for (1..1) {
     skip("Skip Astro::Aladin module not available", 1);
