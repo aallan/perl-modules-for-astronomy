@@ -1,0 +1,44 @@
+Astro::Telescope
+================
+
+This class can be used to retrieve and process details of particular
+telescopes. It can be used to determine the location and altitude
+of a telescope as well as the observational limits.
+
+The list of supported telescopes can be obtained from the SLALIB
+documentation: http://star-www.rl.ac.uk/star/docs/sun67.htx/sun67.html
+(in particular the slaObs routine).
+
+Requirements
+------------
+
+This class uses Astro::SLA. In the future this dependency will
+be removed and the telescope tables will be kept internally.
+
+Building
+--------
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The test make sure some simple parameters can be obtained and
+that limits work as expected.
+
+
+Author
+------
+
+This module was written by Tim Jenness  <t.jenness@jach.hawaii.edu>
+of the Joint Astronomy Centre.
+
+Copyright (C) 1998-2002 Particle Physics and Astronomy Research Council.
+All Rights Reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+Changes
+-------
+
+  v0.50 - First release to CPAN
+
