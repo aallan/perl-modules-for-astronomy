@@ -1,3 +1,13 @@
+  ! Modifcation history.
+
+  ! Originally written for the eSTAR LX200 e-science demonstrator.
+
+  ! Modified in August 2003 for the UKIRT tests.  Much of the stuff
+  ! which was specific for USNO A2 vs optical data (likely accuracy of
+  ! of photometry, number of correlations etc) changed into parameters
+  ! set at the head of the corlate code.
+
+
   module corlate_subs
 
     implicit none
@@ -155,21 +165,42 @@
       real :: a, b, chisq
       integer :: nclip
 
-      ! For calculating the mean seperation.
-      real :: another_alpha, another_delta, dist, dist_mean
+      ! For calculating the modal separation.
+      real :: another_alpha, another_delta
+      real :: mod_shift_alpha, mod_shift_delta
+      real, dimension(:), allocatable :: dist_alpha, dist_delta
+      ! For the mean.
+      real :: dist_mean, dist
 
       ! For the probablility.
       integer, parameter :: mprob=101
       real, dimension(mprob) :: bin
       integer :: nprob, iprob, ibin
       real, allocatable, dimension(:) :: prob
-      real :: delta_mag
+      real :: delta_mag, abs_delta_mag
+
+      ! Some things you may want to tweak.
+      ! The minimum number of stars in common you must have.
+      integer, parameter :: minpair=3
+      ! The lowest signal-to-noise stars you will use in the correlation.
+      real, parameter :: lowest_sn=0.2
+      ! The false alarm probablility you are prepared to accept.
+      real, parameter :: accept_prob=0.05
+      ! Set this true if you want to find stars that have faded as well as
+      ! those which have brightened.
+      logical, parameter :: allow_fading=.true.
+      ! The initial search radius.
+      real, parameter :: inital_rad=8.0
+      ! Search radius after tweaking positions.
+      real, parameter :: final_rad=1.0
+      ! Minimum change in magnitude to believe variable.
+      real, parameter :: min_mag_change=1.0
 
       ! Start as we mean to go on.
       corlate=0
       open(unit=2, file=file_name_3, status='unknown')
 
-      fixrad=3.0
+      fixrad=inital_rad
 
       open(1,file=file_name_1, status='old', iostat=iostat, action='read')
       if (iostat /= 0) then
@@ -209,7 +240,8 @@
 
       allocate(matches(nstars1))
       npair=0
-      dist_mean=0.0
+
+      allocate(dist_alpha(nstars2), dist_delta(nstars2))
 
       rad: do istar=1, nstars2
 
@@ -219,25 +251,21 @@
         if (n_matches > 0) then
 
           ! Now, go through the reasons for not fitting this star.
-          if (star2(istar)%col(1)%err > 0.1) cycle rad
+          if (star2(istar)%col(1)%err > lowest_sn) cycle rad
           if (star2(istar)%col(1)%flg /= 0) cycle rad
           if (star1(matches(1))%col(1)%flg /= 0) cycle rad
           if (star1(matches(1))%col(2)%flg /= 0) cycle rad
 
           ! O.K., its one we want.
 
+          npair=npair+1
+
           ! First find the separation.
           call radec2rad(star2(istar)%ra_h, star2(istar)%ra_m, &
           star2(istar)%ra_s, star2(istar)%dc_d, star2(istar)%dc_m, &
           star2(istar)%dc_s, another_alpha, another_delta)
-          dist=(another_alpha-alpha(matches(1)))
-          dist=dist*cos((another_delta+delta(matches(1)))/2.0)
-          dist=dist**2.0
-          dist=dist+(another_delta-delta(matches(1)))**2.0
-          dist=sqrt(dist)*206264.8
-          dist_mean=dist_mean+(dist*dist)
-
-          npair=npair+1
+          dist_alpha(npair)=(another_alpha-alpha(matches(1)))
+          dist_delta(npair)=(another_delta-delta(matches(1)))
 
         end if
 
@@ -245,12 +273,17 @@
 
       write(2,*) 'Number of pairs for first pass was ', npair
 
-      if (npair > 10) then
-        dist_mean=sqrt(dist_mean/real(npair))
-        write(2,*) 'Which gave a mean separation of ', dist_mean
-        ! We have some objects with significant proper motions, so let
-        ! the slop be 3 arcsec plus the RMS.
-        fixrad = sqrt ( (3.0*dist_mean)**2.0 + 3.0**2.0)
+      dist_alpha=dist_alpha*206264.8
+      dist_delta=dist_delta*206264.8*cos(delta(1))
+      mod_shift_alpha=median(dist_alpha, npair)
+      mod_shift_delta=median(dist_delta, npair)
+
+      deallocate(dist_alpha, dist_delta)
+
+      if (npair >= minpair) then
+        write(2,*) 'Which gave a modal separations in RA and dec of ', &
+        mod_shift_alpha, mod_shift_delta, ' arcseconds.'
+        fixrad = final_rad
       else        
         write(2,*) 'Too few pairs to continue.'
         corlate=-3
@@ -258,6 +291,9 @@
         close(2)
         return
       end if
+
+      mod_shift_alpha=mod_shift_alpha/206264.8
+      mod_shift_delta=mod_shift_delta/(206264.8*cos(delta(1)))
 
       allocate(pair(nstars2))
       npair=0
@@ -271,7 +307,7 @@
 
       new_star: do istar=1, nstars2
 
-        call match_them(nstars1, star1, alpha, delta, star2(istar), &
+        call match_them(nstars1, star1, alpha+mod_shift_alpha, delta+mod_shift_delta, star2(istar), &
         fixrad, matches, n_matches)
 
         if (n_matches == 0) then
@@ -280,7 +316,7 @@
         else
 
           ! Now, go through the reasons for not fitting this star.
-          if (star2(istar)%col(1)%err > 0.1) cycle new_star
+          if (star2(istar)%col(1)%err > lowest_sn) cycle new_star
           if (star2(istar)%col(1)%flg /= 0) cycle new_star
           if (star1(matches(1))%col(1)%flg /= 0) cycle new_star
           if (star1(matches(1))%col(2)%flg /= 0) cycle new_star
@@ -291,10 +327,10 @@
           call radec2rad(star2(istar)%ra_h, star2(istar)%ra_m, &
           star2(istar)%ra_s, star2(istar)%dc_d, star2(istar)%dc_m, &
           star2(istar)%dc_s, another_alpha, another_delta)
-          dist=(another_alpha-alpha(matches(1)))
+          dist=(another_alpha-alpha(matches(1))-mod_shift_alpha)
           dist=dist*cos((another_delta+delta(matches(1)))/2.0)
           dist=dist**2.0
-          dist=dist+(another_delta-delta(matches(1)))**2.0
+          dist=dist+(another_delta-delta(matches(1))-mod_shift_delta)**2.0
           dist=sqrt(dist)*206264.8
           dist_mean=dist_mean+(dist*dist)
 
@@ -337,7 +373,7 @@
 
       write(2,*) 'Number of pairs for fitting is ', npair
 
-      if (npair > 10) then
+      if (npair >= minpair) then
 
         dist_mean=sqrt(dist_mean/real(npair))
         write(2,*) 'Whose mean separation is ', dist_mean, ' arcsec.'
@@ -369,13 +405,21 @@
         nprob=0
         do istar=1, npair
           delta_mag = pair(istar)%col(1)%data - a-b*pair(istar)%col(2)%data
-          if (delta_mag > 0.0) then
+          !print*, delta_mag
+          if (allow_fading) then
+            abs_delta_mag=abs(delta_mag)
+          else
+            abs_delta_mag=delta_mag
+          end if
+          if (abs_delta_mag > min_mag_change) then
             nprob=nprob+1
             ! Work out the probablility, after scaling the error bar by chisq.
             prob(nprob)= &
-            pchisq(((delta_mag/pair(istar)%col(1)%err)**2.0)/chisq)
+            pchisq(((abs_delta_mag/pair(istar)%col(1)%err)**2.0)/chisq)
             prob(nprob)=1.0-(1.0-prob(nprob))**real(npair)
-            if (prob(nprob) < 0.01) then
+            ! One day we should correct the above to be two 
+            ! sided if (allow_fading).
+            if (prob(nprob) < accept_prob) then
               ! Change colour 1 to be the change in magnitde.
               pair(istar)%col(1)%data = -delta_mag
               call write_star(1, pair(istar), 4)
@@ -433,5 +477,40 @@
 
             
     end function corlate
+
+    real function median(srtbuf, nfile)
+
+      ! Finds the median value in steps of 1.  Needs generalising.
+
+      real, intent(out), dimension(:) :: srtbuf
+      integer, intent(in) :: nfile
+
+      integer :: k, l, m
+      real :: aval
+      integer, dimension(:), allocatable :: count
+
+      do 140 k=2, nfile
+        aval=srtbuf(k)
+        do l=1, k-1
+          if (aval .lt. srtbuf(l)) then
+            do m=k, l+1, -1
+              srtbuf(m)=srtbuf(m-1)
+            end do
+            srtbuf(l)=aval
+            goto 140
+          endif
+        end do
+140   continue
+
+      allocate(count(nint(srtbuf(1)):nint(srtbuf(nfile))))
+      count=0
+      do k=1, nfile
+        l=nint(srtbuf(k))
+        count(l)=count(l)+1
+      end do
+      median=real(minval(maxloc(count)))+nint(srtbuf(1))-1
+      deallocate(count)
+
+    end function median
 
   end module corlate_subs
