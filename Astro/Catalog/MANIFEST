@@ -1,0 +1,10 @@
+README
+MANIFEST
+Makefile.PL
+GPL
+ChangeLog
+Catalog.pm
+Star/Star.pm
+Star/Makefile.PL
+t/star.t
+t/catalog.t
