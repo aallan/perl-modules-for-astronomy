@@ -1,3 +1,10 @@
+2005-02-02  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.9.0)
+
+        * Star/Star.pm: Fixed quality comparison in line 860 (now 865) so 
+          it can handle undef values. Not sure this was the right thing to, 
+          why was it getting undef values to start with? This could indicate 
+          a bug in one of the IO plugin modules?
+
 2005-02-02  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
         * t/2_astrom.t: __DATA__ section needed updating to use publically-
