@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.7 2003/06/09 04:03:44 aa Exp $
+#     $Id: Catalog.pm,v 1.8 2003/06/09 04:04:36 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -55,14 +55,14 @@ use vars qw/ $VERSION /;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.7 2003/06/09 04:03:44 aa Exp $
+$Id: Catalog.pm,v 1.8 2003/06/09 04:04:36 aa Exp $
 
 =head1 METHODS
 
@@ -551,7 +551,7 @@ sub _read_cluster {
    my $self = shift;
    my @catalog = @_;
 
-   # loop through file
+   # loop through catalog
    foreach my $i ( 3 .. $#catalog ) {
  
       # remove leading spaces
@@ -587,8 +587,8 @@ sub _read_cluster {
       $star->y( $separated[9] );
       
       # number of magnitudes and colours
-      $file[1] =~ s/^\s+//;
-      my @colours = split( /\s+/, $file[1] );
+      $catalog[1] =~ s/^\s+//;
+      my @colours = split( /\s+/, $catalog[1] );
       
       my @quality;
       foreach my $j ( 0 .. $#colours ) {
