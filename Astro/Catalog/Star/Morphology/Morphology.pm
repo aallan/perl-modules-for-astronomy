@@ -23,7 +23,7 @@ use Class::Struct;
 
 use warnings::register;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 METHODS
 
@@ -50,6 +50,7 @@ struct ( 'Astro::Catalog::Star::Morphology',
            minor_axis_pixel => '$',
            major_axis_world => '$',
            minor_axis_world => '$',
+           area => '$',
          }
        );
 
@@ -89,11 +90,16 @@ Length of the semi-major axis in units of degrees.
 
 Length of the semi-minor axis in units of degrees.
 
+=item B<area>
+
+Area of the object, usually by using isophotal techniques, in square
+pixels.
+
 =back
 
 =head1 REVISION
 
- $Id: Morphology.pm,v 1.1 2004/11/24 01:16:33 cavanagh Exp $
+ $Id: Morphology.pm,v 1.2 2004/12/22 01:42:24 cavanagh Exp $
 
 =head1 COPYRIGHT
 
