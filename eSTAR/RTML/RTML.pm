@@ -19,7 +19,7 @@ package eSTAR::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.3 2002/03/18 06:20:00 aa Exp $
+#     $Id: RTML.pm,v 1.4 2003/06/03 21:24:50 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -54,13 +54,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.3 2002/03/18 06:20:00 aa Exp $
+$Id: RTML.pm,v 1.4 2003/06/03 21:24:50 aa Exp $
 
 =head1 METHODS
 
@@ -72,7 +72,8 @@ $Id: RTML.pm,v 1.3 2002/03/18 06:20:00 aa Exp $
 
 Create a new instance from a hash of options
 
-  $rtml = new eSTAR::RTML( File => $rtml_file );
+  $rtml_object = new eSTAR::RTML( File => $rtml_file );
+  $rtml_object = new eSTAR::RTML( Source => $rtml_document );
 
 returns a reference to an RTML object.
 
@@ -180,7 +181,7 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / File / ) {
+  for my $key (qw / File Source / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -208,6 +209,25 @@ sub file {
   return ${${${$self->{DOCUMENT}}[1]}[0]}{'dtd'};
 }
 
+=item B<source>
+
+Populates the object from a scalar returning the version number of the DTD.
+
+   $dtd = $rtml->source( $rtml );
+
+This method is called directly from configure() is the C<Document> key and 
+value is passed into to teh object in the %options hash.
+
+=cut
+
+sub source {
+  my $self = shift;
+  if (@_) { 
+     my $rtml = shift;
+     $self->{DOCUMENT} = $self->{XML}->parse( $rtml );
+  }
+  return ${${${$self->{DOCUMENT}}[1]}[0]}{'dtd'};
+}
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 

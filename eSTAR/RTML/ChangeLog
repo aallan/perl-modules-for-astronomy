@@ -4,7 +4,10 @@
           to straight exposure time requests. Removed freeze() function.
 
         * Parse.pm: Added support for Signal-to-noise.
-                  
+            
+        * RTML.pm: Added support for RTML documents from scalars as well as
+          from a file.
+                    
 2002-03-29  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Added freeze() functions for persistent store
