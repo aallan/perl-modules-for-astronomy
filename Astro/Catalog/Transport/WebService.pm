@@ -20,7 +20,7 @@ in the C<Astro::Catalog> distribution (eg C<Astro::Catalog::Query::Sesame>).
 use 5.006;
 use strict;
 use warnings;
-use base qw/ Astro::Catalog::BaseQuery /;
+use base qw/ Astro::Catalog::Query /;
 use vars qw/ $VERSION /;
 
 use SOAP::Lite;
@@ -32,11 +32,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: WebService.pm,v 1.1 2003/07/29 04:11:57 aa Exp $
+$Id: WebService.pm,v 1.2 2003/07/29 20:15:12 aa Exp $
 
 =head1 METHODS
 

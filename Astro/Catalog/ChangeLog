@@ -1,3 +1,9 @@
+2003-07-29  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Moved Astro::Catalog::BaseQuery to be Astro::Catalog::Query in
+          preparation for it be a 'proprt' polymorphic factory class for
+          generic catalogue queries.
+          
 2003-07-28  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Moved the catalogue query classes to chare a common namespace,

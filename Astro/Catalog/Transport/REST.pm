@@ -21,7 +21,7 @@ in the C<Astro::Catalog> distribution (eg C<Astro::Catalog::Query::GSC>).
 use 5.006;
 use strict;
 use warnings;
-use base qw/ Astro::Catalog::BaseQuery /;
+use base qw/ Astro::Catalog::Query /;
 use vars qw/ $VERSION /;
 
 use LWP::UserAgent;
@@ -33,11 +33,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: REST.pm,v 1.2 2003/07/29 04:11:57 aa Exp $
+$Id: REST.pm,v 1.3 2003/07/29 20:15:12 aa Exp $
 
 =head1 METHODS
 
