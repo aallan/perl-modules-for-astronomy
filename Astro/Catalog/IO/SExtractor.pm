@@ -75,11 +75,21 @@ sub _read_catalog {
   # Set up columns.
   my $id_column = -1;
   my $x_column = -1;
+  my $xerr_column = -1;
   my $y_column = -1;
+  my $yerr_column = -1;
   my $ra_column = -1;
   my $dec_column = -1;
   my $mag_column = -1;
   my $magerr_column = -1;
+  my $ell_column = -1;
+  my $posang_pixel_column = -1;
+  my $posang_world_column = -1;
+  my $minor_pixel_column = -1;
+  my $major_pixel_column = -1;
+  my $minor_world_column = -1;
+  my $major_world_column = -1;
+  my $area_column = -1;
 
   # Loop through the lines.
   for ( @lines ) {
@@ -91,20 +101,57 @@ sub _read_catalog {
     # flux.
     if( $line =~ /^#/ ) {
       my @column = split( /\s+/, $line );
-      if( $column[2] =~ /NUMBER/ ) {
+      if( $column[2] =~ /^NUMBER/ ) {
         $id_column = $column[1] - 1;
-      } elsif( $column[2] =~ /X_IMAGE/ ) {
+        print "ID column is $id_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^X_IMAGE/ ) {
         $x_column = $column[1] - 1;
-      } elsif( $column[2] =~ /Y_IMAGE/ ) {
+        print "X column is $x_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^Y_IMAGE/ ) {
         $y_column = $column[1] - 1;
-      } elsif( $column[2] =~ /ALPHA_J2000/ ) {
+        print "Y column is $y_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^X2_IMAGE/ ) {
+        $xerr_column = $column[1] - 1;
+        print "X ERROR column is $xerr_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^Y2_IMAGE/ ) {
+        $yerr_column = $column[1] - 1;
+        print "Y ERROR column is $yerr_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^ALPHA_J2000/ ) {
         $ra_column = $column[1] - 1;
-      } elsif( $column[2] =~ /DELTA_J2000/ ) {
+        print "RA column is $ra_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^DELTA_J2000/ ) {
         $dec_column = $column[1] - 1;
-      } elsif( $column[2] =~ /MAG_ISOCOR/ ) {
+        print "DEC column is $dec_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^MAG_ISOCOR/ ) {
         $mag_column = $column[1] - 1;
-      } elsif( $column[2] =~ /MAGERR_ISOCOR/ ) {
+        print "MAG column is $mag_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^MAGERR_ISOCOR/ ) {
         $magerr_column = $column[1] - 1;
+        print "MAG ERROR column is $magerr_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^ELLIPTICITY/ ) {
+        $ell_column = $column[1] - 1;
+        print "ELLIPTICITY column is $ell_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^THETA_IMAGE/ ) {
+        $posang_pixel_column = $column[1] - 1;
+        print "POSITION ANGLE (PIXELS) column is $posang_pixel_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^THETA_WORLD/ ) {
+        $posang_world_column = $column[1] - 1;
+        print "POSITION ANGLE (WORLD) column is $posang_world_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^B_IMAGE/ ) {
+        $minor_pixel_column = $column[1] - 1;
+        print "MINOR AXIS (PIXELS) column is $minor_pixel_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^A_IMAGE/ ) {
+        $major_pixel_column = $column[1] - 1;
+        print "MAJOR AXIS (PIXELS) column is $major_pixel_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^B_WORLD/ ) {
+        $minor_world_column = $column[1] - 1;
+        print "MINOR AXIS (WORLD) column is $minor_world_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^A_WORLD/ ) {
+        $major_world_column = $column[1] - 1;
+        print "MAJOR AXIS (WORLD) column is $major_world_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^ISOAREA_IMAGE/ ) {
+        $area_column = $column[1] - 1;
+        print "AREA column is $area_column\n" if $DEBUG;
       }
       next;
     }
@@ -122,9 +169,9 @@ sub _read_catalog {
 
     # Grab the coordinates, forming an Astro::Coords object.
     my $coords = new Astro::Coords( type => 'J2000',
-                                    ra => $fields[$ra_column],
-                                    dec => $fields[$dec_column],
-                                    name => $fields[$id_column],
+                                    ra => ( $ra_column != -1 ? $fields[$ra_column] : undef ),
+                                    dec => ( $dec_column != -1 ? $fields[$dec_column] : undef ),
+                                    name => ( $id_column != -1 ? $fields[$id_column] : undef ),
                                     units => 'degrees',
                                   );
 
@@ -133,10 +180,30 @@ sub _read_catalog {
 
     # Set the magnitude and the magnitude error. Set the filter
     # to 'unknown' because SExtractor doesn't know about such things.
-    my %mags = ( 'unknown' => $fields[$mag_column] );
-    $star->magnitudes( \%mags );
-    my %magerrs = ( 'unknown' => $fields[$magerr_column] );
-    $star->magerr( \%magerrs );
+    if( $mag_column != -1 ) {
+      my %mags = ( 'unknown' => $fields[$mag_column] );
+      $star->magnitudes( \%mags );
+    }
+    if( $magerr_column != -1 ) {
+      my %magerrs = ( 'unknown' => $fields[$magerr_column] );
+      $star->magerr( \%magerrs );
+    }
+
+    # Set the x and y coordinates.
+    $star->x( ( $x_column != -1 ? $fields[$x_column] : undef ) );
+    $star->y( ( $y_column != -1 ? $fields[$y_column] : undef ) );
+
+    # Set up the star's morphology.
+    my $morphology = new Astro::Catalog::Star::Morphology( ellipticity => ( $ell_column != -1 ? $fields[$ell_column] : undef ),
+                                                           position_angle_pixel => ( $posang_pixel_column != -1 ? $fields[$posang_pixel_column] : undef ),
+                                                           position_angle_world => ( $posang_world_column != -1 ? $fields[$posang_world_column] : undef ),
+                                                           major_axis_pixel => ( $major_pixel_column != -1 ? $fields[$major_pixel_column] : undef ),
+                                                           minor_axis_pixel => ( $minor_pixel_column != -1 ? $fields[$minor_pixel_column] : undef ),
+                                                           major_axis_world => ( $major_world_column != -1 ? $fields[$major_world_column] : undef ),
+                                                           minor_axis_world => ( $minor_world_column != -1 ? $fields[$minor_world_column] : undef ),
+                                                           area => ( $area_column != -1 ? $fields[$area_column] : undef ),
+                                                         );
+    $star->morphology( $morphology );
 
     # Push the star onto the catalog.
     $catalog->pushstar( $star );
@@ -167,7 +234,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.1 2004/11/23 01:17:26 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.2 2004/12/22 01:39:46 cavanagh Exp $
 
 =head1 FORMAT
 
