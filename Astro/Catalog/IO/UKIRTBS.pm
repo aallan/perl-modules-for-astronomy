@@ -55,13 +55,18 @@ sub _read_catalog {
   # Go through each line and parse it
   my @stars;
   for my $l ( @$lines ) {
-    my $bs = substr($l,0,8); $bs =~ s/^\s+//;
+    # benchmarks suggest that substr is faster than an unpack
+    my $bs = substr($l,0,8);
     my $ra = substr($l,9,12);
     my $dec = substr($l,21,12);
     my $rap = substr($l,34,4);
     my $decp = substr($l,40,4);
     my $mag = substr($l,46,4);
-    my $type = substr($l,50);chomp($type);
+    my $type = substr($l,50);
+
+    # Tidy the result
+    chomp($type);
+    $bs =~ s/^\s+//;
 
     # Create coordinate object
     my $c = new Astro::Coords( ra => $ra,
