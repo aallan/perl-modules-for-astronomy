@@ -21,7 +21,7 @@ package Astro::Corlate;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Corlate.pm,v 1.5 2001/12/18 23:48:14 aa Exp $
+#     $Id: Corlate.pm,v 1.6 2002/03/31 21:58:20 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -80,13 +80,13 @@ use Astro::Corlate::Wrapper qw / corlate /;
 use File::Spec;
 use Carp;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Corlate.pm,v 1.5 2001/12/18 23:48:14 aa Exp $
+$Id: Corlate.pm,v 1.6 2002/03/31 21:58:20 aa Exp $
 
 =head1 METHODS
 
@@ -235,7 +235,15 @@ Returns the full path to the Corlate log file
 
 =cut
 
-sub logfile { my $self = shift; return ${$self->{FILES}}{"logfile"}; }
+sub logfile { 
+  my $self = shift; 
+
+  if (@_) { 
+    ${$self->{FILES}}{"logfile"} = shift;
+  }
+    
+  return ${$self->{FILES}}{"logfile"}; 
+}
 
 =item B<Variables>
 
@@ -245,7 +253,15 @@ Returns the full path to the variable star catalogue file
 
 =cut
 
-sub variables { my $self = shift; return ${$self->{FILES}}{"variables"}; }
+sub variables { 
+   my $self = shift; 
+
+  if (@_) { 
+    ${$self->{FILES}}{"variables"} = shift;
+  }   
+   
+   return ${$self->{FILES}}{"variables"}; 
+ }
 
 =item B<Data>
 
@@ -255,7 +271,14 @@ Returns the full path to the catalogue file containing the fitted colour data
 
 =cut
 
-sub data { my $self = shift; return ${$self->{FILES}}{"data"}; }
+sub data { 
+   my $self = shift; 
+
+  if (@_) { 
+    ${$self->{FILES}}{"data"} = shift;
+  }     
+   return ${$self->{FILES}}{"data"}; 
+}
 
 =item B<Fit>
 
@@ -265,7 +288,15 @@ Returns the full path to the X-Y file defining the fit to the colour data
 
 =cut
 
-sub fit { my $self = shift; return ${$self->{FILES}}{"fit"}; }
+sub fit { 
+   my $self = shift; 
+ 
+  if (@_) { 
+    ${$self->{FILES}}{"fit"} = shift;
+  }   
+   
+   return ${$self->{FILES}}{"fit"}; 
+}
 
 =item B<Histogram>
 
@@ -275,7 +306,15 @@ Returns the full path to the X-Y data file of the probability histogram
 
 =cut
 
-sub histogram { my $self = shift; return ${$self->{FILES}}{"histogram"}; }
+sub histogram { 
+   my $self = shift; 
+  
+  if (@_) { 
+    ${$self->{FILES}}{"histogram"} = shift;
+  }     
+   
+   return ${$self->{FILES}}{"histogram"}; 
+}
 
 =item B<Information>
 
@@ -285,7 +324,15 @@ Returns the full path to the Corlate useful information file
 
 =cut
 
-sub information { my $self = shift; return ${$self->{FILES}}{"information"}; }
+sub information { 
+   my $self = shift; 
+  
+  if (@_) { 
+    ${$self->{FILES}}{"information"} = shift;
+  }     
+    
+   return ${$self->{FILES}}{"information"}; 
+}
 
 # C O N F I G U R E -------------------------------------------------------
 

@@ -355,7 +355,7 @@
         write(1,*) work, a+b*work
         work=maxval(pair(1:npair)%col(2)%data+pair(1:npair)%col(2)%err)
         write(1,*) work, a+b*work
-
+        close(1)
 
         open(unit=1, file=file_name_4, status='unknown')
         write(1,*) '4 colours, ', dist_mean, ' arcsec RMS separation.'
