@@ -168,8 +168,8 @@ print "# Connecting to ADS\n";
 my $cites = $paper->citations();
 print "# Continuing Tests\n";
 
-# currently should be 6 citations on ADS for this paper
-ok( $cites->sizeof(), 6 );
+# currently should be 7 citations on ADS for this paper
+ok( $cites->sizeof(), 7 );
 
 # shouldn't be a TOC with this paper
 print "# Connecting to ADS\n";
