@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.8 2003/07/24 19:43:13 timj Exp $
+#     $Id: Star.pm,v 1.9 2003/07/25 00:45:43 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -79,14 +79,14 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.8 2003/07/24 19:43:13 timj Exp $
+$Id: Star.pm,v 1.9 2003/07/25 00:45:43 timj Exp $
 
 =head1 METHODS
 
@@ -263,8 +263,6 @@ sub ra {
 
     # Update the object
     $self->coords($c);
-
-    print $c->status;
   }
 
   my $outc = $self->coords;
@@ -315,10 +313,6 @@ sub dec {
     # Issue a warning specifically for this call
     my @info = caller();
     warnings::warnif("deprecated","Use of ra() method for setting RA now deprecated. Please use the coords() method instead, at $info[1] line $info[2]");
-
-    print "Reading DEc: $dec\n";
-    use Data::Dumper;
-    print Dumper([caller]);
 
     # Get the coordinate object
     my $c = $self->coords;
@@ -772,11 +766,8 @@ sexagesimal.
 sub configure {
   my $self = shift;
 
-  use Data::Dumper;
-  print Dumper(\@_);
-
   # return unless we have arguments
-  return undef unless @_;
+  return unless @_;
 
   # grab the argument list
   my %args = @_;

@@ -10,6 +10,8 @@ ChangeLog
 Catalog.pm
 Star/Star.pm
 Star/Makefile.PL
+BaseQuery/BaseQuery.pm
+BaseQuery/Makefile.PL
 USNOA2/README
 USNOA2/MANIFEST
 USNOA2/Makefile.PL

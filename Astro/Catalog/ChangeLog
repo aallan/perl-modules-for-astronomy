@@ -5,6 +5,8 @@
           
 2003-07-24  Tim Jenness <timj@jach.hawaii.edu>
 
+	* BaseQuery/BaseQuery.pm: Write base class for catalog query classes.
+
 	* Catalog.pm (_read_cluster): No longer use ra() and dec() methods
 	to set the ra and dec (store the Astro::Coords object directly)
 
