@@ -19,7 +19,7 @@ package Astro::Catalog::USNOA2::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.4 2002/01/24 22:15:09 aa Exp $
+#     $Id: Query.pm,v 1.5 2002/01/25 16:43:27 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -40,7 +40,7 @@ Astro::Catalog::USNOA2::Query - A query request to the USNO-A2.0 Catalog
                                              Bright    => $magbright,
                                              Faint     => $magfaint,
                                              Sort      => $sort_type,
-                                             Nout      => $number_out );
+                                             Number    => $number_out );
       
   my $catalog = $usno->querydb();
 
@@ -70,13 +70,13 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.4 2002/01/24 22:15:09 aa Exp $
+$Id: Query.pm,v 1.5 2002/01/25 16:43:27 aa Exp $
 
 =head1 METHODS
 
@@ -472,7 +472,7 @@ sub sort {
 
 =item B<Number>
 
-The number of objects to return, defaults to 20,000 which should hopefully
+The number of objects to return, defaults to 2000 which should hopefully
 be sufficent to return all objects of interest. This value should be increased
 if a (very) large sample radius is requested.
 
