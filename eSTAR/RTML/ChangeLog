@@ -1,5 +1,10 @@
 2005-02-08  Alasdair Allan <aa@astro.ex.ac.uk>
 
+         * Changed things so that we can now specify both the "type" and "ident"
+           attributes of the <Target> tag.
+           
+2005-02-07  Alasdair Allan <aa@astro.ex.ac.uk>
+
          * Build.pm & Parse.pm: Added targettype() method so we can now 
            specify the TargetType attribute in the <Target type=""></Target>
            tag.

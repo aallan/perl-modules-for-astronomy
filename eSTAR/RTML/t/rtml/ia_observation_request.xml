@@ -48,7 +48,7 @@
 	</Altitude>
     </Location>
     <Observation status="ok">
-	<Target type="normal">
+	<Target type="normal" ident="Observation">
 	    <TargetName>
 	        Test Target 2
 	    </TargetName>

@@ -141,7 +141,7 @@ my $message5 = new eSTAR::RTML::Build(
 # build a score request
 $status = $message5->request_observation(
              Target => 'Test Target',
-             TargetType => 'very odd',
+             TargetIdent => 'very odd',
              RA     => '09 00 00',
              Dec    => '+60 00 00', 
              Snr    => '5.0',
@@ -154,7 +154,7 @@ ok( $message5->ra(), '09 00 00' );
 ok( $message5->dec(), '+60 00 00' );
 ok( $message5->snr(), '5.0' );
 ok( $message5->flux(), '12.0' );
-ok( $message5->targettype(), 'very odd' );
+ok( $message5->targetident(), 'very odd' );
 
 # dump out the request
 my $doc5 = $message5->dump_rtml();

@@ -126,8 +126,8 @@ ok( $type, 'score' );
 # pass it to the Parse module
 my $score_message = new eSTAR::RTML::Parse( RTML => $ers_score );
 
-my $target_type = $score_message->targettype();
-ok( $target_type, 'normal' );
+my $target_ident = $score_message->targetident();
+ok( $target_ident, 'Observation' );
 
 # check the parsed document
 ok( $score_message->dtd(), '2.1' );

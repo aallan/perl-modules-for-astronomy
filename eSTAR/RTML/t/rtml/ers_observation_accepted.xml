@@ -132,7 +132,7 @@
 	    Replaced if filled in by the IA (see Score above).
 	</CompletionTime>
 
-	<Target type="normal">
+	<Target type="normal" ident="Observation">
 	    This is the 1st observation Target.
 
 	    The Target attribute ident should be filled in by the Telescope.

@@ -23,7 +23,7 @@
 	</Abstract>
     </Project>
     <Observation status="ok">
-	<Target type="normal">
+	<Target type="normal" ident="Observation">
 	    <TargetName>
 	        Observable target
 	    </TargetName>
