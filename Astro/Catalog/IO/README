@@ -12,12 +12,12 @@ Currently supported formats are:
  GaiaPick - Gaia/SkyCat Pick Object format. The output from a "Pick Object"
             in GAIA
  STL      - Starlink's Small Text List format, see SUN/190 and SSN/75
+ SExtractor - ASCII_HEAD output from SExtractor.
+ UKIRTBS  - UKIRT Bright Standard catalogue.
 
 Other catalogue formats that we are considering:
 
  FITS       - FITS binary tables
 
- ASCII_HEAD - (S)Extractor format, see SUN/226 for more details.
-   
  OASIS      - Text format from oasis.
                http://irsa.ipac.caltech.edu/applications/Oasis/svc/index.html
