@@ -5,12 +5,12 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 5 };
+BEGIN { plan tests => 7 };
 
 # load modules
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
-use Data::Dumper;
+#use Data::Dumper;
 
 # T E S T   H A R N E S S --------------------------------------------------
 
@@ -100,3 +100,12 @@ my @arrayoftwo = $results->objectbyname("IP Peg");
 
 # check size
 ok( scalar(@arrayoftwo), 2 );
+
+# do a list of objects
+my @list = $results->listofobjects();
+ok( "@list", "V* HT Cas V* IP Peg 1950 V* IP Peg 2000" );
+ok( scalar(@list), 3 );
+
+# Time at the bar...
+
+exit;

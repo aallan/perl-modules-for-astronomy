@@ -5,7 +5,7 @@ my $file = File::Spec->catfile(File::Spec->curdir, "Query", "Query.pm");
 
 
 WriteMakefile( 
-               'NAME'           => 'Astro::ADS',
+               'NAME'           => 'Astro::SIMBAD',
 	       'VERSION_FROM'   => $file,
                'PREREQ_PM'      => { LWP => 5.53 },
 	       'dist'           => { COMPRESS => "gzip -9f"},

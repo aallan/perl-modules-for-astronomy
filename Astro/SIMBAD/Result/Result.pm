@@ -19,7 +19,7 @@ package Astro::SIMBAD::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.2 2001/11/28 03:02:12 aa Exp $
+#     $Id: Result.pm,v 1.3 2001/11/28 17:43:34 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.2 2001/11/28 03:02:12 aa Exp $
+$Id: Result.pm,v 1.3 2001/11/28 17:43:34 aa Exp $
 
 =head1 METHODS
 
@@ -100,7 +100,7 @@ sub new {
 
 =item B<sizeof>
 
-Return the number of papers in the Astro::SIMBAD::Result object.
+Return the number of objects in the Astro::SIMBAD::Result object.
 
    $num = $result->sizeof();
 
@@ -189,6 +189,31 @@ sub objectbyname {
   
   # return it
   return @array;
+}
+
+
+=item B<listofobjects>
+
+Returns a list of all the stellar objects held in the Result object
+
+    @object_name = $result->listofobjects();
+    $number = $result->listofobjects();
+
+if called in a scalar context it will return the number of objects in
+the Result object.
+
+=cut
+
+sub listofobjects{
+   my $self = shift;
+   
+   my @list;
+   for my $key ( sort keys %{$self->{RESULTS}} ) {
+     push ( @list, $key);
+  }   
+   
+  return wantarray ? @list : scalar(@list);
+
 }
 
 # C O N F I G U R E -------------------------------------------------------
