@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 46 };
+BEGIN { plan tests => 48 };
 
 # load modules
 use Astro::ADS::Query;
@@ -147,6 +147,16 @@ my $refs = $paper->references();
 
 # should be 27 references on ADS for this paper
 ok( $refs->sizeof(), 27 );
+
+# do a followup query
+my $cites = $paper->citations();
+
+# currently should be 5 citations on ADS for this paper
+ok( $cites->sizeof(), 5 );
+
+# shouldn't be a TOC with this paper
+my $toc = $paper->tableofcontents();
+ok( $toc, undef );
 
 exit;
 

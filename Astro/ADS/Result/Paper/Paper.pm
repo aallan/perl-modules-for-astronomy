@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.6 2001/11/02 01:32:28 aa Exp $
+#     $Id: Paper.pm,v 1.7 2001/11/02 01:59:30 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -63,13 +63,13 @@ use strict;
 use vars qw/ $VERSION /;
 
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.6 2001/11/02 01:32:28 aa Exp $
+$Id: Paper.pm,v 1.7 2001/11/02 01:59:30 aa Exp $
 
 =head1 METHODS
 
@@ -372,10 +372,21 @@ Returns an Astro::ADS::Result object containing the references for the paper.
 
    $result = $paper->references();
 
+returns undef if this external link type is not available for this paper.
+
 =cut
 
 sub references {
   my $self = shift;
+  
+  # check to see if link is defined
+  my $flag = undef;
+  for my $i ( 0 ... $#{$self->{LINKS}} ) {
+     $flag = 1 if ${$self->{LINKS}}[$i] eq "REFERENCES";
+  }
+  
+  # return if keyword has not been flagged
+  return undef unless defined $flag;
   
   # grab the bibcode of the paper  
   my $bibcode = $self->{BIBCODE};
@@ -384,6 +395,102 @@ sub references {
   my $query = new Astro::ADS::Query();
                                       
   return $query->followup( $bibcode, "REFERENCES" );
+}
+
+=item B<citations>
+
+Returns an Astro::ADS::Result object containing the citations for the paper.
+
+   $result = $paper->citations();
+
+returns undef if this external link type is not available for this paper.
+
+=cut
+
+sub citations {
+  my $self = shift;
+  
+  # check to see if link is defined
+  my $flag = undef;
+  for my $i ( 0 ... $#{$self->{LINKS}} ) {
+     $flag = 1 if ${$self->{LINKS}}[$i] eq "CITATIONS";
+  }
+  
+  # return if keyword has not been flagged
+  return undef unless defined $flag;
+    
+  # grab the bibcode of the paper  
+  my $bibcode = $self->{BIBCODE};
+  
+  # build a query object
+  my $query = new Astro::ADS::Query();
+                                      
+  return $query->followup( $bibcode, "CITATIONS" );
+}
+
+=item B<alsoread>
+
+Returns an Astro::ADS::Result object containing papers which were `also
+read' along with this paper.
+
+   $result = $paper->alsoread();
+
+returns undef if this external link type is not available for this paper.
+
+=cut
+
+sub alsoread {
+  my $self = shift;
+  
+  # check to see if link is defined
+  my $flag = undef;
+  for my $i ( 0 ... $#{$self->{LINKS}} ) {
+     $flag = 1 if ${$self->{LINKS}}[$i] eq "AR";
+  }
+  
+  # return if keyword has not been flagged
+  return undef unless defined $flag;
+   
+  # grab the bibcode of the paper  
+  my $bibcode = $self->{BIBCODE};
+  
+  # build a query object
+  my $query = new Astro::ADS::Query();
+                                      
+  return $query->followup( $bibcode, "AR" );
+}
+
+
+=item B<tableofcontents>
+
+Returns an Astro::ADS::Result object containingteh table of contents of
+the journal or proceedings.
+
+   $result = $paper->tableofcontents();
+
+returns undef if this external link type is not available for this paper.
+
+=cut
+
+sub tableofcontents {
+  my $self = shift;
+  
+  # check to see if link is defined
+  my $flag = undef;
+  for my $i ( 0 ... $#{$self->{LINKS}} ) {
+     $flag = 1 if ${$self->{LINKS}}[$i] eq "TOC";
+  }
+  
+  # return if keyword has not been flagged
+  return undef unless defined $flag;
+   
+  # grab the bibcode of the paper  
+  my $bibcode = $self->{BIBCODE};
+  
+  # build a query object
+  my $query = new Astro::ADS::Query();
+                                      
+  return $query->followup( $bibcode, "TOC" );
 }
 
 # C O N F I G U R E -------------------------------------------------------
