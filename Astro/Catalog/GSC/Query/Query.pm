@@ -19,7 +19,7 @@ package Astro::Catalog::GSC::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.6 2003/07/25 04:03:28 timj Exp $
+#     $Id: Query.pm,v 1.7 2003/07/25 04:16:31 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -72,11 +72,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.6 2003/07/25 04:03:28 timj Exp $
+$Id: Query.pm,v 1.7 2003/07/25 04:16:31 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -198,32 +198,32 @@ sub _parse_query {
   my $star;
 
   my ( $line, $counter );
-  my ( $ra, $dec, $radius );
+  my %field; # field centre
+
   # loop round the returned buffer and stuff the contents into star objects
   foreach $line ( 0 ... $#buffer ) {
 
      # Parse field centre
      # ------------------
-     my %field;
 
      # RA
      if( lc($buffer[$line]) =~ "<td>ra:" ) {
         $_ = lc($buffer[$line]);
-        ( $ra ) = /^\s*<td>ra:\s+(.*)<\/td>/;
+        my ( $ra ) = /^\s*<td>ra:\s+(.*)<\/td>/;
         $field{RA} = $ra;
      }
 
      # Dec
      if( lc($buffer[$line]) =~ "<td>dec:" ) {
         $_ = lc($buffer[$line]);
-        ( $dec ) = /^\s+<td>dec:\s+(.*)<\/td>/;
+        my ( $dec ) = /^\s+<td>dec:\s+(.*)<\/td>/;
 	$field{Dec} = $dec;
      }
 
      # Radius
      if( lc($buffer[$line]) =~ "search radius:" ) {
         $_ = lc($buffer[$line+1]);
-        ( $radius ) = />\s+(.*)\s\w/;
+        my ( $radius ) = />\s+(.*)\s\w/;
 	$field{Radius} = $radius;
      }
      $catalog->fieldcentre( %field );
@@ -316,6 +316,8 @@ sub _parse_query {
      }
 
   }
+  # Set the field centre
+  $catalog->fieldcentre( %field );
 
   return $catalog;
 }
