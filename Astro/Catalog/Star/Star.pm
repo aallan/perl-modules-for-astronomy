@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.2 2002/01/11 22:57:01 aa Exp $
+#     $Id: Star.pm,v 1.3 2002/01/14 01:21:37 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -51,7 +51,7 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
 
 Stores generic meta-data about an individual stellar object from a catalogue.
 
-If the catalogue has a field center the Distance and Position Angle propertie
+If the catalogue has a field center the Distance and Position Angle properties
 should be used to store the direction to the field center, e.g. a star from the
 USNO-A2 catalogue retrieived from the ESO/ST-ECF Archive will have these
 properties.
@@ -64,14 +64,14 @@ properties.
 use strict;
 use vars qw/ $VERSION /;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.2 2002/01/11 22:57:01 aa Exp $
+$Id: Star.pm,v 1.3 2002/01/14 01:21:37 aa Exp $
 
 =head1 METHODS
 
@@ -445,7 +445,7 @@ Return (or set) the quality flag of the star
    $quality = $star->quailty();
    $star->quality( 0 );
 
-for example for the USNO-A2 caltalogue, 0 denotes good quality, and 1 denotes
+for example for the USNO-A2 catalogue, 0 denotes good quality, and 1 denotes
 a possible problem object. In the generic case any flag value, including a boolean, could be used.
 
 =cut
@@ -458,10 +458,78 @@ sub quality {
   return $self->{QUALITY};
 }  
 
-sub field {}
-sub gsc {}
-sub distance {}
-sub posangle {} 
+=item B<field>
+
+Return (or set) the field parameter for the star
+
+   $field = $star->field();
+   $star->field( '0080' );
+
+=cut
+
+sub field {
+  my $self = shift;
+  if (@_) {
+    $self->{FIELD} = shift;
+  }
+  return $self->{FIELD};
+}
+
+=item B<gsc>
+
+Return (or set) the GSC flag for the object
+
+   $gsc = $star->gsc();
+   $star->gsc( 'TRUE' );
+
+the flag is TRUE if the object is known to be in the Guide Star Catalogue, 
+and FALSE otherwise.
+
+=cut
+sub gsc {
+  my $self = shift;
+  if (@_) {
+    $self->{GSC} = shift;
+  }
+  return $self->{GSC};
+}
+
+=item B<distance>
+
+Return (or set) the distance from the field centre
+
+   $distance = $star->distance();
+   $star->distance( '0.009' );
+
+e.g. for the USNO-A2 catalogue.
+
+=cut
+sub distance {
+  my $self = shift;
+  if (@_) {
+    $self->{DISTANCE} = shift;
+  }
+  return $self->{DISTANCE};
+}
+
+=item B<posangle>
+
+Return (or set) the position angle from the field centre
+
+   $position_angle = $star->posangle();
+   $star->posangle( '50.761' );
+
+e.g. for the USNO-A2 catalogue.
+
+=cut
+sub posangle {
+  my $self = shift;
+  if (@_) {
+    $self->{POSANGLE} = shift;
+  }
+  return $self->{POSANGLE};
+}
+
 
 # C O N F I G U R E -------------------------------------------------------
 
