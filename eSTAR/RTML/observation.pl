@@ -47,7 +47,7 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 use Data::Dumper;
 
 # CVS revision tag
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # T E S T   H A R N E S S ---------------------------------------------------
 
@@ -88,43 +88,6 @@ print "# Observation Script ($VERSION)\n#\n";
 print "# Node is $opt{dn_host}:$opt{dn_port}\n";
 print "# R.A. = $opt{ra}  Dec. = $opt{dec}\n";
 print "# Temporary Directory: \$ESTAR_DATA = $ENV{ESTAR_DATA}\n";
-
-
-# connection callback --------------------------------------------------------
-
-my $callback = sub { 
-   my $handle = shift;
-   
-   my ( $status );
-   
-   print "# Server Callback ( " . $handle . " )\n#\n";
-   print "# Reading RTML\n#\n";
-
-   # READ MESSAGE FROM DISCOVERY NODE
-   my $reply = read_message( $handle );
-
-   unless ( defined $reply ) {
-      report_error();
-      #print "# Shutting down sever on port $server_port\n#\n";
-      #$status = stop_server( );
-      print "# Deactvating modules\n#\n";
-      $status = module_deactivate();
-      exit;
-   }  
-   
-   # print out message
-   print "# Writing RTML to $ENV{ESTAR_DATA}/server_message.xml\n";
-   my $file = File::Spec->catfile( $ENV{"ESTAR_DATA"}, "server_message.xml" );
-   unless ( open ( FILE, "+>$file" )) {
-     croak("eSTAR: Cannont open output file $file");
-   }   
-
-   print FILE @{$reply}[0];
-   close(FILE);
-   print "#\n# Leaving Callback\n";
-      
-   return GLOBUS_TRUE 
-};      
 
 # create an RTML object -----------------------------------------------------
 
@@ -167,19 +130,10 @@ if( $status == GLOBUS_FALSE) {
    exit;
 } 
 
-# start server --------------------------------------------------------------
-
-# wait for response RTML demo discovery node
-#print "# Starting Server process on port $server_port\n";
-#my $server_process = threads->create("start_server", $server_port, $callback );
-#my $server_process = new Proc::Simple();
-#$server_process->start( File::Spec->catfile( 
-#                             File::Spec->curdir() . "server.pl" ) );
-
 # SLEEP ---------------------------------------------------------------------
 
-print "# Sleeping for 5 seconds\n#\n";
-sleep(5);
+print "# Sleeping for 2 seconds\n#\n";
+sleep(2);
 
 # client thread -------------------------------------------------------------
 
@@ -269,7 +223,6 @@ if( $score <= 0.0001 ) {
    $status = module_deactivate();
    exit;
 }
-
 
 
 # SLEEP ---------------------------------------------------------------------

@@ -17,7 +17,7 @@ use strict;
 use threads;
 use threads::shared;
 
-use vars qw/ $VERSION $SELF /;
+use vars qw/ $VERSION $UA @FILES /;
 
 # load test
 use Test;
@@ -34,9 +34,14 @@ use eSTAR::IO qw / :all /;
 use eSTAR::IO::Server;
 use eSTAR::IO::Client;
 
+use Astro::FITS::Header;
+use Astro::Catalog;
+
 use Carp;
 use Getopt::Long;
 use Net::Domain qw(hostname hostdomain);
+use Net::FTP;
+use LWP::UserAgent;
 
 # file paths
 use File::Spec qw / tmpdir /;
@@ -46,9 +51,18 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 use Data::Dumper;
 
 # CVS revision tag
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
-# T E S T   H A R N E S S --------------------------------------------------
+# Configure USERAGENT --------------------------------------------------------
+
+# Setup the LWP::UserAgent
+my $HOST = hostname();
+my $DOMAIN = hostdomain();
+$UA = new LWP::UserAgent( timeout => 30 ); 
+$UA->agent("eSTAR IA Testbed /$VERSION ($HOST.$DOMAIN)");
+$UA->env_proxy();
+
+# T E S T   H A R N E S S ----------------------------------------------------
 
 # test the test system
 ok(1);
@@ -80,6 +94,7 @@ my $callback = sub {
    print "# Reading RTML\n#\n";
 
    # READ MESSAGE FROM DISCOVERY NODE
+   # ================================
    my $reply = read_message( $handle );
 
    unless ( defined $reply ) {
@@ -91,7 +106,8 @@ my $callback = sub {
       exit;
    }  
    
-   # print out message
+   # WRITE MESSAGE TO FILE
+   # =====================
    print "# Writing RTML to $ENV{ESTAR_DATA}/server_message.xml\n";
    my $file = File::Spec->catfile( $ENV{"ESTAR_DATA"}, "server_message.xml" );
    unless ( open ( FILE, "+>$file" )) {
@@ -102,6 +118,8 @@ my $callback = sub {
    close(FILE);
    print "# Closing $ENV{ESTAR_DATA}/server_message.xml\n"; 
    
+   # PARSE MESSAGE
+   # =============
    print "# Re-opening $ENV{ESTAR_DATA}/server_message.xml\n";
 
    my $obs = new eSTAR::RTML( File => File::Spec->catfile( $ENV{"ESTAR_DATA"},
@@ -111,9 +129,65 @@ my $callback = sub {
    print "# Got a '" . $type . "' RTML file from ERS server at $opt{dn_host}\n";
 
    my $parsed = new eSTAR::RTML::Parse( RTML => $obs );   
+   #print Dumper( $parsed );
    
-   print Dumper( $parsed );
+   # PARSE FITS HEADER BLOCK
+   # =======================
+   #my $header = new Astro::FITS::Header( Cards => $parsed->fitsheaders() );
+   #
+   #print Dumper( $header );
    
+   # GRAB IMAGE DATA
+   # ===============
+   my $image_url = $parsed->dataimage();
+   print "# Image data: $image_url\n";
+   
+   # build request
+   my $request = new HTTP::Request('GET', $image_url);
+   my $reply = $UA->request($request);
+    
+   if ( ${$reply}{"_rc"} eq 200 ) {
+     if ( ${${$reply}{"_headers"}}{"content-type"} 
+        eq "application/octet-stream" ) {
+            
+        # mangle filename from $ENV and returned unique(?) filename   
+         my $file_name = ${${$reply}{"_headers"}}{"content-disposition"};
+         my $start_index = index( $file_name, q/"/ );
+         my $last_index = rindex( $file_name, q/"/ );
+         $file_name = substr( $file_name, $start_index+1, 
+                              $last_index-$start_index-1);
+         
+         $file_name = File::Spec->catfile( $ENV{"ESTAR_DATA"}, $file_name);                       
+         # Open output file
+         unless ( open ( FH, ">$file_name" )) {
+            report_error();
+            print "# Shutting down sever on port $server_port\n#\n";
+            $status = stop_server( );
+            print "# Deactvating modules\n#\n";
+            $status = module_deactivate();
+            croak("Error: Cannont open output file $file_name");
+         }   
+
+         # push the output files onto teh stack of filenames
+         push( @FILES, $file_name );
+         
+         # Write to output file
+         my $length = length(${$reply}{"_content"});
+         syswrite( FH, ${$reply}{"_content"}, $length );
+         close(FH);
+ 
+      }
+   } else {
+      report_error();
+      print "# Shutting down sever on port $server_port\n#\n";
+      $status = stop_server( );
+      print "# Deactvating modules\n#\n";
+      $status = module_deactivate();
+      croak("Error ${$reply}{_rc}: Failed to establish network connection");
+   }  
+   
+   
+   print "# Output files: @FILES\n";
    print "#\n# Leaving Callback\n";
       
    return GLOBUS_TRUE 

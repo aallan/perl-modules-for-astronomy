@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.7 2002/03/18 13:10:44 aa Exp $
+#     $Id: Parse.pm,v 1.8 2002/03/19 15:06:49 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.7 2002/03/18 13:10:44 aa Exp $
+$Id: Parse.pm,v 1.8 2002/03/19 15:06:49 aa Exp $
 
 =head1 METHODS
 
@@ -149,7 +149,7 @@ sub score {
 
 Return the CompletionTime from of the RTML document
 
-  $completino_time = $rtml->time();
+  $completion_time = $rtml->time();
 
 =cut
 
@@ -157,6 +157,45 @@ sub time {
   my $self = shift;
   return ${$self->{COMPLETIONTIME}}{tag_value};
 }
+
+=item B<fitsheaders>
+
+Return the FITS headers from the RTML as an array reference
+
+  $hdu = $rtml->fitsheaders();
+
+=cut
+
+sub fitsheaders {
+  my $self = shift;
+  return ${${$self->{OBSERVATION}}{Fitsheader}}{tag_value};
+}
+
+=item B<catalogue>
+
+Return the Cluster format catalogue as an array reference
+
+  $catalog = $rtml->catalogue();
+
+=cut
+
+sub catalogue {
+  my $self = shift;
+  return ${${$self->{OBSERVATION}}{Objectlist}}{tag_value};
+}
+
+=item B<dataimage>
+
+Return the URL of the data image
+
+  $url = $rtml->dataimage();
+
+=cut
+sub dataimage {
+  my $self = shift;
+  return ${${$self->{OBSERVATION}}{Imagedata}}{tag_value};
+}
+
 # C O N F I G U R E ----------------------------------------------------------
 
 =back
