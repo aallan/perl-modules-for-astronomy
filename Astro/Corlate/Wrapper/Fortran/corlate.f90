@@ -246,7 +246,9 @@
       if (npair > 10) then
         dist_mean=sqrt(dist_mean/real(npair))
         write(2,*) 'Which gave a mean separation of ', dist_mean
-        fixrad=3.0*dist_mean
+        ! We have some objects with significant proper motions, so let
+        ! the slop be 3 arcsec plus the RMS.
+        fixrad = sqrt ( (3.0*dist_mean)**2.0 + 3.0**2.0)
       else        
         write(2,*) 'Too few pairs to continue.'
         corlate=-3
@@ -315,6 +317,7 @@
           pair(npair)%col(2)=star1(matches(1))%col(2)
           pair(npair)%col(3)=star2(istar)%col(1)
           pair(npair)%col(4)=star1(matches(1))%col(1)
+          ! Set colour 1 to be the difference between the colour 1s.
           pair%col(1)%data=pair%col(4)%data - pair%col(3)%data
           pair(npair)%col(1)%err = &
           sqrt(pair(npair)%col(3)%err**2.0 + pair(npair)%col(4)%err**2.0)
@@ -370,6 +373,8 @@
             pchisq(((delta_mag/pair(istar)%col(1)%err)**2.0)/chisq)
             prob(nprob)=1.0-(1.0-prob(nprob))**real(npair)
             if (prob(nprob) < 0.01) then
+              ! Change colour 1 to be the change in magnitde.
+              pair(istar)%col(1)%data = -delta_mag
               call write_star(1, pair(istar), 4)
               write(3,*) '!! Begining of new star description.'
               write(3,*) colstr2(1), '! Filter observed in.'

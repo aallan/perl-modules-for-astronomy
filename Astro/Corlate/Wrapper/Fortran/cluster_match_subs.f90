@@ -38,7 +38,10 @@
       allocate(star(nstars))
       do istar=1, nstars
         iostat=read_star(iunit, star(istar), ncol)
-        if (iostat /= 0) print*, 'Error reading that file.'
+        if (iostat /= 0) then
+          print*, 'Error reading that file, iostat is', iostat
+          print*, 'For line number ', istar+3
+        end if
       end do
 
     end subroutine read_cluster_file
