@@ -4,40 +4,58 @@
 #include "string.h"
 #include "globus_common.h"
 #include "globus_io.h"
-#include "src/estar_io.h"
+#include "estar_io.h"
+#include "client.h"
 
-#define HANDLE (&globus_io_handle_t)
-
-MODULE = eSTAR::IO   PACKAGE = eSTAR::IO   PREFIX eSTAR_IO_		
-
-globus_io_handle_t *
-HANDLE()
-  CODE:
-    RETVAL = HANDLE;
-  OUTPUT:
-    RETVAL 
-
+MODULE = eSTAR::IO   PACKAGE = eSTAR::IO  PREFIX = eSTAR_IO_
+    
 void
-Error()
-
-MODULE = eSTAR::IO::Client   PACKAGE = globus_io_handle_tPtr PREFIX = eSTAR_IO_
+eSTAR_IO_report_error()
+  CODE:
+    eSTAR_IO_Error();
 
 int
-Write_Message( handle, message )
+eSTAR_IO_write_message( handle, message )
+    globus_io_handle_t * handle
     char * message
-    globus_io_handle_t * handle
-
-message_array
-Read_Message( handle )
-    globus_io_handle_t * handle
-  PREINIT:
+  PREINIT: 
     int status;
-    char ** message;
-  CODE
-    status = eSTAR_IO_Read_Message( handle, message );
-    
+  CODE:  
+    printf("write_messageXS globus_io_handle %p\n", handle);
+    printf("write_messageXS handle->fd = %i\n", handle->fd);
+    RETVAL = eSTAR_IO_Write_Message( handle, message );
+    printf("write_messageXS globus_io_handle %p\n", handle);
+    printf("write_messageXS handle->fd = %i\n", handle->fd);
   OUTPUT:
-  
-  CLEANUP:
-    if (status != GLOBUS_FALSE ) 
-      XSRETURN_UNDEF;       
+    RETVAL         
+
+
+AV *
+eSTAR_IO_read_message( handle )
+     globus_io_handle_t * handle
+   PREINIT:
+     int status;
+     char ** message;
+     char ** index;
+     AV * array;
+   CODE:
+     printf("read_messageXS globus_io_handle %p\n", handle);
+     printf("read_messageXS handle->fd = %i\n", handle->fd);
+     printf("read_messageXS char** %p\n", message);
+     status = eSTAR_IO_Read_Message( handle, message );
+     printf("read_messageXS globus_io_handle %p\n", handle);
+     printf("read_messageXS handle->fd = %i\n", handle->fd);
+     printf("read_messageXS char** %p\n", message);
+     printf("read_messageXS return status %i (should be 1)\n", status);
+     if (status == GLOBUS_FALSE ) 
+       XSRETURN_UNDEF;
+              
+     array = newAV();
+     index = message;
+     while (*index) {
+       av_push( array, newSVpv( *index, 0));
+       index++;
+     }
+     RETVAL = array;
+   OUTPUT:
+     RETVAL

@@ -4,17 +4,34 @@
 #include "string.h"
 #include "globus_common.h"
 #include "globus_io.h"
-#include "../src/estar_io.h"
+#include "estar_io.h"
+#include "client.h"
 
-MODULE = eSTAR::IO::Client   PACKAGE = eSTAR::IO::Client   PREFIX = eSTAR_IO_		
-int
-Open_Client( hostname, port, handle )
+static globus_io_handle_t handle;
+    
+MODULE = eSTAR::IO::Client   PACKAGE = eSTAR::IO::Client
+
+globus_io_handle_t *
+open_client( hostname, port )
     char * hostname
     int port
-    globus_io_handle_t * handle
-
-MODULE = eSTAR::IO::Client   PACKAGE = globus_io_handle_tPtr PREFIX = eSTAR_IO_
+  PREINIT:
+    int status;
+  CODE:
+    printf("open_clientXS globus_io_handle %p\n", &handle);
+    printf("open_clientXS handle->fd = %i\n", handle.fd);
+    status = open_client( hostname, port, &handle );
+    RETVAL = &handle;  
+    printf("open_clientXS globus_io_handle %p\n", &handle);
+    printf("open_clientXS handle->fd = %i\n", handle.fd);
+  OUTPUT:
+    RETVAL 
+  CLEANUP:
+    if (status == GLOBUS_FALSE ) 
+      XSRETURN_UNDEF;           
 
 int
-Close_Client( handle )
+close_client( handle )
     globus_io_handle_t * handle
+    
+

@@ -1,10 +1,18 @@
+#!/home/globus/Perl/bin/perl -W 
+
 # eSTAR::IO::Client test harness
+
+use lib "blib/arch";
+use lib "blib/lib";
 
 # strict
 use strict;
 
 # load test
 use Test;
+use Test::Harness qw(&runtests $verbose); 
+$verbose=1;
+
 BEGIN { plan tests => 5 };
 
 # load modules

@@ -1,3 +1,11 @@
+2002-03-07  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Total re-write due to unforseen problems with
+          threading and GLOBUS loosing I/O handles when
+          the temporarily pass out of scope. Working Client,
+          tested against the LJM C test_server, but don't
+          have a working Server yet.
+          
 2002-03-04  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Inital framework, most functions in place, missing
