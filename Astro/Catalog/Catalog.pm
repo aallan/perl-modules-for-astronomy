@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.27 2003/07/27 08:26:56 timj Exp $
+#     $Id: Catalog.pm,v 1.28 2003/07/27 08:30:24 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,14 +64,14 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.27 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.28 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.27 2003/07/27 08:26:56 timj Exp $
+$Id: Catalog.pm,v 1.28 2003/07/27 08:30:24 timj Exp $
 
 =head1 METHODS
 
@@ -1149,8 +1149,8 @@ Returns -1,0,1
 
 sub by_name
 {
-  my $b2 = $b->{name};
-  my $a2 = $a->{name};
+  my $b2 = $b->{id};
+  my $a2 = $a->{id};
 
   # only compare if the name is defined and has length
   if (defined $a2 && defined $b2 &&
