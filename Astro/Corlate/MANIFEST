@@ -7,6 +7,7 @@ Corlate.pm
 Wrapper/Makefile.PL
 Wrapper/Wrapper.pm
 Wrapper/Wrapper.xs
+Wrapper/Fortran/README
 Wrapper/Fortran/cluster_match_subs.f90
 Wrapper/Fortran/corlate.f90
 Wrapper/Fortran/define_star.f90
