@@ -6,12 +6,22 @@ What is it?
 
 The module is a generic object orientated astronomical catalogue object.
 
+What has changed recently?
+--------------------------
+
+As of v2.2 the module has been rewritten  to make use of Tim Jenness'
+Astro::Coords module which much simplifies the internals. Some of the
+pre-exisiting API is therefore depreciated and new API functions have 
+appeared. Some of the broken encapsulation has also been fixed and the
+module POD has been much improved.
+
 Requirements
 ------------
 
-While useful in itself as a generic catalogue object, the additional optionals
-Astro::Catalog::USNOA2 and Astro::Catalog::GSC modules provides an interfaces 
-to the online USNO-A2 and Guide Star Catalogues provided by ESO/ST-ECF.
+While useful in itself as a generic catalogue object, the additional
+optionals Astro::Catalog::USNOA2 and Astro::Catalog::GSC modules provides 
+an interfaces  to the online USNO-A2 and Guide Star Catalogues provided by
+ESO/ST-ECF.
 
 The following external modules are required by the Astro::Catalog module and
 associated classes
@@ -62,26 +72,30 @@ Installation is automated using the ExtUtils::MakeMaker library
 Authors
 -------
 
-The module was written by Alasdair Allan <aa@astro.ex.ac.uk>, of the 
-University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/) 
+The module was originally written by Alasdair Allan <aa@astro.ex.ac.uk>,
+of the  University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/)  
 as part of his work for the eSTAR project.
 
-The latest version of the module includes patches supplied by Stephen
-Quinney <S.J.Quinney@durham.ac.uk> of Durham University, and Brad
-Cavanagh <b.cavanagh@jach.hawaii.edu> of the Joint Astronomy Centre
-in Hawaii.
+The internal architecture of the module has been extensively rewritten 
+for v2.2 by Tim Jenness <t.jenness@jach.hawaii.edu> of the Joint Astronomy
+Centre in Hawaii.
+
+This version also includes patches supplied by Stephen Quinney
+<S.J.Quinney@durham.ac.uk> of Durham University, and Brad Cavanagh
+<b.cavanagh@jach.hawaii.edu> of the Joint Astronomy Centre in Hawaii.
 
 License
--------
-This package is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
+------- 
+This package is free software; you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the 
+Free Software Foundation; either version 2 of the License, or (at your 
+option) any later version.
 
-This program is distributed in the hope that it will be useful,but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+for more details.
 
-You should have received a copy of the GNU General Public License along with
-this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-Place,Suite 330, Boston, MA  02111-1307, USA
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place,Suite 330, Boston, MA  02111-1307, USA
