@@ -134,6 +134,7 @@ for my $i (0 .. $#buffer) {
    ok( $file[$i], $buffer[$i] );
 }
 
+
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
 # Dump catalog object to screen

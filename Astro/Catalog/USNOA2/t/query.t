@@ -228,6 +228,29 @@ ok( $star_dat->posangle(), $star_net->posangle() );
 #                                "usno-a2.cat" ) );
 
 # quitting time
+
+# Long catalogue
+# --------------
+
+# grab catalogue 
+my $long = new Astro::Catalog::USNOA2::Query( Target => 'HT Cas',
+                                              Radius => 10,
+                                              Nout   => 2000 );
+   
+print "# Connecting to ESO/ST-ECF USNO-A2 Catalogue\n";
+my $long_catalog = $long->querydb();
+print "# Continuing tests\n";
+       
+# write to file
+
+my @out_mags = ( 'R' );
+my @out_cols = ( 'B-R' );
+my $reference = File::Spec->catfile( $ENV{"ESTAR_DATA"}, 'reference.cat' );
+my $status = $long_catalog->write_catalog( $reference, \@out_mags, \@out_cols );
+
+print "# reference.cat written to $ENV{ESTAR_DATA}\n";
+
+
 exit;
 
 # D A T A   B L O C K  -----------------------------------------------------

@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.4 2002/01/14 07:32:13 aa Exp $
+#     $Id: Star.pm,v 1.5 2002/01/24 22:15:09 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -45,7 +45,9 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
                                     Field      => $field,
                                     GSC        => $in_gsc,
                                     Distance   => $distance_to_centre,
-                                    PosAngle   => $position_angle );
+                                    PosAngle   => $position_angle,
+                                    X          => $x_pixel_coord,
+                                    Y          => $y_pixel_coord );
 
 =head1 DESCRIPTION
 
@@ -64,14 +66,14 @@ properties.
 use strict;
 use vars qw/ $VERSION /;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.4 2002/01/14 07:32:13 aa Exp $
+$Id: Star.pm,v 1.5 2002/01/24 22:15:09 aa Exp $
 
 =head1 METHODS
 
@@ -95,7 +97,9 @@ Create a new instance from a hash of options
                                     Field      => $field,
                                     GSC        => $in_gsc,
                                     Distance   => $distance_to_centre,
-                                    PosAngle   => $position_angle );
+                                    PosAngle   => $position_angle,
+                                    X          => $x_pixel_coord,
+                                    Y          => $y_pixel_coord );
 
 returns a reference to an Astro::Catalog::Star object.
 
@@ -117,7 +121,9 @@ sub new {
                       FIELD      => undef, 
                       GSC        => undef, 
                       DISTANCE   => undef, 
-                      POSANGLE   => undef }, $class;
+                      POSANGLE   => undef,
+                      X          => undef,
+                      Y          => undef }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -530,6 +536,39 @@ sub posangle {
   return $self->{POSANGLE};
 }
 
+=item B<x>
+
+Return (or set) the X pixel co-ordinate of the star
+
+   $x = $star->x();
+   $star->id( $x );
+
+=cut
+
+sub x {
+  my $self = shift;
+  if (@_) {
+    $self->{X} = shift;
+  }
+  return $self->{X};
+}
+
+=item B<y>
+
+Return (or set) the Y pixel co-ordinate of the star
+
+   $y = $star->y();
+   $star->id( $y );
+
+=cut
+
+sub y {
+  my $self = shift;
+  if (@_) {
+    $self->{Y} = shift;
+  }
+  return $self->{Y};
+}
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -561,7 +600,7 @@ sub configure {
   # Loop over the allowed keys storing the values
   # in the object if they exist
   for my $key (qw / ID RA Dec Magnitudes MagErr Colours ColErr
-                    Quality Field GSC Distance PosAngle  /) {
+                    Quality Field GSC Distance PosAngle X Y /) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }

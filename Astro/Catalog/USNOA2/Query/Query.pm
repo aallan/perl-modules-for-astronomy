@@ -19,7 +19,7 @@ package Astro::Catalog::USNOA2::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.3 2002/01/14 06:29:14 aa Exp $
+#     $Id: Query.pm,v 1.4 2002/01/24 22:15:09 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -70,13 +70,13 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.3 2002/01/14 06:29:14 aa Exp $
+$Id: Query.pm,v 1.4 2002/01/24 22:15:09 aa Exp $
 
 =head1 METHODS
 
@@ -94,7 +94,7 @@ Create a new instance from a hash of options
                                              Bright    => $magbright,
                                              Faint     => $magfaint,
                                              Sort      => $sort_type,
-                                             Nout      => $number_out );
+                                             Number    => $number_out );
       
 
 returns a reference to an USNO-A2 query object.
@@ -470,18 +470,18 @@ sub sort {
 
 }
 
-=item B<Nout>
+=item B<Number>
 
 The number of objects to return, defaults to 20,000 which should hopefully
 be sufficent to return all objects of interest. This value should be increased
 if a (very) large sample radius is requested.
 
-   $num = $query->nout();
+   $num = $query->number();
    $query->nout( 100 );
 
 =cut
 
-sub nout {
+sub number {
   my $self = shift;
 
   if (@_) { 
@@ -541,7 +541,7 @@ sub configure {
   ${$self->{OPTIONS}}{"magfaint"}    = 100;
   ${$self->{OPTIONS}}{"format"}      = 1;
   ${$self->{OPTIONS}}{"sort"}        = "ra";
-  ${$self->{OPTIONS}}{"nout"}        = "20000";
+  ${$self->{OPTIONS}}{"nout"}        = "2000";
 
   # CONFIGURE FROM ARGUEMENTS
   # -------------------------
@@ -677,6 +677,14 @@ sub _parse_query {
         # reached the catalog block, loop through until </pre> reached
         $counter = $line+2;
         until ( lc($buffer[$counter+1]) =~ "</pre>" ) {
+            
+           # hack for first line, remove </b>
+           if ( lc($buffer[$counter]) =~ "</b>" ) {
+              $buffer[$counter] = substr( $buffer[$counter], 5);
+           }
+           
+           # remove leading spaces
+           $buffer[$counter] =~ s/^\s+//; 
                       
            # split each line
            my @separated = split( /\s+/, $buffer[$counter] );
@@ -693,7 +701,7 @@ sub _parse_query {
               $star = new Astro::Catalog::Star(); 
 
               # ID
-              my $id = $separated[2];
+              my $id = $separated[1];
               $star->id( $id );
                
               # debugging
@@ -701,31 +709,31 @@ sub _parse_query {
               #print "# ID $id star $num\n";      
               
               # RA
-              my $objra = "$separated[3] $separated[4] $separated[5]";
+              my $objra = "$separated[2] $separated[3] $separated[4]";
               $star->ra( $objra );
               
               # Dec
-              my $objdec = "$separated[6] $separated[7] $separated[8]";
+              my $objdec = "$separated[5] $separated[6] $separated[7]";
               $star->dec( $objdec );
               
               # R Magnitude
-              my %r_mag = ( R => $separated[9] );
+              my %r_mag = ( R => $separated[8] );
               $star->magnitudes( \%r_mag );
               
               # B Magnitude
-              my %b_mag = ( B => $separated[10] );
+              my %b_mag = ( B => $separated[9] );
               $star->magnitudes( \%b_mag );
               
               # Quality
-              my $quality = $separated[11];
+              my $quality = $separated[10];
               $star->quality( $quality );
               
               # Field
-              my $field = $separated[12];
+              my $field = $separated[11];
               $star->field( $field );
               
               # GSC
-              my $gsc = $separated[13];
+              my $gsc = $separated[12];
               if ( $gsc eq "+" ) {
                  $star->gsc( "TRUE" );
               } else {
@@ -733,11 +741,11 @@ sub _parse_query {
               }
               
               # Distance
-              my $distance = $separated[14];
+              my $distance = $separated[13];
               $star->distance( $distance );
               
               # Position Angle
-              my $pos_angle = $separated[15];
+              my $pos_angle = $separated[14];
               $star->posangle( $pos_angle );
 
            }
@@ -749,6 +757,12 @@ sub _parse_query {
            
            # Calculate error
            # ---------------
+           
+           # Error are calculated as follows
+           #
+           #   Delta.R = 0.15*sqrt( 1 + 10**(0.8*(R-19)) )
+           #   Delta.B = 0.15*sqrt( 1 + 10**(0.8*(B-19)) )
+           #
            
            my ( $power, $delta_r, $delta_b );
                       
@@ -766,6 +780,11 @@ sub _parse_query {
            
            # calcuate B-R colour and error
            # -----------------------------
+           
+           # Error is calculated as follows
+           # 
+           #   Delta.(B-R) = sqrt( Delta.R**2 + Delta.B**2 )
+           #
            
            my $b_minus_r = $star->get_magnitude( 'B' ) - 
                            $star->get_magnitude( 'R' );

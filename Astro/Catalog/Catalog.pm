@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.3 2002/01/14 09:05:48 aa Exp $
+#     $Id: Catalog.pm,v 1.4 2002/01/24 22:15:09 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -55,14 +55,14 @@ use vars qw/ $VERSION /;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.3 2002/01/14 09:05:48 aa Exp $
+$Id: Catalog.pm,v 1.4 2002/01/24 22:15:09 aa Exp $
 
 =head1 METHODS
 
@@ -110,9 +110,16 @@ sub new {
 
 Will write the catalogue object to an standard ARK Cluster format file
 
-   $status = $catalog->write_catalog( $file_name );
+   $status = $catalog->write_catalog( $file_name, \@mags, \@colour );
 
-returns zero on sucess and non-zero if the write failed. 
+returns zero on sucess and non-zero if the write failed. Only magnitudes 
+and colours passed in the array will be written to the file, e.g.
+
+   my @mags = ( 'R' );
+   my @colour = ( 'B-R', 'B-V' );
+   $status = $catalog->write_catalog( $file_name, \@mags, \@colour );
+
+will write a catalogue with R, B-R and B-V.   
 
 =cut
 
@@ -125,9 +132,9 @@ sub write_catalog {
   # grab file name and open file for writing
   my $file_name = shift;
   unless ( open( FH, ">$file_name" ) ) {
-     croak("Astro::Catalog write_catalog() - Cannont open file $file_name");
+     croak("Astro::Catalog write_catalog() - Can not open file $file_name");
   } 
-  
+ 
   # number of stars in catalogue
   my $number = $#{$self->{STARS}};
  
@@ -139,10 +146,45 @@ sub write_catalog {
   my $num_colours = ${$self->{STARS}}[0]->what_colours();
   my @colours = ${$self->{STARS}}[0]->what_colours();
 
+  # grab the filters and colours to be output to the file
+  my ( $output_mags, $output_cols );
+  if ( @_ ) {
+    $output_mags = shift;
+    $output_cols = shift;
+  } else {
+    $output_mags = \@filters;
+    $output_cols = \@colours;
+  }   
+
+  # define varaibles for output filters and colours
+  my ( @out_filters, @out_colours );
+        
+  # if we want fewer magnitudes than we have in the object
+  # to be written to the cluster file
+  foreach my $m ( 0 .. $#{$output_mags} ) {
+     foreach my $n ( 0 .. $#filters ) {
+        if ( ${$output_mags}[$m] eq $filters[$n] ) {
+           push( @out_filters, ${$output_mags}[$m]);
+        }
+     }   
+  }
+  
+  # same for colours
+  foreach my $m ( 0 .. $#{$output_cols} ) {
+     foreach my $n ( 0 .. $#colours ) {
+        if ( ${$output_cols}[$m] eq $colours[$n] ) {
+           push( @out_colours, ${$output_cols}[$m]);
+        }   
+     }
+  }  
+        
   # write header
-  my $total = $num_filters + $num_colours;
+  
+  # check to see if we're outputing all the filters and colours
+  my $total = scalar(@out_filters) + scalar(@out_colours);
+   
   print FH "$total colours were created\n";
-  print FH "@filters @colours\n";
+  print FH "@out_filters @out_colours\n";
   print FH "A sub-set of USNO-A2: Field centre at RA " . $self->get_ra() .
            ", Dec " . $self->get_dec() . ", Search Radius " . 
            $self->get_radius() . " arcminutes \n";
@@ -159,16 +201,50 @@ sub write_catalog {
      
      # magnitudes
      foreach my $i ( 0 .. $num_filters-1 ) {
-        print FH ${$self->{STARS}}[$star]->get_magnitude( $filters[$i] ) . "  ";
-        print FH ${$self->{STARS}}[$star]->get_errors( $filters[$i] ) . "  ";
-        print FH ${$self->{STARS}}[$star]->quality() . "  ";
+     
+        my $doit = 0;
+        
+        # if we want fewer magnitudes than we have in the object
+        # to be written to the cluster file
+        if ( defined ${$output_mags}[0] ) { 
+
+           $doit = -1;
+           # check to see if we have a valid filter
+           foreach my $m ( 0 .. $#{$output_mags} ) {
+              $doit = 1 if ( ${$output_mags}[$m] eq $filters[$i] );
+           }
+        }
+           
+        # so long as $doit isn't -1 then we have a valid filter 
+        if( $doit != -1 ) {   
+          print FH ${$self->{STARS}}[$star]->get_magnitude($filters[$i]) . "  ";
+          print FH ${$self->{STARS}}[$star]->get_errors($filters[$i]) . "  ";
+          print FH ${$self->{STARS}}[$star]->quality() . "  ";
+        } 
      }
      
      # colours
      foreach my $j ( 0 .. $num_colours-1 ) {
-        print FH ${$self->{STARS}}[$star]->get_colour( $colours[$j] ) . "  ";
-        print FH ${$self->{STARS}}[$star]->get_colourerr( $colours[$j] ) . "  ";
-        print FH ${$self->{STARS}}[$star]->quality() . "  ";
+     
+        my $doit = 0;
+        
+        # if we want fewer magnitudes than we have in the object
+        # to be written to the cluster file
+        if ( defined ${$output_cols}[0] ) { 
+
+           $doit = -1;
+           # check to see if we have a valid filter
+           foreach my $m ( 0 .. $#{$output_cols} ) {
+              $doit = 1 if ( ${$output_cols}[$m] eq $colours[$j] );
+           }
+        }
+           
+        # so long as $doit isn't -1 then we have a valid filter 
+        if( $doit != -1 ) {   
+           print FH ${$self->{STARS}}[$star]->get_colour( $colours[$j] ) . "  ";
+           print FH ${$self->{STARS}}[$star]->get_colourerr($colours[$j]) ."  ";
+           print FH ${$self->{STARS}}[$star]->quality() . "  ";
+        }
      } 
      
      # next star      
@@ -466,7 +542,10 @@ sub _read_cluster {
    
    # loop through file
    foreach my $i ( 3 .. $#file ) {
-   
+ 
+      # remove leading spaces
+      $file[$i] =~ s/^\s+//;
+
       # split each line
       my @separated = split( /\s+/, $file[$i] );
  
@@ -481,6 +560,9 @@ sub _read_cluster {
       # field
       $star->field( $separated[0] );
       
+      # id
+      $star->id( $separated[1] );
+      
       # ra
       my $objra = "$separated[2] $separated[3] $separated[4]";
       $star->ra( $objra );
@@ -489,7 +571,12 @@ sub _read_cluster {
       my $objdec = "$separated[5] $separated[6] $separated[7]";
       $star->dec( $objdec );
       
+      # x & y
+      $star->x( $separated[8] );
+      $star->y( $separated[9] );
+      
       # number of magnitudes and colours
+      $file[1] =~ s/^\s+//;
       my @colours = split( /\s+/, $file[1] );
       
       my @quality;

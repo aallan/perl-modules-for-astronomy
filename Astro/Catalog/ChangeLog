@@ -1,3 +1,9 @@
+2002-01-24  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Various changes made to support the Field Correlation Client,
+          note that the USNO-A2 parsing was broken for catalogues with
+          more than 1000 stars before this update.
+
 2002-01-14  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Catalog.pm: Can now read from, and dump to, ARK Cluster files.
