@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.3 2002/03/18 05:32:00 aa Exp $
+#     $Id: Parse.pm,v 1.4 2002/03/18 05:46:26 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -41,8 +41,9 @@ eSTAR::RTML::Parse - module which parses valid RTML messages
 =head1 DESCRIPTION
 
 The module parses incoming RTML messages recieved by the intelligent
-gent from the discovery nod, it takes an eSTAR::RTML object as input
-returning an object with parsed
+gent from the discovery node, it takes an eSTAR::RTML object as input
+returning an object with parsed RTML. The object has various query
+methods enabled allowing the user to grab tag values simply.
 
 =cut
 
@@ -55,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.3 2002/03/18 05:32:00 aa Exp $
+$Id: Parse.pm,v 1.4 2002/03/18 05:46:26 aa Exp $
 
 =head1 METHODS
 
@@ -102,41 +103,13 @@ sub new {
 
 }
 
-# M E T H O D S -------------------------------------------------------------
 
-=back
-
-=head2 Main Methods
-
-=over 4
-
-=item B<rtml>
-
-Populate the pre-parsed RTML document tree using an eSTAR::RTML object
-
-   $message->rtml( $rtml_object );
-
-and parse the tree.
-
-=cut
-
-sub rtml {
-  my $self = shift;
-  my $rtml = shift;
- 
-  # populate the document tree (icky)
-  $self->{BUFFER} = $rtml->return_tree();
-  
-  # parse the document tree
-  _parse_rtml();
-
-}
 
 # A C C E S S O R   M E T H O D S --------------------------------------------
 
 =back
 
-=head2 Main Methods
+=head2 Accessor Methods
 
 =over 4
 
@@ -181,7 +154,8 @@ Configures the object, takes an options hash as an argument
 
   $message->configure( %options );
 
-Does nothing if the array is not supplied.
+Does nothing if the hash is not supplied. This is called directly from
+the constructor during object creation
 
 =cut
 
@@ -207,13 +181,53 @@ sub configure {
 
 }
 
+# M E T H O D S -------------------------------------------------------------
+
+=item B<rtml>
+
+Populate the pre-parsed RTML document tree using an eSTAR::RTML object
+
+   $message->rtml( $rtml_object );
+
+and parse the tree. This method is called directly from the configure
+method if an RTML key and value is supplied to the %options hash.
+
+=cut
+
+sub rtml {
+  my $self = shift;
+  my $rtml = shift;
+ 
+  # populate the document tree (icky)
+  $self->{BUFFER} = $rtml->return_tree();
+  
+  # parse the document tree using provate methods.
+  _parse_rtml();
+
+}
+
 # T I M E   A T   T H E   B A R  --------------------------------------------
 
 =back
 
+=head1 COPYRIGHT
+
+Copyright (C) 2002 University of Exeter. All Rights Reserved.
+
+This program was written as part of the eSTAR project and is free software;
+you can redistribute it and/or modify it under the terms of the GNU Public
+License.
+
+=head1 AUTHORS
+
+Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
+
+=cut
+
+
 =begin __PRIVATE_METHODS__
 
-=head2 Private methods
+=head2 Private Methods
 
 These methods are for internal use only.
 
@@ -238,7 +252,7 @@ sub _parse_rtml {
    
    # parse the remainder of the RTML document
    for ( my $i = 3; $i <= $#document; $i++ ) {
-      print "# $i = $document[$i](*)\n";
+      print "# $i = $document[$i] (*)\n";
       
       my @tag = @{$document[$i+1]};
       # parse the tag
@@ -285,7 +299,7 @@ sub _parse_tag {
   # their own sub-tags so need to deal with them individually
          
   for ( my $j = 3; $j <= $#obs; $j++ ) {
-     print "#    $j = $obs[$j]*\n";
+     print "#    $j = $obs[$j] <*>\n";
          
      # grab section
      my @generic = @{$obs[$j+1]};
@@ -300,7 +314,7 @@ sub _parse_tag {
                
      # loop through sub-tags
      for ( my $k = 3; $k <= $#generic; $k++ ) {
-        print "#       $k = $generic[$k]*\n";
+        print "#       $k = $generic[$k] [*]\n";
                   
         # grab sub-tag array reference
         my @array = @{$generic[$k+1]};
@@ -356,7 +370,7 @@ sub _parse_sub_tag {
   my @array = @$array_reference;
    
   for ( my $j = 3; $j <= $#array; $j++ ) {
-     print "#    $j = $array[$j]*\n";
+     print "#    $j = $array[$j] *\n";
             
      # grab the hash entry
      my $entry = ${$array[$j+1]}[2];
@@ -389,7 +403,7 @@ sub _parse_sub_sub_tag {
   
   # loop through sub-tags
   for ( my $l = 3; $l <= $#array; $l++ ) {
-     print "#          $l = $array[$l]*\n";
+     print "#          $l = $array[$l] *\n";
                     
      # grab the hash entry
      my $entry = ${$array[$l+1]}[2];
@@ -422,7 +436,7 @@ sub _parse_sub_sub_sub_tag {
   
   # loop through sub-tags
   for ( my $l = 3; $l <= $#array; $l++ ) {
-     print "#          $l = $array[$l]*\n";
+     print "#          $l = $array[$l] *\n";
                     
      # grab the hash entry
      my $entry = ${$array[$l+1]}[2];
@@ -564,20 +578,7 @@ sub _parse_sub_sub_sub_value {
      }      
   }
 }
-                  
-=head1 COPYRIGHT
 
-Copyright (C) 2002 University of Exeter. All Rights Reserved.
-
-This program was written as part of the eSTAR project and is free software;
-you can redistribute it and/or modify it under the terms of the GNU Public
-License.
-
-=head1 AUTHORS
-
-Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
-
-=cut
 
 # L A S T  O R D E R S ------------------------------------------------------
 
