@@ -46,11 +46,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: USNOA2.pm,v 1.1 2003/07/29 20:33:25 aa Exp $
+$Id: USNOA2.pm,v 1.2 2003/07/30 00:23:39 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -360,7 +360,7 @@ Currently translations are a bit thin on the ground...
 
 =head1 SEE ALSO
 
-L<Astro::Catalog::BaseQuery>, L<Astro::Catalog::GSC::Query>
+L<Astro::Catalog::Query>, L<Astro::Catalog::GSC::Query>
 
 =head1 COPYRIGHT
 

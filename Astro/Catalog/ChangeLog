@@ -5,8 +5,14 @@
           generic catalogue queries.
         
         * Moved actualy query sub-classes down a directory level to allow
-          for the Query.pm file  
+          for the Query.pm file 
           
+        * Added a WebService transport class, probably needs some added
+          generalisation, but our sample of web services is still small
+          
+        * Added a Sesame.pm class to do CDS Sesame lookups by target name
+          using the new WebService transport class. 
+                       
 2003-07-28  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Moved the catalogue query classes to chare a common namespace,

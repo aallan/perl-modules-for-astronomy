@@ -32,11 +32,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: WebService.pm,v 1.2 2003/07/29 20:15:12 aa Exp $
+$Id: WebService.pm,v 1.3 2003/07/30 00:23:39 aa Exp $
 
 =head1 METHODS
 
@@ -89,24 +89,14 @@ sub new {
 
 =item B<querydb>
 
-Returns an Astro::Catalog object resulting from the specific query.
-
-   $catalog = $q->querydb();
+Unlike C<Astro::Transport::REST> a default C<querydb()> method is not
+provided by this base class, each sub-class must provide its own 
+implemetation.
 
 =cut
 
 sub querydb {
-  my $self = shift;
-
-  # call the private method to make the actual query
-  $self->_make_query();
-
-  # check for failed connect
-  return undef unless defined $self->{BUFFER};
-
-  # return catalog
-  return $self->_parse_query();
-
+  croak "querydb() must be provided by the subclass\n";
 }
 
 =item B<proxy>
@@ -189,9 +179,13 @@ sub endpoint {
     $self->{ENDPOINT} = $endpoint;
     
   }
-
-  return $self->{ENDPOINT};
   
+  if ( defined $self->{ENDPOINT} ) {
+     return $self->{ENDPOINT};
+  } else {
+     return $self->_default_endpoint();
+  }
+     
 }
 
 =back
@@ -204,7 +198,7 @@ sub endpoint {
 
 Configures the object, takes an options hash as an argument
 
-  $dss->configure( %options );
+  $q->configure( %options );
 
 Does nothing if the array is not supplied.
 
@@ -251,66 +245,52 @@ sub _default_endpoint {
   croak "default endpoint must be specified in subclass\n";
 }
 
+=item B<_is_service>
 
-=item B<_make_query>
+Whether the webservice uses a URN and $endpoint, or is
+a service specified by a WSDL file
 
-Private function used to make an query. Should not be called directly,
-since it does not parse the results. Instead use the querydb() assessor 
-method.
+  $bool = $q->_is_service();
 
 =cut
 
-sub _make_query {
-   my $self = shift;
-
-   # grab the soaplite object
-   my $soap = $self->soaplite();
-
-   # clean out the buffer
-   $self->{BUFFER} = "";
-
-   # grab the base URL
-   my $endpoint = $self->endpoint();
-
-   # loop round all the options keys and build the query
-   my %allow = $self->_get_allowed_options;
-   foreach my $key ( keys %allow ) {
-     # Need to translate them...
-     my $cvtmethod = "_from_" . $key;
-     my ($outkey, $outvalue);
-     if ($self->can($cvtmethod)) {
-       ($outkey, $outvalue) = $self->$cvtmethod();
-     } else {
-       # Currently assume everything is one to one
-       warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping");
-       $outkey = $key;
-       $outvalue = $self->query_options($key);
-     }
-
-     $options .= "&$outkey=". $outvalue
-       if defined $outvalue;
-   }
-
-   # build final query URL
-   $URL = $URL . $options;
-
-   # build request
-   my $request = new HTTP::Request('GET', $URL);
-
-   # grab page from web
-   my $reply = $ua->request($request);
-
-   # declare file name
-   my $file_name;
-
-   if ( ${$reply}{"_rc"} eq 200 ) {
-      # stuff the page contents into the buffer
-      $self->{BUFFER} = ${$reply}{"_content"};
-   } else {
-      croak("Error ${$reply}{_rc}: Failed to establish network connection");
-   }
+sub _is_service {
+  croak "decision must be made by subclass\n";
 }
 
+=item B<_translate_options>
+
+Translates the options from the default interface into the internal
+options for the sub-class
+
+  %options = _translate_options( );
+  
+=cut
+
+sub _translate_options {
+  my $self = shift;
+    
+  my %outhash;  
+  my %allow = $self->_get_allowed_options();
+  
+  foreach my $key ( keys %allow ) {
+    # Need to translate them...
+    my $cvtmethod = "_from_" . $key;
+    my ($outkey, $outvalue);
+    if ($self->can($cvtmethod)) {
+      ($outkey, $outvalue) = $self->$cvtmethod();
+    } else {
+      # Currently assume everything is one to one
+      warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping");
+      $outkey = $key;
+      $outvalue = $self->query_options($key);
+    }
+     
+    $outhash{$outkey} = $outvalue;
+  } 
+  
+  return %outhash;
+}   
 
 =head1 COPYRIGHT
 

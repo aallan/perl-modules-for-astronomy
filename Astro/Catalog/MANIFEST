@@ -15,8 +15,10 @@ Query/Makefile.PL
 Query/Query/USNOA2.pm
 Query/Query/GSC.pm
 Query/Query/SuperCOSMOS.pm
+Query/Query/Sesame.pm
 Query/Query/Makefile.PL
 Transport/REST.pm
+Transport/WebService.pm
 Transport/Makefile.PL
 t/1_compile.t
 t/2_cluster.t

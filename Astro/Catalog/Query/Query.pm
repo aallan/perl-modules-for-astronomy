@@ -29,13 +29,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.1 2003/07/29 20:16:14 aa Exp $
+$Id: Query.pm,v 1.2 2003/07/30 00:23:39 aa Exp $
 
 =head1 METHODS
 
@@ -111,6 +111,9 @@ sub query_options {
   if (@_) {
     my $opt = lc(shift);
     my %allow = $self->_get_allowed_options;
+
+    #print "\$opt = $opt\n";
+    #print "\$allow{\$opt} = $allow{$opt}\n";
     if (!exists $allow{$opt}) {
       warnings::warnif("Option $opt not supported by this cataloge");
       return;
@@ -458,6 +461,14 @@ sub _set_query_options {
   my %newopt = @_;
 
   my %allow = $self->_get_allowed_options();
+  
+  #foreach my $i ( sort keys %newopt ) {
+  #   print "newopt $i = $newopt{$i} \n";
+  #}  
+    
+  #foreach my $i ( sort keys %allow ) {
+  #  print "allow  $i = $allow{$i} \n";
+  #}   
 
   for my $newkey (keys %newopt) {
     if (!exists $allow{$newkey}) {
@@ -500,6 +511,21 @@ sub _dump_raw {
 
    return @portable;
 }
+
+=item B<_set_raw>
+
+Private function to fill the current buffer with a string. This is used
+when deealing with the buffer cannot be encapsulated inside a Transport
+class and must be deal with by child classese.
+
+   $q->_set_raw( $buffer );
+   
+=cut
+
+sub _set_raw {
+   my $self = shift;
+   $self->{BUFFER} = shift;
+}   
 
 =item B<_dump_options>
 
