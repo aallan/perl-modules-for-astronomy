@@ -10,6 +10,7 @@ Star/Makefile.PL
 Star/Morphology/Makefile.PL
 Star/Morphology/Morphology.pm
 IO/README
+IO/Astrom.pm
 IO/JCMT.pm
 IO/Cluster.pm
 IO/Simple.pm
@@ -19,6 +20,8 @@ IO/VOTable.pm
 IO/GaiaPick.pm
 IO/UKIRTBS.pm
 IO/Makefile.PL
+IO/FINDOFF.pm
+IO/SExtractor.pm
 Query/Query.pm
 Query/Makefile.PL
 Query/Query/2MASS.pm
@@ -44,6 +47,8 @@ t/2_simple.t
 t/2_stl.t
 t/2_tst.t
 t/2_votable.t
+t/2_astrom.t
+t/2_findoff.t
 t/3_catalog.t
 t/3_star.t
 t/4_cmc.t
