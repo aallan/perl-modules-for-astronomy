@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.6 2002/03/18 12:48:03 aa Exp $
+#     $Id: Parse.pm,v 1.7 2002/03/18 13:10:44 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.6 2002/03/18 12:48:03 aa Exp $
+$Id: Parse.pm,v 1.7 2002/03/18 13:10:44 aa Exp $
 
 =head1 METHODS
 
@@ -153,7 +153,7 @@ Return the CompletionTime from of the RTML document
 
 =cut
 
-sub score {
+sub time {
   my $self = shift;
   return ${$self->{COMPLETIONTIME}}{tag_value};
 }

@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.3 2002/03/18 12:44:41 aa Exp $
+#     $Id: Build.pm,v 1.4 2002/03/18 13:15:26 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -59,13 +59,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.3 2002/03/18 12:44:41 aa Exp $
+$Id: Build.pm,v 1.4 2002/03/18 13:15:26 aa Exp $
 
 =head1 METHODS
 
@@ -616,7 +616,7 @@ the completion time should be of the format YYYY-MM-DDTHH:MM:SS
 
 =cut
 
-sub score {
+sub time {
   my $self = shift;
 
   if (@_) {
