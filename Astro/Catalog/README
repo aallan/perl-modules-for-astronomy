@@ -6,14 +6,14 @@ What is it?
 
 The module is a generic object orientated astronomical catalogue object.
 
-Version 3.0
------------
+Version 3.x.x
+-------------
 
-Verison 3.0 of the Astro::Catalog breaks the existing v1.x and v2.x API. There
-are many good reasons for this, chiefly the introduction of new features that
-would have been hard to implement and maintain backwards compatibility.
+Verison 3.x.x of the Astro::Catalog breaks the existing v1.x and v2.x API. 
+There are many good reasons for this, chiefly the introduction of new features
+that would have been hard to implement and maintain backwards compatibility.
 
-New features for v3.0 include pluggable I/O support, filtering and inline
+New features for v3.x.x include pluggable I/O support, filtering and inline
 sorting of retrieved catalogues. However alot of the improvements are not 
 readily noticable by the user as alot of work has gone into the infrastructure
 of the package. This means that adding additional I/O and Query support has 
@@ -37,10 +37,6 @@ The madatory requirement of the Astro::Catalog package are,
   Test::More
   Data::Dumper
   Carp
-  
-Additionally,if you wish to use the Astro::Catalog::Query::SuperCOSMOS
-module, the package requires that the Astro::Aladin module (and associated
-CDS Java Aladin infrastructure) are installed.
 
 Provides
 --------
@@ -68,6 +64,11 @@ The package provides the following user level classes
   Astro::Catalog::Query::SuperCOSMOS
     A class to automatically retrieves a objects in the SuperCOSMOS catalogue
     matching query parameters and returns an Astro::Catalog object. 
+            
+  Astro::Catalog::Query::CMC
+    A class to automatically retrieves a objects in the Carlsberg Merdian
+    Catralogue (CMC/12) matching query parameters and returns an Astro::Catalog
+    object. 
     
   Astro::Catalog::Query::Sesame
     A class that does a name lookup using the CDS Sesame Web Service and
@@ -100,6 +101,9 @@ The user level query classes inherit from the Astro::Catalog::Transport::XXX
 classes, which in turn all inherit basic functionality from the Query base
 class Astro::Catalog::Query. The Astro::Catalog::IO modules provide pluggable
 polymorphic input/output.
+
+It should be noted that Astro::Catalog::IO::TST does not currently provide
+a _write_catalog() function.
  
 Where can I get it?
 -------------------

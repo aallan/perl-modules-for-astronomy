@@ -6,7 +6,7 @@ my $cfg_to_install = "sss.cfg";
 
 WriteMakefile( 
                'NAME'           => 'Astro::Catalog',
-	       'VERSION'        => '3.2.0',
+	       'VERSION'        => '3.2.2',
                'EXE_FILES'      => [ ],
                'PREREQ_PM'      => { 'LWP'              => 5.53,
                                      'Net::Domain'      => 2.13,
@@ -44,7 +44,7 @@ sub test {
   my $self = shift;
   my $inherited = $self->SUPER::test (@_);
 
-  $inherited =~ s/^TEST_VERBOSE=0$/TEST_VERBOSE=1/gm;
+  #$inherited =~ s/^TEST_VERBOSE=0$/TEST_VERBOSE=1/gm;
   $inherited;
 }
 
