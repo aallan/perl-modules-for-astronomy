@@ -31,6 +31,9 @@ Compare 2 catalogs.
 
   compare_catalog( $cat1, $cat2 );
 
+where $cat1 is the catalogue to be tested, and $cat2 is the
+reference catalogue.
+
 Catalogs must be C<Astro::Catalog> objects. Currently simply compares
 each star in teh catalog, without forcing a new sort (so order is
 important).
@@ -38,16 +41,16 @@ important).
 =cut
 
 sub main::compare_catalog {
-  my ($refcat, $cmpcat) = @_;
+  my ($cmpcat, $refcat) = @_;
 
   isa_ok( $refcat, "Astro::Catalog", "Check ref catalog type" );
   isa_ok( $cmpcat, "Astro::Catalog", "Check cmp catalog type" );
 
   # Star count
-  is( $refcat->sizeof(), $cmpcat->sizeof(), "compare star count" );
+  is( $cmpcat->sizeof(), $refcat->sizeof(), "compare star count" );
 
   for my $i (0.. ($refcat->sizeof()-1)) {
-    compare_star( $refcat->starbyindex($i), $cmpcat->starbyindex($i));
+    compare_star( $cmpcat->starbyindex($i), $refcat->starbyindex($i));
   }
 }
 
@@ -58,19 +61,22 @@ and filters.
 
   compare_star( $star1, $star2 );
 
+where $star1 is the star to be tested and $star2 is the
+reference star.
+
 =cut
 
 sub compare_star {
-  my ($refstar, $newstar) = @_;
+  my ($cmpstar, $refstar) = @_;
 
   isa_ok( $refstar, "Astro::Catalog::Star", "Check ref star type");
-  isa_ok( $newstar, "Astro::Catalog::Star", "Check cmp star type");
+  isa_ok( $cmpstar, "Astro::Catalog::Star", "Check cmp star type");
 
-  is( $refstar->id(), $newstar->id(), "compare star ID" );
+  is( $cmpstar->id(), $refstar->id(), "compare star ID" );
 
   # Distance is okay if we are within 1 arcsec
   my $maxsec = 1;
-  my $radsep = $refstar->coords->distance( $newstar->coords );
+  my $radsep = $refstar->coords->distance( $cmpstar->coords );
 
   if (!defined $radsep) {
     # did not get any value. Too far away
@@ -85,37 +91,37 @@ sub compare_star {
 
 
 
-  is( $refstar->ra(), $newstar->ra(), "compare star RA" );
-  is( $refstar->dec(), $newstar->dec(), "Compare star Dec" );
+  is( $cmpstar->ra(), $refstar->ra(), "compare star RA" );
+  is( $cmpstar->dec(), $refstar->dec(), "Compare star Dec" );
 
-  my @dat_filters = $refstar->what_filters();
-  my @net_filters = $newstar->what_filters();
+  my @dat_filters = $cmpstar->what_filters();
+  my @net_filters = $refstar->what_filters();
   foreach my $filter ( 0 ... $#net_filters ) {
     is( $dat_filters[$filter], $net_filters[$filter],"compare filter $filter" );
-    is( $refstar->get_magnitude($dat_filters[$filter]),
-	$newstar->get_magnitude($net_filters[$filter]),
+    is( $cmpstar->get_magnitude($dat_filters[$filter]),
+	$refstar->get_magnitude($net_filters[$filter]),
 	"compare magnitude $filter");
-    is( $refstar->get_errors($dat_filters[$filter]),
-	$newstar->get_errors($net_filters[$filter]),
+    is( $cmpstar->get_errors($dat_filters[$filter]),
+	$refstar->get_errors($net_filters[$filter]),
 	"compare magerr $filter");
   }
 
-  my @dat_cols = $refstar->what_colours();
-  my @net_cols = $newstar->what_colours();
+  my @dat_cols = $cmpstar->what_colours();
+  my @net_cols = $refstar->what_colours();
   foreach my $col ( 0 ... $#net_cols ) {
     is( $dat_cols[$col], $net_cols[$col],"compare color $col" );
-    is( $refstar->get_colour($dat_cols[$col]), 
-	$newstar->get_colour($net_cols[$col]),
+    is( $cmpstar->get_colour($dat_cols[$col]), 
+	$refstar->get_colour($net_cols[$col]),
 	"compare value of color $col");
-    is( $refstar->get_colourerr($dat_cols[$col]), 
-	$newstar->get_colourerr($net_cols[$col]),"compare color error $col" );
+    is( $cmpstar->get_colourerr($dat_cols[$col]), 
+	$refstar->get_colourerr($net_cols[$col]),"compare color error $col" );
   }
 
-  is( $refstar->quality(), $newstar->quality(), "check quality" );
-  is( $refstar->field(), $newstar->field(), "check field" );
-  is( $refstar->gsc(), $newstar->gsc() , "check GSC flag");
-  is( $refstar->distance(), $newstar->distance() ,"check distance");
-  is( $refstar->posangle(), $newstar->posangle(), "check posangle" );
+  is( $cmpstar->quality(), $refstar->quality(), "check quality" );
+  is( $cmpstar->field(), $refstar->field(), "check field" );
+  is( $cmpstar->gsc(), $refstar->gsc() , "check GSC flag");
+  is( $cmpstar->distance(), $refstar->distance() ,"check distance");
+  is( $cmpstar->posangle(), $refstar->posangle(), "check posangle" );
 
 }
 
