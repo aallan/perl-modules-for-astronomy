@@ -13,16 +13,20 @@ Astro::Catalog::Query::CMC - A query request to the SuperCOSMOS catalogue
 
 =head1 SYNOPSIS
 
-  $supercos = new Astro::Catalog::Query::SuperCOSMOS( RA        => $ra,
-					              Dec       => $dec,
-					             Radius    => $radius,
-					             Nout      => $number_out );
+  $supercos = new Astro::Catalog::Query::SuperCOSMOS( RA     => $ra,
+					              Dec    => $dec,
+					              Radius => $radius,
+					              Nout   => $number_out,
+                                                      Colour => $band );
 
   my $catalog = $supercos->querydb();
 
 =head1 WARNING
 
-This code should be superceeded by the generic SkyCat query class.
+This code totally ignores the epoch of the observations and the associated
+proper motions, this pretty much means that for astrometric work the catalogues
+you get back from the query are pretty much bogus. This should be sorted in
+the next distribution.
 
 =head1 DESCRIPTION
 
@@ -59,7 +63,7 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 $VERSION = '0.01';
 $DEBUG = 0;
@@ -80,7 +84,7 @@ my %CONFIG;
 
 =head1 REVISION
 
-$Id: SuperCOSMOS.pm,v 1.5 2003/09/25 21:27:50 aa Exp $
+$Id: SuperCOSMOS.pm,v 1.6 2003/09/25 21:54:32 aa Exp $
 
 =head1 METHODS
 
@@ -88,7 +92,7 @@ $Id: SuperCOSMOS.pm,v 1.5 2003/09/25 21:27:50 aa Exp $
 
 =item B<new>
 
-Simple constructor. Should just handle the 'Colour' option, e.g.
+Simple constructor, handles the 'Colour' option, e.g.
 
  long_name:      SuperCOSMOS catalog - blue (UKJ) southern survey
  short_name:     SSScat_UKJ@WFAU
@@ -106,6 +110,8 @@ Simple constructor. Should just handle the 'Colour' option, e.g.
 
 Allowed options are 'UKJ', 'UKR', 'UKI', and 'ESOR' for the UK Blue, UK Red, 
 UK near-IR and ESO Red catalogues respectively.
+
+All other options are passed on to SUPER::new().
 
 =cut
 
