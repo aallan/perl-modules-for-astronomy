@@ -1,0 +1,22 @@
+2002-05-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Telescope.pm: CPAN release 0.50
+
+	* t/simple.t: Add limit tests.
+
+	* Telescope.pm: Add telescope limits.
+
+2001-09-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* t/simple.t: Write proper test.
+
+	* Telescope.pm: Complete rewrite from the ground up to support the
+	 OMP interface. 
+	 (see http://www.jach.hawaii.edu/JACpublic/JAC/software/omp)
+
+2000-03-28  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* t/simple.t: Add test
+
+	* Telescope.pm: Tweak of Pod
+
