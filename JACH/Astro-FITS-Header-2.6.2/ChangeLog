@@ -1,0 +1,246 @@
+2003-04-28  Alasdair Allan <aa@astro.ex.ac.uk> (Version 2.6.2)
+
+        * Applied patch by Diab, shipped as 2.6.2
+
+2003-03-28  Diab Jerius  <djerius@cfa.harvard.edu>
+
+	* t/subhdr.t: code cleanup to avoid undefined warning
+
+2003-03-26  Diab Jerius  <djerius@cfa.harvard.edu>
+
+	* CFITSIO/CFITSIO.pm (writehdr):
+	   if there was no END card in the existing header the initial
+	   card was not written.  also, additional streamlining of code.
+	
+	* CFITSIO/CFITSIO.pm (configure):
+	   the code assumed that there was an END card in the existing
+	   header read by CFITSIO, which is not always the case.  Now
+	   explictily adds one.
+
+2003-03-12 Alasdair Allan <aa@astro.ex.ac.uk> (Version 2.6.1)
+
+        * t/hierarch.t: Added more test cases.
+
+2003-03-12 Alasdair Allan <aa@astro.ex.ac.uk> (Version 2.6)
+
+        * Minor documentation tweaks and released as Version 2.6
+        
+2003-03-12 Craig DeForest <deforest@boulder.swri.edu> 
+
+        * Header.pm 
+	   - FETCH: END card always returns ' ' if present, undef if not.
+	   - STORE: END & SIMPLE cards are always put in the right place.
+	   - STORE: Cleaned out some extra cruft in the card assignment 
+	            block
+	   - new:   SIMPLE & END cards are assigned automagically
+	   - Documentation: several improvements.
+
+	* Item.pm
+	   - 'F' evaluates false if assigned to a card of type LOGICAL
+	     (already evaluated false if assigned to a card of unknown type).
+	   - END cards no longer emit warnings with 'use strict'.
+	   
+2003-03-11  Alasdair Allan <aa@astro.ex.ac.uk> (Version 2.5.1)
+
+        * Minor documentation tweaks, badged as version 2.5
+        
+        * t/hierarch.t: Added test harness for ESO HIERARCH header keywords
+
+2003-03-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Header.pm: Add tiereturnshash, and configure it from TIEHASH
+	
+	* Header.pm (FETCH): Respect the new tiereturnshash method. If
+	true, will return multi-valued items as a reference to an array
+	rather than as a joined string (tied interface does not respect
+	calling context).
+
+	* Header.pm (FETCH/STORE): Tied interface can now retrieve or set
+	the comment string associated with an item by adding '_COMMENT' to
+	the keyword.
+
+2002-01-19  Malcolm J. Currie <mjc@star.rl.ac.uk>
+
+        * Item/Item.pm: Added support for HIERARCH hierarchical keywords.
+
+2002-12-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Header.pm (FETCH): Tied interface now returns a hash ref when a
+	subheader is encountered. (STORE): And accepts a hash via STORE
+
+2002-12-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF/NDF.pm (configure): Allow for someone to supply an explicit
+	HDS path to an NDF
+
+	* Item/Item.pm: Sub-headers can now be stored with
+	Astro::FITS::Header objects, using type HEADER
+
+	* Header.pm (STORE): Allow an Astro::FITS::Header object to be
+	stored through the tied interface.
+
+2002-12-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Header.pm (insert{): Fix problem with tied hash when
+	doing %$tieref = %new
+
+2002-12-02  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF/NDF.pm (configure): Fix problem with SCUBA raw data. The
+	files are NDFs but are not declared as such in the type field
+
+2002-11-27  Alasdair Allan <aa@astro.ex.ac.uk> (Version 2.4)
+
+        * Added patch provided by Diab Jerius <djerius@cfa.harvard.edu>
+          which allows you to open files in ReadOnly mode. Additionally
+          it moves the module over to using the new Astro::FITS::CFITSIO 
+          rather than the older CFITSIO module.
+
+        * Minor documentation changes to reflect new versions of the
+          Astro::FITS::CFITSIO library now needed by the module.
+          
+2002-11-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* GSD/GSD.pm: Add GSD reader 
+
+	* NDF/NDF.pm (configure): Workaround a bug in NDF when reading
+	  .HEADER NDFs.
+
+2002-06-24  Alasdair Allan <aa@astro.ex.ac.uk> (Version 2.2)
+
+        * Minor documentation tweaks to reflect Tim's changes,
+          released as v2.2.
+
+2002-06-19  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF/NDF.pm: Add first support for .HEADER HDS containers 
+
+	* Item/Item.pm (_stringify): Support blank lines
+
+	* Header.pm: Add stringification overload 
+
+2002-06-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* t/tied.t: Use two argument form of ok()
+
+	* t/parse.t: Use two argument form of ok()
+
+2002-06-10  Alasdair Allan <aa@astro.ex.ac.uk> 
+
+        * Minor documentation changes, integrated patches into the main
+          CVS tree, released as v2.1. The major change from v1.x is a
+          much improved tied interface, see the POD for details.
+
+2002-05-14   Craig DeForest <deforest@boulder.swri.edu>
+
+        * Header.pm: Fix to typecasting of string in tied interface 
+
+        * t/parse.t: Added single-quote case
+
+2002-05-10   Craig DeForest <deforest.@boulder.swri.edu>
+ 
+        * Header.pm: Minor bug fix for FETCH of undefined tag values 
+          (used to return ''; now returns undef)
+
+        * Header.pm: FETCH and STORE convert tags to ALL UPPERCASE
+          per the FITS standard.
+
+        * Header.pm: undefine the type of newly-assigned cards in the 
+          tied-hash code, so that the autotyper can figure it out.
+
+        * Header.pm: Hash-ref passing now forces string interpretation
+         
+2002-05-09   Craig DeForest <deforest@boulder.swri.edu>
+
+        * Header.pm: Added multiline support to the tied interface, using
+          multiline string return -- which should preserve 0th-element 
+          functionality in arithmetic expressions, as expected by legacy code.
+
+        * t/tied.t: added multline tests.
+
+2002-03-29   Alasdair Allan <aa@astro.ex.ac.uk> 
+
+        * Header.pm: Added freeze() function
+        
+        * Item.pm: Added freeze() function
+        
+2001-10-16   Diab Jerius  <dj@head-cfa.harvard.edu>
+
+	* Header.pm: itembyname(), index(), value(), and comment() now
+	  return a single element when called in scalar context.
+
+	* t/parse.t: test new behavior of above routines in scalar environment
+	
+2001-06-26  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Header.pm: Fixed bug in removebyname() method
+
+2001-06-18  Alasdair Allan <aa@astro.ex.ac.uk>
+        
+        * Header.pm: Added allitems() method	
+
+2001-03-30  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Packaged for CPAN distribution, included README and GPL files
+	
+2001-03-29  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * CFITSIO/CFITSIO.pm: Implemented writehdr
+	
+	* t/cfitsio.t: Added test harness for new class
+
+2001-03-28  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * CFITSIO/CFITSIO.pm: Implemented configure
+	
+2001-03-27  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Header.pm: Added tied hash to header class
+	
+	* t/tied.t: Added test harness for new tied interface
+
+2001-03-24  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * CFITSIO/CFITSIO.pm: Skeleton structre for CFITSIO module added
+ 	
+        * t/parse.t: Rewrote test harness for Header
+	
+	* Header.pm: Fixed bugs in array maps being returned by some functions
+	
+	* t/ndf.t: Rewote test harness using some harder tests
+	    	
+2001-03-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Header.pm: configure Now uses map and _rebuild_lookup
+
+2001-03-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+        * NDF/NDF.pm: Add
+
+	* t/ndf.t: Add test
+
+	* Header.pm: Use map. Add dump(). Use hash for configure()
+
+2001-03-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Item/t/parse.t: Add caching test 
+
+	* Item/Item.pm: Fix caching
+
+	* Item/t/parse.t: Rewrite to use a for loop and add some harder tests
+
+	* Item/Item.pm: Fix some warnings with undef and add an UNDEF type
+
+2001-03-15  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * t/parse.t: Rewrote test harness
+
+        * Item/Item.pm: Added some work arounds for common non-standard entries
+
+2001-03-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* t/parse.t: Update test to fix array comparison.
+
+2001-03-10  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Original version

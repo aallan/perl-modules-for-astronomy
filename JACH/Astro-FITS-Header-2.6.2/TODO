@@ -1,0 +1,21 @@
+To Do
+-----
+
+- Add ability for units to be extracted from item comments
+
+- Read HISTORY from NDF and merge it into FITS header. On writing the
+  merged HISTORY should be writing to the HISTORY extension of the NDF
+  as this is regarded as canonical.
+
+- Provide option to extract WCS from FITS header and store it in AST object
+
+- Support subheaders (ie those in Multi-extension fits files that are
+  not part of the main header, or the headers in UKIRT data (.I1, .I2).
+  
+  As of Version 2.6 this is partially complete, you can have an Item of type
+  HEADER which simply points to another Astro::FITS::Header object, and appears
+  as hashes when using a tied object.
+  
+  However there is no code to generate those subheaders automatically when
+  reading an MEF file.
+
