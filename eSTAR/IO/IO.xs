@@ -6,7 +6,7 @@
 #include "globus_io.h"
 #include "src/estar_io.h"
 
-# define HANDLE (&globus_io_handle_t)
+#define HANDLE (&globus_io_handle_t)
 
 MODULE = eSTAR::IO   PACKAGE = eSTAR::IO   PREFIX eSTAR_IO_		
 
@@ -25,8 +25,17 @@ Write_Message( handle, message )
     char * message
     globus_io_handle_t * handle
 
-int
-Read_Message( handle, message )
-    AV * message;
+message_array
+Read_Message( handle )
+    globus_io_handle_t * handle
   PREINIT:
-    char ** array;    
+    int status;
+    char ** message;
+  CODE
+    status = eSTAR_IO_Read_Message( handle, message );
+    
+  OUTPUT:
+  
+  CLEANUP:
+    if (status != GLOBUS_FALSE ) 
+      XSRETURN_UNDEF;       

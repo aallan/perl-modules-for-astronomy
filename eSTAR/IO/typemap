@@ -1,1 +1,2 @@
 globus_io_handle_t *    T_PTROBJ
+message_array * T_OPAQUEARRAY
