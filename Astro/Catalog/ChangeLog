@@ -3,10 +3,16 @@
         * Query/Query/SIMBAD.pm: Removed debugging statements which 
           generated a file containing a copy of the retrieved HTML in 
           the current working directory.
-        
+               
         * etc/sss.cfg: Added SkyCat SuperCOSMOS configuration file to 
           default distribution
         
+        * etc/skycat.cfg: Added generic SkyCat configuration file to 
+          default distribution   
+
+        * Query/Query/SkyCat.pm: Updated to look for $PERLPREFIX/etc/skycat.cfg
+          configuration file by default.
+               
         * Makefile.PL: Modified makefile to install the SuperCOSMOS config
           file to $(PERLPREFIX)/etc in preperation for shifting access to
           SuperCOSMOS from being dependant on Astro::Aladin to using the
