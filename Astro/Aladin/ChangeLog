@@ -1,3 +1,7 @@
+2003-02-26  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Aladin.pm: POD documentation fixed
+        
 2003-02-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Fixed some minor problems, minimal test suite.
