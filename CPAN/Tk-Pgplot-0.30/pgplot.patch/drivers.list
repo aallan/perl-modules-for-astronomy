@@ -114,3 +114,7 @@
 ! The following driver is included solely for use by the aips++ team.
 !
 ! RVDRIV 0 /XRV       X-window Rivet/Tk programs with pgplot widgets.   C
+!
+! The following driver is for MacOSX only
+!
+! AQDRIV 0 /AQT       AquaTerm.app under Mac OS X                       C
