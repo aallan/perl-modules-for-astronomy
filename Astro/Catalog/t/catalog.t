@@ -7,7 +7,7 @@ use strict;
 use Test;
 use File::Spec;
 use Data::Dumper;
-BEGIN { plan tests => 6 };
+BEGIN { plan tests => 11 };
 
 # load modules
 use Astro::Catalog;
@@ -34,8 +34,8 @@ my %col_error1 = ( 'B-V' => '0.02', 'B-R' => '0.05' );
 
 # create a star
 $star[0] = new Astro::Catalog::Star( ID         => 'U1500_01194794',
-                                      RA         => '17.55398',
-                                      Dec        => '60.07673',
+                                      RA         => '09 55 39',
+                                      Dec        => '+60 07 23.6',
                                       Magnitudes => \%mags1,
                                       MagErr     => \%mag_error1,
                                       Colours    => \%colours1,
@@ -57,8 +57,8 @@ my %col_error2 = ( 'B-V' => '0.05', 'B-R' => '0.07' );
 
 # create a star
 $star[1] = new Astro::Catalog::Star( ID         => 'U1500_01194795',
-                                     RA         => '19.44578',
-                                     Dec        => '12.34535',
+                                     RA         => '10 44 57',
+                                     Dec        => '+12 34 53.5',
                                      Magnitudes => \%mags2,
                                      MagErr     => \%mag_error2,
                                      Colours    => \%colours2,
@@ -72,10 +72,10 @@ $star[1] = new Astro::Catalog::Star( ID         => 'U1500_01194795',
 # Create Catalog Object
 # ---------------------
 
-my $catalog = new Astro::Catalog( RA => '01 10 12.9',
-                                  Dec => '+60 04 35.9',
+my $catalog = new Astro::Catalog( RA     => '01 10 12.9',
+                                  Dec    => '+60 04 35.9',
                                   Radius => '1',
-                                  Stars => \@star );
+                                  Stars  => \@star );
 
 # Write Catalog to Cluster File
 # -----------------------------
@@ -102,19 +102,51 @@ for my $i (0 .. $#buffer) {
    ok( $file[$i], $buffer[$i] );
 }
 
+# Create another catalog object from the Cluster file
+# ---------------------------------------------------
+
+my $cluster = new Astro::Catalog( RA      => '01 10 12.9',
+                                  Dec     => '+60 04 35.9',
+                                  Radius  => '1',
+                                  Cluster => $file_name );
+
+# Write Catalog to Cluster File
+# -----------------------------
+
+$file_name = File::Spec->catfile( $ENV{"ESTAR_DATA"}, "other.cat" );
+
+# write it to /tmp/other.cat under UNIX
+$cluster->write_catalog( $file_name );
+
+# Compare output file and DATA block
+# ----------------------------------
+
+# clean out @file
+@file = [];
+
+# temporary file
+open( FILE, $file_name );
+@file = <FILE>;
+chomp @file;
+close(FILE);
+
+for my $i (0 .. $#buffer) {
+   ok( $file[$i], $buffer[$i] );
+}
 
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
 # Dump catalog object to screen
 #print Dumper($catalog);
+#print Dumper($cluster);
 
-END {
+#END {
   # clean up after ourselves
-  print "# Cleaning up temporary files\n";
-  print "# Deleting: $file_name\n";
-  my @list = ( $file_name );
-  unlink(@list); 
-}        
+#  print "# Cleaning up temporary files\n";
+#  print "# Deleting: $file_name\n";
+#  my @list = ( $file_name );
+#  unlink(@list); 
+#}        
 
 
 # T I M E   A T   T H E   B A R ---------------------------------------------
@@ -127,5 +159,5 @@ __DATA__
 5 colours were created
 B R V B-R B-V
 A sub-set of USNO-A2: Field centre at RA 01 10 12.9, Dec +60 04 35.9, Search Radius 1 arcminutes 
-00080  0  17.55398  60.07673  0.000  0.000  16.4  0.4  0  16.1  0.1  0  16.3  0.3  0  0.3  0.05  0  0.1  0.02  0  
-00081  1  19.44578  12.34535  0.000  0.000  9.3  0.2  0  9.5  0.6  0  9.1  0.1  0  0.2  0.07  0  -0.2  0.05  0  
+00080  0  09 55 39  +60 07 23.6  0.000  0.000  16.4  0.4  0  16.1  0.1  0  16.3  0.3  0  0.3  0.05  0  0.1  0.02  0  
+00081  1  10 44 57  +12 34 53.5  0.000  0.000  9.3  0.2  0  9.5  0.6  0  9.1  0.1  0  0.2  0.07  0  -0.2  0.05  0  

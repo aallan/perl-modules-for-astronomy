@@ -1,7 +1,6 @@
 2002-01-14  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Catalog.pm: Can now dump Astro::Catalog objects to  ARK Cluster 
-          files.
+        * Catalog.pm: Can now read from, and dump to, ARK Cluster files.
 
 2002-01-13  Alasdair Allan <aa@astro.ex.ac.uk>
 

@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.2 2002/01/14 07:32:13 aa Exp $
+#     $Id: Catalog.pm,v 1.3 2002/01/14 09:05:48 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -52,14 +52,17 @@ an ARK Cluster format catalogue.
 use strict;
 use vars qw/ $VERSION /;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+use Astro::Catalog::Star;
+use Carp;
+
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.2 2002/01/14 07:32:13 aa Exp $
+$Id: Catalog.pm,v 1.3 2002/01/14 09:05:48 aa Exp $
 
 =head1 METHODS
 
@@ -389,13 +392,15 @@ sub configure {
     
   } elsif ( defined $args{Cluster} ) {
   
-    # build from Cluster file
+    # build from Cluster file    
     my $file_name = $args{Cluster};
     unless ( open( FH, "$file_name" ) ) {
        croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
-    } 
-    @{$self->{STARS}} = _read_cluster( $file_name );    
+    }     
     close(FH);
+
+    # read catalogue from file
+     _read_cluster( $self, $file_name );    
     
   } else {
   
@@ -443,7 +448,107 @@ Reads and parses an ARK Format Cluster file into the object.
 
 sub _read_cluster {
    my $self = shift;
-
+   
+   # croak unless we have arguments
+   croak ("Astro::Catalog read_catalog() - No filename provided" ) unless @_;
+    
+   # build from Cluster file
+   my $file_name = shift;
+      
+   unless ( open( FH, $file_name ) ) {
+       croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
+   } 
+   
+   # read from file   
+   my @file = <FH>;
+   chomp @file;
+   close(FH);
+   
+   # loop through file
+   foreach my $i ( 3 .. $#file ) {
+   
+      # split each line
+      my @separated = split( /\s+/, $file[$i] );
+ 
+      # debugging (leave in)
+      #foreach my $thing ( 0 .. $#separated ) {
+      #   print "   $thing # $separated[$thing] #\n";
+      #}
+                        
+      # temporary star object
+      my $star = new Astro::Catalog::Star();
+      
+      # field
+      $star->field( $separated[0] );
+      
+      # ra
+      my $objra = "$separated[2] $separated[3] $separated[4]";
+      $star->ra( $objra );
+       
+      # dec
+      my $objdec = "$separated[5] $separated[6] $separated[7]";
+      $star->dec( $objdec );
+      
+      # number of magnitudes and colours
+      my @colours = split( /\s+/, $file[1] );
+      
+      my @quality;
+      foreach my $j ( 0 .. $#colours ) {
+      
+         # colours have minus signs
+         if( lc($colours[$j]) =~ "-" ) {
+         
+            # colours
+            my %colours = ( $colours[$j] => $separated[3*$j+10] );
+            $star->colours( \%colours );
+            
+            # errors
+            my %col_errors = ( $colours[$j] => $separated[3*$j+11] );
+            $star->colerr( \%col_errors );
+            
+            # quality flags
+            $quality[$j] = $separated[3*$j+12];
+            
+         } else {
+         
+            # mags
+            my %magnitudes = ( $colours[$j] => $separated[3*$j+10] );
+            $star->magnitudes( \%magnitudes );
+            
+            # errors
+            my %mag_errors = ( $colours[$j] => $separated[3*$j+11] );
+            $star->magerr( \%mag_errors );
+            
+            # quality flags
+            $quality[$j] = $separated[3*$j+12];
+            
+            # increment counter
+            $j = $j + 2;
+            
+         }
+            
+      }
+            
+      # set default "good" quality
+      $star->quality( 0 );
+      
+      # check and set quality flag
+      foreach my $k( 0 .. $#colours ) {
+      
+         # if quality not good then set bad flag
+         if( $quality[$k] != 0 ) {
+            $star->quality( 1 );
+         }         
+      }
+      
+      # push it onto the stack
+      push ( @{$self->{STARS}}, $star );
+   
+      
+   
+   }
+   
+   
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
