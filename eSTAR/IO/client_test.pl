@@ -33,7 +33,7 @@ my ( $status, $handle, $write_status, $close_status, $reply);
 
 # hardwire the test port and hostname
 my $port = "2000";
-my $host = "dn1.ex.ac.uk";
+my $host = "localhost";
 
 # activate modules ----------------------------------------------------------
 

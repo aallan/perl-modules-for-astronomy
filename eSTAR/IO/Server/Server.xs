@@ -69,6 +69,6 @@ int
 stop_server( )
   CODE:
     printf("close_serverXS context %p\n", &context);
-    RETVAL = eSTAR_IO_Close_Server( context );
+    RETVAL = eSTAR_IO_Close_Server( &context );
   OUTPUT:
     RETVAL  

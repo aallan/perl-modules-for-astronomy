@@ -4,6 +4,8 @@ IO.xs
 MANIFEST
 Makefile.PL
 typemap
+client_test.pl
+server_test.pl
 t/io.t
 t/server.t
 t/client.t
