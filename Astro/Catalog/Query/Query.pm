@@ -29,13 +29,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.5 2003/08/03 06:18:35 timj Exp $
+$Id: Query.pm,v 1.6 2003/08/03 08:18:59 timj Exp $
 
 =head1 METHODS
 
@@ -702,7 +702,7 @@ sub _from_radmax {
   return ($allow{$key}, $value);
 }
 
-sub _from_radmind {
+sub _from_radmin {
   my $self = shift;
   my $key = "radmin";
   my $value = $self->query_options($key);
