@@ -19,7 +19,7 @@ package Astro::DSS;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: DSS.pm,v 1.4 2001/12/11 02:31:26 aa Exp $
+#     $Id: DSS.pm,v 1.5 2001/12/11 02:53:23 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -66,16 +66,16 @@ use vars qw/ $VERSION /;
 
 use LWP::UserAgent;
 use Net::Domain qw(hostname hostdomain);
-use File::Spec qw(tmpdir);
+use File::Spec;
 use Carp;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: DSS.pm,v 1.4 2001/12/11 02:31:26 aa Exp $
+$Id: DSS.pm,v 1.5 2001/12/11 02:53:23 aa Exp $
 
 =head1 METHODS
 
