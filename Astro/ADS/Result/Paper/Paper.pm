@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.4 2001/11/01 18:02:53 aa Exp $
+#     $Id: Paper.pm,v 1.5 2001/11/01 18:57:09 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -63,13 +63,13 @@ use strict;
 use vars qw/ $VERSION /;
 
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.4 2001/11/01 18:02:53 aa Exp $
+$Id: Paper.pm,v 1.5 2001/11/01 18:57:09 aa Exp $
 
 =head1 METHODS
 
@@ -143,9 +143,9 @@ Return (or set) the bibcode for the paper
 sub bibcode {
   my $self = shift;
   if (@_) { 
-    $self->{Bibcode} = shift;
+    $self->{BIBCODE} = shift;
   }
-  return $self->{Bibcode};
+  return $self->{BIBCODE};
 }
 
 =item B<Title>
@@ -160,9 +160,9 @@ Return (or set) the title for the paper
 sub title {
   my $self = shift;
   if (@_) { 
-    $self->{Title} = shift;
+    $self->{TITLE} = shift;
   }
-  return $self->{Title};
+  return $self->{TITLE};
 }
 
 =item B<Authors>
@@ -180,9 +180,9 @@ if called in a scalar context it will return the first author.
 sub authors {
   my $self = shift;
   if (@_) { 
-    $self->{Authors} = shift;
+    $self->{AUTHORS} = shift;
   }  
-  my @authors = @{$self->{Authors}};
+  my @authors = @{$self->{AUTHORS}};
   return wantarray ? @authors : $authors[0];
 }
 
@@ -202,9 +202,9 @@ first author.
 sub affil {
   my $self = shift;
   if (@_) { 
-    $self->{Affil} = shift;
+    $self->{AFFIL} = shift;
   }
-  my @affil = @{$self->{Affil}};
+  my @affil = @{$self->{AFFIL}};
   return wantarray ? @affil : $affil[0];;
 }
 
@@ -220,9 +220,9 @@ Return (or set) the journal reference for the paper
 sub journal {
   my $self = shift;
   if (@_) { 
-    $self->{Journal} = shift;
+    $self->{JOURNAL} = shift;
   }
-  return $self->{Journal};
+  return $self->{JOURNAL};
 }
 
 =item B<Published>
@@ -237,9 +237,9 @@ Return (or set) the month and year when the paper was published.
 sub published {
   my $self = shift;
   if (@_) { 
-    $self->{Published} = shift;
+    $self->{PUBLISHED} = shift;
   }
-  return $self->{Published};
+  return $self->{PUBLISHED};
 }
 
 =item B<Links>
@@ -257,9 +257,9 @@ if called in a scalar context it will return the number of keywords.
 sub keywords {
   my $self = shift;
   if (@_) { 
-    $self->{Keywords} = shift;
+    $self->{KEYWORDS} = shift;
   }
-  return wantarray ? @{$self->{Keywords}} : $#{$self->{Keywords}};
+  return wantarray ? @{$self->{KEYWORDS}} : $#{$self->{KEYWORDS}};
 }
 
 =item B<Origin>
@@ -276,9 +276,9 @@ set to AUTHOR, ADS or SIMBAD for instance.
 sub origin {
   my $self = shift;
   if (@_) { 
-    $self->{Origin} = shift;
+    $self->{ORIGIN} = shift;
   }
-  return $self->{Origin};
+  return $self->{ORIGIN};
 }
 
 =item B<Links>
@@ -298,9 +298,9 @@ available.
 sub links {
   my $self = shift;
   if (@_) { 
-    $self->{Links} = shift;
+    $self->{LINKS} = shift;
   }
-  return wantarray ? @{$self->{Links}} : $#{$self->{Links}};
+  return wantarray ? @{$self->{LINKS}} : $#{$self->{LINKS}};
 }
 
 =item B<URL>
@@ -336,9 +336,9 @@ the abstract.
 sub abstract {
   my $self = shift;
   if (@_) { 
-    $self->{Abstract} = shift;
+    $self->{ABSTRACT} = shift;
   }
-  return wantarray ? @{$self->{Abstract}} : $#{$self->{Abstract}};
+  return wantarray ? @{$self->{ABSTRACT}} : $#{$self->{ABSTRACT}};
 }
 
 =item B<object>
@@ -353,9 +353,9 @@ Return (or set) the object tag for the paper.
 sub object {
   my $self = shift;
   if (@_) { 
-    $self->{Object} = shift;
+    $self->{OBJECT} = shift;
   }
-  return $self->{Object};
+  return $self->{OBJECT};
 }
 
 # C O N F I G U R E -------------------------------------------------------
