@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.8 2003/06/09 04:04:36 aa Exp $
+#     $Id: Catalog.pm,v 1.9 2003/06/10 23:17:42 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -36,6 +36,7 @@ Astro::Catalog - A generic stellar catalogue object.
 
   $catalog = new Astro::Catalog( Stars   => \@array );
   $catalog = new Astro::Catalog( Cluster => $file_name );
+  $catalog = new Astro::Catalog( Scalar      => $scalar );
 
 =head1 DESCRIPTION
 
@@ -55,14 +56,14 @@ use vars qw/ $VERSION /;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.8 2003/06/09 04:04:36 aa Exp $
+$Id: Catalog.pm,v 1.9 2003/06/10 23:17:42 aa Exp $
 
 =head1 METHODS
 
@@ -469,17 +470,25 @@ sub configure {
     @{$self->{STARS}} = @{$args{Stars}};
     
   } elsif ( defined $args{Cluster} ) {
-  
+      
     # build from Cluster file    
     my $file_name = $args{Cluster};
-    unless ( open( FILE, "$file_name" ) ) {
+    unless ( open( CAT, $file_name ) ) {
        croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
     }     
     # read from file   
-    my @catalog = <FILE>;
+    $/ = "\n";
+    my @catalog = <CAT>;
+    close(CAT);
     chomp @catalog;
-    close(FILE);
    
+    #print "File is $file_name\n";
+   
+    #print "Grabbed " . $#catalog . " lines of cluster catalog\n";
+    #foreach my $loop ( 0 ... $#catalog ) {
+    #   print "$loop# " . $catalog[$loop] . "\n";
+    #}
+    
     # read catalogue
      _read_cluster( $self, @catalog ); 
         
@@ -561,6 +570,7 @@ sub _read_cluster {
       my @separated = split( /\s+/, $catalog[$i] );
  
       # debugging (leave in)
+      #print "$i # id $separated[1]\n";
       #foreach my $thing ( 0 .. $#separated ) {
       #   print "   $thing # $separated[$thing] #\n";
       #}
