@@ -1,0 +1,9 @@
+2002-03-20  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Renamed eSTAR::LDAP::Search and tweaked for compat with the
+          eSTAR modules and for use in the IA.
+          
+2001-06-24 Stephen Mock (mock@sdsc.edu)
+	
+        * Original version
+
