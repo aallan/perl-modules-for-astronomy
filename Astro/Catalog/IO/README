@@ -3,28 +3,21 @@ This directory contains the "plugins" for catalogue I/O.
 
 Currently supported formats are:
 
- Simple  - Simple ID, RA, Dec format
- Cluster - ARK Cluster format
- JCMT    - JCMT source catalogue
- TST     - Tab Separated Table                 
-           http://www.starlink.rl.ac.uk/star/docs/ssn75.htx//ssn75.html  
- VOTable - The new standard for Virtual Observatory interoperability
-           http://www.ivoa.net
+ Simple   - Simple ID, RA, Dec format
+ Cluster  - Cluster Collaboration format
+ JCMT     - JCMT source catalogue
+ TST      - Tab Separated Table see SSN/75 for more information.               
+ VOTable  - The new standard for Virtual Observatory interoperability,
+            see http://www.ivoa.net/ for more information
+ GaiaPick - Gaia/SkyCat Pick Object format. The output from a "Pick Object"
+            in GAIA
+ STL      - Starlink's Small Text List format, see SUN/190 and SSN/75
 
 Other catalogue formats that we are considering:
 
- STL     - Small Text List (Starlink)
-   http://www.starlink.rl.ac.uk/star/docs/sun190.htx//sun190.html
-   http://www.starlink.rl.ac.uk/star/docs/ssn75.htx//ssn75.html
+ FITS       - FITS binary tables
 
- FITS    - FITS binary tables
-
- ASCII_HEAD - (S)Extractor format
-   http://www.starlink.rl.ac.uk/star/docs/sun226.htx//sun226.html
-
- Gaia/SkyCat Pick Object format
-   The output from a "Pick Object" in GAIA
-
- OASIS
-  Text format from oasis.
-  http://irsa.ipac.caltech.edu/applications/Oasis/svc/index.html
+ ASCII_HEAD - (S)Extractor format, see SUN/226 for more details.
+   
+ OASIS      - Text format from oasis.
+               http://irsa.ipac.caltech.edu/applications/Oasis/svc/index.html
