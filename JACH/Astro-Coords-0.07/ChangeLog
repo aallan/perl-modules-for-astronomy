@@ -1,0 +1,104 @@
+2004-04-12  Tim Jenness  <tjenness@cpan.org>
+
+	* lib/Astro/Coords/Equatorial.pm (_ecllonglat): Add ecliptic
+	latitude and longitude.
+
+2004-02-27  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* lib/Astro/Coords/Equatorial.pm: Proper motions and parallax
+	no longer default to zero if not given in constructor.
+	
+2004-02-25  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* lib/Astro/Coords/Equatorial.pm: Allow for various equinoxes,
+	epochs, and proper motion and parallax handling.
+
+	* t/pm.t: Add test for proper motion and parallax at different
+	epoch and equinox.
+
+2004-02-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* lib/Astro/Coords/Equatorial.pm: Add ra2000 and dec2000
+	methods. ra() and dec() method now documented to return ra/dec for
+	reference epoch.
+
+2004-01-31  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* lib/Astro/Coords/Equatorial.pm: First attempt at parallax and
+	proper motions
+
+2003-11-17 Tim Jenness <tjenness@cpan.org>
+
+	Release v0.05 to CPAN
+
+2003-11-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* lib/Astro/Coords/Fixed.pm (_hadec): Force RA to be in range 0 to
+	2 PI.
+
+2003-08-19  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords/Equatorial.pm (new): Do not instantiate an
+	object if something is missing from the constructor.
+
+	* lib/Astro/Coords.pm (ha_set: Deal with case where source never
+	has a set time 
+
+2003-07-26  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (_cvt_torad): Issue a warning if the
+	sexagesimal string can not be parsed.
+
+2003-07-15  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm: Add rise/set/transit time and definitions
+	of twilight.
+
+2003-03-12  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (calculate): Trap zero increment
+
+2003-02-18  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm: Add lst to the return hash in calculate method
+
+2002-11-10  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (calculate): Add calculate method
+
+2002-11-08  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (_cvt_fromrad): Fix "array" formatting of seconds
+
+2002-09-03  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (comment): Add comment method
+
+2002-08-16  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords/Elements.pm (_apparent): Add perturbation calculation 
+
+	* lib/Astro/Coords.pm (dec&ra): Add J2000 RA&Dec for all modes.
+
+2002-08-04  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (usenow): Add usenow method
+
+2002-08-03  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* t/basic.t: Test now works for orbital elements
+
+	* lib/Astro/Coords/Elements.pm (new): Now support '1999 Apr 1.445' 
+	format for Epoch
+
+	* lib/Astro/Coords.pm (new): Add support for Interpolated coordinates
+
+	* lib/Astro/Coords/Interpolated.pm: Create
+
+	* lib/Astro/Coords.pm: Add name accessor method
+
+
+2002-05-24 Tim Jenness <tjenness@cpan.org>
+
+	Release v0.03 to CPAN
+	
