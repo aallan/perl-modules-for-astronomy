@@ -33,14 +33,14 @@ use Astro::Coords;
 
 use Data::Dumper;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Simple.pm,v 1.1 2003/07/27 03:21:23 aa Exp $
+$Id: Simple.pm,v 1.2 2003/07/27 03:56:25 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -72,35 +72,62 @@ sub _read_catalog {
    # loop through lines
    foreach my $i ( 3 .. $#lines ) {
 
-      # remove leading spaces
-      $lines[$i] =~ s/^\s+//;
-
-      # split each line
-      my @separated = split( /\s+/, $lines[$i] );
-
-      # debugging (leave in)
-      #print "$i # id $separated[1]\n";
-      #foreach my $thing ( 0 .. $#separated ) {
-      #   print "   $thing # $separated[$thing] #\n";
-      #}
+      # Skip commented and blank lines
+      return if ($lines[$i] =~ /^\s*[\*\%]/);
+      return if ($lines[$i] =~ /^\s*$/);
 
       # temporary star object
       my $star = new Astro::Catalog::Star();
 
-      # id
-      $star->id( $separated[0] );
+      # Use a pattern match parser
+      my @match = ( $lines[$i] =~ m/^(.*?)  # Target name (non greedy)
+		          \s*   # optional trailing space
+                          (\d{1,2}) # 1 or 2 digits [RA:h] [greedy]
+		          \s+       # separator
+		          (\d{1,2}) # 1 or 2 digits [RA:m]
+		          \s+       # separator
+		          (\d{1,2}(?:\.\d*)?) # 1|2 digits opt .fraction [RA:s]
+		                    # no capture on fraction
+		          \s+
+		          ([+-]?\s*\d{1,2}) # 1|2 digit [dec:d] inc sign
+		          \s+
+		          (\d{1,2}) # 1|2 digit [dec:m]
+		          \s+
+		          (\d{1,2}(?:\.\d*)?) # arcsecond (optional fraction)
+                                              # no capture on fraction
+                          \s*
+		          (J2000|B1950|Galactic) # coordinate type
+                          
+		         # most everything else is optional
+		         \s+
+                         \#
+                         \s+(.*)$                    # comment [13]
+		/xi);
 
-      # ra
-      my $objra = "$separated[2] $separated[3] $separated[4]";
+      # Abort if we do not have matches for the first 9 fields
+      for (0 ... 8) {
+         return unless defined $match[$_];
+      }
 
-      # dec
-      my $objdec = "$separated[5] $separated[6] $separated[7]";
-
+      # Read the values
+      my $target = $match[0];
+      my $ra = join(":",@match[1..3]);
+      my $dec = join(":",@match[4..6]);
+      $dec =~ s/\s//g; # remove  space between the sign and number
+      my $type = $match[7];
+      my $comment = $match[8];      
+      
+      # push the target id
+      $star->id( $target );
+      
+      # push the comment
+      $star->comment( $comment );
+      
       # Assume J2000 and create an Astro::Coords object
-      my $coords = new Astro::Coords( type  => 'J2000',
+      my $coords = new Astro::Coords( type  => $type,
 				      units => 'sex',
-				      ra    => $objra,
-				      dec   => $objdec,
+				      ra    => $ra,
+				      dec   => $dec,
 				      name  => $star->id() );
       
       # and push it into the Astro::Catalog::Star object
@@ -111,6 +138,7 @@ sub _read_catalog {
 
    }
    
+   $catalog->origin( 'IO::Simple' );
    return $catalog;
 
 }
@@ -134,11 +162,14 @@ sub _write_catalog {
   # ------------
   my @output;
   my $output_line;
-   
-  push( @output, "# Astro::Catalog::IO::Simple\n" );
-  push( @output, "#\n#\n" );
   
+  push (@output, "# Catalog written automatically by class ". __PACKAGE__ ."\n");
+  push (@output, "# on date " . gmtime . "UT\n" );
+  push (@output, "# Origin of catalogue: ". $catalog->origin ."\n");
 
+  # reference to the $self->{STARS} array in Astro::Catalog
+  my $stars = $catalog->stars();
+  
   # write body
   # ----------
   
@@ -148,12 +179,15 @@ sub _write_catalog {
      $output_line = undef;
         
      if ( defined ${$stars}[$star]->id() ) {
-        $output_line = $output_line . ${$stars}[$star]->id() . "  ";
+        $output_line = ${$stars}[$star]->id() . "  ";
      } else {
-        $output_line = $output_line . $star . " ";
+        $output_line = $star . " ";
      }   
      $output_line = $output_line . ${$stars}[$star]->ra() . "  ";
-     $output_line = $output_line . ${$stars}[$star]->dec();
+     $output_line = $output_line . ${$stars}[$star]->dec() . "   ";
+     $output_line = $output_line . "J2000  ";
+     
+     $output_line = $output_line . "# " . ${$stars}[$star]->comment();
      
      # next star
      $output_line = $output_line . "\n";
