@@ -19,7 +19,7 @@ package Astro::ADS::Result::Paper;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Paper.pm,v 1.9 2001/11/08 03:46:27 timj Exp $
+#     $Id: Paper.pm,v 1.10 2001/11/08 08:13:26 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,6 +51,9 @@ Astro::ADS::Result::Paper - A individual paper in an Astro::ADS::Result object
   $bibcode = $paper->bibcode();
   @authors = $paper->authors();
 
+  $xml = $paper->summary(format => "XML");
+  $text= $paper->summary(format => "TEXT", fields => \@fields);
+
 =head1 DESCRIPTION
 
 Stores meta-data about an individual paper in the Astro::ADS::Result object
@@ -63,14 +66,16 @@ returned by an Astro::ADS::Query object.
 use strict;
 use vars qw/ $VERSION /;
 
+# Overloading
+use overload '""' => "stringify";
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Paper.pm,v 1.9 2001/11/08 03:46:27 timj Exp $
+$Id: Paper.pm,v 1.10 2001/11/08 08:13:26 timj Exp $
 
 =head1 METHODS
 
@@ -151,7 +156,7 @@ sub bibcode {
   return $self->{BIBCODE};
 }
 
-=item B<Title>
+=item B<title>
 
 Return (or set) the title for the paper
 
@@ -189,7 +194,7 @@ sub authors {
   return wantarray ? @authors : $authors[0];
 }
 
-=item B<Affil>
+=item B<affil>
 
 Return (or set) the affiliation of each author for the paper
 
@@ -245,7 +250,7 @@ sub published {
   return $self->{PUBLISHED};
 }
 
-=item B<Links>
+=item B<keywords>
 
 Return (or set) the different keywords the paper is indexed by, could
 include such keys as ACCRETION DISCS, WHITE DWARFS, etc.
@@ -265,7 +270,7 @@ sub keywords {
   return wantarray ? @{$self->{KEYWORDS}} : $#{$self->{KEYWORDS}};
 }
 
-=item B<Origin>
+=item B<origin>
 
 Return (or set) the origin of the paper in the ADS archive, this is not
 necessarily the journal in which the paper was published, but could be
@@ -284,7 +289,7 @@ sub origin {
   return $self->{ORIGIN};
 }
 
-=item B<Links>
+=item B<links>
 
 Return (or set) the different type of outbounds links offered by ADS for this
 paper, examples include ABSTRACT, EJOURNAL, ARTICLE, REFERENCES, CITATIONS,
@@ -306,7 +311,7 @@ sub links {
   return wantarray ? @{$self->{LINKS}} : $#{$self->{LINKS}};
 }
 
-=item B<URL>
+=item B<url>
 
 Return (or set) the URL pointing to the paper at the ADS
 
@@ -323,7 +328,7 @@ sub url {
   return $self->{URL};
 }
 
-=item B<Abstract>
+=item B<abstract>
 
 Return (or set) the abstract of the paper, this may be either the full text
 of the abstract, or a URL pointing to the scanned abstract at the ADS.
@@ -616,6 +621,125 @@ sub configure {
       $self->$method( $args{$key} ) if exists $args{$key};
   }
 
+}
+
+=item B<summary>
+
+Return a summary of the paper in either XML or ASCII tabular format.
+
+  $summary = $paper->summary( format => "XML" );
+
+Takes a hash as argument. The following keys are supported:
+
+=over 4
+
+=item format
+
+Format of the result string. Options are "XML" to return an XML
+representation of the paper, or "TEXT" to return an ASCII formatted
+table. Default is to return "TEXT".
+
+=item fields
+
+Fields to include in the result. Default is to include BIBCODE,
+SCORE, TITLE, PUBLISHED and AUTHORS. Supplied as an array reference.
+
+=back
+
+=cut
+
+sub summary {
+  my $self = shift;
+
+  my %defaults = ( format => "TEXT",
+		   fields => [qw/ BIBCODE SCORE TITLE AUTHORS PUBLISHED/],
+		 );
+
+  # Merge supplied arguments with the default values
+  my %args = (%defaults, @_);
+
+  # Loop over the fields building up an array of the results
+  # One for each line
+  my @output;
+
+  # Have a top level element for XML
+  push(@output, "<ADSPaper>")
+    if $args{format} eq 'XML';
+
+
+  # Might be more efficient to pull out the if and double up the
+  # loop but this is not really an issue at the moment
+  for my $field ( @{$args{fields}} ) {
+
+    my $lcfield = lc($field);
+    my $method = $lcfield;
+
+    # check that the method is allowed
+    next unless $self->can($method);
+
+    # Call the method associated with the field
+    # in an array context
+    my @results = $self->$method;
+
+    # If we have more than one result we need to separate
+    # them and include a wrapper XML field
+    if (@results > 1) {
+      if ($args{format} eq 'XML') {
+	# We have a collection. The collection title is the plural and
+	# the individual element is meant to be the singular
+	# Instead of using a grammar module just take the simple approach
+	my $plural = $lcfield;
+	$plural .= "s" unless $lcfield =~ /s$/;
+	my $single = $lcfield;
+	$single =~ s/s$//;
+
+	# Indent a little
+	push(@output, "  <$plural>");
+	push(@output, map { "    <$single>$_</$single>" } @results),
+	push(@output, "  </$plural>");
+
+      } else {
+
+	# Just print the field name and ; separated list
+	my $string = sprintf("%-15s ", ucfirst($lcfield).":") .
+	  join("; ",@results);
+	push(@output, $string);
+
+      }
+
+    } else {
+      # Only a single thing. Just print it
+      if ($args{format} eq 'XML') {
+	push(@output, "  <$lcfield>$results[0]</$lcfield>");
+      } else {
+	push(@output, sprintf("%-15s %s", ucfirst($lcfield).":", $results[0]));
+      }
+
+    }
+
+  }
+
+  # Have a top level element for XML
+  push(@output, "</ADSPaper>")
+    if $args{format} eq 'XML';
+
+
+  # Join them all together with new lines
+  return join("\n",@output) . "\n";
+
+}
+
+=item B<stringify>
+
+Method called automatically when the object is printed in
+a string context. Simple invokes the C<summary()> method with
+default arguments.
+
+=cut
+
+sub stringify {
+  my $self = shift;
+  return $self->summary();
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------

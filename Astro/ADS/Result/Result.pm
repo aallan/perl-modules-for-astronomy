@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.11 2001/11/08 03:46:27 timj Exp $
+#     $Id: Result.pm,v 1.12 2001/11/08 08:13:26 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -49,15 +49,18 @@ by bibcode.
 use strict;
 use vars qw/ $VERSION /;
 
+# Overloading
+use overload '""' => "stringify";
+
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.11 2001/11/08 03:46:27 timj Exp $
+$Id: Result.pm,v 1.12 2001/11/08 08:13:26 timj Exp $
 
 =head1 METHODS
 
@@ -152,6 +155,20 @@ sub poppaper {
   return pop( @{$self->{RESULTS}} );
 }
 
+=item B<papers>
+
+Return a list of all the C<Astro::ADS::Result::Paper> objects
+stored in the results object.
+
+  @papers = $result->papers;
+
+=cut
+
+sub papers {
+  my $self = shift;
+  return @{ $self->{RESULTS} };
+}
+
 =item B<paperbyindex>
 
 Return the Astro::ADS::Result::Paper object at index $index
@@ -221,6 +238,48 @@ sub configure {
      }
   }
 
+}
+
+=item B<summary>
+
+Return a summary of the object as either plain text table or in XML.
+Simply invokes the C<summary> method of each paper in turn and combines
+the results as a single string.
+
+The arguments are passed through to the C<summary> method unchanged.
+
+=cut
+
+sub summary {
+  my $self = shift;
+  my %args = @_;
+
+  # Array for strings
+  my @output;
+
+  # If we are in XML mode we need to add a wrapper
+  push(@output, "<ADSResult>") if $args{format} eq 'XML';
+
+  # loop over papers
+  push(@output, map { $_->summary(%args) } $self->papers);
+
+  # If we are in XML mode we need to add a wrapper
+  push(@output, "</ADSResult>") if $args{format} eq 'XML';
+
+  return join("\n", @output). "\n";
+}
+
+=item B<stringify>
+
+Method called automatically when the object is printed in
+a string context. Simple invokes the C<summary()> method with
+default arguments.
+
+=cut
+
+sub stringify {
+  my $self = shift;
+  return $self->summary();
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------

@@ -1,3 +1,13 @@
+2001-11-07  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* Result/Result.pm (summary): Add summary and stringify
+
+	* Result/Paper/Paper.pm (summary): Add summary and stringify
+
+	* adsquery.pl: Add first stab at adsquery command line
+
+	* Result/Result.pm (papers): Add a papers method
+
 2001-11-07 Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query.pm: Added timeout() method
