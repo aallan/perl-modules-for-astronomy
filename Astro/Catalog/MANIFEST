@@ -15,6 +15,7 @@ IO/STL.pm
 IO/TST.pm
 IO/VOTable.pm
 IO/GaiaPick.pm
+IO/UKIRTBS.pm
 IO/Makefile.PL
 Query/Query.pm
 Query/Makefile.PL
