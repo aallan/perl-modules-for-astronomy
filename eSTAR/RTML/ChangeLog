@@ -1,3 +1,10 @@
+2003-06-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Build.pm: Added support for Signal-to-noise requests in addition
+          to straight exposure time requests. Removed freeze() function.
+
+        * Parse.pm: Added support for Signal-to-noise.
+                  
 2002-03-29  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Added freeze() functions for persistent store

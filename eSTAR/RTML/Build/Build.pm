@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.7 2002/03/29 18:02:15 aa Exp $
+#     $Id: Build.pm,v 1.8 2003/06/03 17:35:15 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -64,13 +64,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.7 2002/03/29 18:02:15 aa Exp $
+$Id: Build.pm,v 1.8 2003/06/03 17:35:15 aa Exp $
 
 =head1 METHODS
 
@@ -122,11 +122,15 @@ sub new {
 
 Build a score document
 
-   $status = $message->score_observation( Target    => $target_name,
-                                          RA        => $ra,
-                                          Dec       => $dec,
-                                          Equinox   => $equinox,
-                                          Exposure  => $seconds );
+   $status = $message->score_observation( Target        => $target_name,
+                                          RA            => $ra,
+                                          Dec           => $dec,
+                                          Equinox       => $equinox,
+                                          Exposure      => $seconds,
+                                          Snr           => $snr,
+                                          Flux          => $mag );
+
+Use "Exposure", or "Snr" and "Flux", but not both.
 
 =cut
 
@@ -137,7 +141,7 @@ sub score_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Exposure / ) {
+  for my $key (qw / Target RA Dec Equinox Exposure Snr Flux / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -226,14 +230,26 @@ sub score_observation {
            $self->{WRITER}->endTag( 'Equinox' );
 
         $self->{WRITER}->endTag( 'Coordinates' );
+        
+        if( defined ${$self->{OPTIONS}}{SNR} ) {
+           $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'v' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
+           $self->{WRITER}->endTag( 'Flux' );
+        }
 
      $self->{WRITER}->endTag( 'Target' );
         
      $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
 
-        $self->{WRITER}->startTag( 'Exposure',, 
+        if( defined ${$self->{OPTIONS}}{SNR} ) {
+           $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
+        } else {
+           $self->{WRITER}->startTag( 'Exposure',
                                    'type' => 'time', 'units' => 'seconds' );
-        $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
+        }                              
         $self->{WRITER}->endTag( 'Exposure' );
 
      $self->{WRITER}->endTag( 'Schedule' );
@@ -261,7 +277,11 @@ Build a request document
                                             Equinox  => $equinox,
                                             Score    => $score,
                                             Time     => $completion_time,
-                                            Exposure => $exposure );
+                                            Exposure => $exposure,
+                                            Snr      => $snr,
+                                            Flux     => $mag );
+
+Use "Exposure", or "Snr" and "Flux", but not both. );
 
 =cut
 
@@ -361,14 +381,26 @@ sub request_observation {
            $self->{WRITER}->endTag( 'Equinox' );
 
         $self->{WRITER}->endTag( 'Coordinates' );
-                               
+        
+        if( defined ${$self->{OPTIONS}}{SNR} ) {
+           $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'v' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
+           $self->{WRITER}->endTag( 'Flux' );
+        }
+                                       
      $self->{WRITER}->endTag( 'Target' );
         
      $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
 
-        $self->{WRITER}->startTag( 'Exposure', 
+        if( defined ${$self->{OPTIONS}}{SNR} ) {
+           $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
+        } else {
+           $self->{WRITER}->startTag( 'Exposure',
                                    'type' => 'time', 'units' => 'seconds' );
-        $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
+        }                              
         $self->{WRITER}->endTag( 'Exposure' );
 
      $self->{WRITER}->endTag( 'Schedule' );
@@ -698,8 +730,56 @@ sub exposure {
     ${$self->{OPTIONS}}{EXPOSURE} = shift;
   }
 
-  # return the current target score
+  # return the current target exposure
   return ${$self->{OPTIONS}}{EXPOSURE};
+}  
+
+ 
+=item B<snr>
+
+Sets (or returns) the signal to noise for the image
+
+   $message->snr( $sn );
+   $sn = $message->snr();
+
+the signatl to noise ratio  should be a floating point number, alternatively
+you can supply a C<exposure()> in seconds.
+
+=cut
+
+sub snr {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{SNR} = shift;
+  }
+
+  # return the current target snr
+  return ${$self->{OPTIONS}}{SNR};
+}  
+
+ 
+=item B<flux>
+
+Sets (or returns) the flux of teh object needed for signal to noise
+calculations for the image
+
+   $message->flux( $mag );
+   $mag = $message->flux();
+
+the flux should be a continuum V band magnitude value.
+
+=cut
+
+sub flux {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{FLUX} = shift;
+  }
+
+  # return the current flux in magntitudes
+  return ${$self->{OPTIONS}}{FLUX};
 }  
 
 # C O N F I G U R E -------------------------------------------------------
