@@ -1,3 +1,9 @@
+2002-03-18  Alasdair Allan <aa@astro.ex.ac.uk>
+        
+        * Server.pm: Fixed bug in close_server(), still getting
+          attempt to from "unreferenced scalar" in the test
+          harness server_test,pl, unsure why!?
+
 2002-03-13  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Changed server code so it keeps the server internally

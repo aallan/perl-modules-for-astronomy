@@ -32,7 +32,7 @@ ok( 1 );
 my ( $status, $callback, $reply);
 
 # hardwire the test port
-my $port = "2000";
+my $port = "2001";
 
 # connection callback --------------------------------------------------------
 
