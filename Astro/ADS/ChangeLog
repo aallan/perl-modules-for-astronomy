@@ -2,7 +2,9 @@
 
         * ADS.pm: Introduced a placeholder class to get round a documentation
           bug on search.cpan.org.
-          
+
+        * Fixed MANIFEST problems and released as v1.20.7
+                  
 2003-07-02  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Removed some tests from t/*.t since the things they were based

@@ -4,6 +4,7 @@ Makefile.PL
 GPL
 ChangeLog
 adsquery.PL
+ADS.pm
 Query/Query.pm
 Query/Makefile.PL
 Result/Result.pm
