@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.24 2003/07/27 02:40:19 timj Exp $
+#     $Id: Catalog.pm,v 1.25 2003/07/27 03:06:33 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.24 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.25 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.24 2003/07/27 02:40:19 timj Exp $
+$Id: Catalog.pm,v 1.25 2003/07/27 03:06:33 timj Exp $
 
 =head1 METHODS
 
@@ -94,7 +94,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { STARS  => [],
-		      ERRSTAR => '',
+		      ERRSTR => '',
 		      ORIGIN => '<UNKNOWN>',
 		      COORDS => undef,
                       RADIUS => undef }, $class;
@@ -232,7 +232,7 @@ after a call that sets it (eg write_catalog).
 sub errstr {
   my $self = shift;
   if (@_) {
-    $self->{ERRSTAR} = shift;
+    $self->{ERRSTR} = shift;
   }
   return $self->{ERRSTR};
 }
