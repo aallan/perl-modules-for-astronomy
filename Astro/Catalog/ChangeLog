@@ -1,3 +1,14 @@
+2002-01-14  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Catalog.pm: Can now dump Astro::Catalog objects to  ARK Cluster 
+          files.
+
+2002-01-13  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Generic Catalog and Star objects working, lacks way to parse
+          ARK format Cluster files into Astro::Catalog objects, but all
+          other functionality in place.
+          
 2002-01-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Original version.

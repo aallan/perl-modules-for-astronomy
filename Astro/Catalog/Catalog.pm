@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.1 2002/01/14 01:43:07 aa Exp $
+#     $Id: Catalog.pm,v 1.2 2002/01/14 07:32:13 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -52,14 +52,14 @@ an ARK Cluster format catalogue.
 use strict;
 use vars qw/ $VERSION /;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.1 2002/01/14 01:43:07 aa Exp $
+$Id: Catalog.pm,v 1.2 2002/01/14 07:32:13 aa Exp $
 
 =head1 METHODS
 
@@ -83,12 +83,98 @@ sub new {
   my $class = ref($proto) || $proto;
 
   # bless the query hash into the class
-  my $block = bless { STARS => [] }, $class;
+  my $block = bless { STARS  => [],
+                      RA     => undef,
+                      DEC    => undef,
+                      RADIUS => undef }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
 
   return $block;
+
+}
+
+# O U P T U T  ------------------------------------------------------------
+
+=back
+
+=head2 Output Methods
+
+=over 4
+
+=item B<write_catalog>
+
+Will write the catalogue object to an standard ARK Cluster format file
+
+   $status = $catalog->write_catalog( $file_name );
+
+returns zero on sucess and non-zero if the write failed. 
+
+=cut
+
+sub write_catalog {
+  my $self = shift;
+
+  # croak unless we have arguments
+  croak ("Astro::Catalog write_catalog() - No filename provided" ) unless @_;
+ 
+  # grab file name and open file for writing
+  my $file_name = shift;
+  unless ( open( FH, ">$file_name" ) ) {
+     croak("Astro::Catalog write_catalog() - Cannont open file $file_name");
+  } 
+  
+  # number of stars in catalogue
+  my $number = $#{$self->{STARS}};
+ 
+  # how many filters do we have?
+  my $num_filters = ${$self->{STARS}}[0]->what_filters();
+  my @filters = ${$self->{STARS}}[0]->what_filters();
+  
+  # how many colours do we have?
+  my $num_colours = ${$self->{STARS}}[0]->what_colours();
+  my @colours = ${$self->{STARS}}[0]->what_colours();
+
+  # write header
+  my $total = $num_filters + $num_colours;
+  print FH "$total colours were created\n";
+  print FH "@filters @colours\n";
+  print FH "A sub-set of USNO-A2: Field centre at RA " . $self->get_ra() .
+           ", Dec " . $self->get_dec() . ", Search Radius " . 
+           $self->get_radius() . " arcminutes \n";
+           
+  # loop through all the stars in the catalogue
+  foreach my $star ( 0 .. $#{$self->{STARS}} ) {
+  
+     # field, number, ra, dec and x&y position
+     print FH ${$self->{STARS}}[$star]->field() . "  ";
+     print FH $star . "  ";
+     print FH ${$self->{STARS}}[$star]->ra() . "  ";
+     print FH ${$self->{STARS}}[$star]->dec() . "  ";
+     print FH "0.000  0.000  ";
+     
+     # magnitudes
+     foreach my $i ( 0 .. $num_filters-1 ) {
+        print FH ${$self->{STARS}}[$star]->get_magnitude( $filters[$i] ) . "  ";
+        print FH ${$self->{STARS}}[$star]->get_errors( $filters[$i] ) . "  ";
+        print FH ${$self->{STARS}}[$star]->quality() . "  ";
+     }
+     
+     # colours
+     foreach my $j ( 0 .. $num_colours-1 ) {
+        print FH ${$self->{STARS}}[$star]->get_colour( $colours[$j] ) . "  ";
+        print FH ${$self->{STARS}}[$star]->get_colourerr( $colours[$j] ) . "  ";
+        print FH ${$self->{STARS}}[$star]->quality() . "  ";
+     } 
+     
+     # next star      
+     print FH "\n";
+
+  }
+  
+  # clean up
+  close ( FH );      
 
 }
 
@@ -190,6 +276,81 @@ sub starbyindex {
   return ${$self->{STARS}}[$index];
 }
 
+=item B<fieldcentre>
+
+Set the field centre and radius of the catalogue (if appropriate)
+
+     $catalog->fieldcentre( RA     => $ra,
+                            Dec    => $dec,
+                            Radius => $radius );
+
+=cut
+
+sub fieldcentre {
+  my $self = shift;
+
+  # return unless we have arguments
+  return undef unless @_;
+
+  # grab the argument list
+  my %args = @_;
+  
+  # set RA
+  if ( defined $args{RA} ) {
+     $self->{RA} = $args{RA};
+  } 
+   
+  # set Dec
+  if ( defined $args{Dec} ) {
+     $self->{DEC} = $args{Dec};
+  }  
+  
+  # set field radius
+  if ( defined $args{Radius} ) {
+     $self->{RADIUS} = $args{Radius};
+  }
+  
+}
+
+=item B<get_ra>
+
+Return the RA of the catalogue field centre
+
+   $ra = $catalog->get_ra();
+
+=cut
+
+sub get_ra {
+  my $self = shift;
+  return $self->{RA};
+}
+
+=item B<get_dec>
+
+Return the Dec of the catalogue field centre
+
+   $dec = $catalog->get_dec();
+
+=cut
+
+sub get_dec {
+  my $self = shift;
+  return $self->{DEC};
+}
+
+=item B<get_radius>
+
+Return the radius of the catalogue from the field centre
+
+   $radius = $catalog->get_radius();
+
+=cut
+
+sub get_radius {
+  my $self = shift;
+  return $self->{RADIUS};
+}
+
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -218,10 +379,13 @@ sub configure {
   # grab the argument list
   my %args = @_;
 
+  # Define the actual catalogue
+  # ---------------------------
+  
   if ( defined $args{Stars} ) {
   
     # grab the array reference and stuff it into the object
-    @{$self->{STARS}} = @{$args{Stars}}
+    @{$self->{STARS}} = @{$args{Stars}};
     
   } elsif ( defined $args{Cluster} ) {
   
@@ -238,7 +402,25 @@ sub configure {
      # no build arguements
      croak("Astro::Catalog - Bad constructor, no arguements supplied");
   }   
-
+  
+  # Define the field centre if provided
+  # -----------------------------------
+  
+  # set RA
+  if ( defined $args{RA} ) {
+     $self->{RA} = $args{RA};
+  } 
+   
+  # set Dec
+  if ( defined $args{Dec} ) {
+     $self->{DEC} = $args{Dec};
+  }  
+  
+  # set field radius
+  if ( defined $args{Radius} ) {
+     $self->{RADIUS} = $args{Radius};
+  }
+  
 }
 
 # H A N D L E   C L U S T E R   F I L E S ------------------------------------

@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.3 2002/01/14 01:21:37 aa Exp $
+#     $Id: Star.pm,v 1.4 2002/01/14 07:32:13 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,14 +64,14 @@ properties.
 use strict;
 use vars qw/ $VERSION /;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.3 2002/01/14 01:21:37 aa Exp $
+$Id: Star.pm,v 1.4 2002/01/14 07:32:13 aa Exp $
 
 =head1 METHODS
 
@@ -217,7 +217,7 @@ Set the error in UBVRIHK magnitudes of the object, takes a reference to a
 hash of error values
 
     my %mag_errors = ( B => '0.3', V => '0.1', R => '0.4' );
-    $star->magnitudes( \%mag_errors );
+    $star->magerr( \%mag_errors );
 
 additional calls to magerr() will append, not replace, additional error values,
 errors for filters already existing will be over-written.
@@ -300,7 +300,7 @@ sub what_filters {
   }
   
   # return array of filters or number if called in scalar context
-  return wantarray ? @mags : $#mags;
+  return wantarray ? @mags : scalar( @mags );
 }    
 
 =item B<what_colours>
@@ -327,7 +327,7 @@ sub what_colours {
   }
   
   # return array of colours or number if called in scalar context
-  return wantarray ? @cols : $#cols;
+  return wantarray ? @cols : scalar( @cols );
 }  
   
 =item B<get_magnitude>

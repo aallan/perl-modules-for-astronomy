@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 1 };
+BEGIN { plan tests => 16 };
 
 # load modules
 use Astro::Catalog::Star;
@@ -29,7 +29,12 @@ my $star = new Astro::Catalog::Star( ID         => 'U1500_01194794',
                                      Magnitudes => \%mags,
                                      MagErr     => \%mag_error,
                                      Colours    => \%colours,
-                                     ColErr     => \%col_error );
+                                     ColErr     => \%col_error,
+                                     Quality    => '0',
+                                     GSC        => 'FALSE',
+                                     Distance   => '0.09',
+                                     PosAngle   => '50.69',
+                                     Field      => '00080' );
 
 # FILTERS AND MAGNITUDES
 # ----------------------
@@ -79,7 +84,7 @@ for my $i (0 .. $#cols2) {
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
 # Dump star object to screen
-print Dumper($star);
+#print Dumper($star);
 
 # T I M E   A T   T H E   B A R ---------------------------------------------
 exit;                                     

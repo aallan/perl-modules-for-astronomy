@@ -222,6 +222,11 @@ ok( $star_dat->gsc(), $star_net->gsc() );
 ok( $star_dat->distance(), $star_net->distance() );
 ok( $star_dat->posangle(), $star_net->posangle() );
 
+# write to temporary file
+#$ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
+#$catalog_byname->write_catalog( File::Spec->catfile( $ENV{"ESTAR_DATA"}, 
+#                                "usno-a2.cat" ) );
+
 # quitting time
 exit;
 
