@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.14 2003/07/26 23:30:43 timj Exp $
+#     $Id: Catalog.pm,v 1.15 2003/07/27 00:26:46 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.14 2003/07/26 23:30:43 timj Exp $
+$Id: Catalog.pm,v 1.15 2003/07/27 00:26:46 aa Exp $
 
 =head1 METHODS
 
@@ -280,7 +280,7 @@ for catalogue queries, or 'JCMT' for the JCMT pointing catalogue.
 No constraint is placed on the content of this parameter.
 
   $catalog->origin( 'JCMT' );
-  $origin = $catalog->origing;
+  $origin = $catalog->origin();
 
 =cut
 
