@@ -22,6 +22,9 @@ IO/UKIRTBS.pm
 IO/Makefile.PL
 IO/FINDOFF.pm
 IO/SExtractor.pm
+IO/FITSTable.pm
+IO/ASCII.pm
+IO/Binary.pm
 Query/Query.pm
 Query/Makefile.PL
 Query/Query/2MASS.pm
@@ -49,6 +52,7 @@ t/2_tst.t
 t/2_votable.t
 t/2_astrom.t
 t/2_findoff.t
+t/2_fitstable.t
 t/3_catalog.t
 t/3_star.t
 t/4_cmc.t
@@ -60,6 +64,7 @@ t/4_skycat_gsc.t
 t/4_skycat_supercos.t
 t/4_usnoa2.t
 t/helper.pl
+t/data/cat.fit
 etc/README
 etc/sss.cfg
 etc/skycat.cfg
