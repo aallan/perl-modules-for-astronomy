@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.8 2001/11/02 01:32:28 aa Exp $
+#     $Id: Query.pm,v 1.9 2001/11/02 01:39:25 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -55,13 +55,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.8 2001/11/02 01:32:28 aa Exp $
+$Id: Query.pm,v 1.9 2001/11/02 01:39:25 aa Exp $
 
 =head1 METHODS
 
@@ -86,6 +86,7 @@ sub new {
   # bless the query hash into the class
   my $block = bless { OPTIONS   => {},
                       URL       => undef,
+                      FOLLOWUP  => undef,
                       USERAGENT => undef,
                       BUFFER    => undef }, $class;
 
@@ -271,9 +272,10 @@ sub configure {
   # CONFIGURE DEFAULTS
   # ------------------
   
-  # define the default base URL
+  # define the default base URLs
   $self->{URL} = "http://cdsads.u-strasbg.fr/cgi-bin/nph-abs_connect?";
-  
+  $self->{FOLLOWUP} = "http://cdsads.u-strasbg.fr/cgi-bin/nph-ref_query?";
+    
   # Setup the LWP::UserAgent
   $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
 
@@ -412,7 +414,7 @@ sub _make_followup {
    $self->{BUFFER} = "";
    
    # grab the base URL
-   my $URL = $self->{URL};
+   my $URL = $self->{FOLLOWUP};
    
    # which paper?
    my $bibcode = shift;
@@ -425,7 +427,7 @@ sub _make_followup {
    my $data_type = ${$self->{OPTIONS}}{"data_type"};
    
    # build the final query URL
-   $URL = "http://cdsads.u-strasbg.fr/cgi-bin/nph-ref_query?" .
+   $URL = $URL .
           "bibcode=$bibcode&refs=$refs&db_key=$db_key&data_type=$data_type"; 
       
    # build request
