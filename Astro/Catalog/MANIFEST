@@ -6,6 +6,7 @@ ChangeLog
 Catalog.pm
 Star/Star.pm
 Star/Makefile.PL
+IO/README
 IO/JCMT.pm
 IO/Cluster.pm
 IO/Simple.pm
