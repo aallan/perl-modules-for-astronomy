@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.31 2003/07/28 00:32:47 timj Exp $
+#     $Id: Catalog.pm,v 1.32 2003/07/30 23:34:34 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -57,21 +57,22 @@ use 5.006;
 use strict;
 use warnings;
 use warnings::register;
-use vars qw/ $VERSION /;
+use vars qw/ $VERSION $DEBUG /;
 
 use Astro::Coords;
 use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.31 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.32 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+$DEBUG = 0;
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.31 2003/07/28 00:32:47 timj Exp $
+$Id: Catalog.pm,v 1.32 2003/07/30 23:34:34 timj Exp $
 
 =head1 METHODS
 
@@ -823,7 +824,7 @@ sub configure {
     chomp @lines;
 
     # Now read the catalog (overwriting $self)
-    print "READING CATALOG $ioclass \n";
+    print "# READING CATALOG $ioclass \n" if $DEBUG;
     $self =  $ioclass->_read_catalog( \@lines );
 
     croak "Error reading catalog of class $ioclass\n"
