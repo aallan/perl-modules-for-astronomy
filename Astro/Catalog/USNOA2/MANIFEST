@@ -3,5 +3,5 @@ MANIFEST
 Makefile.PL
 GPL
 ChangeLog
-DSS.pm
-t/test.t
+Query/Query.pm
+t/query.t.t
