@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.20 2004/11/24 01:36:51 cavanagh Exp $
+#     $Id: Star.pm,v 1.21 2005/02/02 21:44:18 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -87,7 +87,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -235,7 +235,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.20 2004/11/24 01:36:51 cavanagh Exp $
+$Id: Star.pm,v 1.21 2005/02/02 21:44:18 aa Exp $
 
 =head1 METHODS
 
@@ -856,6 +856,13 @@ sub quality {
     
     # Anyway...
     my $quality = shift;
+    
+    # Shouldn't happen?
+    unless ( defined $quality ) {
+      $self->{QUALITY} = undef;
+      return undef;
+    }  
+
     if ( $quality =~ /^[A-Z][A-Z][A-Z]$/ ) {
        
        $_ = $quality;
