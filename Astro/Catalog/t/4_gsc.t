@@ -5,7 +5,7 @@
 use strict;
 
 #load test
-use Test::More tests => 132;
+use Test::More tests => 150;
 use Data::Dumper;
 
 # Load the generic test code

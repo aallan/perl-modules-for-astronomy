@@ -4,7 +4,7 @@
 use strict;
 
 #load test
-use Test::More tests => 306;
+use Test::More tests => 336;
 
 # Load the generic test code
 chdir "t" if -d "t";
