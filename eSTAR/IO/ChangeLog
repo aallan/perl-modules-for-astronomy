@@ -1,9 +1,14 @@
 2002-03-13  Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Changed server code so it keeps the server internally
+          as a static and doesn't pass it around. Unsure as to
+          the effect in threading code? Needs testing.
+          
+        * Tested server code against LJM send_command and send_file.
+
         * Working server implementation using the mono-threaded
           server. Some problems with connection contexts remain.
         
-        * Tested server code against LJM send_command and send_file.
  
 2002-03-11  Alasdair Allan <aa@astro.ex.ac.uk>
 
@@ -18,12 +23,12 @@
 
 2002-03-07  Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Tested client code against the LJM test_server.
+
         * Total re-write due to unforseen problems with
           threading and GLOBUS loosing I/O handles when
           the temporarily pass out of scope. 
-          
-        * Tested client code against the LJM test_server.
-          
+                    
 2002-03-04  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Inital framework, most functions in place, missing

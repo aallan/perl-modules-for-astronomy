@@ -29,7 +29,7 @@ use Data::Dumper;
 ok( 1 );
 
 # status variable
-my ( $status, $context, $callback, $reply);
+my ( $status, $callback, $reply);
 
 # hardwire the test port
 my $port = "2000";
@@ -39,7 +39,7 @@ my $port = "2000";
 $callback = sub { 
    my $handle = shift;
    
-   print "# globus_io_handle_t * " . Dumper($handle) . "#\n";
+   print "# " . $handle . "\n#\n";
    print "# Reading Message\n";
 
    # READ MESSAGE FROM CLIENT
@@ -47,6 +47,9 @@ $callback = sub {
 
    unless ( defined $reply ) {
       report_error();
+      print "# Shutting down sever on port $port\n#\n";
+      $status = stop_server( );
+      print "# Deactvating modules\n#\n";
       $status = module_deactivate();
       exit;
    } else { ok ( 1 ); }   
@@ -60,6 +63,9 @@ $callback = sub {
 
    if( $status == GLOBUS_FALSE) {
       report_error();
+      print "# Shutting down sever on port $port\n#\n";
+      $status = stop_server( );
+      print "# Deactvating modules\n#\n";
       $status = module_deactivate();
       exit;
    }
@@ -68,9 +74,9 @@ $callback = sub {
    
    # SHUTDOWN IF ASKED
    if( @{$reply}[0] eq "shutdown" ) {
+      print "# Message passed from client requested shutdown\n";
       print "# Shutting down sever on port $port\n#\n";
-      print "# eSTAR_IO_Server_Context_T * " . Dumper($context) . "#\n";
-      $status = stop_server( $context );
+      $status = stop_server( );;
    };
    
    return GLOBUS_TRUE 
@@ -83,23 +89,26 @@ print "# Activating GLOBUS modules\n";
 $status = module_activate();
 if( $status == GLOBUS_FALSE) {
    report_error();
+   print "# Shutting down sever on port $port\n#\n";
+   $status = stop_server( );
+   print "# Deactvating modules\n#\n";
    $status = module_deactivate();
    exit;
 }
 
 # start server --------------------------------------------------------------
 
-$context = GLOBUS_NULL;
-
 print "# Starting Server on port $port\n";
-$context = start_server( $port, $callback );
+start_server( $port, $callback );
 
-unless( defined $context ) {
-   report_error();
-   $status = module_deactivate();
-   exit;
-} else { ok( 1 ); }
-print "# eSTAR_IO_Server_Context_T * " . Dumper($context) . "#\n";
+# shutdown server ------------------------------------------------------------
+
+#print "# Shutting down sever on port $port\n";
+#$status = stop_server( );
+#if( $status == GLOBUS_FALSE) {
+#   report_error();
+#   exit;
+#}
 
 # deactivate modules --------------------------------------------------------
 
@@ -107,9 +116,9 @@ print "# Deactivating GLOBUS modules\n";
 $status = module_deactivate();
 if( $status == GLOBUS_FALSE) {
    report_error();
-   $status = module_deactivate();
    exit;
 }
+
 
 # ----------------------------------------------------------------------------
 

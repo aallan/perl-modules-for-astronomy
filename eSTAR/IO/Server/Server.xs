@@ -19,7 +19,7 @@ void c_callback(globus_io_handle_t *connection_handle)
    int status;
    SV * svhandle;
 
-   printf("connection_callbackXS ENTER\n");
+   printf("** connection_callbackXS ENTER\n");
 
    ENTER;
    SAVETMPS;
@@ -35,18 +35,20 @@ void c_callback(globus_io_handle_t *connection_handle)
     
    printf("connection_callbackXS\n");
    status = call_sv( sv_callback, G_SCALAR );
-   printf("connection_callbackXS status = %i\n", status);
+   printf("connection_callbackXS status = %i (should be 1)\n", status);
 
    SPAGAIN;
    FREETMPS;
    LEAVE;
+
+   printf("** connection_callbackXS LEAVE\n");
     
    return;
 }
 
 MODULE = eSTAR::IO::Server  PACKAGE = eSTAR::IO::Server	
 
-eSTAR_IO_Server_Context_T *
+int
 start_server( port, callback )
    int port
    SV * callback
@@ -55,21 +57,16 @@ start_server( port, callback )
     unsigned short sport;
   CODE:
     sv_callback = callback;
-    printf("start_serverXS storing callback %p\n", sv_callback);
+    printf("start_serverXS storing sv_callback %p\n", sv_callback);
     sport = (unsigned short) port;
     printf("start_serverXS context %p\n", &context);
-    status = eSTAR_IO_Start_Mono_Server( &sport, c_callback, &context );
-    RETVAL = &context;  
+    RETVAL = eSTAR_IO_Start_Mono_Server( &sport, c_callback, &context );
     printf("start_serverXS context %p\n", &context);
   OUTPUT:
-    RETVAL 
-  CLEANUP:
-    if (status == GLOBUS_FALSE ) 
-      XSRETURN_UNDEF;   
+    RETVAL
       
 int 
-stop_server( context )
-    eSTAR_IO_Server_Context_T * context
+stop_server( )
   CODE:
     printf("close_serverXS context %p\n", &context);
     RETVAL = eSTAR_IO_Close_Server( context );
