@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.12 2003/07/18 01:58:09 aa Exp $
+#     $Id: Build.pm,v 1.13 2003/07/19 23:31:48 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -65,13 +65,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.12 2003/07/18 01:58:09 aa Exp $
+$Id: Build.pm,v 1.13 2003/07/19 23:31:48 aa Exp $
 
 =head1 METHODS
 
@@ -656,6 +656,190 @@ sub request_observation {
 
 }
 
+
+
+=item B<confirm_response>
+
+Build a confirm response document
+
+   $status = $message->confirm_response( Target        => $target_name,
+                                          RA            => $ra,
+                                          Dec           => $dec,
+                                          Equinox       => $equinox,
+                                          Exposure      => $seconds,
+                                          Snr           => $snr,
+                                          Flux          => $mag,
+                                          Score         => $score,
+                                          Time          => $completion_time,
+                                          Filter        => filter );
+
+Use "Exposure", or "Snr" and "Flux", but not both.
+
+=cut
+
+sub confirm_response {
+  my $self = shift;
+
+  # grab the argument list
+  my %args = @_;
+
+  # Loop over the allowed keys and modify the default query options
+  for my $key (qw / Target RA Dec Equinox Exposure 
+                    Snr Flux Score Time Filter/ ) {
+  
+     # print "Calling " . lc($key) ."()\n";
+      my $method = lc($key);
+      $self->$method( $args{$key} ) if exists $args{$key};
+  }
+  
+  # open the document
+  $self->{WRITER}->xmlDecl( 'US-ASCII' );
+  $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
+ 
+  # open the RTML document
+  # ======================
+  $self->{WRITER}->startTag( 'RTML',
+                             'version' => '2.1',
+                             'type' => 'confirmation' );
+  
+  # IntelligentAgent Tag
+  # --------------------
+  
+  # identify the IA               
+  $self->{WRITER}->startTag( 'IntelligentAgent', 
+                             'host' => ${$self->{OPTIONS}}{HOST},
+                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
+  
+  # unique IA identity sting
+  $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
+  
+  $self->{WRITER}->endTag( 'IntelligentAgent' );
+  
+  # Telescope Tag
+  # -------------
+  $self->{WRITER}->emptyTag( 'Telescope' );
+  
+  # Contact Tag
+  # -----------
+  $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
+                             
+     $self->{WRITER}->startTag( 'User');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
+     $self->{WRITER}->endTag( 'User' );
+  
+     $self->{WRITER}->startTag( 'Name');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );  
+      
+     $self->{WRITER}->startTag( 'Institution');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' ); 
+      
+     $self->{WRITER}->startTag( 'Email');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' ); 
+
+  $self->{WRITER}->endTag( 'Contact' ); 
+  
+  # Project Tag
+  # -------------
+  $self->{WRITER}->emptyTag( 'Project' );
+    
+  # Observation tag
+  # ---------------
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
+  
+     $self->{WRITER}->startTag( 'Target', 'type' => 'normal' );
+    
+        $self->{WRITER}->startTag( 'TargetName' );
+        $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
+        $self->{WRITER}->endTag( 'TargetName' );
+
+        $self->{WRITER}->startTag( 'Coordinates', 'type' => 'equatorial' );
+        
+           $self->{WRITER}->startTag( 'RightAscension', 
+                                    'format' => 'hh mm ss.s', units => 'hms' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{RA} );
+           $self->{WRITER}->endTag( 'RightAscension' );
+           
+           $self->{WRITER}->startTag( 'Declination', 
+                                    'format' => 'sdd mm ss.s', units => 'dms' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           $self->{WRITER}->endTag( 'Declination' );   
+
+           $self->{WRITER}->startTag( 'Equinox'  );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{EQUINOX} );
+           $self->{WRITER}->endTag( 'Equinox' );
+
+        $self->{WRITER}->endTag( 'Coordinates' );
+
+        if( defined ${$self->{OPTIONS}}{SNR} ) {
+
+           if( defined ${$self->{OPTIONS}}{FILTER} ) {
+              $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
+           } else {        
+              $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
+           }
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
+           $self->{WRITER}->endTag( 'Flux' );
+        }
+
+     $self->{WRITER}->endTag( 'Target' );        
+     
+     $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
+        
+           $self->{WRITER}->startTag( 'Filter' ); 
+ 
+           if( defined ${$self->{OPTIONS}}{FILTER} ) {
+              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
+              $self->{WRITER}->endTag( 'FilterType' ); 
+           } else {          
+              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->characters( 'V' );
+              $self->{WRITER}->endTag( 'FilterType' ); 
+           }
+           
+           $self->{WRITER}->endTag( 'Filter' );
+     $self->{WRITER}->endTag( 'Device' );    
+        
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
+
+        if( defined ${$self->{OPTIONS}}{SNR} ) {
+           $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
+        } else {
+           $self->{WRITER}->startTag( 'Exposure',
+                                   'type' => 'time', 'units' => 'seconds' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
+        }                              
+        $self->{WRITER}->endTag( 'Exposure' );
+
+     $self->{WRITER}->endTag( 'Schedule' );
+                  
+  $self->{WRITER}->endTag( 'Observation' );  
+   
+  # Score Tags
+  # ---------- 
+  $self->{WRITER}->startTag( 'Score' );
+  $self->{WRITER}->characters( ${$self->{OPTIONS}}{SCORE} );
+  $self->{WRITER}->endTag( 'Score' );
+  $self->{WRITER}->startTag( 'CompletionTime' );
+  $self->{WRITER}->characters( ${$self->{OPTIONS}}{COMPLETIONTIME} );
+  $self->{WRITER}->endTag( 'CompletionTime' );       
+    
+  # close the RTML document
+  # =======================
+  $self->{WRITER}->endTag( 'RTML' );
+  $self->{WRITER}->end();
+
+  # return a good status (GLOBUS_TRUE)
+  return 1;
+
+}
 
 =item B<reject_response>
 
