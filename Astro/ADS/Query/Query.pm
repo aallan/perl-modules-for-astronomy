@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.18 2001/12/03 03:41:45 aa Exp $
+#     $Id: Query.pm,v 1.19 2002/01/11 19:59:31 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -67,13 +67,13 @@ use Astro::ADS::Result::Paper;
 use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.18 2001/12/03 03:41:45 aa Exp $
+$Id: Query.pm,v 1.19 2002/01/11 19:59:31 aa Exp $
 
 =head1 METHODS
 
@@ -452,6 +452,140 @@ sub bibcode {
   return ${$self->{OPTIONS}}{"bibcode"};
 }
 
+
+=item B<startmonth>
+
+Return (or set) the current starting month of the ADS query.
+
+   $start_month = $query->startmonth();
+   $query->startmonth( "01" );
+
+=cut
+
+sub startmonth {
+  my $self = shift;
+
+  # SETTING STARTING MONTH
+  if (@_) { 
+
+    # set the starting month option  
+    ${$self->{OPTIONS}}{"start_mon"} = shift;
+  }
+
+  # RETURNING STARTING MONTH
+  return ${$self->{OPTIONS}}{"start_mon"};
+
+}
+
+=item B<endmonth>
+
+Return (or set) the current end month of the ADS query.
+
+   $end_month = $query->endmonth();
+   $query->endmonth( "12" );
+
+=cut
+
+sub endmonth {
+  my $self = shift;
+
+  # SETTING END MONTH
+  if (@_) { 
+
+    # set the end month option  
+    ${$self->{OPTIONS}}{"end_mon"} = shift;
+  }
+
+  # RETURNING END MONTH
+  return ${$self->{OPTIONS}}{"end_mon"};
+
+}
+
+=item B<startyear>
+
+Return (or set) the current starting year of the ADS query.
+
+   $start_year = $query->startyear();
+   $query->start_year( "2001" );
+
+=cut
+
+sub startyear {
+  my $self = shift;
+
+  # SETTING START YEAR
+  if (@_) { 
+
+    # set the starting year option  
+    ${$self->{OPTIONS}}{"start_year"} = shift;
+  }
+
+  # RETURNING START YEAR
+  return ${$self->{OPTIONS}}{"start_year"};
+
+}
+
+=item B<endyear>
+
+Return (or set) the current end year of the ADS query.
+
+   $end_year = $query->endyear();
+   $query->end_year( "2002" );
+
+=cut
+
+sub endyear {
+  my $self = shift;
+
+  # SETTING END YEAR
+  if (@_) { 
+
+    # set the end year option  
+    ${$self->{OPTIONS}}{"end_year"} = shift;
+  }
+
+  # RETURNING END YEAR
+  return ${$self->{OPTIONS}}{"end_year"};
+
+}
+
+=item B<journal>
+
+Return (or set) whether refereed, non-refereed (OTHER) or all bibilographic sources (ALL) are returned.
+
+   $query->journal( "REFEREED" );
+   $query->journal( "OTHER" );
+   $query->journal( "ALL" );
+   
+   $journals = $query->journal();
+
+the default is ALL bibilographic sources
+
+=cut
+
+sub journal {
+  my $self = shift;
+
+  # SETTING END YEAR
+  if (@_) { 
+
+    my $source = shift;
+    
+    if ( $source eq "REFEREED" ) {
+       ${$self->{OPTIONS}}{"jou_pick"} = "NO";
+    } elsif ( $source eq "OTHER" ) {
+       ${$self->{OPTIONS}}{"jou_pick"} = "EXCL";
+    } else {
+       ${$self->{OPTIONS}}{"jou_pick"} = "ALL";
+    }  
+
+  }
+
+  # RETURNING END YEAR
+  return ${$self->{OPTIONS}}{"jou_pick"};
+
+}
+
 # C O N F I G U R E -------------------------------------------------------
 
 =back
@@ -552,6 +686,7 @@ sub configure {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Authors AuthorLogic Objects ObjectLogic Bibcode 
+                    StartMonth EndMonth StartYear EndYear Journal
                     Proxy Timeout URL/ ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};

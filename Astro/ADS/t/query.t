@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 64 };
+BEGIN { plan tests => 68 };
 
 # load modules
 use Astro::ADS::Query;
@@ -174,6 +174,19 @@ ok( @timj_abstract, 32 );
 
 # test the user agent tag
 print "# User Agent: " . $query3->agent() . "\n";
+
+# Test the start/end year and month options
+$query3->startmonth( "01" );
+ok( $query3->startmonth(), "01" );
+
+$query3->endmonth( "12" );
+ok( $query3->endmonth(), "12" );
+
+$query3->startyear( "2001" );
+ok( $query3->startyear(), "2001" );
+
+$query3->endyear( "2002" );
+ok( $query3->endyear(), "2002" );
 
 exit;
 

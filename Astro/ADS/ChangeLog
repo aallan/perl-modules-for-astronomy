@@ -1,3 +1,14 @@
+2002-01-10  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added method to allow you to decide wether only
+          refereed, non-refereed or all bibiliographic sources are queried.
+       
+2002-01-09  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added start & end year/month options to the
+          query module so that the time over which the query can be made
+          can be specified.
+           
 2001-12-03  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query.pm: Added conditional test to see if $base_url is
