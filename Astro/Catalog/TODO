@@ -8,8 +8,6 @@ To Do
   
  * Need to added Epoch and Equinox support, possibly inside Astro::Coords
    rather than in Astro::Catalog::Star itself?
-
- * Add proper motion support to Astro::Catalog::Star (or Astro::Coords?)
  
  * Fix Astro::Catalog::Query::CMC module to correctly parse the CMC TST files,
    currently support is somewhat broken.
@@ -20,7 +18,5 @@ To Do
    be truely generic (or at least work in more cases out of the box).
    
  * Change Astro::Catalog::Query::Vizier to use VOTables for easier parsing?
-   
- * Add support for (S)Extractor format
- 
+    
  * Add further catalogue query classes?
