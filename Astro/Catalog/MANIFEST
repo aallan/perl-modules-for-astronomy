@@ -9,6 +9,7 @@ Star/Makefile.PL
 IO/JCMT.pm
 IO/Cluster.pm
 IO/Simple.pm
+IO/TST.pm
 IO/Makefile.PL
 Query/Query.pm
 Query/Makefile.PL
@@ -25,6 +26,7 @@ t/2_cluster.t
 t/2_simple.t
 t/2_jcmt.t
 t/2_jcmt_loose.t
+t/2_tst.t
 t/3_catalog.t
 t/3_star.t
 t/4_gsc.t
