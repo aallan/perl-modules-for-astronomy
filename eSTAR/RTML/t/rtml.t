@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 3 };
+BEGIN { plan tests => 2 };
 
 # load modules
 use eSTAR::RTML;
@@ -18,3 +18,10 @@ use Data::Dumper;
 
 # test the test system
 ok(1);
+
+my $rtml = new eSTAR::RTML( File => 't/rtml/ia_score_request.xml' );
+my $type = $rtml->determine_type();
+
+ok( $type, 'score' );
+
+exit;

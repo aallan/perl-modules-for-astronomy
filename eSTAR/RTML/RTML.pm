@@ -19,7 +19,7 @@ package eSTAR::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.1 2002/03/14 23:21:32 aa Exp $
+#     $Id: RTML.pm,v 1.2 2002/03/15 05:26:13 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -46,20 +46,21 @@ The module handles RTML for the intelligent agent
 # L O A D   M O D U L E S --------------------------------------------------
 
 use strict;
-use vars qw/ $VERSION /;
+use vars qw/ $VERSION $SELF /;
 
 use XML::Parser;
 use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
+use Data::Dumper;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.1 2002/03/14 23:21:32 aa Exp $
+$Id: RTML.pm,v 1.2 2002/03/15 05:26:13 aa Exp $
 
 =head1 METHODS
 
@@ -82,7 +83,8 @@ sub new {
   my $class = ref($proto) || $proto;
 
   # bless the query hash into the class
-  my $block = bless { XML => undef }, $class;
+  my $block = bless { XML      => undef,
+                      DOCUMENT => undef }, $class;
 
   # Configure the object
   $block->configure( @_ );
@@ -91,7 +93,32 @@ sub new {
 
 }
 
-# M E T H O D S -------------------------------------------------------------
+# L O A D I N G  M E T H O D S ----------------------------------------------
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item B<file>
+
+Loads the RTML file into the
+
+   $dtd = $rtml->file( $rtml_file );
+
+=cut
+
+sub file {
+  my $self = shift;
+  if (@_) { 
+     my $file = shift;
+     $self->{DOCUMENT} = $self->{XML}->parsefile( $file );
+  }
+  return ;
+}
+
+# A C C E S S O R   M E T H O D S -------------------------------------------
 
 =back
 
@@ -99,26 +126,39 @@ sub new {
 
 =over 4
 
-=item B<file>
+=item B<determine_type>
 
-Returns the 
+Return the type of the RTML document
 
-   $objects = $rtml->file( $rtml_file );
+  $type = $rtml->determine_type();
 
 =cut
 
-sub file {
+sub determine_type {
   my $self = shift;
-
-  if (@_) { 
-     my $file = shift
-     $self->{XML}->parsefile( $file );
-  }
-   
+  return ${${${$self->{DOCUMENT}}[1]}[0]}{'type'};
 }
 
+=item B<return_tree>
 
-# C O N F I G U R E -------------------------------------------------------
+Returnd the RTML document tree
+
+  $type = $rtml->return_tree();
+
+used internally in the eSTAR::RTML::Parse module to pull the RTML document
+from the object. While public, its unlikely that anyone would actually want
+to do this outside this module.
+
+=cut
+
+sub return_tree {
+  my $self = shift;
+  
+  my $reference = $self->{DOCUMENT};
+  return $reference;
+}
+
+# C O N F I G U R E ---------------------------------------------------------
 
 =back
 
@@ -130,7 +170,7 @@ sub file {
 
 Configures the object, takes an options hash as an argument
 
-  $message->configure( %options );
+  $rtml->configure( %options );
 
 Does nothing if the array is not supplied.
 
@@ -139,9 +179,14 @@ Does nothing if the array is not supplied.
 sub configure {
   my $self = shift;
 
+  # SELF REFERENCE
+  # --------------
+  $SELF = $self;
+
   # BLESS XML PARSER
   # ----------------
-  $self->{XML} = new XML::Parse( Style => 'Debug' );
+  $self->{XML} = new XML::Parser( Style            => 'Tree',
+                                  ProtocolEncoding => 'US-ASCII' );
 
 
   # CONFIGURE FROM ARGUEMENTS
@@ -162,7 +207,7 @@ sub configure {
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
-
+   
 =head1 COPYRIGHT
 
 Copyright (C) 2002 University of Exeter. All Rights Reserved.

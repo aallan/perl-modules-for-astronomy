@@ -1,4 +1,16 @@
 2002-03-14  Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Most of the parsing stuff implemented, no message creation code.
+        
+        * RTML.pm: Can now read an RTML message from a file and determine
+          the message type. 
+          
+        * Parse/Parse.pm: In progress, most of the way there, with some
+          glaring exceptions. Parsing code is awful, really should implement
+          it as a recursive function to navigate tree passed from RTML.pm
+          module. Unfortunately I think I'm going to have to "tinker" with
+          it for certain commands, a generic recusrsive function could quickly
+          get icky in this case.
+            
         * Original version.
 

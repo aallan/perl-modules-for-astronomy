@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 3 };
+BEGIN { plan tests => 1 };
 
 # load modules
 use eSTAR::RTML;
