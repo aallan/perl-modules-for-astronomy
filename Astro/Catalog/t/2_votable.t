@@ -133,15 +133,15 @@ __DATA__
       <FIELD name="POS_EQ_RA_MAIN"/>
       <FIELD name="POS_EQ_DEC_MAIN"/>
       <FIELD name="PHOT_MAG_B"/>
-      <FIELD name="B_ERROR"/>
+      <FIELD name="PHOT_MAG_B_ERROR"/>
       <FIELD name="PHOT_MAG_R"/>
-      <FIELD name="R_ERROR"/>
+      <FIELD name="PHOT_MAG_R_ERROR"/>
       <FIELD name="PHOT_MAG_V"/>
-      <FIELD name="V_ERROR"/>
+      <FIELD name="PHOT_MAG_V_ERROR"/>
       <FIELD name="PHOT_CI_B-R"/>
-      <FIELD name="B-R_ERROR"/>
+      <FIELD name="PHOT_CI_B-R_ERROR"/>
       <FIELD name="PHOT_CI_B-V"/>
-      <FIELD name="B-V_ERROR"/>
+      <FIELD name="PHOT_CI_B-V_ERROR"/>
       <FIELD name="CODE_QUALITY"/>
       <DATA>
         <TABLEDATA>

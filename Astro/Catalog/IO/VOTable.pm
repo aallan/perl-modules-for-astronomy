@@ -34,14 +34,14 @@ use VOTable::Document;
 
 use Data::Dumper;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOTable.pm,v 1.1 2003/10/13 10:38:20 aa Exp $
+$Id: VOTable.pm,v 1.2 2003/10/13 10:41:32 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -124,11 +124,11 @@ sub _write_catalog {
   push @field_names, "POS_EQ_DEC_MAIN";
   foreach my $i ( 0 .. $#mags ) {
     push @field_names, "PHOT_MAG_" . $mags[$i];
-    push @field_names, $mags[$i] . "_ERROR";
+    push @field_names, "PHOT_MAG_" . $mags[$i] . "_ERROR";
   }
   foreach my $i ( 0 .. $#cols ) {
     push @field_names, "PHOT_CI_" . $cols[$i];
-    push @field_names, $cols[$i] . "_ERROR";
+    push @field_names, "PHOT_CI_" . $cols[$i] . "_ERROR";
   } 
   push @field_names, "CODE_QUALITY"; 
  
