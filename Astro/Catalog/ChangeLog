@@ -1,6 +1,13 @@
-2005-15-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+2005-02-15  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
         * IO/Astrom.pm: Add epoch of observation support.
+        * Catalog.pm: Allow newer versions of Astro::Coords to be used
+          without screwing up output from the ra and dec methods.
+        * Star/Star.pm: Add wcs method allowing for a world coordinate
+          system to be associated with a star. Allow for calculation of
+          x/y position from ra/dec if possible. Allow newer versions
+          of Astro::Coords to be used without screwing up output from
+          the ra and dec methods.
 
 2005-02-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
