@@ -14,8 +14,6 @@ use lib "blib/lib";
 
 # process control
 use strict;
-use threads;
-use threads::shared;
 
 use vars qw/ $VERSION $SELF /;
 
@@ -36,7 +34,6 @@ use eSTAR::IO::Client;
 
 use Carp;
 use Getopt::Long;
-use Proc::Simple;
 use Net::Domain qw(hostname hostdomain);
 
 # file paths
@@ -47,7 +44,7 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 use Data::Dumper;
 
 # CVS revision tag
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # T E S T   H A R N E S S ---------------------------------------------------
 

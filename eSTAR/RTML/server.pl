@@ -14,9 +14,6 @@ use lib "blib/lib";
 
 # process control
 use strict;
-use threads;
-use threads::shared;
-
 use vars qw/ $VERSION $UA @FILES /;
 
 # load test
@@ -51,7 +48,7 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 use Data::Dumper;
 
 # CVS revision tag
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Configure USERAGENT --------------------------------------------------------
 
