@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.10 2001/11/02 16:38:16 aa Exp $
+#     $Id: Query.pm,v 1.11 2001/11/02 17:13:16 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -58,13 +58,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.10 2001/11/02 16:38:16 aa Exp $
+$Id: Query.pm,v 1.11 2001/11/02 17:13:16 aa Exp $
 
 =head1 METHODS
 
@@ -571,6 +571,13 @@ sub _parse_query {
      #     B     Abstract
      #     S     Score
             
+     # NO ABSTRACTS
+     if( $buffer[$line] =~ "Retrieved 0 abstracts" ) {
+     
+        # increment the counter and drop out of the loop
+        $line = $#buffer;
+     }
+            
      # NEW PAPER
      if( substr( $buffer[$line], 0, 2 ) eq "%R" ) {
                     
@@ -972,7 +979,7 @@ sub _parse_query {
      
    }   
 
-   # return an Astro::ADS::Result object
+   # return an Astro::ADS::Result object, or undef if no abstracts returned
    return $result;
 
 }
@@ -992,6 +999,19 @@ sub _dump_raw {
    chomp @portable;
    
    return @portable;
+}
+
+=item B<_dump_options>
+
+Private function for debugging and other testing purposes. It will return
+the current query options as a hash.
+
+=cut
+
+sub _dump_options {
+   my $self = shift;
+   
+   return %{$self->{OPTIONS}};
 }
 
 =head1 COPYRIGHT

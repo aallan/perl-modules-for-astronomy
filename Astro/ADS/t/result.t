@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 1 };
+BEGIN { plan tests => 4 };
 
 # load modules
 use Astro::ADS::Result;
@@ -128,13 +128,34 @@ my $other = new Astro::ADS::Result::Paper( Bibcode   => $bibcode,
                                            Links     => \@links,
                                            URL       => $URL,
                                            Abstract  => \@abstract2 );
+
 my @paper_stack;
-push( @paper_stack, $paper );
-push( @paper_stack, $other );
- 
+push( @paper_stack, $paper, $other);
+
 # create an Astro::ADS::Result object
 my $result = new Astro::ADS::Result( Papers => \@paper_stack );
 
+# create another
+my $next = new Astro::ADS::Result( );
+
+# push papers onto $next
+$next->pushpaper( $paper );
+$next->pushpaper( $other );
+
+# should be the same
+ok( $result->sizeof(), $next->sizeof() );
+
+# pop one paper off $next
+my $ret_paper = $next->poppaper();
+
+# compare with $other
+ok( $other->bibcode(), $ret_paper->bibcode() );
+
+# paperbyindex
+my $index_paper = $result->paperbyindex(1);
+
+# compare with $ret_paper
+ok( $index_paper->bibcode(), $ret_paper->bibcode() );
 
 
 exit;

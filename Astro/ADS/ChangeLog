@@ -1,16 +1,16 @@
 2001-11-02 Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Pre-alpha release
+        * Pre-alpha release, not for general distribution.
 
 2001-11-02 Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Now queries ADS successfully, and can carry out a limited
-          selection of followup queries on the results.
+        * Now parses ADS successfully in all tested cases, can carry out
+          a limited selection of followup queries on the results.
 
 2001-10-31 Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Minimum functionality implemented, passess test harness
-          but no parsing of ADS query into Results object
+        * Minimum functionality implemented,  no parsing of ADS query 
+          into Results object
 
 2001-10-30 Alasdair Allan <aa@astro.ex.ac.uk>
 

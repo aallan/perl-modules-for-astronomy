@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.9 2001/11/02 16:38:16 aa Exp $
+#     $Id: Result.pm,v 1.10 2001/11/02 17:13:16 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.9 2001/11/02 16:38:16 aa Exp $
+$Id: Result.pm,v 1.10 2001/11/02 17:13:16 aa Exp $
 
 =head1 METHODS
 
@@ -99,7 +99,7 @@ sub new {
 
 =item B<sizeof>
 
-Return the number of papers in the Astro::ADS::Result objec.
+Return the number of papers in the Astro::ADS::Result object.
 
    $paper = $result->sizeof();
 
@@ -151,6 +151,29 @@ sub poppaper {
   # pop the paper out of the stack
   return pop( @{$self->{RESULTS}} );
 }
+
+=item B<paperbyindex>
+
+Return the Astro::ADS::Result::Paper object at index $index
+
+   $paper = $result->paperbyindex( $index );
+
+the first paper is at index 0 (not 1). Returns undef if no arguements 
+are provided.
+
+=cut
+
+sub paperbyindex {
+  my $self = shift;
+
+  # return unless we have arguments
+  return undef unless @_;  
+  
+  my $index = shift;
+  
+  return ${$self->{RESULTS}}[$index];
+}
+
 
 # C O N F I G U R E -------------------------------------------------------
 

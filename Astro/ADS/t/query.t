@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 60 };
+BEGIN { plan tests => 61 };
 
 # load modules
 use Astro::ADS::Query;
@@ -111,7 +111,7 @@ ok( $obj_logic, "AND" );
 print "Connecting to ADS\n";
 
 # query ADS
-my $other_result = $query->querydb();
+my $other_result = $query2->querydb();
 #print Dumper($other_result);
 
 print "Continuing Tests\n";
@@ -119,6 +119,31 @@ print "Continuing Tests\n";
 # check the number of papers returned, right now(!) it should be 304,
 # but by default we should get the first 100 abstracts only...
 ok( 100,  $other_result->sizeof());
+
+# add some more objects
+$objects[2] = "M31";
+$objects[3] = "M32";
+
+# Set the object query
+$query2->objects( \@objects );
+
+# for verbose=1
+print "Connecting to ADS\n";
+
+# query ADS
+my $next_result = $query2->querydb();
+#print Dumper($next_result);
+
+print "Continuing Tests\n";
+
+#my %hash = $query2->_dump_options();
+#for my $key ( keys %hash ) {
+#   print "$key\t\t\t= $hash{$key}\n";
+#} 
+
+# should (hopefully) be 0
+ok( 0,  $next_result->sizeof());
+
 
 exit;
 
