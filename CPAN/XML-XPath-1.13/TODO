@@ -1,0 +1,8 @@
+$Id: TODO,v 1.1 2004/03/03 02:44:55 aa Exp $
+
+TODO List for XML::XPath
+
+- Mostly None. Bug fix cycle now.
+- Somehow to allow namespaced extension functions
+- Make SAX parser a SAX2 parser
+
