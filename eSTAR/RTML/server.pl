@@ -45,6 +45,9 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 # debugging
 use Data::Dumper;
 
+# CVS revision tag
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+
 # T E S T   H A R N E S S --------------------------------------------------
 
 # test the test system

@@ -47,7 +47,7 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 use Data::Dumper;
 
 # CVS revision tag
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # T E S T   H A R N E S S ---------------------------------------------------
 
@@ -105,8 +105,8 @@ my $callback = sub {
 
    unless ( defined $reply ) {
       report_error();
-      print "# Shutting down sever on port $server_port\n#\n";
-      $status = stop_server( );
+      #print "# Shutting down sever on port $server_port\n#\n";
+      #$status = stop_server( );
       print "# Deactvating modules\n#\n";
       $status = module_deactivate();
       exit;
@@ -145,9 +145,9 @@ my $message = new eSTAR::RTML::Build(
              );
              
 my $status = $message->score_observation(
-             Target => 'Test Target',
-             RA     => $opt{"ra"},
-             Dec    => $opt{"dec"},
+             Target   => 'Test Target',
+             RA       => $opt{"ra"},
+             Dec      => $opt{"dec"},
              Exposure => $opt{"exposure"}
              );
 
@@ -188,8 +188,8 @@ my $client_handle = open_client( $opt{"dn_host"}, $opt{"dn_port"} );
 
 unless( defined $client_handle ) {
    report_error();
-   print "# Shutting down sever on port $server_port\n#\n";
-   $status = stop_server( );
+   #print "# Shutting down sever on port $server_port\n#\n";
+   #$status = stop_server( );
    print "# Deactvating modules\n#\n";
    $status = module_deactivate();
    exit;
@@ -200,8 +200,8 @@ $status = write_message( $client_handle, $rtml );
 
 if( $status == GLOBUS_FALSE) {
    report_error();
-   print "# Shutting down sever on port $server_port\n#\n";
-   $status = stop_server( );
+   #print "# Shutting down sever on port $server_port\n#\n";
+   #$status = stop_server( );
    print "# Deactvating modules\n#\n";
    $status = module_deactivate();
    exit;
@@ -217,8 +217,8 @@ my $reply = read_message( $client_handle );
 
 unless ( defined $reply ) {
    report_error();
-   print "# Shutting down sever on port $server_port\n#\n";
-   $status = stop_server( );
+   #print "# Shutting down sever on port $server_port\n#\n";
+   #$status = stop_server( );
    print "# Deactvating modules\n#\n";
    $status = module_deactivate();
    exit;
@@ -247,8 +247,14 @@ my $ers_obs = new eSTAR::RTML( File => File::Spec->catfile( $ENV{"ESTAR_DATA"},
                                                  "client_message.xml" )  );
 
 my $type = $ers_obs->determine_type();
-print "# Got a ' " . $type . " ' RTML file from ERS server at $opt{dn_host}\n";
-ok( $type, 'score' );
+print "# Got a '" . $type . "' RTML file from ERS server at $opt{dn_host}\n";
+
+if( $type ne 'score' ) {
+   print "#\n# Scoring request was rejected ($type)\n";
+   print "# Deactvating modules\n#\n";
+   $status = module_deactivate();
+   exit;
+}
 
 my $ers_score = new eSTAR::RTML::Parse( RTML => $ers_obs );
 my $score = $ers_score->score();
@@ -256,6 +262,15 @@ my $completion_time = $ers_score->time();
 
 print "#    Score = $score\n";
 print "#    Time = $completion_time\n";
+
+if( $score <= 0.0001 ) {
+   print "#\n# Observation scoring was too low (score = $score)\n";
+   print "# Deactvating modules\n#\n";
+   $status = module_deactivate();
+   exit;
+}
+
+
 
 # SLEEP ---------------------------------------------------------------------
 
@@ -299,8 +314,8 @@ my $client_handle = open_client( $opt{"dn_host"}, $opt{"dn_port"} );
 
 unless( defined $client_handle ) {
    report_error();
-   print "# Shutting down sever on port $server_port\n#\n";
-   $status = stop_server( );
+   #print "# Shutting down sever on port $server_port\n#\n";
+   #$status = stop_server( );
    print "# Deactvating modules\n#\n";
    $status = module_deactivate();
    exit;
@@ -311,8 +326,8 @@ $status = write_message( $client_handle, $rtml2 );
 
 if( $status == GLOBUS_FALSE) {
    report_error();
-   print "# Shutting down sever on port $server_port\n#\n";
-   $status = stop_server( );
+   #print "# Shutting down sever on port $server_port\n#\n";
+   #$status = stop_server( );
    print "# Deactvating modules\n#\n";
    $status = module_deactivate();
    exit;
@@ -328,8 +343,8 @@ my $reply2 = read_message( $client_handle );
 
 unless ( defined $reply2 ) {
    report_error();
-   print "# Shutting down sever on port $server_port\n#\n";
-   $status = stop_server( );
+   #print "# Shutting down sever on port $server_port\n#\n";
+   #$status = stop_server( );
    print "# Deactvating modules\n#\n";
    $status = module_deactivate();
    exit;
