@@ -1,5 +1,6 @@
 2004-11-23  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 	* Star/Morphology.pm: Add simple support for object morphology.
+	* Star.pm: Add morphology accessor method.
 
 2004-11-22  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
