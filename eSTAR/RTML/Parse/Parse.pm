@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.10 2002/03/28 02:04:50 aa Exp $
+#     $Id: Parse.pm,v 1.11 2002/03/28 02:22:14 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.10 2002/03/28 02:04:50 aa Exp $
+$Id: Parse.pm,v 1.11 2002/03/28 02:22:14 aa Exp $
 
 =head1 METHODS
 
@@ -208,26 +208,27 @@ sub id {
   return ${$self->{INTELLIGENTAGENT}}{tag_value};
 }
 
-=item B<real_name>
+=item B<name>
 
 Return the real name of the observer
 
-  $real_name = $rtml->real_name();
+  $real_name = $rtml->name();
 
 =cut
-sub real_name {
+
+sub name {
   my $self = shift;
   return ${${$self->{CONTACT}}{Name}}{tag_value};
 }
 
-=item B<user_name>
+=item B<user>
 
 Return the user name of the observer
 
-  $user_name = $rtml->user_name();
+  $user = $rtml->user();
 
 =cut
-sub user_name {
+sub user {
   my $self = shift;
   return ${${$self->{CONTACT}}{User}}{tag_value};
 }
@@ -244,26 +245,26 @@ sub institution {
   return ${${$self->{CONTACT}}{Institution}}{tag_value};
 }
 
-=item B<email_address>
+=item B<email>
 
 Return the email address of the observer
 
-  $email = $rtml->email_address();
+  $email = $rtml->email();
 
 =cut
-sub email_address {
+sub email {
   my $self = shift;
   return ${${$self->{CONTACT}}{Email}}{tag_value};
 }
 
-=item B<target_name>
+=item B<target>
 
 Return the name of the target
 
-  $target_name = $rtml->target_name();
+  $target_name = $rtml->target();
 
 =cut
-sub target_name {
+sub target {
   my $self = shift;
   return ${${${$self->{OBSERVATION}}{Target}}{Targetname}}{tag_value};
 }
