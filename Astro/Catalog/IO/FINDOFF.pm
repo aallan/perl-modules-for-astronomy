@@ -28,6 +28,8 @@ use strict;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
+use base qw/ Astro::Catalog::IO::ASCII /;
+
 use vars qw/ $VERSION $DEBUG /;
 
 $VERSION = '0.01';
@@ -101,10 +103,12 @@ The sole mandatory argument is an C<Astro::Catalog> object.
 As the Starlink FINDOFF is ID in column 1, X position in column 2,
 Y position in column 3, and miscellaneous information in the remaining
 columns that gets carried through to the output file, this method
-writes the ID, X, and Y in the first three columns followed by
-the ID again. The ID is duplicated because FINDOFF carries the comment
-column through to its output while creating new IDs for each object;
-carrying the ID through allows one to link up the new ID with the old.
+writes a new ID, X, and Y in the first three columns. A new ID is
+formed by removing any non-numbers from the original ID because
+FINDOFF cannot understand non-integer IDs. This ID is also written
+to the fourth column because FINDOFF trounces the original input
+ID when doing matching, and being able to have the original ID
+is a good thing.
 
 =cut
 
@@ -127,8 +131,10 @@ sub _write_catalog {
               ! defined( $star->y ) ||
               ! defined( $star->id ) );
 
+    ( my $newid = $star->id ) =~ s/[^\d]//g;
+
     # Start off the output string.
-    $output_line = join( ' ', $star->id, $star->x, $star->y, $star->id );
+    $output_line = join( ' ', $newid, $star->x, $star->y, $newid );
 
     # And push this string to the output array.
     push @output, $output_line;
@@ -143,7 +149,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: FINDOFF.pm,v 1.2 2005/02/01 23:14:03 cavanagh Exp $
+ $Id: FINDOFF.pm,v 1.3 2005/03/31 01:24:53 cavanagh Exp $
 
 =head1 SEE ALSO
 

@@ -31,6 +31,8 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
+use base qw/ Astro::Catalog::IO::ASCII /;
+
 $DEBUG = 0;
 $VERSION = '0.01';
 
@@ -139,7 +141,7 @@ sub _read_catalog {
 
 =head1 REVISION
 
- $Id: GaiaPick.pm,v 1.1 2004/02/24 04:26:50 timj Exp $
+ $Id: GaiaPick.pm,v 1.2 2005/03/31 01:24:53 cavanagh Exp $
 
 =head1 FORMAT
 

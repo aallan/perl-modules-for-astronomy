@@ -29,6 +29,8 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
+use base qw/ Astro::Catalog::IO::ASCII /;
+
 use vars qw/ $VERSION $DEBUG /;
 
 $VERSION = '0.01';
@@ -151,7 +153,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: Astrom.pm,v 1.4 2005/02/15 22:52:48 cavanagh Exp $
+ $Id: Astrom.pm,v 1.5 2005/03/31 01:24:53 cavanagh Exp $
 
 =head1 SEE ALSO
 

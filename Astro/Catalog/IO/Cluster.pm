@@ -32,16 +32,18 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
+use base qw/ Astro::Catalog::IO::ASCII /;
+
 use Data::Dumper;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.12 2004/11/30 12:32:05 aa Exp $
+$Id: Cluster.pm,v 1.13 2005/03/31 01:24:53 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 

@@ -30,6 +30,8 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
+use base qw/ Astro::Catalog::IO::ASCII /;
+
 use vars qw/$VERSION $DEBUG /;
 
 $VERSION = '0.14';

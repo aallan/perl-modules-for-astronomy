@@ -30,6 +30,8 @@ use Astro::Catalog::Star;
 use Astro::Coords;
 use Astro::SLA;
 
+use base qw/ Astro::Catalog::IO::ASCII /;
+
 use vars qw/ $VERSION $DEBUG /;
 
 $VERSION = '0.01';
@@ -247,7 +249,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.5 2005/02/15 20:37:21 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.6 2005/03/31 01:24:53 cavanagh Exp $
 
 =head1 FORMAT
 

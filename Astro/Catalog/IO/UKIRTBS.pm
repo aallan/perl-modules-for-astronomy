@@ -28,6 +28,8 @@ use strict;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
+use base qw/ Astro::Catalog::IO::ASCII /;
+
 use vars qw/ $VERSION /;
 
 $VERSION = '0.01';

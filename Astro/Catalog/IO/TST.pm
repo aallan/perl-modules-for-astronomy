@@ -30,6 +30,8 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
+use base qw/ Astro::Catalog::IO::ASCII /;
+
 $DEBUG = 0;
 $VERSION = '0.03';
 
@@ -510,7 +512,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.11 2004/11/22 19:33:56 timj Exp $
+ $Id: TST.pm,v 1.12 2005/03/31 01:24:53 cavanagh Exp $
 
 =head1 FORMAT
 
