@@ -1,3 +1,8 @@
+2001-10-31 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Minimum functionality implemented, passess test harness
+          but no parsing of ADS query into Results object
+
 2001-10-30 Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Original version
