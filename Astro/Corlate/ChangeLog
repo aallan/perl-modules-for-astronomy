@@ -1,7 +1,16 @@
 2001-12-12  Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Astro::Corlate::Wrapper code now works correctly. 
+
         * Wrapper/Makefile.PL: Changed to link using f95, undocumented
           feature in ExtUtils::F77
+          
+        * Wrapper/Wrapper.xs: Modified PACKAGE line to put the corlate()
+          function in the right namespace.  
+          
+        * t/wrapper.t: Modified so that it can actually find the catalog
+          files, does a check on the info.dat file to see if the correct
+          contents have been generated.  
           
 2001-12-06  Alasdair Allan <aa@astro.ex.ac.uk>
 
