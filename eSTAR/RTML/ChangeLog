@@ -1,3 +1,11 @@
+2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk>
+
+         * Build.pm: Added score_response() method to generate a scoring
+           response message.
+           
+         * Parse.pm: Added port() and host() methods to retrieve the
+           originiating host and port from a parsed RTML message
+             
 2003-06-27  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Build.pm: Fixed the request_observation() routine to handle SNR

@@ -103,3 +103,28 @@ ok( $message3->flux(), '12.0' );
 # dump out the request
 my $doc3 = $message3->dump_rtml();
 print $doc3;
+
+
+# build a score request
+my $message4 = new eSTAR::RTML::Build( 
+             Port        => '2000',
+             ID          => 'IA:aa@bofh.astro.ex.ac.uk:2000:0001',
+             User        => 'aa',
+             Name        => 'Alasdair Allan',
+             Institution => 'University of Exeter',
+             Email       => 'aa@astro.ex.ac.uk' );
+             
+my $status = $message4->score_observation(
+             Target => 'Test Target',
+             RA     => '09 00 00',
+             Dec    => '+60 00 00');
+$message4->score_response(
+             Target => 'Test Target',
+             RA     => '09 00 00',
+             Dec    => '+60 00 00',
+             Score  => 1,
+             Time   => "2003-12-12T12:00:00" );
+             
+# dump out the request
+my $doc4 = $message4->dump_rtml();
+print $doc4;

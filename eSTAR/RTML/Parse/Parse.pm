@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.16 2003/06/10 23:38:28 aa Exp $
+#     $Id: Parse.pm,v 1.17 2003/07/15 08:16:51 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.16 2003/06/10 23:38:28 aa Exp $
+$Id: Parse.pm,v 1.17 2003/07/15 08:16:51 aa Exp $
 
 =head1 METHODS
 
@@ -328,6 +328,44 @@ Return the Flux defining the signal-to-noise ratio required
 sub flux {
   my $self = shift;
   return ${${${$self->{OBSERVATION}}{Target}}{Coordinates}}{Flux};
+}
+
+=item B<equinox>
+
+Return the equinox of the RA and Dec
+
+  $equinox = $rtml->equinox();
+
+=cut
+sub equinox {
+  my $self = shift;  
+  return ${${${$self->{OBSERVATION}}{Target}}{Coordinates}}{Equinox};
+}
+
+
+=item B<host>
+
+Return the host of the IA origininating the document
+
+  $host = $rtml->host();
+
+=cut
+sub host {
+  my $self = shift;  
+  return ${$self->{INTELLIGENTAGENT}}{host};
+}
+
+
+=item B<port>
+
+Return the port of the IA origininating the document
+
+  $host = $rtml->port();
+
+=cut
+sub port {
+  my $self = shift;  
+  return ${$self->{INTELLIGENTAGENT}}{port};
 }
 
 
