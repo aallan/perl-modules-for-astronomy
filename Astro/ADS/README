@@ -13,7 +13,7 @@ containing 1,079,814 abstracts; and 4) Los Alamos preprint server, containing
 4,104 abstracts. Each dataset can be searched by author, object name (astronomy
 only), title, or abstract text words. 
 
-As this is a first release of the module only minimal query functionality is
+As this is an early release of the module only minimal query functionality is
 included, however all the backend interaction with the ADS server is in place
 and additional functionality (e.g. adding weights and scoring) should be along
 shortly. I'm currently following the "relase early, release often" strategy.
@@ -85,6 +85,13 @@ The core functionality of the module was written by Alasdair Allan
 Additional functionality and the user space scripts were written by
 Tim Jenness <timj@jach.hawaii.edu> of the Joint Astronomy Centre (JAC) 
 in Hawaii.
+
+Terms and Conditions
+--------------------
+
+Use of this library implies acceptance of the terms and conditions of use
+of the Astrophysical Data Service (ADS) Abstract Service, for full details
+see http://adswww.harvard.edu/use.html
 
 License
 -------
