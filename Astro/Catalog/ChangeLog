@@ -6,7 +6,9 @@
           
         * Query/Query/USNOA2.pm: Changed the id() of the downloaded USNO-A2
           stars to be numberic, otherwise we break the cluster format which
-          requires numeric id's.
+          requires numeric id's. Also tweaked the $catalog->pushstar() line
+          so if the Astro::Coords object in the Astro::Catalog::Star object
+          is broken (bogus dec?) its not going to get included in the catalog.
         
 2003-08-03  Tim Jenness  <timj@jach.hawaii.edu>
 

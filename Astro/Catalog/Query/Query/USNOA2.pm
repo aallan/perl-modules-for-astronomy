@@ -46,11 +46,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: USNOA2.pm,v 1.4 2003/08/19 18:28:51 aa Exp $
+$Id: USNOA2.pm,v 1.5 2003/08/19 18:46:35 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -261,8 +261,15 @@ sub _parse_query {
 
            # Push the star into the catalog
            # ------------------------------
-           $catalog->pushstar( $star );
-
+           
+           # only push the star if the Astro::Coords object is 
+           # correctly defined. The Dec might be bogus since the
+           # USNO-A2 catalogue has its seconds field out of 
+           # normal range (0-59.9) in some cases.
+           if( $star->coords()->dec(format => 's') ) {
+              $catalog->pushstar( $star );
+           }
+           
            # Calculate error
            # ---------------
 
