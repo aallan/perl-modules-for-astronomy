@@ -1,3 +1,6 @@
+2004-11-22  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+  * IO/SExtractor.pm: Add simple reader for output from SExtractor.
+
 2004-11-05  Tim Jenness  <tjenness@cpan.org>
 
 	* IO/UKIRTBS.pm: Add simple reader for the UKIRT version of the
