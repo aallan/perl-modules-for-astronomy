@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.15 2003/07/28 00:26:21 timj Exp $
+#     $Id: Star.pm,v 1.16 2003/08/04 05:31:08 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -47,7 +47,12 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
                                     PosAngle   => $position_angle,
                                     X          => $x_pixel_coord,
                                     Y          => $y_pixel_coord,
-                                    Comment    => $comment_string );
+                                    Comment    => $comment_string
+				    SpecType   => $spectral_type,
+				    StarType   => $star_type,
+				    LongStarType=> $long_star_type,
+				    MoreInfo   => $url,
+				  );
 
 =head1 DESCRIPTION
 
@@ -79,14 +84,155 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+
+# Internal lookup table for Simbad star types
+my %STAR_TYPE_LOOKUP = (
+          'vid' => 'Underdense region of the Universe',
+          'Er*' => 'Eruptive variable Star',
+          'Rad' => 'Radio-source',
+          'Q?' => 'Possible Quasar',
+          'IR' => 'Infra-Red source',
+          'SB*' => 'Spectrocopic binary',
+          'C*' => 'Carbon Star',
+          'Gl?' => 'Possible Globular Cluster',
+          'DNe' => 'Dark Nebula',
+          'GlC' => 'Globular Cluster',
+          'No*' => 'Nova',
+          'V*?' => 'Star suspected of Variability',
+          'LeG' => 'Gravitationnaly Lensed Image of a Galaxy',
+          'mAL' => 'metallic Absorption Line system',
+          'LeI' => 'Gravitationnaly Lensed Image',
+          'WU*' => 'Eclipsing binary of W UMa type',
+          'Be*' => 'Be Star',
+          'PaG' => 'Pair of Galaxies',
+          'Mas' => 'Maser',
+          'LeQ' => 'Gravitationnaly Lensed Image of a Quasar',
+          'mul' => 'Composite object',
+          'SBG' => 'Starburst Galaxy',
+          '*' => 'Star',
+          'gam' => 'gamma-ray source',
+          'bL*' => 'Eclipsing binary of beta Lyr type',
+          'S*' => 'S Star',
+          'El*' => 'Elliptical variable Star',
+          'GNe' => 'Galactic Nebula',
+          'DQ*' => 'Cataclysmic Var. DQ Her type',
+          '?' => 'Object of unknown nature',
+          'WV*' => 'Variable Star of W Vir type',
+          'SR?' => 'SuperNova Remnant Candidate',
+          'Bla' => 'Blazar',
+          'G' => 'Galaxy',
+          'SCG' => 'Supercluster of Galaxies',
+          'OH*' => 'Star with envelope of OH/IR type',
+          'Lev' => '(Micro)Lensing Event',
+          'BNe' => 'Bright Nebula',
+          'RV*' => 'Variable Star of RV Tau type',
+          'IR0' => 'IR source at lambda < 10 microns',
+          'OVV' => 'Optically Violently Variable object',
+          'a2*' => 'Variable Star of alpha2 CVn type',
+          'IR1' => 'IR source at lambda > 10 microns',
+          'Em*' => 'Emission-line Star',
+          'PM*' => 'High proper-motion Star',
+          'X' => 'X-ray source',
+          'HzG' => 'Galaxy with high redshift',
+          'Sy*' => 'Symbiotic Star',
+          'LXB' => 'Low Mass X-ray Binary',
+          '*i*' => 'Star in double system',
+          'Sy1' => 'Seyfert 1 Galaxy',
+          'Sy2' => 'Seyfert 2 Galaxy',
+          'LIN' => 'LINER-type Active Galaxy Nucleus',
+          'rG' => 'Radio Galaxy',
+          'Cl*' => 'Cluster of Stars',
+          'NL*' => 'Nova-like Star',
+          'HV*' => 'High-velocity Star',
+          'EmG' => 'Emission-line galaxy',
+          '*iA' => 'Star in Association',
+          'grv' => 'Gravitational Source',
+          '*iC' => 'Star in Cluster',
+          'SyG' => 'Seyfert Galaxy',
+          'RNe' => 'Reflection Nebula',
+          'EmO' => 'Emission Object',
+          'Ce*' => 'Classical Cepheid variable Star',
+          'CV*' => 'Cataclysmic Variable Star',
+          '*iN' => 'Star in Nebula',
+          'BY*' => 'Variable of BY Dra type',
+          'Pe*' => 'Peculiar Star',
+          'AM*' => 'Cataclysmic Var. AM Her type',
+          'FU*' => 'Variable Star of FU Ori type',
+          'HVC' => 'High-velocity Cloud',
+          'ClG' => 'Cluster of Galaxies',
+          'Ir*' => 'Variable Star of irregular type',
+          'PN?' => 'Possible Planetary Nebula',
+          'ALS' => 'Absorption Line system',
+          'cm' => 'centimetric Radio-source',
+          'As*' => 'Association of Stars',
+          'V*' => 'Variable Star',
+          'Fl*' => 'Flare Star',
+          'EB*' => 'Eclipsing binary',
+          'CGG' => 'Compact Group of Galaxies',
+          'UV' => 'UV-emission source',
+          'Ro*' => 'Rotationally variable Star',
+          'SN*' => 'SuperNova',
+          'pr*' => 'Pre-main sequence Star',
+          'CH*' => 'Star with envelope of CH type',
+          'Al*' => 'Eclipsing binary of Algol type',
+          'Pu*' => 'Pulsating variable Star',
+          'Cld' => 'Cloud of unknown nature',
+          'QSO' => 'Quasar',
+          'Psr' => 'Pulsars',
+          'GiC' => 'Galaxy in Cluster of Galaxies',
+          'V* RI*' => 'Variable Star with rapid variations',
+          'sh' => 'HI shell',
+          'GiG' => 'Galaxy in Group of Galaxies',
+          'OpC' => 'Open (galactic) Cluster',
+          'WR*' => 'Wolf-Rayet Star',
+          'BCG' => 'Blue compact Galaxy',
+          'blu' => 'Blue object',
+          'GiP' => 'Galaxy in Pair of Galaxies',
+          'LyA' => 'Ly alpha Absorption Line system',
+          'CGb' => 'Cometary Globule',
+          '**' => 'Double or multiple star',
+          'H2G' => 'HII Galaxy',
+          'RR*' => 'Variable Star of RR Lyr type',
+          'HB*' => 'Horizontal Branch Star',
+          'RC*' => 'Variable Star of R CrB type',
+          'SNR' => 'SuperNova Remnant',
+          'MoC' => 'Molecular Cloud',
+          'HXB' => 'High Mass X-ray Binary',
+          'mR' => 'metric Radio-source',
+          'TT*' => 'T Tau-type Star',
+          'DN*' => 'Dwarf Nova',
+          'eg sr*' => 'Semi-regular pulsating Star',
+          'HII' => 'HII (ionized) region',
+          'HH' => 'Herbig-Haro Object',
+          'HI' => 'HI (neutral) region',
+          'WD*' => 'White Dwarf',
+          'Or*' => 'Variable Star in Orion Nebula',
+          'dS*' => 'Variable Star of delta Sct type',
+          'DLy' => 'Dumped Ly alpha Absorption Line system',
+          'AGN' => 'Active Galaxy Nucleus',
+          'GrG' => 'Group of Galaxies',
+          'Mi*' => 'Variable Star of Mira Cet type',
+          'RS*' => 'Variable of RS CVn type',
+          'mm' => 'millimetric Radio-source',
+          'red' => 'Very red source',
+          'BLL' => 'BL Lac - type object',
+          'reg' => 'Region defined in the sky',
+          'PN' => 'Planetary Nebula',
+          'ZZ*' => 'Variable White Dwarf of ZZ Cet type',
+          'gB' => 'gamma-ray Burster',
+          'PoC' => 'Part of Cloud',
+          'XB*' => 'X-ray Binary',
+          'PoG' => 'Part of a Galaxy',
+          'Neb' => 'Nebula of unknown nature'
+        );
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.15 2003/07/28 00:26:21 timj Exp $
+$Id: Star.pm,v 1.16 2003/08/04 05:31:08 timj Exp $
 
 =head1 METHODS
 
@@ -112,7 +258,12 @@ Create a new instance from a hash of options
                                     PosAngle   => $position_angle,
                                     X          => $x_pixel_coord,
                                     Y          => $y_pixel_coord,
-                                    Comment    => $comment_string );
+                                    Comment    => $comment_string
+				    SpecType   => $spectral_type,
+				    StarType   => $star_type,
+				    LongStarType=> $long_star_type,
+				    MoreInfo   => $url,
+				  );
 
 returns a reference to an Astro::Catalog::Star object.
 
@@ -139,7 +290,12 @@ sub new {
 		      COORDS     => undef,
                       X          => undef,
                       Y          => undef,
-                      COMMENT    => undef }, $class;
+                      COMMENT    => undef,
+		      SPECTYPE   => undef,
+		      STARTYPE   => undef,
+		      LONGTYPE   => undef,
+		      MOREINFO   => undef,
+		    }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -785,6 +941,86 @@ sub comment {
   }
   return $self->{COMMENT};
 }
+
+=item B<spectype>
+
+The spectral type of the Star.
+
+  $spec = $star->spectype;
+
+=cut
+
+sub spectype {
+  my $self = shift;
+  if (@_) {
+    $self->{SPECTYPE} = shift;
+  }
+  return $self->{SPECTYPE};
+}
+
+=item B<startype>
+
+The type of star. Usually uses the Simbad abbreviation.
+eg. '*' for a star, 'rG' for a Radio Galaxy.
+
+  $type = $star->startype;
+
+See also C<longstartype> for the expanded version of this type.
+
+=cut
+
+sub startype {
+  my $self = shift;
+  if (@_) {
+    $self->{STARTYPE} = shift;
+  }
+  return $self->{STARTYPE};
+}
+
+=item B<longstartype>
+
+The full description of the type of star. Usually uses the Simbad text.
+If no text has been provided, a lookup will be performed using the
+abbreviated C<startype>.
+
+  $long = $star->longstartype;
+  $star->longstartype( "A variable star" );
+
+See also C<longstartype> for the expanded version of this type.
+
+=cut
+
+sub longstartype {
+  my $self = shift;
+  if (@_) {
+    $self->{LONGTYPE} = shift;
+  }
+  # if we have nothing, attempt a look up
+  if (!defined $self->{LONGTYPE} && defined $self->startype
+     && exists $STAR_TYPE_LOOKUP{$self->startype}) {
+    return $STAR_TYPE_LOOKUP{$self->startype};
+  } else {
+    return $self->{STARTYPE};
+  }
+}
+
+=item B<moreinfo>
+
+A link (URL) to more information on the star in question. For example
+this might provide a direct link to the full Simbad description.
+
+  $url = $star->moreinfo;
+
+=cut
+
+sub moreinfo {
+  my $self = shift;
+  if (@_) {
+    $self->{MOREINFO} = shift;
+  }
+  return $self->{MOREINFO};
+}
+
 
 # C O N F I G U R E -------------------------------------------------------
 
