@@ -1,3 +1,20 @@
+2003-07-28  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Moved the catalogue query classes to chare a common namespace,
+          current classes now inherit from the Astro::Catalog::Transport::REST
+          class. While future web and GRID service classes will inherit from
+          related classes. All the Astro::Catalog::Transport classes inherit
+          from Tim's BaseQuery class.
+
+2003-07-27  Tim Jenness <timj@jach.hawaii.edu>
+
+        * Added sorting and filtering of catalogues.
+
+2003-07-26  Tim Jenness <timj@jach.hawaii.edu> 
+            & Alasdiar Allan <aa@astro.ex.ac.uk>
+            
+        * Added pluggable IO.
+            
 2003-07-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * t/catalog.t: Tests fixed to reflect the new two decimal place
