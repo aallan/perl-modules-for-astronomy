@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.6 2001/11/02 00:22:14 aa Exp $
+#     $Id: Result.pm,v 1.7 2001/11/02 00:46:14 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.6 2001/11/02 00:22:14 aa Exp $
+$Id: Result.pm,v 1.7 2001/11/02 00:46:14 aa Exp $
 
 =head1 METHODS
 
@@ -218,7 +218,7 @@ sub configure {
 Copyright (C) 2001 University of Exeter. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the GNU Public License.
 
 =head1 AUTHORS
 
