@@ -19,7 +19,7 @@ package Astro::DSS;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: DSS.pm,v 1.7 2003/02/21 18:52:15 aa Exp $
+#     $Id: DSS.pm,v 1.8 2003/07/22 00:54:48 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -30,7 +30,7 @@ package Astro::DSS;
 
 =head1 NAME
 
-Astro::DSS - Object definining a query request in the Digital Sky Survey
+Astro::DSS - An Object Orientated interface to the Digital Sky Survey
 
 =head1 SYNOPSIS
 
@@ -69,13 +69,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: DSS.pm,v 1.7 2003/02/21 18:52:15 aa Exp $
+$Id: DSS.pm,v 1.8 2003/07/22 00:54:48 aa Exp $
 
 =head1 METHODS
 
