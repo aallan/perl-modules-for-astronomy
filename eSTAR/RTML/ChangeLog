@@ -1,3 +1,8 @@
+2003-06-27  Alasdair Allan <aa@astro.ex.ac.uk>
+
+         * Build.pm: Fixed the request_observation() routine to handle SNR
+           and Flux correctly.
+           
 2003-06-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Parse.pm: Fixed ra() and dec() which were incorrectly looking

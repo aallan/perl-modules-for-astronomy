@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.8 2003/06/03 17:35:15 aa Exp $
+#     $Id: Build.pm,v 1.9 2003/06/27 13:56:02 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -64,13 +64,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.8 2003/06/03 17:35:15 aa Exp $
+$Id: Build.pm,v 1.9 2003/06/27 13:56:02 aa Exp $
 
 =head1 METHODS
 
@@ -292,7 +292,7 @@ sub request_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Score Time Exposure / ) {
+  for my $key (qw / Target RA Dec Equinox Score Time Exposure Snr Flux / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
