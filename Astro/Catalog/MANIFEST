@@ -10,6 +10,7 @@ IO/README
 IO/JCMT.pm
 IO/Cluster.pm
 IO/Simple.pm
+IO/STL.pm
 IO/TST.pm
 IO/VOTable.pm
 IO/Makefile.PL
@@ -34,6 +35,7 @@ t/2_cluster.t
 t/2_simple.t
 t/2_jcmt.t
 t/2_jcmt_loose.t
+t/2_stl.t
 t/2_tst.t
 t/2_votable.t
 t/3_catalog.t
