@@ -19,7 +19,7 @@ package Astro::SIMBAD::Result::Object;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Object.pm,v 1.1 2001/11/27 18:09:42 aa Exp $
+#     $Id: Object.pm,v 1.2 2001/11/28 01:06:10 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -40,7 +40,8 @@ Astro::SIMBAD::Result::Object - A individual astronomical object
                                                Frame => \@coord_frame,
                                                RA     => $ra,
                                                Dec    => $declination,
-                                               Spec   => $spectral_type );
+                                               Spec   => $spectral_type,
+                                               URL    => $url );
 
 =head1 DESCRIPTION
 
@@ -54,13 +55,13 @@ Astro::SIMBAD::Result object returned by an Astro::SIMBAD::Query object.
 use strict;
 use vars qw/ $VERSION /;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Object.pm,v 1.1 2001/11/27 18:09:42 aa Exp $
+$Id: Object.pm,v 1.2 2001/11/28 01:06:10 aa Exp $
 
 =head1 METHODS
 
@@ -86,10 +87,11 @@ sub new {
   my $block = bless { NAME    => undef,
                       TYPE    => undef,
                       LONG    => undef,
-                      FRAME  => [],
+                      FRAME   => [],
                       RA      => undef,
                       DEC     => undef,
-                      SPEC    => undef }, $class;
+                      SPEC    => undef,
+                      URL     => undef }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -236,6 +238,24 @@ sub spec {
   return $self->{SPEC};
 }
 
+=item B<url>
+
+Return (or set) the followup URL for the object where more information
+can be found via SIMBAD, including pointers to reduced data.
+
+   $url = $object->url();
+   $object->url( $url );
+
+=cut
+
+sub url {
+  my $self = shift;
+  if (@_) {
+    $self->{URL} = shift;
+  }
+  return $self->{URL};
+}
+
 # C O N F I G U R E -------------------------------------------------------
 
 =back
@@ -265,7 +285,7 @@ sub configure {
 
   # Loop over the allowed keys storing the values
   # in the object if they exist
-  for my $key (qw / Name Type Long Frame RA Dec Spec /) {
+  for my $key (qw / Name Type Long Frame RA Dec Spec URL /) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }

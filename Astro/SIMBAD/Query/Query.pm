@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.1 2001/11/27 18:09:42 aa Exp $
+#     $Id: Query.pm,v 1.2 2001/11/28 01:06:10 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -55,15 +55,19 @@ use strict;
 use vars qw/ $VERSION /;
 
 use LWP::UserAgent;
+use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+use Astro::SIMBAD::Result;
+use Astro::SIMBAD::Result::Object;
+
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.1 2001/11/27 18:09:42 aa Exp $
+$Id: Query.pm,v 1.2 2001/11/28 01:06:10 aa Exp $
 
 =head1 METHODS
 
@@ -87,6 +91,8 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { OPTIONS   => {},
+                      RA        => undef,
+                      DEC       => undef,
                       URL       => undef,
                       QUERY     => undef,
                       USERAGENT => undef,
@@ -125,7 +131,7 @@ sub querydb {
   return undef unless defined $self->{BUFFER};
 
   # return an Astro::SIMBAD::Result object
-  return $self->_parse_query();
+  #return $self->_parse_query();
 
 }
 
@@ -179,7 +185,216 @@ sub timeout {
 
 }
 
+=item B<url>
+
+Return (or set) the current base URL for the ADS query.
+
+   $url = $query->url();
+   $query->url( "simbad.u-strasbg.fr" );
+
+if not defined the default URL is simbad.u-strasbg.fr
+
+=cut
+
+sub url {
+  my $self = shift;
+
+  # SETTING URL
+  if (@_) { 
+
+    # set the url option 
+    my $base_url = shift; 
+    $self->{URL} = $base_url;
+    $self->{QUERY} = "http://$base_url/sim-id.pl?";
+  }
+
+  # RETURNING URL
+  return $self->{URL};
+}
+
+=item B<agent>
+
+Returns the user agent tag sent by the module to the ADS server.
+
+   $agent_tag = $query->agent();
+
+=cut
+
+sub agent {
+  my $self = shift;
+  return $self->{USERAGENT}->agent();
+}
+
 # O T H E R   M E T H O D S ------------------------------------------------
+
+
+=item B<RA>
+
+Return (or set) the current target R.A. defined for the SIMBAD query
+
+   $ra = $query->ra();
+   $query->ra( $ra );
+
+where $ra should be a string of the form "HH MM SS.SS", e.g. 21 42 42.66
+
+=cut
+
+sub ra {
+  my $self = shift;
+
+  # SETTING R.A.
+  if (@_) { 
+
+    # clear the ra 
+    $self->{RA} = "";
+    
+    # grab the new R.A.
+    my $ra = shift;
+    
+    # mutilate it and stuff it and the current $self->{RA} 
+    # into the ${$self->{OPTIONS}}{"Ident"} hash item.
+    $ra =~ s/\s/\+/g;
+    $self->{RA} = $ra;
+    
+    # grab the currently set DEC
+    my $dec = $self->{DEC};
+    
+    # set the identifier
+    ${$self->{OPTIONS}}{"Ident"} = "$ra+$dec";
+  }
+  
+  return $ra;
+}
+
+=item B<Dec>
+
+Return (or set) the current target Declination defined for the SIMBAD query
+
+   $dec = $query->dec();
+   $query->dec( $dec );
+
+where $dec should be a string of the form "+-HH MM SS.SS", e.g. +43 35 09.5
+or -40 25 67.89
+
+=cut
+
+sub dec { 
+  my $self = shift;
+
+  # SETTING DEC
+  if (@_) { 
+
+    # clear the dec
+    $self->{DEC} = "";
+    
+    # grab the new Dec
+    my $dec = shift;
+    
+    # mutilate it and stuff it and the current $self->{DEC} 
+    # into the ${$self->{OPTIONS}}{"Ident"} hash item.
+    $dec =~ s/\+/%2B/g;
+    $dec =~ s/\s/\+/g;
+    $self->{DEC} = $dec;
+
+    # grab the currently set RA
+    my $ra = $self->{RA};
+    
+    # set the identifier
+    ${$self->{OPTIONS}}{"Ident"} = "$ra+$dec";
+  }
+  
+  return $dec;
+
+}
+
+=item B<Identifier>
+
+Instead of querying SIMBAD by R.A. and Dec., you may also query it by object
+name. Return (or set) the current target object defined for the SIMBAD query
+
+   $ident = $query->identifier();
+   $query->identifier( "HT Cas" );
+
+using an object name will override the current R.A. and Dec settings for the
+Query object (if currently set) and the next querydb() method call will query
+SIMBAD using this identifier rather than any currently set co-ordinates.
+
+=cut
+
+sub identifier {
+  my $self = shift;
+
+  # SETTING IDENTIFIER
+  if (@_) { 
+
+    # grab the new object name
+    my $ident = shift;
+    
+    # mutilate it and stuff it into ${$self->{OPTIONS}}{"Ident"} 
+    $ident =~ s/\s/\+/g;
+    ${$self->{OPTIONS}}{"Ident"} = $ident;
+  }
+  
+  return $ident;
+
+}
+
+=item B<Error>
+
+The error radius to be searched for SIMBAD objects around the target R.A. 
+and Dec, the radius defaults to 10 arc seconds, with the radius unit being
+set using the errorunit() method.
+
+
+   $error = $query->error();
+   $query->error( 20 );
+
+=cut
+
+sub error {
+  my $self = shift;
+
+  if (@_) { 
+    ${$self->{OPTIONS}}{"Radius"} = shift;
+  }
+  
+  return ${$self->{OPTIONS}}{"Radius"};
+
+}
+
+=item B<Error>
+
+The unit for the error radius to be searched for SIMBAD objects around the
+target R.A.  and Dec, the radius defaults to 10 arc seconds, with the radius itself being set using the error() method
+
+   $error = $query->errorunit();
+   $query->errorunit( "arcmin" );
+
+valid unit types are "arcsec", "arcmin" and "deg".
+
+=cut
+
+sub errorunit {
+  my $self = shift;
+
+  if (@_) {
+  
+    my $unit = shift; 
+    if( $unit eq "arcsec" || $unit eq "arcmin" || $unit eq "deg" ) {
+       ${$self->{OPTIONS}}{"Radius.unit"} = $unit;
+    }   
+  }
+  
+  return ${$self->{OPTIONS}}{"Radius.unit"};
+
+}
+
+sub frame {}
+
+sub epoch {}
+
+sub equinox {}
+
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -206,17 +421,50 @@ sub configure {
   # ------------------
 
   # define the default base URLs
-  $self->{URL} = "";
-  $self->{QUERY} = "";
+  $self->{URL} = "simbad.u-strasbg.fr";
+  
+  # define the query URLs
+  my $default_url = $self->{URL};
+  $self->{QUERY} = "http://$default_url/sim-id.pl?";
 
   # Setup the LWP::UserAgent
+  my $HOST = hostname();
+  my $DOMAIN = hostdomain();
   $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
+  $self->{USERAGENT}->agent("Astro::SIMBAD/$VERSION ($HOST.$DOMAIN)");
 
   # Grab Proxy details from local environment
   $self->{USERAGENT}->env_proxy();
 
   # configure the default options
+  ${$self->{OPTIONS}}{"protocol"}           = "html";
+  ${$self->{OPTIONS}}{"Ident"}              = undef;
+  ${$self->{OPTIONS}}{"NbIdent"}            = "around";
+  ${$self->{OPTIONS}}{"Radius"}             = "10";
+  ${$self->{OPTIONS}}{"Radius.unit"}        = "arcsec";
+  ${$self->{OPTIONS}}{"CooFrame"}           = "FK5";
+  ${$self->{OPTIONS}}{"CooEpoch"}           = "2000";
+  ${$self->{OPTIONS}}{"CooEqui"}            = "2000";
+  ${$self->{OPTIONS}}{"output.max"}         = "all";
+  ${$self->{OPTIONS}}{"o.catall"}           = "on";
+  ${$self->{OPTIONS}}{"output.mesdisp"}     = "A";
+  ${$self->{OPTIONS}}{"Bibyear1"}           = "1983";
+  ${$self->{OPTIONS}}{"Bibyear2"}           = "2001";
 
+  # Frame 1, FK5 2000/2000
+  ${$self->{OPTIONS}}{"Frame1"}             = "FK5";
+  ${$self->{OPTIONS}}{"Equi1"}              = "2000.0";
+  ${$self->{OPTIONS}}{"Epoch1"}             = "2000.0";
+  
+  # Frame 2, FK4 1950/1950
+  ${$self->{OPTIONS}}{"Frame2"}             = "FK4";
+  ${$self->{OPTIONS}}{"Equi2"}              = "1950.0";
+  ${$self->{OPTIONS}}{"Epoch2"}             = "1950.0";
+  
+  # Frame 3, Galactic
+  ${$self->{OPTIONS}}{"Frame3"}             = "G";
+  ${$self->{OPTIONS}}{"Equi3"}              = "2000.0";
+  ${$self->{OPTIONS}}{"Epoch3"}             = "2000.0";
 
   # CONFIGURE FROM ARGUEMENTS
   # -------------------------
@@ -227,8 +475,11 @@ sub configure {
   # grab the argument list
   my %args = @_;
 
-  # Loop over the allowed keys and modify the default query options
-  for my $key (qw /  / ) {
+  # Loop over the allowed keys and modify the default query options, note
+  # that due to the order these are called in supplying both and RA and Dec
+  # and an object Identifier (e.g. HT Cas) will cause the query to default
+  # to using the identifier rather than the supplied co-ordinates.
+  for my $key (qw / RA Dec Identifier Error ErrorUnit Frame Epoch Equinox / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -515,16 +766,4 @@ Sy2     Seyfert 2 Galaxy
 Bla     Blazar
 BLL     BL Lac - type object
 OVV     Optically Violently Variable object
-QSO     Quasar  
-# declare the lookup hash
-  my %lookup;
-  
-  # build the data table
-  my @data = <DATA>;
-  chomp @data;
-  
-  # build the lookup hash
-  for my $i ( 0 .. $#data ) {
-     my @pair = split( /\s+/, $data[$i] );
-     $lookup{$pair[0]} = $pair[1];
-  }
+QSO     Quasar
