@@ -1,7 +1,7 @@
 #!perl
 
 # Astro::Catalog test harness
-use Test::More tests => 130;
+use Test::More tests => 133;
 
 # strict
 use strict;
@@ -16,7 +16,7 @@ require_ok("Astro::Catalog::Star");
 
 # Do a private require so that we can skip the tests if VOTable is missing
 eval {
-  require Astro::Catalog::VOTable;
+  require VOTable;
 };
 my $hasvo = ($@ ? 0 : 1);
 
