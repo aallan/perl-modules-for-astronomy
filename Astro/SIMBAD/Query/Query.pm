@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.10 2001/12/03 08:58:00 aa Exp $
+#     $Id: Query.pm,v 1.11 2001/12/03 16:32:05 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.10 2001/12/03 08:58:00 aa Exp $
+$Id: Query.pm,v 1.11 2001/12/03 16:32:05 aa Exp $
 
 =head1 METHODS
 
@@ -821,7 +821,8 @@ sub _parse_query {
      # grab the url based on quotes around the string
      my $start_index = index( $separated[0], q/"/ );
      my $last_index = rindex( $separated[0], q/"/ );
-     my $url = substr( $separated[0], $start_index+1, $last_index-$start_index);
+     my $url = substr( $separated[0], $start_index+1, 
+                       $last_index-$start_index-1);
 
      # push it into the object
      $object->url( $url );
