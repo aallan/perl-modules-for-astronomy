@@ -1,3 +1,9 @@
+2002-05-29  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Applied patch provided by Stephen Quiney <S.J.Quinney@durham.ac.uk>,
+          removes dependancy on Math::libm and fixes test script problem
+          which required the $ESTAR_DATA environment variable to be set.
+
 2002-03-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Minor bug fix?

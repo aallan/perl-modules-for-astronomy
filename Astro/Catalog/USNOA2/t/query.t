@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-use Math::Libm qw(:all);
+
 use Data::Dumper;
 BEGIN { plan tests => 36 };
 
@@ -102,11 +102,11 @@ foreach my $line ( 0 .. $#buffer ) {
                       
     # delta.R
     $power = 0.8*( $star->get_magnitude( 'R' ) - 19.0 );
-    $delta_r = 0.15*sqrt( 1.0 + pow( 10.0, $power ) );
+    $delta_r = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
            
     # delta.B
     $power = 0.8*( $star->get_magnitude( 'B' ) - 19.0 );
-    $delta_b = 0.15*sqrt( 1.0 + pow( 10.0, $power ) );
+    $delta_b = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
            
     # mag errors
     my %mag_errors = ( B => $delta_b,  R => $delta_r );
@@ -122,7 +122,7 @@ foreach my $line ( 0 .. $#buffer ) {
     $star->colours( \%colours );
            
     # delta.(B-R)
-    my $delta_bmr = sqrt( pow( $delta_r, 2.0 ) + pow( $delta_b, 2.0 ) );
+    my $delta_bmr = ( ( $delta_r ** 2.0 ) + ( $delta_b ** 2.0 ) ) ** (1.0/2.0);
            
     # col errors
     my %col_errors = ( 'B-R' => $delta_bmr );
@@ -242,6 +242,8 @@ my $long_catalog = $long->querydb();
 print "# Continuing tests\n";
        
 # write to file
+
+$ENV{"ESTAR_DATA"} ||= '.';
 
 my @out_mags = ( 'R' );
 my @out_cols = ( 'B-R' );

@@ -19,7 +19,7 @@ package Astro::Catalog::USNOA2::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.5 2002/01/25 16:43:27 aa Exp $
+#     $Id: Query.pm,v 1.6 2002/05/29 20:32:29 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -63,20 +63,20 @@ use vars qw/ $VERSION /;
 use LWP::UserAgent;
 use Net::Domain qw(hostname hostdomain);
 use File::Spec;
-use Math::Libm qw(:all);
+
 use Carp;
 
 # generic catalog objects
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.5 2002/01/25 16:43:27 aa Exp $
+$Id: Query.pm,v 1.6 2002/05/29 20:32:29 aa Exp $
 
 =head1 METHODS
 
@@ -768,11 +768,11 @@ sub _parse_query {
                       
            # delta.R
            $power = 0.8*( $star->get_magnitude( 'R' ) - 19.0 );
-           $delta_r = 0.15*sqrt( 1.0 + pow( 10.0, $power ) );
+           $delta_r = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
            
            # delta.B
            $power = 0.8*( $star->get_magnitude( 'B' ) - 19.0 );
-           $delta_b = 0.15*sqrt( 1.0 + pow( 10.0, $power ) );
+           $delta_b = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
            
            # mag errors
            my %mag_errors = ( B => $delta_b,  R => $delta_r );
@@ -793,7 +793,7 @@ sub _parse_query {
            $star->colours( \%colours );
            
            # delta.(B-R)
-           my $delta_bmr = sqrt( pow( $delta_r, 2.0 ) + pow( $delta_b, 2.0 ) );
+           my $delta_bmr = ( ( $delta_r ** 2.0 ) + ( $delta_b ** 2.0 ) ) ** (1.0/2.0);
            
            # col errors
            my %col_errors = ( 'B-R' => $delta_bmr );
