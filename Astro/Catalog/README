@@ -110,6 +110,9 @@ polymorphic input/output.
 It should be noted that Astro::Catalog::IO::TST does not currently provide
 a _write_catalog() function, and that Astro::Catalog::IO::VOTable does not
 provide a _read_catalog() function.
+
+While Astro::Catalog::IO::Cluster writes old style numeric quality flag Cluster
+files there is (limited) support for reading new style character quality flags.
  
 Where can I get it?
 -------------------

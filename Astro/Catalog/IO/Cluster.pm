@@ -34,14 +34,14 @@ use Astro::Coords;
 
 use Data::Dumper;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.10 2003/08/26 19:53:02 aa Exp $
+$Id: Cluster.pm,v 1.11 2003/10/30 17:07:11 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -163,9 +163,15 @@ sub _read_catalog {
       foreach my $k( 0 .. $#colours ) {
 
          # if quality not good then set bad flag
-         if( defined $quality[$k] && $quality[$k] != 0 ) {
-            $star->quality( 1 );
-         }
+         if ( Scalar::Util::looks_like_number($quality[$k]) ) { 
+            if( defined $quality[$k] && $quality[$k] != 0 ) {
+               $star->quality( 1 );
+            }
+         } else {   
+            if( defined $quality[$k] && $quality[$k] ne "OO") {
+               $star->quality( 1 );
+            }
+         }   
       }
 
       # push it onto the stack
