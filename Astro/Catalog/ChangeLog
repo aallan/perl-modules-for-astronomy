@@ -1,3 +1,12 @@
+2004-12-21  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/SExtractor.pm: add support for morphology, x and y position, 
+	  and add more debugging statements.
+
+	* Star/Morphology/Morphology.pm: add area to list of attributes.
+
+	* t/4_mpc.t: fix tests to correspond to changing asteroid positions.
+
 2004-11-30  Alasdair Allan <aa@astro.ex.ac.uk> 
 
         * IO/VOTable.pm: Changed dependancy to Astro::VO::VOTable away
