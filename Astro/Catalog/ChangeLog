@@ -1,3 +1,7 @@
+2004-02-23  Tim Jenness  <tjenness@cpan.org>
+
+	* IO/GaiaPick.pm: Add GaiaPick log file support
+
 2004-02-05  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* t/2_votable.t: Now attempt to skip VOtable tests if the VOTable

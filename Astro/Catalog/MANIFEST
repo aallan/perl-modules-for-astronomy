@@ -14,6 +14,7 @@ IO/Simple.pm
 IO/STL.pm
 IO/TST.pm
 IO/VOTable.pm
+IO/GaiaPick.pm
 IO/Makefile.PL
 Query/Query.pm
 Query/Makefile.PL
@@ -39,6 +40,7 @@ t/2_jcmt_loose.t
 t/2_stl.t
 t/2_tst.t
 t/2_votable.t
+t/2_gaiapick.t
 t/3_catalog.t
 t/3_star.t
 t/4_gsc.t

@@ -100,7 +100,9 @@ query plugins, these are
   Astro::Catalog::IO::Cluster
   Astro::Catalog::IO::JCMT
   Astro::Catalog::IO::Simple
-  Astro::Catalog::IO::TST   (read only)
+  Astro::Catalog::IO::TST      (read only)
+  Astro::Catalog::IO::STL      (read only)
+  Astro::Catalog::IO::GaiaPick (read only)
   Astro::Catalog::IO::VOTable 
   Astro::Catalog::Transport::REST
   Astro::Catalog::Transport::WebService
@@ -112,15 +114,7 @@ class Astro::Catalog::Query. The Astro::Catalog::IO modules provide pluggable
 polymorphic input/output.
 
 It should be noted that Astro::Catalog::IO::TST does not currently provide
-<<<<<<< README
 a _write_catalog() function.
-=======
-a _write_catalog() function, and that Astro::Catalog::IO::VOTable does not
-provide a _read_catalog() function.
-
-While Astro::Catalog::IO::Cluster writes old style numeric quality flag Cluster
-files there is (limited) support for reading new style character quality flags.
->>>>>>> 1.14
  
 Where can I get it?
 -------------------
