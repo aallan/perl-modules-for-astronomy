@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: BSC.pm,v 1.1 2003/09/24 16:15:07 aa Exp $
+$Id: BSC.pm,v 1.2 2003/09/24 17:03:51 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -130,7 +130,7 @@ make and parse the results.
 sub _parse_query {
   my $self = shift;
 
-  #print $self->{BUFFER};
+  print $self->{BUFFER};
   return new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER},
 			     Origin => 'Bright Star Catalogue',
 			     ReadOpt => {

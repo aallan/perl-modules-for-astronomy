@@ -393,63 +393,6 @@ sub _read_catalog {
 
     # Modify the array in place
     $star = new Astro::Catalog::Star( id => $star->{id}, %construct );
-    
-    # Ungodly hack warning...
-    # -----------------------
-    # If we have J, H and K magnitudes, we probably also want some 
-    # colours, so lets generate some here and push it into the star object. 
-    #
-    # This is for 2MASS catalogues, and we need something a bit more
-    # generic here. Yes Tim, I'll fix it later.
-
-    # TJ: Indeed - this should go in Astro::Catalog::Star itself
-    # and be dynamic depending on the stored magnitudes....
-    
-    # generate the colours
-    my $j_minus_h = $star->get_magnitude( 'J' ) -
-                    $star->get_magnitude( 'H' ) if defined $star;
-                    
-    my $j_minus_k = $star->get_magnitude( 'J' ) -
-                    $star->get_magnitude( 'K' ) if defined $star;
-                    
-    my $h_minus_k = $star->get_magnitude( 'H' ) -
-                    $star->get_magnitude( 'K' ) if defined $star;
-     
-    # generate the deltas
-    my $delta_j = $star->get_errors( 'J' ) if defined $star;
-    my $delta_h = $star->get_errors( 'H' ) if defined $star;
-    my $delta_k = $star->get_errors( 'K' ) if defined $star;
-       
-    # quick kludge, stars without errors will get flagged bad anyway   
-    $delta_j = 0.000 unless defined $delta_j;
-    $delta_h = 0.000 unless defined $delta_h;
-    $delta_k = 0.000 unless defined $delta_k;
-    
-    my $delta_jmh = ( ( $delta_j ** 2.0 ) + ( $delta_h ** 2.0 ) ) ** (1.0/2.0);
-    my $delta_jmk = ( ( $delta_j ** 2.0 ) + ( $delta_k ** 2.0 ) ) ** (1.0/2.0);
-    my $delta_hmk = ( ( $delta_h ** 2.0 ) + ( $delta_k ** 2.0 ) ) ** (1.0/2.0);
-
-    # fudge accuracy for readable catalogues
-    $j_minus_h = sprintf("%.4f", $j_minus_h );
-    $j_minus_k = sprintf("%.4f", $j_minus_k );
-    $h_minus_k = sprintf("%.4f", $h_minus_k );     
-    $delta_jmh = sprintf("%.4f", $delta_jmh );
-    $delta_jmk = sprintf("%.4f", $delta_jmk );
-    $delta_hmk = sprintf("%.4f", $delta_hmk );
-
-    # generate the hashes
-    my %colours = ( 'J-H' => $j_minus_h,
-                    'J-K' => $j_minus_k, 
-                    'H-K' => $h_minus_k );
-    
-    my %col_errors = ( 'J-H' => $delta_jmh,
-                       'J-K' => $delta_jmk, 
-                       'H-K' => $delta_hmk );
-    
-    # append to star object
-    $star->colours( \%colours );
-    $star->colerr( \%col_errors );
-    
 
   }
 
@@ -511,7 +454,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.6 2003/09/04 20:41:10 aa Exp $
+ $Id: TST.pm,v 1.7 2003/09/24 17:03:51 aa Exp $
 
 =head1 FORMAT
 
