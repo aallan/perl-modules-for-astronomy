@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.2 2001/10/31 18:39:52 aa Exp $
+#     $Id: Result.pm,v 1.3 2001/10/31 19:04:44 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.2 2001/10/31 18:39:52 aa Exp $
+$Id: Result.pm,v 1.3 2001/10/31 19:04:44 aa Exp $
 
 =head1 METHODS
 
@@ -159,7 +159,7 @@ sub configure {
   if (defined $args{Papers}) {
    
      # Go through each of the supplied paper objects and index by bibcode
-     for my $i ( 0 ...$#{$args{Papers} ) {
+     for my $i ( 0 ...$#{$args{Papers}} ) {
         my $key = ${$args{Papers}}[$i]->bibcode();
         ${$self->{RESULTS}}{$key} = ${$args{Papers}}[$i];
      }

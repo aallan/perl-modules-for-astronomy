@@ -1,4 +1,4 @@
-# Astro::ADS::Query test harness
+# Astro::ADS::Result::Paper test harness
 
 # strict
 use strict;
