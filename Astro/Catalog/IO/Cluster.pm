@@ -33,14 +33,14 @@ use Astro::Coords;
 
 use Data::Dumper;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.5 2003/07/27 01:50:04 aa Exp $
+$Id: Cluster.pm,v 1.6 2003/07/27 02:02:33 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -273,17 +273,17 @@ sub _write_catalog {
   
   # wierd and odd
   $output_line = 
-    "Origin: " . $catalog->origin() . ", " if defined $catalog->origin();
+    "Origin: " . $catalog->origin() . " " if defined $catalog->origin();
     
   if( defined $catalog->get_ra() && defined $catalog->get_dec() ) {
      $output_line = $output_line . 
-       " Field centre at RA " . $catalog->get_ra() . 
-       ", Dec " . $catalog->get_dec() . ", ";
+       "  Field Centre: RA " . $catalog->get_ra() . 
+       ", Dec " . $catalog->get_dec() . " ";
   }
        
   $output_line = $output_line . 
-      " Radius " . $catalog->get_radius() . 
-      " arcminutes" if defined $catalog->get_radius();
+      "  Catalogue Radius: " . $catalog->get_radius() . 
+      " arcmin" if defined $catalog->get_radius();
 
   $output_line = $output_line . "\n";
   push( @output, $output_line );
