@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 
 WriteMakefile( 
-               'NAME'           => 'Astro::DDS',
+               'NAME'           => 'Astro::DSS',
 	       'VERSION_FROM'   => 'DSS.pm',
                'PREREQ_PM'      => { LWP         => 5.53,
                                      Net::Domain => 2.13,
