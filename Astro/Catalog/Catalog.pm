@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.33 2003/07/31 00:08:08 timj Exp $
+#     $Id: Catalog.pm,v 1.34 2003/07/31 02:07:33 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,7 +64,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.33 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.34 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -72,7 +72,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.33 2003/07/31 00:08:08 timj Exp $
+$Id: Catalog.pm,v 1.34 2003/07/31 02:07:33 timj Exp $
 
 =head1 METHODS
 
@@ -711,6 +711,9 @@ are:
           This key is used in preference to 'File' if both are present
 
   Stars => Array of Astro::Catalog::Star objects. Supercedes all other options.
+  ReadOpt => Reference to hash of options to be forwarded onto the
+             format specific catalogue reader. See the IO documentation
+             for details.
 
 If Format is supplied without any other options, a default file is requested
 from the class implementing the formatted read. If no default file is
@@ -823,9 +826,12 @@ sub configure {
     # remove new lines
     chomp @lines;
 
+    # Read Catalog options passed in from caller
+    my $readopt = (defined $args{readopt} ? $args{readopt} : {} );
+
     # Now read the catalog (overwriting $self)
     print "# READING CATALOG $ioclass \n" if $DEBUG;
-    $self =  $ioclass->_read_catalog( \@lines );
+    $self =  $ioclass->_read_catalog( \@lines, %$readopt);
 
     croak "Error reading catalog of class $ioclass\n"
       unless defined $self;
@@ -834,7 +840,7 @@ sub configure {
     delete $args{format};
     delete $args{file};
     delete $args{data};
-	
+    delete $args{readopt};
   }
 
   # Define the field centre if provided
