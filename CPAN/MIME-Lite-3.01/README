@@ -1,0 +1,104 @@
+This is MIME::Lite 3.01 Maintenance release
+-------------------------------------------------------------------------
+INSTALLATION
+    Install using
+
+      perl makefile.pl
+      make test
+      make install
+
+    Or instead of the last line, even better is
+
+      make install TEST_VERBOSE=1
+
+    Adjust the make command as is appropriate for your OS. 'nmake' is the
+    usual name under Win32
+
+    In order to read the docmentation please use
+
+      perldoc MIME::Lite
+
+    from the command line or visit
+
+      http://search.cpan.org/search?query=MIME%3A%3ALite&mode=all
+
+    for a list of all MIME::Lite related materials including the
+    documentation in HTML of all of the released versions of MIME::Lite.
+
+BUNDLED GOODIES
+    MIME::Lite comes with a number of extra files in the distribution
+    bundle. This includes examples, and utility modules that you can use to
+    get yourself started with the module.
+
+    The ./examples directory contains a number of snippets in prepared form,
+    generally they are documented, but they should be easy to understand.
+
+    The ./contrib directory contains a companion/tool modules that come
+    bundled with MIME::Lite, they dont get installed by default. Please
+    review the POD they come with.
+
+OTHER MODULES
+    MIME::Lite works nicely with other certain other modules if they are present.
+    Good to have installed is the latest MIME::Types, Mail::Address MIME::Base64.
+
+BUGS
+    The whole reason that version 3.01 was released was to ensure that
+    MIME::Lite is up to date and patched. If you find an issue please report
+    it.
+
+    As far as I know MIME::Lite doesnt currently have any serious bugs, but
+    my usage is hardly comprehensive.
+
+    Having said that there are a number of open issues for me, mostly caused
+    by the progress in the community as whole since Eryq last released. The
+    tests are based around an interesting but non standard test framework.
+    I'd like to change it over to using Test::More.
+
+    Should tests fail please review the ./testout directory, and in any bug
+    reports please include the output of the relevent file. This is the only
+    redeeming feature of not using Test::More that I can see.
+
+    Bug fixes / Patches / Contribution are welcome, however I probably won't
+    apply them unless they also have an associated test. This means that if
+    I dont have the time to write the test the patch wont get applied, so
+    please, include tests for any patches you provide.
+
+TERMS AND CONDITIONS
+    Copyright (c) 1997 by Eryq.
+    Copyright (c) 1998 by ZeeGee Software Inc.
+    Copyright (c) 2003 Yves Orton. demerphq (at) hotmail.com.
+
+    All rights reserved. This program is free software; you can
+    redistribute it and/or modify it under the same terms as Perl
+    itself.
+
+    This software comes with NO WARRANTY of any kind. See the COPYING
+    file in the distribution for details.    
+
+-------------------------------------------------------------------------------
+
+Visit perlmonks.org for a excellent community of perl programmers, experts and
+just generally nice and knowledgable people.  Be sure to post a code snippet
+that illustrates your question if you go there for advice.
+
+-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
