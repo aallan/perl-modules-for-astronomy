@@ -47,7 +47,7 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 use Data::Dumper;
 
 # CVS revision tag
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # T E S T   H A R N E S S ---------------------------------------------------
 
@@ -60,12 +60,13 @@ my $server_port = "2000";
 # options handling -----------------------------------------------------------
 
 my ( %opt );
-
-my $status = GetOptions( "ra=s"      => \$opt{"ra"},
-                         "dec=s"     => \$opt{"dec"},
-                         "host=s"    => \$opt{"dn_host"},
-                         "port=s"    => \$opt{"dn_port"},
-                         "request=s"    => \$opt{"number"} );
+ 
+my $status = GetOptions( "ra=s"       => \$opt{"ra"},
+                         "dec=s"      => \$opt{"dec"},
+                         "host=s"     => \$opt{"dn_host"},
+                         "port=s"     => \$opt{"dn_port"},
+                         "request=s"  => \$opt{"number"},
+                         "exposure=s" => \$opt{"exposure"} );
 
 # connection options defaults
 $opt{"dn_host"} = "dn1.ex.ac.uk" unless defined $opt{"dn_host"};
@@ -85,7 +86,7 @@ unless ( defined $opt{"number"} ) {
 
 print "# Observation Script ($VERSION)\n#\n";
 print "# Node is $opt{dn_host}:$opt{dn_port}\n";
-print "# R.A. = $opt{ra}  Dec. $opt{dec}\n";
+print "# R.A. = $opt{ra}  Dec. = $opt{dec}\n";
 print "# Temporary Directory: \$ESTAR_DATA = $ENV{ESTAR_DATA}\n";
 
 
@@ -146,7 +147,8 @@ my $message = new eSTAR::RTML::Build(
 my $status = $message->score_observation(
              Target => 'Test Target',
              RA     => $opt{"ra"},
-             Dec    => $opt{"dec"}
+             Dec    => $opt{"dec"},
+             Exposure => $opt{"exposure"}
              );
 
 # grab RTML -----------------------------------------------------------------
@@ -276,11 +278,12 @@ my $message2 = new eSTAR::RTML::Build(
              );
              
 $status = $message2->request_observation(
-             Target => 'Test Target',
-             RA     => '09 00 00',
-             Dec    => '+60 00 00',
-             Score  => $score,
-             Time   => $completion_time
+             Target   => 'Test Target',
+             RA       => '09 00 00',
+             Dec      => '+60 00 00',
+             Score    => $score,
+             Time     => $completion_time,
+             Exposure => $opt{"exposure"}
              );  
              
 
@@ -333,7 +336,7 @@ unless ( defined $reply2 ) {
 }
 
 print "# read_message returned $status (1)\n#\n";
-print "# Returned message '" . @{$reply}[0] . "'\n#\n";   
+print "# Returned message '" . @{$reply2}[0] . "'\n#\n";   
     
 # --------------------------------------------------------------------------
 

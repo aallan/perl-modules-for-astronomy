@@ -64,7 +64,6 @@ my $status = GetOptions( );
 
 print "# Server Script ($VERSION)\n#\n";
 print "# Node is $server_host:$server_port\n";
-print "# R.A. = $opt{ra}  Dec. $opt{dec}\n";
 print "# Temporary Directory: \$ESTAR_DATA = $ENV{ESTAR_DATA}\n";
 
 # connection callback --------------------------------------------------------

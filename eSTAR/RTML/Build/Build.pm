@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.5 2002/03/18 17:05:53 aa Exp $
+#     $Id: Build.pm,v 1.6 2002/03/18 17:23:22 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -64,13 +64,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.5 2002/03/18 17:05:53 aa Exp $
+$Id: Build.pm,v 1.6 2002/03/18 17:23:22 aa Exp $
 
 =head1 METHODS
 
@@ -231,7 +231,8 @@ sub score_observation {
         
      $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
 
-        $self->{WRITER}->startTag( 'Exposure', 'time' => 'seconds' );
+        $self->{WRITER}->startTag( 'Exposure',, 
+                                   'type' => 'time', 'units' => 'seconds' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
         $self->{WRITER}->endTag( 'Exposure' );
 
@@ -365,7 +366,8 @@ sub request_observation {
         
      $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
 
-        $self->{WRITER}->startTag( 'Exposure', 'time' => 'seconds' );
+        $self->{WRITER}->startTag( 'Exposure', 
+                                   'type' => 'time', 'units' => 'seconds' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
         $self->{WRITER}->endTag( 'Exposure' );
 
