@@ -1,0 +1,282 @@
+                     SOAP::Lite for Perl
+                     ===================
+
+SOAP::Lite for Perl is a collection of Perl modules which provides a simple 
+and lightweight interface to the Simple Object Access Protocol (SOAP) both 
+on client and server side. 
+
+To learn about SOAP, go to http://www.soaplite.com/#LINKS for more
+information.
+
+This version of SOAP::Lite supports a subset of the SOAP 1.1 specification
+and has initial support for SOAP 1.2 specification.
+See http://www.w3.org/TR/SOAP for details. 
+
+FEATURES
+
+- Supports SOAP 1.1 spec. 
+- Interoperability tests with different implementations: Apache SOAP, Frontier, 
+  Microsoft SOAP, Microsoft .NET, DevelopMentor, XMethods, 4s4c, Phalanx, 
+  Kafka, SQLData, Lucin (in Java, Perl, C++, Python, VB, COM, XSLT). 
+- Provides COM interface. Single dll (standalone [2.5MB] or minimal [32kB]). 
+  Works on Windows 9x/Me/NT/2K. Doesn't require ROPE or MSXML. 
+  Examples in VB, Excel/VBA, C#, ASP, JavaScript, PerlScript and Perl. 
+- Provides transparent compression support for HTTP transport. 
+- Provides mod_soap module. Make SOAP server with a few lines in .htaccess 
+  or .conf file. 
+- Includes XML::Parser::Lite (regexp-based XML parser) which runs instead 
+  of XML::Parser where Perl 5.6 runs (even on WinCE) with some limitations. 
+- Includes XMLRPC::Lite, implementation of XML-RPC protocol on client and 
+  server side. All transports and features of SOAP::Lite are available. 
+- Supports multipart/form-data MIME attachments. 
+- Supports circular linked lists and multiple references. 
+- Supports Map datatype (encoding of maps/hashes with arbitrary keys). 
+- Supports HTTPS protocol. 
+- Provides proxy support. 
+- Provides CGI/daemon/mod_perl/Apache::Registry server implementations. 
+- Provides TCP server implementation. 
+- Provides IO (STDIN/STDOUT/File) server implementation. 
+- Provides FTP client implementation. 
+- Supports single/multipart MIME attachment (parsing side only). 
+- Supports SMTP protocol. 
+- Provides POP3 server implementation. 
+- Supports M-POST and redirects in HTTP transport. 
+- Supports Basic/Digest server authentication. 
+- Works with CGI accelerators, like VelociGen and PerlEx. 
+- Supports UDDI interface on client side. See UDDI::Lite for details. 
+- Supports UDDI publishing API. Examples and documentation provided. 
+- Supports WSDL schema with stub and run-time access. 
+- Supports blessed object references. 
+- Supports arrays (both serialization and deserialization with autotyping). 
+- Supports custom serialization. 
+- Provides exception transport with custom exceptions 
+- Supports Base64 encoding. 
+- Supports XML entity encoding. 
+- Supports header attributes. 
+- Supports dynamic and static class/method binding. 
+- Supports objects-by-reference with simple garbage collection and activation. 
+- Provides shell for interactive SOAP sessions. 
+- Supports out parameters binding. 
+- Supports transparent SOAP calls with autodispatch feature. 
+- Provides easy services deployment. Put module in specified directory and 
+  it'll be accessible. 
+- Has tests, examples and documentation to let you be up and running in no time.
+
+PREREQUISITES
+
+This library has been tested by the author with Perl versions 5.005 
+and 5.6.0 on different platforms: Windows 98/2K, Solaris 2.6, Linux 2.2. 
+Should run everywhere where Perl 5.004 or later runs.
+
+Some modules within this package depend on other packages that are
+distributed separately from Perl. It supposes that you have the
+following distributions installed before you install SOAP::Lite:
+
+  XML::Parser
+
+  You may not follow this requirement as soon as you have XML::Parser::Lite 
+  (included), which will run automatically on Perl 5.00503 and later if 
+  XML::Parser is not available.
+
+Following modules will be loaded on demand only:
+
+  XML::Parser::Expat (included with XML::Parser)
+  MIME::Base64                                  
+  URI (for HTTP/SMTP transport and autodispatch)
+  HTTP::Daemon (for daemon server implementation, included with libwww-perl) 
+  Apache (for mod_perl server implementation, included with mod_perl) 
+  Net::POP3 and MIME::Parser (for POP3 server implementation)
+  MIME::Lite (for SMTP client implementation)
+  IO::File (for FTP client and IO server)
+  Net::FTP (for FTP client)
+  MQSeries (for MQSeries transport)
+  Net::Jabber (for Jabber transport)
+  FCGI (for FastCGI server implementation)
+  IO::Socket::SSL (SSL support for TCP transport)
+  MIME::Parser (for MIME attachment support)
+  Compress::Zlib (for compression support)
+
+Following modules will be used for HTTP protocol only:
+
+  LWP::UserAgent (included with libwww-perl) 
+  HTTP::Request (included with libwww-perl) 
+  HTTP::Headers (included with libwww-perl) 
+  HTTP::Status (included with libwww-perl) 
+  Crypt::SSLeay (for HTTPS/SSL transfer)
+
+These modules should be available from CPAN (http://search.cpan.org/).
+
+INSTALLATION
+
+You install SOAP::Lite as you would install any perl module library,
+by running these commands:
+
+if you have CPAN.pm installed and are connected to the Internet
+
+   perl -MCPAN -e shell
+   > install SOAP::Lite
+
+or even 
+
+   perl -MCPAN -e 'install SOAP::Lite'
+
+otherwise
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Use nmake instead of make on Windows platform.
+
+DOCUMENTATION
+
+See lib/SOAP/Lite.pm for an overview of the library. Documentation is 
+included in modules and scripts. These are normally converted to manual 
+pages and installed as part of the "make install" process.  You should 
+also be able to use the 'perldoc' utility to extract and read 
+documentation from the module files directly.
+
+LIMITATIONS
+
+- Limited support for WSDL schema.
+- XML::Parser::Lite relies on Unicode support in Perl and doesn't do entity
+  decoding. 
+- Limited support for mustUnderstand and Actor attributes. 
+
+SUPPORT
+
+Questions about how to use this library should be directed to the SOAP 
+mailing list (http://discuss.develop.com/soap.html). Bug reports and 
+suggestions for improvements can also be sent there. This mailing list is 
+also the place for general discussions and development of the SOAP protocol 
+itself. 
+Feel free to send mail directly to author with your comments, suggestions, 
+bug reports and complaints. 
+
+AVAILABILITY
+
+You can download the latest version SOAP::Lite for Unix or SOAP::Lite for 
+Win32 from http://www.soaplite.com/ . 
+SOAP::Lite is also available from CPAN ( http://search.cpan.org/ ). 
+
+INCOMPATIBILITIES
+
+Due to extensive interoperability tests and some interface changes
+versions after 0.50 introduced possible incompatibilities with previous 
+versions. Check this list for more information if you are upgrading 
+to version 0.50 or later.
+
+VERSION 0.50 INTRODUCED
+
+- compression (406 => 415, compress => deflate)
+  Switched from 'compress' to 'deflate' to correctly describe used method.
+
+- no string in Fault detail, updated faultsting
+  Previous versions put extended information about Fault as a string in 
+  detail element (but only qualified subelements are allowed there). Current
+  version will use faultstring for Fault description and detail for subelement
+  you may provide. Faultstrings that can be returned from server side were
+  updated to reflect these changes.
+
+- changed namespace/encodingspace behavior and dropped ~C/~V prefixes
+  Dropped undocumented prefixes ~C/~V. Use encodingspace() and namespace().
+
+- prefixes check
+  Current version will resolve all prefixes, so element <foo:bar/> won't
+  be allowed unless you declared 'foo' prefix somewhere in outer elements.
+
+- mustUnderstand check (DO_NOT_CHECK_MUSTUNDERSTAND)
+  SOAP server will fail message that has Header with mustUnderstand attribute
+  set to 'true' and no actor attribute or actor attribute with specific
+  "..../next" value. You may disable this check by specifying 
+  $SOAP::Constants::DO_NOT_CHECK_MUSTUNDERSTAND = 1;
+  in your server code right after 'use SOAP::Lite' directive.
+
+- 200OK handling
+  Some servers return Fault message with 200OK code. Current version will
+  look into the message for Fault element and will call on_fault()
+  handler in this case also.
+
+- charset in content-type (DO_NOT_USE_CHARSET)
+  Current version will specify charset in content-type header for HTTP
+  protocol. Some toolkits don't understand such headers and may fail
+  your request. Use:
+  $SOAP::Constants::DO_NOT_USE_CHARSET = 1;
+  in your client code to disable it. See t/21-public.t for example.
+
+- XML::Parser::Lite (DO_NOT_USE_XML_PARSER)
+  Current version will try to load XML::Parser first and then load 
+  XML::Parser::Lite. If for any reason you don't want to load XML::Parser
+  you may specify it with:
+  $SOAP::Constants::DO_NOT_USE_XML_PARSER = 1;
+  in your server code right after 'use SOAP::Lite' directive on client or
+  server side.
+
+- changed order of parameters in deserializer (as_TYPE)
+
+- methods as_TYPE/as_CLASS in de/serializer do not alter case
+  Using as_TYPE/as_CLASS specify names exactly as class name in deserializer 
+  and serializer.
+
+- simple arrays and hashes (not objects) are not blessed anymore during
+  deserialization. Shouldn't break any code, but let me know if it does.
+
+VERSION 0.51 INTRODUCED
+
+- changed way attributes and names of elements are look like.
+  Now attribute will contain full name, '{namespace}name', where
+  namespace is namespace of prefix on attribute wrapped into '{}'.
+  Name of element will be returned without namespace, yet namespace 
+  will be available as the result of uri() call.  
+  Internally (for deserializer handlers) names will be passed as
+  '{namespace}name' instead of 'name'.
+
+- dropped semi-documented '~' prefix (as in '~:element')
+  This prefix was a mistake. Use '{namespace}element' syntax or
+  combination of name/uri as in SOAP::Data->name(...)->uri(...).
+
+- deprecated encodingspace() and namespace() methods
+  Use encprefix() and envprefix().
+
+- prefixes on datatypes check
+  Current version will resolve prefixes on datatypes, so in
+  xsi:type="abc:MyType" abc must be declared somewhere in outer elements.
+
+- updated dispatch for XML-RPC
+  Dispatch for XMLRPC servers looks exactly as for SOAP servers.
+  In case you would like to restore old behavior (with dispatch to 
+  'methodName'), use '->on_dispatch(sub{return})' method for server.
+
+- added 'response' type of envelope
+
+- deserialized structures and arrays are not blesses anymore
+
+- moved methods encode_data() and encode_attribute() to SOAP::Utils
+
+- changed 'use SOAP::Lite' syntax
+  To make it consistant over all available options, 'import' and 'trace'
+  options now accept only one parameter. Use array syntax (with brackets)
+  if you want to pass more than one parameter.
+
+  Instead of 
+    use SOAP::Lite +trace => debug => sub {};
+  do
+    use SOAP::Lite +trace => [debug => sub {}];
+
+VERSION 0.52 INTRODUCED
+
+- no undef values in XML-RPC
+  elements encoded as <value/> or <value></value> will be deserialized
+  as empty strings rather than 'undef' values as it was before.
+
+COPYRIGHT
+
+Copyright (C) 2000-2001 Paul Kulchenko. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHOR
+
+Paul Kulchenko (paulclinger@yahoo.com)
