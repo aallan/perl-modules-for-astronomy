@@ -47,17 +47,25 @@ chomp @file;
 for my $i (0 .. $#info) {
    ok( $file[$i], $info[$i] );
 }
-
+  
+# clean up after ourselves
+print "# Cleaning up temporary files\n";
+print "# Deleting: " . $file_name_3 ."\n";
+print "# Deleting: " . $file_name_4 ."\n";
+print "# Deleting: " . $file_name_5 ."\n";
+print "# Deleting: " . $file_name_6 ."\n";
+print "# Deleting: " . $file_name_7 ."\n";
+print "# Deleting: " . $file_name_8 ."\n";
 exit;
 
 # --------------------------------------------------------------------------
 
 __DATA__
-   0.7889522 ! Mean separation in arcsec of stars successfully paired.
+   0.0000000E+00 ! Mean separation in arcsec of stars successfully paired.
  !! Begining of new star description.
- V  ! Filter observed in.
-   3.0721891 ! Increase brightness in magnitudes.
-   0.1619290 ! Error in above.
-   1.6093254E-05 ! False alarm probability.
- 1 10  12.9499998 ! Target RA from archive catalogue.
- 60 4  36.2500000 ! Target Declination from archive catalogue.
+ K  ! Filter observed in.
+  -1.1217473 ! Increase brightness in magnitudes.
+   2.7586227E-02 ! Error in above.
+   9.5367432E-06 ! False alarm probability.
+ 21 42  42.7999992 ! Target RA from archive catalogue.
+ 43 35   9.8999996 ! Target Declination from archive catalogue.
