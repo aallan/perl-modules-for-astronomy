@@ -7,7 +7,7 @@ package Astro::Corlate;
 #    Astro::Corlate
 
 #  Purposes:
-#    Object orientated interface to Astro::Corlate::Wrapper
+#    Object orientated interface to Astro::Corlate::Wrapper module
 
 #  Language:
 #    Perl module
@@ -21,7 +21,7 @@ package Astro::Corlate;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Corlate.pm,v 1.2 2001/12/12 02:37:41 aa Exp $
+#     $Id: Corlate.pm,v 1.3 2001/12/12 06:19:19 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -36,22 +36,38 @@ Astro::Corlate - Object a catalog corelation
 
 =head1 SYNOPSIS
 
-  $corlate = new Astro::Corlate( Catalog     =>  $catalog,
+  use Astro::Corlate;
+  
+  $corlate = new Astro::Corlate( Catalogue   =>  $catalogue,
                                  Observation =>  $observation );
 
+  # run the corelation routine
   my $status = $corlate->run_corrlate();
   
-  my $log_file = $corlate->logfile();
-  my $variables_file = $corlate->variables();
-  my $fit_data_file = $corlate->fitdata();
-  my $fit_to_data_file = $corlate->fit();
-  my $histogram_file = $corlate->histogram();
-  my $output_file = $corlate->output();
+  # get the log file
+  my $log = $corlate->logfile();
+  
+  # get the variable star catalogue
+  my $variables = $corlate->variables();
+  
+  # fitted colour data catalogue
+  my $data = $corlate->data();
+  
+  # fit to the colour data
+  my $fit = $corlate->fit();
+  
+  # get probability histogram file
+  my $histogram = $corlate->histogram();
+  
+  # get the useful information file
+  my $information = $corlate->information();
 
 =head1 DESCRIPTION
 
 This module is an object-orientated interface to the Astro::Corlate::Wrapper
-module, which in turn wraps the Fortran 95 CORLATE sub-routine
+module, which in turn wraps the Fortran 95 CORLATE sub-routine. It will save
+returned files into the ESTAR_DATA directory or to TMP if the ESTAR_DATA
+environment variable is not defined.
 
 =cut
 
@@ -61,15 +77,16 @@ use strict;
 use vars qw/ $VERSION /;
 
 use Astro::Corlate::Wrapper qw / corlate /;
+use File::Spec;
 use Carp;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Corlate.pm,v 1.2 2001/12/12 02:37:41 aa Exp $
+$Id: Corlate.pm,v 1.3 2001/12/12 06:19:19 aa Exp $
 
 =head1 METHODS
 
@@ -81,7 +98,8 @@ $Id: Corlate.pm,v 1.2 2001/12/12 02:37:41 aa Exp $
 
 Create a new instance from a hash of options
 
-  $query = new Astro::Corlate( );
+  $query = new Astro::Corlate( Reference   =>  $catalogue,
+                               Observation =>  $observation );
 
 returns a reference to an Corlate object.
 
@@ -92,7 +110,8 @@ sub new {
   my $class = ref($proto) || $proto;
 
   # bless the query hash into the class
-  my $block = bless {  }, $class;
+  my $block = bless { DATADIR => undef,
+                      FILES   => {} }, $class;
 
   # Configure the object
   $block->configure( @_ );
@@ -121,7 +140,7 @@ returns a status value
   -1 = Failed to open catalog file
   -2 = Failed to open observation file
   -3 = Too few stars paired between catalogues
-  -4 = Incorrect number of file names supplied
+  -4 = Observation and Reference catalogues not supplied
 
 =cut
 
@@ -133,6 +152,15 @@ sub run_corlate {
 
 # O T H E R   M E T H O D S ------------------------------------------------
 
+sub reference {}
+sub observation {}
+
+sub logfile {}
+sub variables {}
+sub data {}
+sub fit {}
+sub histogram {}
+sub information {}
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -155,6 +183,46 @@ Does nothing if the array is not supplied.
 sub configure {
   my $self = shift;
 
+  # CONFIGURE DEFAULTS
+  # ------------------
+  
+  # Grab something for DATA directory
+  if ( defined $ENV{"ESTAR_DATA"} ) {
+     if ( opendir (DIR, File::Spec->catdir($ENV{"ESTAR_DATA"}) ) ) {
+        # default to the ESTAR_DATA directory
+        $self->{DATADIR} = File::Spec->catdir($ENV{"ESTAR_DATA"});
+        closedir DIR;
+     } else {
+        # Shouldn't happen?
+       croak("Cannot open $ENV{ESTAR_DATA} for incoming files.");
+     }        
+  } elsif ( opendir(TMP, File::Spec->tmpdir() ) ) {
+        # fall back on the /tmp directory
+        $self->{DATADIR} = File::Spec->tmpdir();
+        closedir TMP;
+  } else {
+     # Shouldn't happen?
+     croak("Cannot open any directory for incoming files.");
+  }     
+  
+  # DEFAULT FILENAMES
+  ${$self->{FILES}}{"reference"} = 
+             File::Spec->catfile( $self->{DATADIR}, 'archive.cat' );
+  ${$self->{FILES}}{"observation"} = 
+             File::Spec->catfile( $self->{DATADIR}, 'new.cat' );
+  ${$self->{FILES}}{"logfile"} = 
+             File::Spec->catfile( $self->{DATADIR}, 'corlate.log' ); 
+  ${$self->{FILES}}{"variables"} = 
+             File::Spec->catfile( $self->{DATADIR}, 'corlate.cat' ); 
+  ${$self->{FILES}}{"data"} = 
+             File::Spec->catfile( $self->{DATADIR}, 'colfit.cat' );
+  ${$self->{FILES}}{"fit"} = 
+             File::Spec->catfile( $self->{DATADIR}, 'colfit.fit' );
+  ${$self->{FILES}}{"histogram"} = 
+             File::Spec->catfile( $self->{DATADIR}, 'hist.dat' ); 
+  ${$self->{FILES}}{"information"} = 
+             File::Spec->catfile( $self->{DATADIR}, 'info.dat' );       
+
   # return unless we have arguments
   return undef unless @_;
 
@@ -162,7 +230,7 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / / ) {
+  for my $key (qw / Reference Observation / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
