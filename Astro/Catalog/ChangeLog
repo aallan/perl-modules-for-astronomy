@@ -1,3 +1,8 @@
+2005-01-13  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/SExtractor.pm: allow filter to be passed as argument to
+	  _read_catalog method.
+
 2004-12-21  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/SExtractor.pm: add support for morphology, x and y position, 
