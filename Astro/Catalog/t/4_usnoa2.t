@@ -227,30 +227,6 @@ ok( $star_dat->gsc(), $star_net->gsc() );
 ok( $star_dat->distance(), $star_net->distance() );
 ok( $star_dat->posangle(), $star_net->posangle() );
 
-# Long catalogue
-# --------------
-
-# grab catalogue 
-my $long = new Astro::Catalog::Query::USNOA2( Target => 'HT Cas',
-                                              Radius => 10,
-                                              Nout   => 2000 );
-   
-print "# Connecting to ESO/ST-ECF USNO-A2 Catalogue\n";
-my $long_catalog = $long->querydb();
-print "# Continuing tests\n";
-       
-
-# write to file
-
-my dir = File::Spec->tmpdir();
-
-my @out_mags = ( 'R' );
-my @out_cols = ( 'B-R' );
-my $reference = File::Spec->catfile( $dir, 'reference.cat' );
-my $status = $long_catalog->write_catalog( $reference, \@out_mags, \@out_cols );
-
-print "# reference.cat written to $dir\n";
-
 
 exit;
 

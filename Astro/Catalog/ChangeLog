@@ -6,6 +6,10 @@
           related classes. All the Astro::Catalog::Transport classes inherit
           from Tim's BaseQuery class.
 
+        * t/*.t: Test scripts modified to work within new framework.
+        
+        * t/1_compile.t: Now chekc for presence of Astro::Aladin module
+        
 2003-07-27  Tim Jenness <timj@jach.hawaii.edu>
 
         * Added sorting and filtering of catalogues.

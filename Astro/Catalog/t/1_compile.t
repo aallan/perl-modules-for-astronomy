@@ -53,11 +53,26 @@ for my $module (@modules) {
   } else {
     # Child
     die "cannot fork: $!" unless defined $pid;
-    eval "use $module ();";
-    if( $@ ) {
-      warn "require failed with '$@'\n";
-      print "not ";
-    }
+    
+    if ( $module eq "Astro::Catalog::Query::SuperCOSMOS" ) {
+       eval "use Astro::Aladin";
+       if ($@) {
+         print "ok - $module (skipped: Astro::Aladin module not available)\n";
+         exit;
+       } else {
+         eval "use $module ();";
+         if( $@ ) {
+           warn "require failed with '$@'\n";
+           print "not ";
+         }
+       }        
+    } else {
+      eval "use $module ();";
+      if( $@ ) {
+        warn "require failed with '$@'\n";
+        print "not ";
+      }
+    }  
     print "ok - $module\n";
     # Must remember to exit from the fork
     exit;
