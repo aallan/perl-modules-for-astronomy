@@ -117,8 +117,10 @@ sub _read_catalog {
     }
 
     # And create the star objects
-    push(@stars, map { new Astro::Catalog::Star( id => $_->name,
-						 coords => $_ ) } @planets);
+    push(@stars, map { new Astro::Catalog::Star( 
+						field => 'JCMT',
+						id => $_->name,
+						coords => $_ ) } @planets);
 
   }
 
@@ -370,7 +372,7 @@ sub _parse_line {
   $dec =~ s/\s//g; # remove  space between the sign and number
   my $epoc = $match[7];
 
-  print "Creating a new source in getsourcefromfile\n" if $DEBUG;
+  print "Creating a new source in _parse_line: $target\n" if $DEBUG;
 
   # need to translate JCMT epoch to normal epoch
   my %coords;
@@ -430,7 +432,7 @@ sub _parse_line {
   # Field name should simply be linked to the telescope
   my $field = (defined $tel ? $tel->name : '<UNKNOWN>' );
 
-  print "Created a new source in getsourcefromfile\n" if $DEBUG;
+  print "Created a new source in _parse_line: $target in field $field\n" if $DEBUG;
 
   # Now create the star object
   return new Astro::Catalog::Star( id => $target,
