@@ -273,6 +273,14 @@
 
       write(2,*) 'Number of pairs for first pass was ', npair
 
+      if (npair < minpair) then
+        write(2,*) 'Too few pairs to continue.'
+        corlate=-3
+        deallocate(matches)
+        close(2)
+        return
+      end if
+
       dist_alpha=dist_alpha*206264.8
       dist_delta=dist_delta*206264.8*cos(delta(1))
       mod_shift_alpha=median(dist_alpha, npair)
@@ -280,17 +288,9 @@
 
       deallocate(dist_alpha, dist_delta)
 
-      if (npair >= minpair) then
-        write(2,*) 'Which gave a modal separations in RA and dec of ', &
-        mod_shift_alpha, mod_shift_delta, ' arcseconds.'
-        fixrad = final_rad
-      else        
-        write(2,*) 'Too few pairs to continue.'
-        corlate=-3
-        deallocate(matches)
-        close(2)
-        return
-      end if
+      write(2,*) 'Which gave a modal separations in RA and dec of ', &
+      mod_shift_alpha, mod_shift_delta, ' arcseconds.'
+      fixrad = final_rad
 
       mod_shift_alpha=mod_shift_alpha/206264.8
       mod_shift_delta=mod_shift_delta/(206264.8*cos(delta(1)))
