@@ -1,5 +1,5 @@
 #!perl
-# Astro::Catalog::Query::USNOA2 test harness
+# Astro::Catalog::Query::SkyCat with usnoa2 test harness
 
 # strict
 use strict;
@@ -12,12 +12,15 @@ BEGIN {
   # load modules
   use_ok("Astro::Catalog::Star");
   use_ok("Astro::Catalog");
-  use_ok("Astro::Catalog::Query::USNOA2");
+  use_ok("Astro::Catalog::Query::SkyCat");
 }
 
 # Load the generic test code
 my $p = ( -d "t" ?  "t/" : "");
 do $p."helper.pl" or die "Error reading test functions: $!";
+
+
+
 
 # T E S T   H A R N E S S --------------------------------------------------
 
@@ -143,8 +146,11 @@ $catalog_data->fieldcentre( RA => '01 10 12.9', Dec => '+60 04 35.9', Radius => 
 # Grab comparison from ESO/ST-ECF Archive Site
 # --------------------------------------------
 
-my $usno_byname = new Astro::Catalog::Query::USNOA2( Target => 'HT Cas',
-                                                     Radius => '1' );
+my $usno_byname = new Astro::Catalog::Query::SkyCat( #Target => 'HT Cas',
+						    Catalog => 'usno',
+						    RA => '01 10 12.9',
+						    Dec => '+60 04 35.9',
+						    Radius => '1' );
 
 print "# Connecting to ESO/ST-ECF USNO-A2 Catalogue\n";
 my $catalog_byname = $usno_byname->querydb();
@@ -155,6 +161,8 @@ print "# Continuing tests\n";
 # check sizes
 print "# DAT has " . $catalog_data->sizeof() . " stars\n";
 print "# NET has " . $catalog_byname->sizeof() . " stars\n";
+
+$catalog_byname->sort_catalog( 'ra' );
 
 # Now compare the stars in the catalogues in order
 #-------------------------------------------------

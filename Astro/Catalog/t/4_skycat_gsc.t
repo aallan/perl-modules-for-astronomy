@@ -1,25 +1,23 @@
 #!perl
-# Astro::Catalog::Query::GSC test harness
+# Astro::Catalog::Query::SkyCat test harness with GSC option
 
 # strict
 use strict;
 
 #load test
-use Test::More tests => 150;
+use Test::More tests => 120;
 use Data::Dumper;
 
-# Catalog modules need to be loaded first
 BEGIN {
-  use_ok( "Astro::Catalog::Star");
-  use_ok( "Astro::Catalog");
-  use_ok( "Astro::Catalog::Query::GSC");
+  # load modules
+  use_ok("Astro::Catalog::Star");
+  use_ok("Astro::Catalog");
+  use_ok("Astro::Catalog::Query::SkyCat");
 }
-
 
 # Load the generic test code
 my $p = ( -d "t" ?  "t/" : "");
 do $p."helper.pl" or die "Error reading test functions: $!";
-
 
 # T E S T   H A R N E S S --------------------------------------------------
 
@@ -29,7 +27,7 @@ my @buffer = <DATA>;
 chomp @buffer;
 
 # test catalog
-my $catalog_data = new Astro::Catalog();
+my $catalog_data = new Astro::Catalog( origin => 'Reference');
 
 # create a temporary object to hold stars
 my $star;
@@ -111,12 +109,19 @@ $catalog_data->fieldcentre( RA => '01 10 12.9',
 # Grab comparison from ESO/ST-ECF Archive Site
 # --------------------------------------------
 
-my $gsc_byname = new Astro::Catalog::Query::GSC( Target => 'HT Cas',
-                                                  Radius => '5' );
+my $gsc_byname = new Astro::Catalog::Query::SkyCat( # Target => 'HT Cas',
+						    RA => '01 10 12.9',
+						   Dec => '+60 04 35.9',
+						    Radius => '5',
+						    Catalog => 'gsc',
+						  );
                                                      
 print "# Connecting to ESO/ST-ECF GSC Catalogue\n";
 my $catalog_byname = $gsc_byname->querydb();
 print "# Continuing tests\n";
+
+# sort by RA
+$catalog_byname->sort_catalog( "ra" );
 
 # C O M P A R I S O N ------------------------------------------------------
 
@@ -124,8 +129,8 @@ print "# Continuing tests\n";
 print "# DAT has " . $catalog_data->sizeof() . " stars\n";
 print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
-# Compare catalogues
-compare_catalog( $catalog_byname, $catalog_data);
+# and compare content
+compare_catalog( $catalog_byname, $catalog_data );
 
 # quitting time
 exit;
@@ -133,12 +138,12 @@ exit;
 # D A T A   B L O C K  -----------------------------------------------------
 
 __DATA__
-   1 0403000551 01 09 55.34 +60 00 37.4   0.2 12.18 0.40  1 0 01MU F;   4.54 209
-   2 0403000725 01 10 02.45 +60 01 05.6   0.3 13.94 0.40  1 0 01MU F;   3.74 200
-   3 0403000383 01 10 06.76 +60 05 25.9   0.2 11.54 0.40  1 0 01MU F;   1.13 317
-   4 0403000719 01 10 12.73 +60 04 14.4   0.2 13.91 0.40  1 0 01MU F;   0.36 183
-   5 0403000581 01 10 34.84 +60 03 09.7   0.2 10.08 0.40  1 3 01MU F;   3.09 118
-   6 0403000727 01 10 37.55 +60 04 33.6   0.2 13.94 0.40  1 0 01MU F;   3.07  91
-   7 0403000561 01 10 38.58 +60 01 46.1   0.2 10.29 0.40  1 0 01MU F;   4.28 131
-   8 0403000187 01 10 42.48 +60 07 24.3   0.2 11.89 0.40  1 0 01MU F;   4.63  53
-   9 0403000655 01 10 50.99 +60 04 15.8   0.3 12.95 0.40  1 3 01MU F;   4.76  94
+   1 GSC0403000551 01 09 55.34 +60 00 37.4   0.2 12.18 0.40  1 0 01MU F;   4.54 209
+   2 GSC0403000725 01 10 02.45 +60 01 05.6   0.3 13.94 0.40  1 0 01MU F;   3.74 200
+   3 GSC0403000383 01 10 06.76 +60 05 25.9   0.2 11.54 0.40  1 0 01MU F;   1.13 317
+   4 GSC0403000719 01 10 12.73 +60 GSC04 14.4   0.2 13.91 0.40  1 0 01MU F;   0.36 183
+   5 GSC0403000581 01 10 34.84 +60 03 09.7   0.2 10.08 0.40  1 3 01MU F;   3.09 118
+   6 GSC0403000727 01 10 37.55 +60 GSC04 33.6   0.2 13.94 0.40  1 0 01MU F;   3.07  91
+   7 GSC0403000561 01 10 38.58 +60 01 46.1   0.2 10.29 0.40  1 0 01MU F;   4.28 131
+   8 GSC0403000187 01 10 42.48 +60 07 24.3   0.2 11.89 0.40  1 0 01MU F;   4.63  53
+   9 GSC0403000655 01 10 50.99 +60 04 15.8   0.3 12.95 0.40  1 3 01MU F;   4.76  94

@@ -1,22 +1,25 @@
 #!perl
 
-# Astro::Catalog test harness
-use Test::More tests => 14;
-
-# Load the generic test code
-chdir "t" if -d "t";
-do "helper.pl" or die "Error reading test functions: $!";
-
 # strict
 use strict;
+
+# Astro::Catalog test harness
+use Test::More tests => 16;
 
 #load test
 use File::Spec;
 use Data::Dumper;
 
 # load modules
-require_ok("Astro::Catalog::Star");
-require_ok("Astro::Catalog::Query::Sesame");
+BEGIN {
+  use_ok("Astro::Catalog::Star");
+  use_ok("Astro::Catalog::Query::Sesame");
+}
+
+# Load the generic test code
+my $path = ( -d "t" ?  "t/" : "");
+do $path."helper.pl" or die "Error reading test functions: $!";
+
 
 # T E S T -----------------------------------------------------------------
 

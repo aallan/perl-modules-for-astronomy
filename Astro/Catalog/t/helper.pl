@@ -1,10 +1,6 @@
 
 use strict;
 
-# Loading these here defeats the purpose of the use_ok in
-# the caller
-use Astro::Catalog::Star; # for DR2AS
-
 =head1 NAME
 
 helper - Test helper routines
@@ -143,8 +139,11 @@ sub compare_star {
 Requires that your tests are written using C<Test::More>
 and that the top of each test includes the code:
 
- chdir "t" if -d "t";
- do "helper.pl" or die "Error reading test functions: $!";
+  my $p = ( -d "t" ?  "t/" : "");
+  do $p."helper.pl" or die "Error reading test functions: $!";
+
+This allows the test to be run from inside or outside the
+test directory.
 
 =head1 SEE ALSO
 
