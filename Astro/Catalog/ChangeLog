@@ -1,3 +1,8 @@
+2005-01-14  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Catalog.pm, IO/FINDOFF.pm, t/2_findoff.t: support for Starlink 
+	  FINDOFF input/output file format
+
 2005-01-13  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/SExtractor.pm: allow filter to be passed as argument to
