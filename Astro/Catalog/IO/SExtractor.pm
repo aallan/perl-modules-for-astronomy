@@ -73,6 +73,7 @@ sub _read_catalog {
     croak "Filter as passed to SExtractor->_read_catalog must be an Astro::WaveBand object";
   }
 
+  my $filter;
   if( defined( $args{'filter'} ) ) {
     $filter = $args{'filter'}->natural;
   } else {
@@ -246,7 +247,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.3 2005/01/14 01:59:47 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.4 2005/02/01 23:14:58 cavanagh Exp $
 
 =head1 FORMAT
 
