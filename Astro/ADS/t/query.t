@@ -124,15 +124,17 @@ ok( 100,  $other_result->sizeof());
 $objects[2] = "M31";
 $objects[3] = "M32";
 
+my $query3 = new Astro::ADS::Query( Objects => \@objects );
+$query3->objectlogic("AND");
+
 # Set the object query
-$query2->objects( \@objects );
+$query3->objects( \@objects );
 
 # for verbose=1
 print "# Connecting to ADS\n";
 
 # query ADS
-my $next_result = $query2->querydb();
-#print Dumper($next_result);
+my $next_result = $query3->querydb();
 
 print "# Continuing Tests\n";
 
@@ -142,7 +144,7 @@ print "# Continuing Tests\n";
 #} 
 
 # should (hopefully) be 0
-ok( 0,  $next_result->sizeof());
+ok( $next_result->sizeof(), 0);
 
 # set and check the proxy
 $query2->proxy('http://wwwcache.ex.ac.uk:8080/');
@@ -157,11 +159,11 @@ my $time = $query2->timeout();
 ok( $time , 60 );
 
 # test bibcode query for Tim Jenness
-my $query3 = new Astro::ADS::Query( Bibcode => "1996PhDT........42J" );
+my $query4 = new Astro::ADS::Query( Bibcode => "1996PhDT........42J" );
 
 # query ADS
 print "# Connecting to ADS\n";
-my $bibcode_result = $query3->querydb();
+my $bibcode_result = $query4->querydb();
 #print Dumper($bibcode_result);
 print "# Continuing Tests\n";
 
@@ -173,20 +175,20 @@ my @timj_abstract = $timj_thesis->abstract();
 ok( @timj_abstract, 32 );
 
 # test the user agent tag
-print "# User Agent: " . $query3->agent() . "\n";
+print "# User Agent: " . $query4->agent() . "\n";
 
 # Test the start/end year and month options
-$query3->startmonth( "01" );
-ok( $query3->startmonth(), "01" );
+$query4->startmonth( "01" );
+ok( $query4->startmonth(), "01" );
 
-$query3->endmonth( "12" );
-ok( $query3->endmonth(), "12" );
+$query4->endmonth( "12" );
+ok( $query4->endmonth(), "12" );
 
-$query3->startyear( "2001" );
-ok( $query3->startyear(), "2001" );
+$query4->startyear( "2001" );
+ok( $query4->startyear(), "2001" );
 
-$query3->endyear( "2002" );
-ok( $query3->endyear(), "2002" );
+$query4->endyear( "2002" );
+ok( $query4->endyear(), "2002" );
 
 exit;
 

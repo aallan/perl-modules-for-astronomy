@@ -1,7 +1,18 @@
+
 2002-05-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * t/paper.t: Minor bugfix to test harness.
         
+2002-09-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Modified query string to reflect changes in
+          the ADS interface, if you wondered where the Journal strings
+          went this should fix it. Fixed handling of 500 errors as these
+          are now returned under some circumstances by ADS when no results 
+          are found.
+          
+        * t/paper.t: Fixed tests, same problem.  
+
 2002-01-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query.pm: Added method to allow you to decide wether only

@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.19 2002/01/11 19:59:31 aa Exp $
+#     $Id: Query.pm,v 1.20 2002/09/03 18:18:50 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -67,13 +67,13 @@ use Astro::ADS::Result::Paper;
 use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.19 2002/01/11 19:59:31 aa Exp $
+$Id: Query.pm,v 1.20 2002/09/03 18:18:50 aa Exp $
 
 =head1 METHODS
 
@@ -673,7 +673,9 @@ sub configure {
   ${$self->{OPTIONS}}{"bibcode"}          = "";
 
   # Set the data_type option to PORTABLE so our regular expressions work!
+  # Set the return format to LONG so we get full abstracts!
   ${$self->{OPTIONS}}{"data_type"}        = "PORTABLE";
+  ${$self->{OPTIONS}}{"return_fmt"}       = "LONG";
 
   # CONFIGURE FROM ARGUEMENTS
   # -------------------------
@@ -733,7 +735,7 @@ sub _make_query {
 
    # build final query URL
    $URL = $URL . $options;
-
+   
    # build request
    my $request = new HTTP::Request('GET', $URL);
 
@@ -741,12 +743,43 @@ sub _make_query {
    my $reply = $ua->request($request);
 
    if ( ${$reply}{"_rc"} eq 200 ) {
+   
       # stuff the page contents into the buffer
       $self->{BUFFER} = ${$reply}{"_content"};
+      
+   } elsif ( ${$reply}{"_rc"} eq 500 ) {
+   
+      # we may have a network unreachable, or we may have a no reference
+      # selected error returned by ADS (go figure)
+
+      $self->{BUFFER} = ${$reply}{"_content"};
+      my @buffer = split( /\n/,$self->{BUFFER});
+      chomp @buffer;
+            
+      # assume we have an error unless we can prove otherwise
+      my $error_flag = 1;
+      
+      foreach my $line ( 0 ... $#buffer ) {
+          if( $buffer[$line] =~ "No reference selected" ) {
+       
+             # increment the counter and drop out of the loop
+             $line = $#buffer;
+             $error_flag = 0;
+          }      
+      }
+      
+      # we definately have an error
+      if( $error_flag ) { 
+         $self->{BUFFER} = undef;
+         croak("Error ${$reply}{_rc}: Failed to establish network connection");
+      }
+      
    } else {
       $self->{BUFFER} = undef;
       croak("Error ${$reply}{_rc}: Failed to establish network connection");
    }
+   
+   
 }
 
 =item B<_make_followup>
@@ -793,7 +826,7 @@ sub _make_followup {
       $self->{BUFFER} = ${$reply}{"_content"};
    } else {
       $self->{BUFFER} = undef;
-      croak("Error ${$reply}{_rc}: Failed to establish network connection");
+      croak("Error ${$reply}{_rc}: Failed to establish network connection" . $self->{BUFFER} ."\n");
    }
 }
 
@@ -842,8 +875,16 @@ sub _parse_query {
 
         # increment the counter and drop out of the loop
         $line = $#buffer;
+        
      }
-
+     
+     # NO ABSTRACT (HTML version)
+     if( $buffer[$line] =~ "No reference selected" ) {
+       
+       # increment the counter and drop out of the loop
+        $line = $#buffer;
+     }
+     
      # NEW PAPER
      if( substr( $buffer[$line], 0, 2 ) eq "%R" ) {
 
