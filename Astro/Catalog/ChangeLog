@@ -16,8 +16,15 @@
           from scratch to use the SkyCat.pm module rather than relying
           on the Astro::Aladin implementation. 
 
-        * t/4_skycat_supercos.t: Added
+        * t/4_skycat_supercos.t: Added a test suite for the new SuperCOSMOS
+          module. This superceedes the older 4_supercos.t test suite.
 
+        * MANIFEST: Updated to reflect the actual package, we've been shipping
+          V3.x with bits missing since release, whoops!
+        
+        * old/*: Moved some of the non-functional test suite into a this
+          directory along with the old Astro::Aladin SuperCOSMOS module. 
+           
 2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query/CMC.pm: Added a Vizier Carlsberg Meridian Catalogue

@@ -1,0 +1,27 @@
+File which have been superceeded, but still contain useful (alternative)
+implementations that I want to keep around just in case I need them again.
+
+
+ Query/Query/SuperCOSMOS.pm
+
+    The SuperCOSMOS catalogue is now retrieved by a custom interface into
+    SkyCat. This code was the older interface that used Astro::Aladin to
+    retrieve the catalogue. It's useful, we should keep it.
+ 
+ t/4_supercos.t
+ 
+    The test suite that went with the older SuperCOSMOS module.
+
+ t/4_skycat_usno.t
+ 
+    Due to problems with the SkyCat module this test suite doesn't work,
+    need to resolve these problems and drop this module back into the
+    distribution as soon as possible.
+    
+ t/4_gsc_cmp_skycat.t
+
+    The current Astro::Catalog::Query::SkyCat module doesn't work properly
+    as it doesn't correctly parse the returned TST files in alot of cases,
+    the GSC is one of these cases. So, currently, the custom GSC module and
+    the SkyCat GSC module don't return the same thing. I'm saving this code
+    until they do and it becomes useful again.
