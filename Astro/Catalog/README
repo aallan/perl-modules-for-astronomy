@@ -9,10 +9,21 @@ The module is a generic object orientated astronomical catalogue object.
 Requirements
 ------------
 
-While useful in itself as a generic catalogue object, the additional optional
-Astro::Catalog::USNOA2 module provides an interface to the USNO-A2 online
-catalogue provided by ESO.
+While useful in itself as a generic catalogue object, the additional optionals
+Astro::Catalog::USNOA2 and Astro::Catalog::GSC modules provides an interfaces 
+to the online USNO-A2 and Guide Star Catalogues provided by ESO/ST-ECF.
 
+The following external modules are required by the Astro::Catalog module and
+associated classes
+
+   LWP::UserAgent
+   Net::Domain 
+   File::Spec
+   Math::Libm
+   Carp
+   
+all these modules, if not already installed, are available from CPAN. 
+  
 Provides
 --------
 
@@ -20,6 +31,8 @@ The package provides the following classes
 
     Astro::Catalog
     Astro::Catalog::Star
+    Astro::Catalog::GSC::Query
+    Astro::Catalog::USNOA2::Query
     
 further information can be found in the POD included in modules.
 
