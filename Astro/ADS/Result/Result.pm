@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.5 2001/11/01 19:34:31 aa Exp $
+#     $Id: Result.pm,v 1.6 2001/11/02 00:22:14 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -51,13 +51,13 @@ use vars qw/ $VERSION /;
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.5 2001/11/01 19:34:31 aa Exp $
+$Id: Result.pm,v 1.6 2001/11/02 00:22:14 aa Exp $
 
 =head1 METHODS
 
@@ -80,7 +80,7 @@ sub new {
   my $class = ref($proto) || $proto;
 
   # bless the query hash into the class
-  my $block = bless { RESULTS => {} }, $class;
+  my $block = bless { RESULTS => [] }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -97,30 +97,30 @@ sub new {
 
 =over 4
 
-=item B<paperbybibcode>
+=item B<paperbyauthor>
 
-Return an Astro::ADS::Result::Paper object by bibcode.
+Return an Astro::ADS::Result::Paper object by author.
 
-   $paper = $result->paperbybibcode("1999MNRAS.310...407W");
+   $paper = $result->paperbyauthor("Allan, A.");
 
 =cut
 
-sub paperbybibcode {
+sub paperbyauthor {
   my $self = shift;
 
   # return unless we have arguments
-  return undef unless @_;  
-  
-  my $bibcode = shift;
-  
-  return ${$self->{RESULTS}}{$bibcode};
+  return undef unless @_;
+ 
+    
 }
 
 =item B<pushpaper>
 
-Append a new paper onto the end of the Astro::ADS::Result object
+Push a new paper onto the end of the Astro::ADS::Result object
 
    $result->pushpaper( $paper );
+
+returns the number of papers now in the Result object.
 
 =cut
 
@@ -134,16 +134,14 @@ sub pushpaper {
   my $bibcode = $paper->bibcode();
 
   # push the new hash item onto the stack 
-  ${$self->{RESULTS}}{$bibcode} = $paper;
-  
-  return;
+  return push( @{$self->{RESULTS}}, $paper );
 }
 
 =item B<poppaper>
 
-Delete a paper from the Astro::ADS::Result object by bibcode
+Pop a paper from the end of the Astro::ADS::Result object
 
-   $paper = $result->poppaper( $bibcode );
+   $paper = $result->poppaper();
 
 the method deletes the paper and returns the deleted paper object.
 
@@ -158,9 +156,7 @@ sub poppaper {
   my $bibcode = shift;
 
   # pop the paper out of the stack
-  my $paper = delete ${$self->{RESULTS}}{$bibcode};
-  
-  return $paper;
+  return pop( @{$self->{RESULTS}} );
 }
 
 # C O N F I G U R E -------------------------------------------------------
@@ -203,10 +199,9 @@ sub configure {
 
   if (defined $args{Papers}) {
    
-     # Go through each of the supplied paper objects and index by bibcode
+     # Go through each of the supplied paper objects
      for my $i ( 0 ...$#{$args{Papers}} ) {
-        my $key = ${$args{Papers}}[$i]->bibcode();
-        ${$self->{RESULTS}}{$key} = ${$args{Papers}}[$i];
+        ${$self->{RESULTS}}[$i] = ${$args{Papers}}[$i];
      }
   }
 

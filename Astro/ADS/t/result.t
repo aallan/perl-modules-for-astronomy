@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 3 };
+BEGIN { plan tests => 1 };
 
 # load modules
 use Astro::ADS::Result;
@@ -135,9 +135,6 @@ push( @paper_stack, $other );
 # create an Astro::ADS::Result object
 my $result = new Astro::ADS::Result( Papers => \@paper_stack );
 
-# check that paper by bibcode retrieves the right objects
-ok ( $result->paperbybibcode("1998MNRAS.295..167A"), $paper );
-ok ( $result->paperbybibcode("2001adass..10..459A"), $other );
 
 
 exit;
