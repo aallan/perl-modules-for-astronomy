@@ -156,7 +156,6 @@
       integer :: npair
 
       integer :: i, iostat, istar
-      real :: fixrad
       integer, dimension(:), allocatable :: matches
       integer :: n_matches
       real :: work
@@ -181,26 +180,31 @@
 
       ! Some things you may want to tweak.
       ! The minimum number of stars in common you must have.
+      ! For 2MASS + UKIRT 3; for USNO-A2 + LX200 10.
       integer, parameter :: minpair=3
       ! The lowest signal-to-noise stars you will use in the correlation.
+      ! For 2MASS + UKIRT 0.2; for USNO A-2 + LX200 0.1.
       real, parameter :: lowest_sn=0.2
       ! The false alarm probablility you are prepared to accept.
+      ! For 2MASS + UKIRT 0.05; for USNO A-2 + LX200 0.01.
       real, parameter :: accept_prob=0.05
       ! Set this true if you want to find stars that have faded as well as
       ! those which have brightened.
-      logical, parameter :: allow_fading=.true.
+      logical, parameter :: allow_fading=.false.
       ! The initial search radius.
       real, parameter :: inital_rad=8.0
       ! Search radius after tweaking positions.
-      real, parameter :: final_rad=1.0
+      ! For 2MASS + UKIRT 1.0; for USNO-A2 + LX200 used to use sum (in 
+      ! quadrature) of RMS of fit + 3.0.
+      real, parameter :: final_rad=3.0
       ! Minimum change in magnitude to believe variable.
+      ! For 2MASS + UKIRT started with 0.5, but 0.0 is intellectually correct
+      ! (which is what USNO-A2 + LX200 used).
       real, parameter :: min_mag_change=0.5
 
       ! Start as we mean to go on.
       corlate=0
       open(unit=2, file=file_name_3, status='unknown')
-
-      fixrad=inital_rad
 
       open(1,file=file_name_1, status='old', iostat=iostat, action='read')
       if (iostat /= 0) then
@@ -246,7 +250,7 @@
       rad: do istar=1, nstars2
 
         call match_them(nstars1, star1, alpha, delta, star2(istar), &
-        fixrad, matches, n_matches)
+        inital_rad, matches, n_matches)
 
         if (n_matches > 0) then
 
@@ -290,7 +294,6 @@
 
       write(2,*) 'Which gave a modal separations in RA and dec of ', &
       mod_shift_alpha, mod_shift_delta, ' arcseconds.'
-      fixrad = final_rad
 
       mod_shift_alpha=mod_shift_alpha/206264.8
       mod_shift_delta=mod_shift_delta/(206264.8*cos(delta(1)))
@@ -308,7 +311,7 @@
       new_star: do istar=1, nstars2
 
         call match_them(nstars1, star1, alpha+mod_shift_alpha, delta+mod_shift_delta, star2(istar), &
-        fixrad, matches, n_matches)
+        final_rad, matches, n_matches)
 
         if (n_matches == 0) then
           ! Not found any match.
@@ -421,7 +424,7 @@
             ! sided if (allow_fading).
             if (prob(nprob) < accept_prob) then
               ! Change colour 1 to be the change in magnitde.
-              pair(istar)%col(1)%data = -delta_mag
+              ! pair(istar)%col(1)%data = -delta_mag
               call write_star(1, pair(istar), 4)
               write(3,*) '!! Begining of new star description.'
               write(3,*) colstr2(1), '! Filter observed in.'
