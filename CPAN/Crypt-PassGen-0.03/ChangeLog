@@ -1,0 +1,17 @@
+2002-10-05  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* PassGen.pm: Construct default frequency file using File::Spec
+
+	* Makefile.PL: Fix PREREQ_PM so that it works correctly with
+	CPAN.pm (undef version number is not supported) [thanks to Florian
+	Helmberger]
+
+2002-09-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* PassGen.pm: Synopsis now correct [thanks to Florian Helmberger]
+
+2001-04-09  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Makefile.PL: Search in /usr/share  as well as /usr/ for default
+	dictionary.
+

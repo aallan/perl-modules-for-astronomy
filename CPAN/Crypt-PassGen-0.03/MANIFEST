@@ -1,0 +1,6 @@
+README
+PassGen.pm
+Makefile.PL
+t/passgen.t
+MANIFEST
+ChangeLog
