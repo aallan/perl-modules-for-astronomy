@@ -1,0 +1,45 @@
+Hello again,
+
+A new version of the Perl interface to William Pence's cfitsio
+subroutine library is available. For more information on the cfitsio
+subroutine library, see http://heasarc.gsfc.nasa.gov/fitsio
+
+New features in Astro::FITS::CFITSIO 1.01 include:
+
+* Added new cfitsio 2.420 and 2.410 routines:
+  fits_flush_buffer
+  fits_open_data
+  fits_open_image
+  fits_open_table
+  fits_write_errmark
+  fits_clear_errmark
+  fits_delete_rowrange
+  fits_copy_file
+  fits_parse_range
+  fits_insert_key
+
+* Implemented older cfitsio routine:
+  fits_find_first_row
+
+* Bug fix in this version:
+  Utility routine used by fits_read_pix and fits_read_pixnull had
+  an invalid array access which could trigger segmentation violations,
+  bus errors and various other mischief. Thanks go to Bob Wiegand
+  for finding and fixing this problem.
+  
+
+You will need at least version 2.420 of the cfitsio library in order
+to build this module. Astro::FITS::CFITSIO has been tested on Linux
+(ix86 2.4.x, glibc 2.1/2.2) and Solaris (sparc 2.6/2.8) with Perl
+5.6.0 and 5.005.
+
+This version of CFITSIO.pm can be obtained at:
+  http://cxc.harvard.edu/~rpete/cfitsio/Astro-FITS-CFITSIO-1.01.tar.gz
+
+And also on your local CPAN mirror under:
+  authors/id/P/PR/PRATZLAFF/Astro-FITS-CFITSIO-1.01.tar.gz
+
+As always, you can find the latest version of CFITSIO.pm at
+  http://cxc.harvard.edu/~rpete/cfitsio
+
+-Pete Ratzlaff <pratzlaff@cfa.harvard.edu>

@@ -1,0 +1,278 @@
+2002-10-28  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.pm: $VERSION = '1.01';
+
+2002-09-04  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs: added cfitsio 2.420 routine fits_flush_buffer.
+
+2002-07-30  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs: added fits_find_first_row/ffffrw
+
+2002-06-27  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* util.c: unpackND() bug fixed.
+
+	* CFITSIO.xs: Added cfitsio 2.410 routines fits_open_data,
+	fits_open_image, fits_open_table, fits_write_errmark,
+	fits_clear_errmark, fits_delete_rowrange, fits_copy_file,
+	fits_parse_range, and fits_insert_key.
+	
+
+2002-04-05  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '1.00';
+
+	* Name changed to Astro::FITS::CFISIO
+
+2002-02-21  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs: Added fits_[gs]et_{compression_type,noise_bits,tile_dim}
+	and fits_write_subset, all from cfitsio 2.400
+
+	* util.c: beginning of TLONGLONG support
+
+2001-11-05  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added cfitsio 2.300 constants GZIP_1, PLIO_1, RICE_1.
+
+	* Added cfitsio 2.300 routines fits_compress_heap/ffcmph,
+	fits_test_heap/fftheap, fits_compress_img/fits_comp_img,
+	fits_decompress_img/fits_decomp_img
+
+	* Updated test programs for cfitsio 2.300.
+	
+2000-11-17  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.95';
+
+	* fits_read_pix/fits_read_pixnull should now unpack correctly.
+	Tested on both 2d and 3d datasets.
+
+2000-11-15  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Fixed large memory leak reading into perl arrays.
+
+2000-11-14  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* unsigned type cleanups in util.c
+
+	* Added, tested fits_read_subset()/ffgsv().
+
+	* Added fits_write_pix()/ffppx() and fits_write_pixnull()/ffppxn().
+	The latter does not have a longname alias in cfitsio 2.100, but it
+	is listed in the user manual.
+
+2000-11-12  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* added fits_get_keyname()/ffgknm(), thanks to Tim Conrow.
+
+	* fits_get_img_size() bug causing sigsegv and/or out of memory
+	condition fixed when called on a non-image HDU - thanks to Tim Conrow
+	Function now determines the output array size needed, and always
+	unpacks to a perl array.
+
+	* bug fixed in fits_test_expr(), output variables setting
+	
+	* Updated testprogs and test.pl
+
+	* fits_get_hduoff() added.
+
+	* Fixed bug in fits_get_hduaddr(), causing all output fields to be
+	set to value of headstart.
+
+2000-08-23  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Fixed TBIT column write in fits_write_col(), when PerlyUnpacking(1).
+	Minor documentation updates.
+
+2000-07-24  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Fixed TBIT column reads in fits_read_col() and fits_read_colnull().
+
+2000-02-25  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.94';
+
+	* Minor pod changes.
+
+2000-02-23  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Reformat of util.c, minor cleanups in example scripts.
+
+2000-02-22  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Updated examples.
+
+	* Added cfitsio2036 routines fits_read_imgnull(), fits_read_colnull().
+
+	* Removed maxdim argument from fits_read_atblhdr(),
+	fits_read_btblhdr(), fits_read_imghdr(), fits_decode_tdim(),
+	fits_read_tdim(), fits_test_expr(), fits_get_img_parm().
+	Updated calls to these routines in testprogs and test.pl.
+
+	* Added cfitsio2035 routines fits_update_key_longstr(),
+	fits_insert_key_longstr(), fits_modify_key_longstr(),
+	fits_get_img_par() and fits_get_keyclass(). Added cfitsio2035
+	constants TYP_x_KEY.
+
+2000-01-10  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* fits_read_header() makes an array of comments if there is
+	more than one for a given header keyword (e.g., HISTORY keywords,
+	because they end up in the COMMENTS portion of the output hash).
+
+1999-12-11  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Disabled prototypes.
+
+1999-12-11  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added examples/check_status.pl and examples/match_datatype.pl
+	to MANIFEST.
+
+1999-12-11  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Attempt at making example scripts portable
+	to 64-bit architectures, in a generalized manner.
+
+1999-12-09  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Allow undef for timeref argument in fits_get_system_date().
+
+1999-12-08  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added sizeof_datatype().
+
+1999-12-02  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.93';
+
+	* Added cfitsio version section to README.
+
+	* Some common problems and solutions explained in INSTALL.
+
+	* Explicitly enabled prototypes in CFITSIO.xs.
+
+1999-11-26  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Updated fits_get_img_size/ffgisz() for new prototype
+	in CFITSIO 2.034.
+
+1999-11-12  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added WCS routines fits_get_image_wcs_keys()/ffgiwcs() and
+	fits_get_table_wcs_keys()/ffgtwcs(). Another routine -
+	fits_get_imagecell_wcs_keys() - is documented in the manual
+	but not found in the cfitsio library.
+
+1999-11-01  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* unpack3D() - fixed bug in inner loop.
+
+1999-10-06  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* read_tblbytes(): Fixed compiler warning of incompatible pointers.
+
+1999-09-28  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* fits_get_hdu_num() now accepts undef argument. Useful since
+	its return value is the current HDU number, and setting the variable
+	inplace was redundant.
+
+1999-09-21  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* Added fits_null_check/ffnchk(), fits_get_img_type/ffgidt(),
+	fits_get_img_dim/ffgidm() and fits_get_img_size/ffgisz().
+
+	These are all new in CFITSIO v2.033
+
+1999-09-14  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* $VERSION = '0.92';
+
+1999-09-13  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs: find_rows(), read_3d_TYP(), read_colnull_str(),
+	read_descripts(), read_grppar_TYP(), read_imgnull_TYP(),
+	read_subset_TYP(), read_subsetnull_TYP(), read_tblbytes():
+	Created fastpaths for case of PerlyUnpacking(0).
+
+1999-09-13  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs: read_2d_TYP(), read_img_TYP(), fastpaths for
+	PerlyUnpacking(0).
+
+1999-09-13  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs: read_colnull_TYP() fastpaths for PerlyUnpacking(0).
+
+1999-09-09  Pete Ratzlaff  <rpete@ascda3.harvard.edu>
+
+	* examples/: Updated examples somewhat. Nothing big, though.
+
+1999-08-31  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs: read_col_TYPE(), read_col_bit_TYPE(): Fast path created
+	for case of PerlyUnpacking(0). Was doing an extra allocation and memcpy,
+	no more. This needs to be done for a number of the other routines as
+	well.
+
+1999-08-30  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* examples/bintable_read.pl: Was not actually die()ing if get_colnum()
+	failed. Fixed.
+
+1999-08-24  Pete Ratzlaff <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.pm: Fixed example function call in pod.
+
+1999-04-08  Pete Ratzlaff <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.pm: $VERSION = '0.91';
+
+	* CFITSIO.pm: Removed duplicate 'my' declaration.
+
+	* CFITSIO.pm, CFITSIO.xs: Synched up with cfitsio2031. Added
+	fits_get_col_display/ffgcdw, fits_read_col_bit_{usht,uint}/ffgcxu{ik},
+	fits_url_type/ffurlt
+
+	* examples/bintable_read.pl: Use get_num_rows() to find number of rows
+	instead of read_btblhdr().
+
+	* CFITSIO.pm: fits_read_header() was griping with -w, $status now
+	predeclared.
+
+1999-03-23  Pete Ratzlaff <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs: ffopen() was segfaulting if filename was undef, now
+	assumes empty string (which will fail, of course).
+
+	* CFITSIO.xs: fits_get_colnum() accepts undef for output variable now.
+
+1998-12-15  Pete Ratzlaff <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.pm: fits_read_header() no longer calls fits_close_file() if
+	passed a fitsfilePtr.
+
+1998-12-08  Pete Ratzlaff <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.xs, testprog/*: Bug squashed...fits_read_colnull_{,dbl}cmp were
+	not allocating enough memory for null-flags array. Turns out you need
+	2*nelem elements.
+
+1998-12-07  Pete Ratzlaff <pratzlaff@cfa.harvard.edu>
+
+	* Makefile.PL: Minor fix to clean testprog/testprog.{fit,lis}.
+
+	* testprog/runtests: First hack at auto testprogs
+
+1998-12-04  Pete Ratzlaff <pratzlaff@cfa.harvard.edu>
+
+	* test.pl: More tests added.
+
+	* CFITSIO.pm: Updated pod.
+
+	* CFITSIO.xs: More compatibility fixes and squashed bugs.
+
