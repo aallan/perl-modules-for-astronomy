@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.4 2002/01/24 22:15:09 aa Exp $
+#     $Id: Catalog.pm,v 1.5 2002/03/29 17:40:17 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -55,14 +55,14 @@ use vars qw/ $VERSION /;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.4 2002/01/24 22:15:09 aa Exp $
+$Id: Catalog.pm,v 1.5 2002/03/29 17:40:17 aa Exp $
 
 =head1 METHODS
 
@@ -502,6 +502,18 @@ sub configure {
      $self->{RADIUS} = $args{Radius};
   }
   
+}
+
+=item B<freeze>
+
+Method to return a blessed reference to the object so that we can store
+ths object on disk using Data::Dumper module.
+
+=cut
+
+sub freeze {
+  my $self = shift;
+  return bless $self, 'Astro::Catalog';
 }
 
 # H A N D L E   C L U S T E R   F I L E S ------------------------------------

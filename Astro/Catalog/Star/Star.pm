@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.5 2002/01/24 22:15:09 aa Exp $
+#     $Id: Star.pm,v 1.6 2002/03/29 17:40:17 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -66,14 +66,14 @@ properties.
 use strict;
 use vars qw/ $VERSION /;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.5 2002/01/24 22:15:09 aa Exp $
+$Id: Star.pm,v 1.6 2002/03/29 17:40:17 aa Exp $
 
 =head1 METHODS
 
@@ -605,6 +605,18 @@ sub configure {
       $self->$method( $args{$key} ) if exists $args{$key};
   }
 
+}
+
+=item B<freeze>
+
+Method to return a blessed reference to the object so that we can store
+ths object on disk using Data::Dumper module.
+
+=cut
+
+sub freeze {
+  my $self = shift;
+  return bless $self, 'Astro::Catalog::Star';
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------

@@ -1,3 +1,8 @@
+2002-03-29  Alasdair Allan <aa@astro.ex.ac.uk>
+        
+        * Added a freeze() function so that the the Catalog object can be
+          stored persistently using the Data::Dumper module
+          
 2002-01-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Various changes made to support the Field Correlation Client,
