@@ -3,11 +3,18 @@
 # Test FITS binary table read
 
 # Astro::Catalog test harness
-use Test::More tests => 7;
+use Test::More;
 
 use File::Spec;
 
 use strict;
+
+eval { require Astro::FITS::CFITSIO; };
+if( $@ ) {
+  plan skip_all => "Tests require Astro::FITS::CFITSIO";
+} else {
+  plan tests => 7;
+}
 
 require_ok( "Astro::Catalog" );
 require_ok( "Astro::Catalog::IO::FITSTable" );
