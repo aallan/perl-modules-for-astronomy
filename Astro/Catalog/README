@@ -21,7 +21,14 @@ associated classes
    File::Spec
    Carp
    
-all these modules, if not already installed, are available from CPAN. 
+all these modules, if not already installed, are available from CPAN. If you
+want to (optionally) use the Astro::Catalog::SuperCOSMOS module then the
+
+   Astro::Aladin
+   
+module and supporting CDS Java infrastructure must be installed. This is
+also needed, along with the Astro::DSS module, if you want to make use of
+the example scripts provided with the distribution.   
   
 Provides
 --------
@@ -30,6 +37,7 @@ The package provides the following classes
 
     Astro::Catalog
     Astro::Catalog::Star
+    Astro::Catalog::SuperCOSMOS::Query
     Astro::Catalog::GSC::Query
     Astro::Catalog::USNOA2::Query
     

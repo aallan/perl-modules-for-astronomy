@@ -1,3 +1,10 @@
+2003-02-24  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Astro::Catalog now wraps SuperCOSMOS catalogue using 
+          the Astro::Aladin module. Some example scripts using this
+          new module and the Astro::DSS module are included in the
+          distribution.
+          
 2002-05-31  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Removed references to Math::libm from the GSC modules, these
