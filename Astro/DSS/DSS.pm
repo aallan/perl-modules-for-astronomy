@@ -19,7 +19,7 @@ package Astro::DSS;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: DSS.pm,v 1.6 2002/01/24 22:16:00 aa Exp $
+#     $Id: DSS.pm,v 1.7 2003/02/21 18:52:15 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -69,13 +69,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: DSS.pm,v 1.6 2002/01/24 22:16:00 aa Exp $
+$Id: DSS.pm,v 1.7 2003/02/21 18:52:15 aa Exp $
 
 =head1 METHODS
 
@@ -374,7 +374,10 @@ The x extent of the DSS image to be retrieved in arcmin.
    $xsize = $dss->xsize();
    $dss->xsize( 20 );
 
-Image sizes for FITS, gzipped FITS and GIF are 260kB, 110kB and 70 kB respectively for a field of 10*10 arc minutes. There's a limit of around 4 MB for the largest image to be delivered. Images from the DSS2 are bigger, because the pixel size is smaller. 
+Image sizes for FITS, gzipped FITS and GIF are 260kB, 
+110kB and 70 kB respectively for a field of 10*10 arc minutes. 
+There's a limit of around 4 MB for the largest image to be delivered. 
+Images from the DSS2 are bigger, because the pixel size is smaller. 
 
 =cut
 
@@ -620,6 +623,9 @@ sub _make_query {
             croak("Error: Cannont open output file $file_name");
          }   
 
+         # Needed for Windows (yuck!)
+         binmode FH;
+         
          # Write to output file
          my $length = length(${$reply}{"_content"});
          syswrite( FH, ${$reply}{"_content"}, $length );
