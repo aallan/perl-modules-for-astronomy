@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.5 2001/11/28 01:39:44 aa Exp $
+#     $Id: Query.pm,v 1.6 2001/11/28 02:27:23 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.5 2001/11/28 01:39:44 aa Exp $
+$Id: Query.pm,v 1.6 2001/11/28 02:27:23 aa Exp $
 
 =head1 METHODS
 
@@ -558,25 +558,50 @@ parse the results.
 sub _parse_query {
   my $self = shift;
 
+  my $number = 0;   # number of objects found in error circle
+  my @target;       # raw HTML lines, one per object
+  
   # get a local copy of the current BUFFER
   my @buffer = split( /\n/,$self->{BUFFER});
   chomp @buffer;
 
-  # create an Astro::ADS::Result object to hold the search results
+  # create an Astro::SIMBAD::Result object to hold the search results
   my $result = new Astro::SIMBAD::Result();
 
-  # create a temporary object to hold papers
+  # create a temporary object to hold objects, I _really_ should have
+  # called Astro::SIMBAD::Result::Object something else, this is getting
+  # really confusing, oh well, too late now...
   my $object;
 
-  # loop round the returned buffer and stuff the contents into Paper objects
+  # loop round the returned buffer 
   my ( $line );
   foreach $line ( 0 ... $#buffer ) {
 
+     # NUMBER OF OBJECTS FOUND IN ERROR CIRCLE
+     if( lc($buffer[$line]) =~ "objects: </b><pre>" ) {
+        $_ = lc($buffer[$line]);
+        ( $number ) = /^<b>(\d*)\s+/;
+        print "Number of Objects: $number\n";
     
-   }
-
-   # return an Astro::SIMBAD::Result object, or undef if no abstracts returned
-   return $result;
+        # GRAB EACH OBJECT
+        foreach my $i ( $line+2 ... $line+$number+1 ) {
+           push ( @target, lc($buffer[$i]) );
+        }
+        
+        # DROP OUT OF FIRST LOOP
+        $line = $#buffer;
+     }  
+  }
+  
+  # ...and stuff the contents into Object objects
+  my ( $star );
+  foreach $star ( 0 ... $#target ) {
+  
+     print "target: " . $target[$star] . "\n";
+  }
+  
+  # return an Astro::SIMBAD::Result object, or undef if no abstracts returned
+  return $result;
 
 }
 
