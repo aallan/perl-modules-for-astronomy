@@ -1,5 +1,7 @@
 2004-08-11  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* Catalog.pm: Add auto_filter_observability
+
 	* IO/JCMT.pm: Publish a method for cleaning the target name (so
 	that the JCMT VAX control system will not get upset) and use that
 	method in the JCMT catalog writer (so that a "use this target"

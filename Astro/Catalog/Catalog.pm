@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.44 2004/02/26 02:28:57 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.45 2004/08/12 02:36:09 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -71,7 +71,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.44 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.45 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -79,7 +79,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.44 2004/02/26 02:28:57 cavanagh Exp $
+$Id: Catalog.pm,v 1.45 2004/08/12 02:36:09 timj Exp $
 
 =head1 METHODS
 
@@ -114,6 +114,7 @@ sub new {
 		      REFPOS => undef,
 		      REFTIME => undef,
                       FIELDDATE => undef,
+		      AUTO_OBSERVE => 0,
 		    }, $class;
 
   # If we have arguments configure the object
@@ -729,6 +730,25 @@ sub fielddate {
   return $self->{FIELDDATE};
 }
 
+=item B<auto_filter_observability>
+
+If this flag is true, a reset_list will automatically remove targets
+that are not observable (as determined by C<filter_by_observability>
+which will be invoked).
+
+Default is false.
+
+=cut
+
+sub auto_filter_observability {
+  my $self = shift;
+  if (@_) {
+    $self->{AUTO_OBSERVE} = shift;
+  }
+  return $self->{AUTO_OBSERVE};
+}
+
+
 # C O N F I G U R E -------------------------------------------------------
 
 =back
@@ -916,6 +936,9 @@ list.
 
   $catalog->reset_list();
 
+If C<auto_filter_observability> is true, the list will be immediately
+filtered for observability.
+
 =cut
 
 sub reset_list {
@@ -924,6 +947,11 @@ sub reset_list {
   # Simply need to clear the CURRENT
   $self->{CURRENT} = undef;
 
+  # and filter automatically if required
+  $self->filter_by_observability
+    if $self->auto_filter_observability;
+
+  return;
 }
 
 =item B<force_ref_time>
@@ -977,20 +1005,20 @@ coordinates are also filtered.  Starts from the current star list
   @new = $catalog->filter_by_observability();
 
 Returns the newly selected stars (as if the C<stars> method was called
-immediately.
+immediately, unless called in a non-list context.
 
 =cut
 
 sub filter_by_observability {
   my $self = shift;
 
-  $self->forceRefTime;
+  $self->force_ref_time;
   my $ref = $self->stars;
 
   # For each star, extract the coordinate object and, if defined
   # check for observability
   @$ref = grep { $_->coords->isObservable } grep { $_->coords; } @$ref;
-  return $self->stars;
+  return $self->stars if wantarray;
 }
 
 =item B<filter_by_id>
@@ -1206,7 +1234,7 @@ sub sort_catalog {
     # Array to hold the sorted hashes
     my @rSources;
 
-    # Now do the search
+    # Now do the sort
     if ($sort =~ /(name|id)/) {
       @rSources = sort  by_id @unsorted;
     } elsif ($sort =~ /ra/) {
