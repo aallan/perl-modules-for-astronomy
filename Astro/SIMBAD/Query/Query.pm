@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.11 2001/12/03 16:32:05 aa Exp $
+#     $Id: Query.pm,v 1.12 2002/01/24 22:16:34 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -34,14 +34,28 @@ Astro::SIMBAD::Query - Object definining an prospective SIMBAD query.
 
 =head1 SYNOPSIS
 
-  $query = new Astro::SIMBAD::Query( );
+  $query = new Astro::SIMBAD::Query( Target  => $object,
+                                     RA      => $ra,
+                                     Dec     => $dec,
+                                     Error   => $radius,
+                                     Units   => $radius_units,
+                                     Frame   => $coord_frame,
+                                     Epoch   => $coord_epoch,
+                                     Equinox => $coord_equinox,
+                                     Proxy   => $proxy,
+                                     Timeout => $timeout,
+                                     URL     => $alternative_url );
 
   my $results = $query->querydb();
+
+  $other = new Astro::SIMBAD::Query( Target  => $object );
 
 =head1 DESCRIPTION
 
 Stores information about an prospective SIMBAD query and allows the query to
-be made, returning an Astro::SIMBAD::Result object. 
+be made, returning an Astro::SIMBAD::Result object. Minimum information needed
+for a sucessful query is an R.A. and Dec. or an object Target speccification,
+other variables will be defaulted. 
 
 The object will by default pick up the proxy information from the HTTP_PROXY 
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
@@ -61,13 +75,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.11 2001/12/03 16:32:05 aa Exp $
+$Id: Query.pm,v 1.12 2002/01/24 22:16:34 aa Exp $
 
 =head1 METHODS
 
@@ -79,7 +93,17 @@ $Id: Query.pm,v 1.11 2001/12/03 16:32:05 aa Exp $
 
 Create a new instance from a hash of options
 
-  $query = new Astro::SIMBAD::Query(  );
+  $query = new Astro::SIMBAD::Query( Target  => $object,
+                                     RA      => $ra,
+                                     Dec     => $dec,
+                                     Error   => $radius,
+                                     Units   => $radius_units,
+                                     Frame   => $coord_frame,
+                                     Epoch   => $coord_epoch,
+                                     Equinox => $coord_equinox,
+                                     Proxy   => $proxy,
+                                     Timeout => $timeout,
+                                     URL     => $alternative_url );
 
 returns a reference to an SIMBAD query object.
 
