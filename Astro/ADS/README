@@ -46,7 +46,7 @@ since Perl 5.7.2, but otherwise can be downloaded from CPAN as part of the libne
 
 Finally the package requires Pod::Usage, v1.14 or above, by Brad Appleton 
 <bradapp@enteract.com>. Again this has been included in the base distribution
-since Perl 5.7.2, but can be downloaded seperately from CPAN as part of the
+since Perl 5.6.1, but can be downloaded seperately from CPAN as part of the
 PodParser package, see http://search.cpan.org/search?dist=PodParser
 
 Provides
