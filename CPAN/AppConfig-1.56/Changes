@@ -1,0 +1,113 @@
+#========================================================================
+# Version 1.56  Date: 2004/02/04
+#========================================================================
+
+* Applied a patch from Jianhong Feng to add "heredoc" style quoting.
+
+* Applied patch from Dave Viner to AppConfig::Sys to fix problems on
+  Win32.  Thanks also to Ijon Tichy for a similar patch.
+
+* Applied patch from Axel Gerstmair to prevent undefined variable
+  warnings in block.t test.
+
+
+#========================================================================
+# Version 1.55  Date: 2003/04/29
+#========================================================================
+
+* Fixed version numbers of various files which had got out-of-step
+  with CPAN.
+
+
+#========================================================================
+# Version 1.54  Date: 2003/04/29
+#========================================================================
+
+* Added POSIX style '=value' suffixes to --parameters.  Thus '--foo=bar'
+  is now equivalent to '-foo bar'.
+
+* Added AppConfig::CGI module to parse CGI script parameters.
+
+* Added cgi() delegate method to AppConfig to instantiate and call
+  AppConfig::CGI.  
+
+* Added CGI documentation and cleaned up copious typos, grammos and
+  thinkos.
+
+* Applied documentation patches from Tim Mooney.
+
+* Fixed missing '>' tyop which caused POD to complain.  Thanks to 
+  David Cantrell and many others for reporting it.
+
+* Applied patch from Steven McDowall to provide default options
+  for LIST and HASH data types.
+
+* Applied patch from Robert Goff to allow '$' to be escaped (e.g. \$)
+  to suppress variable expansion in files. 
+
+* Applied patch from John Salmon to allow comments to appear anywhere
+  on a line, not just at the beginning.
+
+
+#========================================================================
+# Version 1.53  Date: not released
+#========================================================================
+
+* various changes, incorporated above.
+
+
+#========================================================================
+# Version 1.52  Date: 1998/10/29 11:44:23  Author: abw
+#========================================================================
+
+* Modified AppConfig::Getopt to work with Getopt::Long version 2.17,
+  instead of the yet-to-be-released-as-of-29-Oct-1998 version 2.93
+  (3.00 beta).  Getopt::Long version 3.00 offers object-orientation
+  but will continue to be backwardly compatible with earlier versions.
+  Thus, AppConfig::Getopt should continue with future versions of
+  Getopt::Long.  Nice one, Johan!
+
+* Added code to AppConfig::State::define() to handle the compact format.
+  The ALIAS and ARGS options are extracted from it and the ARGCOUNT 
+  is determined from the ARGS parameter.
+
+* Added Getopt::Long version 2.17 as a dependency in Makefile.PL.
+  Added documentation to note this and explain how to modify the 
+  Makefile.PL to avoid this check.
+
+* Added t/compact.t and expanded t/getopt.t test files.
+
+* Added documentation for AppConfig::Getopt use and the compact definition
+  format.
+
+* Added documentation for +/- prefix format in configuration files.
+
+* Other minor documentation fixes.
+
+
+#========================================================================
+# Version 1.51  Date: 1998/10/22 09:22:53  Author: abw
+#========================================================================
+
+* Added '+variable' (set on) and '-variable' (reset to 0 or default)
+  syntax for configuration files, as suggested by Chip Salzenberg.
+
+* Fixed auto-creation of variables that was generating two warning 
+  messages each time.
+
+* Removed some straggling references to the AppConfig::Const module. 
+
+* Changed Makefile.PL to explicitly list MAN3PODS for all AppConfig::*
+  modules.  ExtUtils::MakeMaker ignores files that match the pattern 
+  /(config|setup).*\.pm/i;  Thanks to Alex Medina for catching that.  
+
+
+#========================================================================
+# Version 1.50  Date: 1998/10/21 09:28:15  Author: abw
+#========================================================================
+
+* Completed documentation.
+
+* First public beta release.
+
+
