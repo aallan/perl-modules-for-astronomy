@@ -25,7 +25,7 @@ package Astro::Aladin;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Aladin.pm,v 1.2 2003/02/24 22:45:56 aa Exp $
+#     $Id: Aladin.pm,v 1.3 2003/02/26 19:21:37 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2003 University of Exeter. All Rights Reserved.
@@ -39,7 +39,7 @@ package Astro::Aladin;
 Astro::Aladin - Perl class giving access to images and catalogues
 
 =head1 SYNOPSIS
-  
+
   my $aladin = new Astro::Aladin();
   
   my $aladin = new Astro::Aladin( RA     => $ra, 
@@ -74,7 +74,7 @@ use threads;
 use threads::shared;
 use Astro::Aladin::LowLevel;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Check for threading
 #use Config;
@@ -119,7 +119,7 @@ my $threaded_supercos_catalog = sub {
 
 =head1 REVISION
 
-$Id: Aladin.pm,v 1.2 2003/02/24 22:45:56 aa Exp $
+$Id: Aladin.pm,v 1.3 2003/02/26 19:21:37 aa Exp $
 
 =head1 METHODS
 
@@ -276,15 +276,17 @@ sub file {
   return $self->{FILE};
 
 }
+
 =item B<supercos_catalog>
 
 Retrieves a SuperCOSMOS catalogue from Edinburgh using Aladin.
 
-   $filename = $aladin->supercos_catalog( RA     => $ra, 
-                                          Dec    => $dec, 
-                                          Radius => $radius,
-                                          File   => $catalog_file,
-                                          Band   => $waveband )
+   $filename = $aladin->supercos_catalog( 
+                       RA     => $ra, 
+                       Dec    => $dec, 
+                       Radius => $radius,
+                       File   => $catalog_file,
+                       Band   => $waveband );
    
    $filename = $aladin->supercos_catalog();
    
