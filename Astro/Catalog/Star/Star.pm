@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.19 2004/02/26 01:42:57 cavanagh Exp $
+#     $Id: Star.pm,v 1.20 2004/11/24 01:36:51 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -40,6 +40,7 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
                                     MagErr       => \%mag_errors,
                                     Colours      => \%colours,
                                     ColErr       => \%colour_errors,
+                                    Morphology   => new Astro::Catalog::Star::Morphology(),
                                     Quality      => $quality_flag,
                                     Field        => $field,
                                     GSC          => $in_gsc,
@@ -75,6 +76,7 @@ use warnings;
 use vars qw/ $VERSION /;
 use Carp;
 use Astro::Coords;
+use Astro::Catalog::Star::Morphology;
 
 # Register an Astro::Catalog::Star warning category
 use warnings::register;
@@ -85,7 +87,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -233,7 +235,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.19 2004/02/26 01:42:57 cavanagh Exp $
+$Id: Star.pm,v 1.20 2004/11/24 01:36:51 cavanagh Exp $
 
 =head1 METHODS
 
@@ -252,6 +254,7 @@ Create a new instance from a hash of options
                                     MagErr       => \%mag_errors,
                                     Colours      => \%colours,
                                     ColErr       => \%colour_errors,
+                                    Morphology   => new Astro::Catalog::Star::Morphology(),
                                     Quality      => $quality_flag,
                                     Field        => $field,
                                     GSC          => $in_gsc,
@@ -284,6 +287,7 @@ sub new {
                       MAGERR     => {},
                       COLOURS    => {},
                       COLERR     => {},
+                      MORPHOLOGY => undef,
                       QUALITY    => undef,
                       FIELD      => undef,
                       GSC        => undef,
@@ -780,6 +784,34 @@ sub get_colourerr {
      }
   }
   return $col_error;
+}
+
+=item B<morphology>
+
+Get or set the morphology of the star as an C<Astro::Catalog::Star::Morphology>
+object.
+
+  $star->morphology( $morphology );
+
+The object returned by this method is the actual object stored
+inside this Star object and not a clone. If the morphology
+is changed through this object the morphology of the star is
+also changed.
+
+=cut
+
+sub morphology {
+  my $self = shift;
+  if (@_) {
+    my $m = shift;
+    croak "Morphology must be an Astro::Catalog::Star::Morphology object"
+      unless UNIVERSAL::isa($m, "Astro::Catalog::Star::Morphology");
+
+    # Store the new coordinate object
+    # Storing it late stops looping from the id and comment methods
+    $self->{MORPHOLOGY} = $m;
+  }
+  return $self->{MORPHOLOGY};
 }
 
 =item B<quality>
