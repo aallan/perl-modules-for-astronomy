@@ -49,9 +49,6 @@ sub _read_catalog {
   my $class = shift;
   my $lines = shift;
 
-  use Data::Dumper;
-  print Dumper($lines);
-
   croak "Must supply catalogue contents as a reference to an array"
     unless ref($lines) eq 'ARRAY';
 
