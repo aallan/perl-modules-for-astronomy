@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.17 2001/11/14 00:12:40 aa Exp $
+#     $Id: Query.pm,v 1.18 2001/12/03 03:41:45 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -67,13 +67,13 @@ use Astro::ADS::Result::Paper;
 use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.17 2001/11/14 00:12:40 aa Exp $
+$Id: Query.pm,v 1.18 2001/12/03 03:41:45 aa Exp $
 
 =head1 METHODS
 
@@ -250,8 +250,10 @@ sub url {
     # set the url option 
     my $base_url = shift; 
     $self->{URL} = $base_url;
-    $self->{QUERY} = "http://$base_url/cgi-bin/nph-abs_connect?";
-    $self->{FOLLOWUP} = "http://$base_url/cgi-bin/nph-ref_query?";
+    if( defined $base_url ) {
+       $self->{QUERY} = "http://$base_url/cgi-bin/nph-abs_connect?";
+       $self->{FOLLOWUP} = "http://$base_url/cgi-bin/nph-ref_query?";
+    }
   }
 
   # RETURNING URL

@@ -19,7 +19,7 @@ package Astro::ADS::Result;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Result.pm,v 1.13 2001/11/10 20:58:43 timj Exp $
+#     $Id: Result.pm,v 1.14 2001/12/03 03:41:45 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -38,9 +38,8 @@ Astro::ADS::Result - Results from an ADS Query
 
 =head1 DESCRIPTION
 
-Stores the results returned from an ADS search as a hash of
-Astro::ADS::Result::Paper objects, with the papers being indexed
-by bibcode.
+Stores the results returned from an ADS search as an array of
+Astro::ADS::Result::Paper objects.
 
 =cut
 
@@ -54,13 +53,13 @@ use overload '""' => "stringify";
 
 use Astro::ADS::Result::Paper;
 
-'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Result.pm,v 1.13 2001/11/10 20:58:43 timj Exp $
+$Id: Result.pm,v 1.14 2001/12/03 03:41:45 aa Exp $
 
 =head1 METHODS
 

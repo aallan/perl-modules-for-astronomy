@@ -1,3 +1,8 @@
+2001-12-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added conditional test to see if $base_url is
+          defined before setting it in the method.
+          
 2001-11-13  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* adsquery.PL: Turn adsquery.pl into a "proper" executable

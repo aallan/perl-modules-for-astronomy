@@ -1,3 +1,8 @@
+2001-12-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query.pm: Added conditional test to see if $base_url is
+          defined before setting it in the method.
+          
 2001-11-28 Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Result.pm: listofobjects() method added

@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.8 2001/11/28 17:18:02 aa Exp $
+#     $Id: Query.pm,v 1.9 2001/12/03 03:42:30 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.8 2001/11/28 17:18:02 aa Exp $
+$Id: Query.pm,v 1.9 2001/12/03 03:42:30 aa Exp $
 
 =head1 METHODS
 
@@ -205,8 +205,10 @@ sub url {
 
     # set the url option 
     my $base_url = shift; 
-    $self->{URL} = $base_url;
-    $self->{QUERY} = "http://$base_url/sim-id.pl?";
+    if( defined $base_url ) {
+       $self->{URL} = $base_url;
+       $self->{QUERY} = "http://$base_url/sim-id.pl?";
+    }
   }
 
   # RETURNING URL
