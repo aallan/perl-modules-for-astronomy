@@ -69,7 +69,7 @@
       call file_in(file_name_1, file_1)
       call file_in(file_name_2, file_2)
 
-      status = corlate( file_1, file_2, file_name_3, &
+      status = corlate( file_1, size(file_1), file_2, size(file_2), file_name_3, &
                         file_name_4, file_name_5, file_name_6, &
                         file_name_7, file_name_8 )
 

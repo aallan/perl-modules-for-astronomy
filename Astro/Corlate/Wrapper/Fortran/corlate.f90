@@ -93,7 +93,7 @@
 
     end subroutine fit
 
-    integer function corlate( file_1, file_2, file_name_3, &
+    integer function corlate( file_1, n_1, file_2, n_2, file_name_3, &
                               file_name_4, file_name_5, file_name_6, &
                               file_name_7, file_name_8 ) 
 
@@ -131,8 +131,9 @@
       !    of header.
       ! 8. A file of useful information on the variable stars.
 
-      character(len=*), dimension(:), intent(in):: file_1
-      character(len=*), dimension(:), intent(in):: file_2
+      integer :: n_1, n_2
+      character(len=*), dimension(n_1), intent(in):: file_1
+      character(len=*), dimension(n_2), intent(in):: file_2
       character(len=*), intent(in):: file_name_3
       character(len=*), intent(in):: file_name_4
       character(len=*), intent(in):: file_name_5
