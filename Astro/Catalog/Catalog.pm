@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.19 2003/07/27 01:50:45 timj Exp $
+#     $Id: Catalog.pm,v 1.20 2003/07/27 02:00:42 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.19 2003/07/27 01:50:45 timj Exp $
+$Id: Catalog.pm,v 1.20 2003/07/27 02:00:42 aa Exp $
 
 =head1 METHODS
 
@@ -147,8 +147,7 @@ sub write_catalog {
   } else {
      $file = $args{file};
   }   
-     
-  
+      
   # default to cluster format if no filenames supplied
   $args{format} = 'Cluster' unless ( defined $args{format} );
 
@@ -163,10 +162,20 @@ sub write_catalog {
   # call the io plugin's _write_catalog function
   my $lines = $ioclass->_write_catalog( $self, %args );
   
-  use Data::Dumper;
-  print Dumper( @$lines );
+  # open file
+  unless ( open ( CATALOG, ">$file" ) ) {
+      croak ( "Catalog.pm: Cannot open $file\n" );
+  }
   
+  # write to file
+  foreach my $i ( 0 ... $#$lines ) {
+     chomp( ${$lines}[$i] );
+     print CATALOG ${$lines}[$i] . "\n";
+  }
 
+  # close file  
+  close(CATALOG);
+  return;       
 }
 
 # A C C E S S O R  --------------------------------------------------------
