@@ -29,13 +29,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.4 2003/07/30 03:35:04 aa Exp $
+$Id: Query.pm,v 1.5 2003/08/03 06:18:35 timj Exp $
 
 =head1 METHODS
 
@@ -203,8 +203,7 @@ sub target {
     $clear{ra} = undef if exists $allow{ra};
     $clear{dec} = undef if exists $allow{dec};
 
-    # mutilate it and stuff it into ${$self->{OPTIONS}}{object}
-    $ident =~ s/\s/\+/g;
+    # Store it in the options table
     $self->_set_query_options(
 			      object => $ident,
 			      %clear
@@ -287,33 +286,7 @@ sub sort {
   my $self = shift;
 
   if (@_) {
-
-    my $option = shift;
-    my $sort;
-    # pick an option
-    if( $option eq "RA" ) {
-      # sort by RA
-      $sort = "ra";
-    } elsif ( $option eq "DEC" ) {
-      # sort by Dec
-      $sort = "dec";
-    } elsif ( $option eq "RMAG" ) {
-      # sort by R magnitude
-      $sort = "mr";
-    } elsif ( $option eq "BMAG" ) {
-      # sort by B magnitude
-      $sort = "mb";
-    } elsif ( $option eq "DIST" ) {
-      # sort by distance from field centre
-      $sort = "d";
-    } elsif ( $option eq "POS" ) {
-      # sort by position angle to field centre
-      $sort = "pos";
-    } else {
-      # in case there are no valid options sort by RA
-      warnings::warnif("Unknown sort type: using ra");
-      $sort = "ra";
-    }
+    my $sort = shift;
     $self->_set_query_options( sort => $sort );
   }
 
@@ -349,29 +322,6 @@ sub nout {
   return $self->number( @_ );
 }
 
-=item B<multi>
-
-Whether to return multiple identifications
-
-   $multi = $query->multi();
-   $query->multi( 'no' );
-
-valid responses are 'yes' and 'no', the default is yes.
-
-=cut
-
-sub multi {
-  my $self = shift;
-
-  if (@_) { 
-    $self->_set_query_options( multi => shift );
-  }
-
-  return $self->query_options("multi");
-}
-
-
-
 =back
 
 =head2 General Methods
@@ -405,12 +355,23 @@ sub configure {
   return undef unless @_;
 
   # grab the argument list
-  my %args = @_;
+  my %args = Astro::Catalog::_normalize_hash(@_);
 
-  # Loop over the allowed keys and modify the default query options
-  for my $key ($self->_get_supported_init) {
-      my $method = lc($key);
-      $self->$method( $args{$key} ) if exists $args{$key};
+  # Grab the allowed options
+  my %allow = $self->_get_allowed_options();
+
+  # Loop over the supplied arguments. If they correspond to
+  # a method, run it, if they correspond to an option, set it
+  for my $key (keys %args) {
+    my $lckey = lc($key);
+    if ($self->can($lckey)) {
+      $self->$lckey( $args{$key} );
+    } elsif (exists $allow{$lckey}) {
+      # set the option explcitly
+      $self->_set_query_options( $lckey => $args{$key} );
+    } else {
+      warnings::warnif("Unrecognized option: $key. Ignoring it.");
+    }
   }
 
 }
@@ -426,25 +387,6 @@ sub configure {
 These methods are for internal use only.
 
 =over 4
-
-=item B<_get_supported_init>
-
-Return the list of initialization methods supported by this catalogue.
-This is not the same as the allowed options since some methods are
-not related to options and other methods that are related to options
-use different names.
-
-Returns a list. The default list is:
-
-  RA Dec Target Radius Bright Faint Sort Number
-  URL Timeout Proxy
-
-=cut
-
-sub _get_supported_init {
-  return (qw/ Target Radius Bright Faint Sort Number
-                    URL Timeout Proxy /);
-}
 
 
 =item B<_set_query_options>
@@ -467,7 +409,7 @@ sub _set_query_options {
   my %allow = $self->_get_allowed_options();
 
   for my $newkey (keys %newopt) {
-  
+
     if (!exists $allow{$newkey}) {
       warnings::warnif("Option $newkey not supported by catalog ".
 		       ref($self)."\n");
@@ -479,6 +421,79 @@ sub _set_query_options {
   return;
 }
 
+=item B<_get_allowed_options>
+
+Return a hash with keys corresponding to the internal options
+supported by the query, and values corresponding to the names
+used by the specific query sub-system. Can use the keys
+to work out whether an option is supported.
+
+  %allow = $q->_get_allowed_options();
+
+Generally, must be over-ridden in subclass. By default returns all
+the internal options, with 1-1 mapping.
+
+=cut
+
+sub _get_allowed_options {
+  return (
+	  ra => 'ra',
+	  dec => 'dec',
+	  object => 'object',
+	  radmax => 'radmax',
+	  radmin => 'radmin',
+	  width => 'width',
+	  height => 'height',
+	  magbright => 'magbright',
+	  magfaint => 'magfaint',
+	  sort => 'sort',
+	  nout => 'nout',
+	 );
+}
+
+=item B<_get_supported_accessor_options>
+
+Returns a hash with keys corresponding to accessor methods
+and values corresponding to the internal option.
+
+ %opt = $q->_get_supported_accessor_options();
+
+This method should be superfluous if the methods had been named
+correctly!
+
+Should support object init either via options or methods. This does not cover all
+options. In configure, if there is an option available but no corresponding mapping
+then we will just set the option directly.
+
+=cut
+
+sub _get_supported_accessor_options {
+  return (
+	  ra => 'ra',
+	  dec => 'dec',
+	  faint => 'magfaint',
+	  bright => 'magbright',
+	  radius => 'radmax',
+	  target => 'object',
+	  sort => 'sort',
+	  number => 'nout',
+	  format => 'format',
+  );
+}
+
+=item B<_get_default_options>
+
+Retrieve the defaults options for this particular catalog query.
+Usually called by C<_set_default_options> during object configure.
+
+  %defs = $q->_get_default_options();
+
+=cut
+
+sub _get_default_options {
+  croak "get_default_options must be subclassed";
+}
+
 =item B<_set_default_options>
 
 Each catalogue requires different default settings for the
@@ -487,7 +502,15 @@ URL parameters. They should be specified in a subclass.
 =cut
 
 sub _set_default_options {
-  croak "default options are specified in subclass\n";
+  my $self = shift;
+
+  # get the defaults
+  my %defaults = $self->_get_default_options();
+
+  # set them
+  $self->_set_query_options( %defaults );
+  return;
+
 }
 
 =item B<_dump_raw>
@@ -516,13 +539,13 @@ when deealing with the buffer cannot be encapsulated inside a Transport
 class and must be deal with by child classese.
 
    $q->_set_raw( $buffer );
-   
+
 =cut
 
 sub _set_raw {
    my $self = shift;
    $self->{BUFFER} = shift;
-}   
+}
 
 =item B<_dump_options>
 
@@ -535,6 +558,16 @@ sub _dump_options {
    my $self = shift;
 
    return $self->query_options;
+}
+
+=item B<_parse_query>
+
+Stub. Needs to be subclassed.
+
+=cut
+
+sub _parse_query {
+  croak "Query parsing is not generic. Please write one\n";
 }
 
 =back
@@ -551,7 +584,41 @@ provided in the form of _from_$opt. ie:
 
 The base class only includes one to one mappings.
 
+=item B<_translate_options>
+
+Translates the options from the default interface into the internal
+options specific for the sub-class
+
+  %options = _translate_options( );
+
+The keys and values therefore are no longer general.
+
 =cut
+
+sub _translate_options {
+  my $self = shift;
+
+  my %outhash;
+  my %allow = $self->_get_allowed_options();
+
+  foreach my $key ( keys %allow ) {
+    # Need to translate them...
+    my $cvtmethod = "_from_" . $key;
+    my ($outkey, $outvalue);
+    if ($self->can($cvtmethod)) {
+      ($outkey, $outvalue) = $self->$cvtmethod();
+    } else {
+      # Currently assume everything is one to one
+      warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping.\n");
+      $outkey = $allow{$key};
+      $outvalue = $self->query_options($key);
+    }
+    $outhash{$outkey} = $outvalue;
+  }
+  return %outhash;
+}
+
+
 
 # RA and Dec replace spaces with pluses and + sign with special code
 
@@ -582,6 +649,41 @@ sub _from_dec {
   return ($allow{dec},$dec);
 }
 
+sub _from_sort {
+  my $self = shift;
+  my $key = "sort";
+  # case insensitive conversion
+  my $value = uc($self->query_options($key));
+
+  my $sort;
+  # pick an option
+  if( $value eq "RA" ) {
+    # sort by RA
+    $sort = "ra";
+  } elsif ( $value eq "DEC" ) {
+    # sort by Dec
+    $sort = "dec";
+  } elsif ( $value eq "RMAG" ) {
+    # sort by R magnitude
+    $sort = "mr";
+  } elsif ( $value eq "BMAG" ) {
+    # sort by B magnitude
+    $sort = "mb";
+  } elsif ( $value eq "DIST" ) {
+    # sort by distance from field centre
+    $sort = "d";
+  } elsif ( $value eq "POS" ) {
+    # sort by position angle to field centre
+    $sort = "pos";
+  } else {
+    # in case there are no valid options sort by RA
+    warnings::warnif("Unknown sort type [$value]: using ra");
+    $sort = "ra";
+  }
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $sort);
+}
+
 # one to one mapping
 
 sub _from_object {
@@ -600,6 +702,14 @@ sub _from_radmax {
   return ($allow{$key}, $value);
 }
 
+sub _from_radmind {
+  my $self = shift;
+  my $key = "radmin";
+  my $value = $self->query_options($key);
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
 sub _from_magfaint {
   my $self = shift;
   my $key = "magfaint";
@@ -611,14 +721,6 @@ sub _from_magfaint {
 sub _from_magbright {
   my $self = shift;
   my $key = "magbright";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
-
-sub _from_sort {
-  my $self = shift;
-  my $key = "sort";
   my $value = $self->query_options($key);
   my %allow = $self->_get_allowed_options();
   return ($allow{$key}, $value);

@@ -49,13 +49,13 @@ use Astro::Catalog::Star;
 # aladin stuff
 use Astro::Aladin;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: SuperCOSMOS.pm,v 1.1 2003/07/29 20:33:25 aa Exp $
+$Id: SuperCOSMOS.pm,v 1.2 2003/08/03 06:18:35 timj Exp $
 
 =head1 METHODS
 
@@ -109,37 +109,20 @@ sub _get_allowed_options {
 	 );
 }
 
-=item B<_get_supported_init>
+=item B<_get_default_options>
 
-Initialise methods supported by this routine are:
-
-  RA, Dec, Radius and Band
+Get the default query state.
 
 =cut
 
-sub _get_supported_init {
-  return (qw/ RA Dec Radius Band / );
-}
+sub _get_default_options {
+  return (
+	  ra => undef,
+	  dec => undef,
 
-=item B<_set_default_options>
-
-Set the default query state.
-
-=cut
-
-sub _set_default_options {
-  my $self = shift;
-
-  my %defaults = (
-		  ra => undef,
-		  dec => undef,
-
-		  radmax => 10,
-		  band => "UKST Blue",
-		 );
-
-  $self->_set_query_options( %defaults );
-  return;
+	  radmax => 10,
+	  band => "UKST Blue",
+	 );
 }
 
 =item B<_make_query>

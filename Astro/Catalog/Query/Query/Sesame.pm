@@ -31,11 +31,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Sesame.pm,v 1.2 2003/07/30 03:35:04 aa Exp $
+$Id: Sesame.pm,v 1.3 2003/08/03 06:18:35 timj Exp $
 
 =head1 METHODS
 
@@ -154,14 +154,9 @@ Set the default query state.
 =cut
 
 sub _set_default_options {
-  my $self = shift;
-
-  my %defaults = (
-		  object => undef,
-		 );
-
-  $self->_set_query_options( %defaults );
-  return;
+  return (
+	  object => undef,
+	 );
 }
 
 

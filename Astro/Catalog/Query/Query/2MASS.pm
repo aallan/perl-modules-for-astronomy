@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: 2MASS.pm,v 1.1 2003/07/31 08:53:06 timj Exp $
+$Id: 2MASS.pm,v 1.2 2003/08/03 06:18:35 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -97,43 +97,26 @@ sub _get_allowed_options {
 	 );
 }
 
-=item B<_get_supported_init>
 
-The init methods supported by this class are the same as the base class
-with the addition of the "multi" option.
+=item B<_get_default_options>
 
-=cut
-
-sub _get_supported_init {
-  my $self = shift;
-  return (qw/ ra dec radius number/);
-}
-
-=item B<_set_default_options>
-
-Set the default query state.
+Get the default query state.
 
 =cut
 
-sub _set_default_options {
-  my $self = shift;
+sub _get_default_options {
+  return (
+	  # Internal
+	  catalogue => '2MASS',
 
-  my %defaults = (
-                  # Internal
-                  catalogue => '2MASS',
+	  # Target information
+	  ra => undef,
+	  dec => undef,
 
-		  # Target information
-		  ra => undef,
-		  dec => undef,
-
-		  # Limits
-		  radmax => 5,
-		  nout => 20000,
-                  
-		 );
-
-  $self->_set_query_options( %defaults );
-  return;
+	  # Limits
+	  radmax => 5,
+	  nout => 20000,
+	 );
 }
 
 =item B<_parse_query>

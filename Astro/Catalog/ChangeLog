@@ -1,3 +1,20 @@
+2003-08-02  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Transport/*.pm: Reorganized as part of SkyCat work 
+
+	* Query/Query/*.pm: All Query classes reorganised to make SkyCat
+	easier. 
+
+	* Query/Query.pm: Much reorganization to support SkyCat class. 
+
+	* Query/Query/SkyCat.pm: Now forms a query and parses the results
+	for an abritrary SkyCat-enabled server. Still not ready for prime
+	time.
+
+	* t/4_*.t: All query tests now use helper.pl
+	
+	* t/helper.pl: Reusable test components now in separate file 
+
 2003-08-01  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Transport/REST.pm (useragent): Instantiate useragent on demand

@@ -21,6 +21,7 @@ in the C<Astro::Catalog> distribution (eg C<Astro::Catalog::Query::GSC>).
 use 5.006;
 use strict;
 use warnings;
+use warnings::register;
 use base qw/ Astro::Catalog::Query /;
 use vars qw/ $VERSION /;
 
@@ -33,11 +34,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: REST.pm,v 1.4 2003/08/02 10:44:12 timj Exp $
+$Id: REST.pm,v 1.5 2003/08/03 06:18:35 timj Exp $
 
 =head1 METHODS
 
@@ -437,21 +438,13 @@ sub _build_query {
 
   # loop round all the options keys and build the query
   my %allow = $self->_get_allowed_options;
-  foreach my $key ( keys %allow ) {
-    # Need to translate them...
-    my $cvtmethod = "_from_" . $key;
-    my ($outkey, $outvalue);
-    if ($self->can($cvtmethod)) {
-      ($outkey, $outvalue) = $self->$cvtmethod();
-    } else {
-      # Currently assume everything is one to one
-      warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping");
-      $outkey = $key;
-      $outvalue = $self->query_options($key);
-    }
 
-    $options .= "&$outkey=". $outvalue
-      if defined $outvalue;
+  # Translate options
+  my %translated = $self->_translate_options();
+
+  foreach my $key ( keys %translated) {
+    $options .= "&$key=". $translated{$key}
+      if defined $translated{$key};
   }
 
   # build final query URL

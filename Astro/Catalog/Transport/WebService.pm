@@ -32,11 +32,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: WebService.pm,v 1.3 2003/07/30 00:23:39 aa Exp $
+$Id: WebService.pm,v 1.4 2003/08/03 06:18:35 timj Exp $
 
 =head1 METHODS
 
@@ -258,39 +258,6 @@ sub _is_service {
   croak "decision must be made by subclass\n";
 }
 
-=item B<_translate_options>
-
-Translates the options from the default interface into the internal
-options for the sub-class
-
-  %options = _translate_options( );
-  
-=cut
-
-sub _translate_options {
-  my $self = shift;
-    
-  my %outhash;  
-  my %allow = $self->_get_allowed_options();
-  
-  foreach my $key ( keys %allow ) {
-    # Need to translate them...
-    my $cvtmethod = "_from_" . $key;
-    my ($outkey, $outvalue);
-    if ($self->can($cvtmethod)) {
-      ($outkey, $outvalue) = $self->$cvtmethod();
-    } else {
-      # Currently assume everything is one to one
-      warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping");
-      $outkey = $key;
-      $outvalue = $self->query_options($key);
-    }
-     
-    $outhash{$outkey} = $outvalue;
-  } 
-  
-  return %outhash;
-}   
 
 =head1 COPYRIGHT
 

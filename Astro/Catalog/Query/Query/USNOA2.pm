@@ -46,11 +46,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: USNOA2.pm,v 1.2 2003/07/30 00:23:39 aa Exp $
+$Id: USNOA2.pm,v 1.3 2003/08/03 06:18:35 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -99,38 +99,26 @@ sub _get_allowed_options {
 	 );
 }
 
-=item B<_get_supported_init>
 
-Uses base class options.
+=item B<_get_default_options>
 
-=cut
-
-# bas class
-
-=item B<_set_default_options>
-
-Set the default query state.
+Get the default query state.
 
 =cut
 
-sub _set_default_options {
-  my $self = shift;
+sub _get_default_options {
+  return (
+	  ra => undef,
+	  dec => undef,
+	  object => undef,
 
-  my %defaults = (
-		  ra => undef,
-		  dec => undef,
-		  object => undef,
-
-		  radmax => 5,
-		  magbright => 0,
-		  magfaint => 100,
-		  format => 1,
-		  sort => 'ra',
-		  nout => 2000,
-		 );
-
-  $self->_set_query_options( %defaults );
-  return;
+	  radmax => 5,
+	  magbright => 0,
+	  magfaint => 100,
+	  format => 1,
+	  sort => 'RA',
+	  nout => 2000,
+	 );
 }
 
 =item B<_parse_query>

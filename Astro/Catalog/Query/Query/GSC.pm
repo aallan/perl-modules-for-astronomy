@@ -47,11 +47,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: GSC.pm,v 1.1 2003/07/29 20:33:25 aa Exp $
+$Id: GSC.pm,v 1.2 2003/08/03 06:18:35 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -104,51 +104,33 @@ sub _get_allowed_options {
 	 );
 }
 
-=item B<_get_supported_init>
+=item B<_get_default_options>
 
-The init methods supported by this class are the same as the base class
-with the addition of the "multi" option.
-
-=cut
-
-sub _get_supported_init {
-  my $self = shift;
-  my @list = $self->SUPER::_get_supported_init();
-  return (@list, "Multi");
-}
-
-=item B<_set_default_options>
-
-Set the default query state.
+Get the default query state.
 
 =cut
 
-sub _set_default_options {
-  my $self = shift;
+sub _get_default_options {
+  return  (
+	   # Hidden
+	   catalogue => 'gsc',
+	   epoch => '2000.0',
+	   chart => 1,
 
-  my %defaults = (
-		  # Hidden
-		  catalogue => 'gsc',
-		  epoch => '2000.0',
-		  chart => 1,
+	   # Target information
+	   ra => undef,
+	   dec => undef,
+	   object => undef,
 
-		  # Target information
-		  ra => undef,
-		  dec => undef,
-		  object => undef,
-
-		  # Limits
-		  radmax => 5,
-		  magbright => 0,
-		  magfaint => 100,
-		  format => 1,
-		  sort => 'ra',
-		  nout => 20000,
-		  multi => 'yes',
-		 );
-
-  $self->_set_query_options( %defaults );
-  return;
+	   # Limits
+	   radmax => 5,
+	   magbright => 0,
+	   magfaint => 100,
+	   format => 1,
+	   sort => 'RA',
+	   nout => 20000,
+	   multi => 1,
+	  );
 }
 
 =item B<_parse_query>
@@ -314,6 +296,25 @@ The base class only includes one to one mappings.
 
 =cut
 
+sub _from_multi {
+  my $self = shift;
+  my $key = "multi";
+  my $value = $self->query_options($key);
+
+  # convert boolean to "yes" or "no"
+  if (!$value || $value =~ /^no%/i) {
+    # boolean false is always false
+    # as is "no"
+    $value = 'no';
+  } else {
+    # must be true
+    $value = 'yes';
+  }
+
+  my %allow = $self->_get_allowed_options();
+  return ($allow{$key}, $value);
+}
+
 
 sub _from_chart {
   my $self = shift;
@@ -326,14 +327,6 @@ sub _from_chart {
 sub _from_epoch {
   my $self = shift;
   my $key = "epoch";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
-
-sub _from_multi {
-  my $self = shift;
-  my $key = "multi";
   my $value = $self->query_options($key);
   my %allow = $self->_get_allowed_options();
   return ($allow{$key}, $value);
