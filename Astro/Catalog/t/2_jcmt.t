@@ -6,7 +6,9 @@
 # Author: Tim Jenness (tjenness@cpan.org)
 # Copyright (C) 2003 Particle Physics and Astronomy Research Council
 
-use Test::More tests => 14;
+use strict;
+use warnings;
+use Test::More tests => 13;
 use Astro::SLA;
 
 require_ok( 'Astro::SLA' );
@@ -28,7 +30,7 @@ isa_ok( $cat->allstars->[0]->coords, "Astro::Coords");
 # The remaining tests actually test the catalog filtering
 # search by substring
 my @results = $cat->filter_by_id("3C");
-is( scalar(@results), 6, "search by ID");
+is( scalar(@results), 6, "search by ID - \"3C\"");
 
 for (@results) {
   print "# Name: " . $_->id . "\n";
@@ -64,7 +66,7 @@ ok( -e "catalog$$.dat", "Check catalog file was created");
 unlink "catalog$$.dat";
 
 # Test object constructor fails (should be in Astro::Catalog tests)
-eval { $cat2 = new Astro::Catalog( Format => 'JCMT', Data => { } ); };
+eval { my $cat2 = new Astro::Catalog( Format => 'JCMT', Data => { } ); };
 ok( $@, "Explicit object constructor failure - hash ref");
 
 __DATA__
