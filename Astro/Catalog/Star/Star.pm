@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.6 2002/03/29 17:40:17 aa Exp $
+#     $Id: Star.pm,v 1.7 2003/07/24 02:50:12 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -65,15 +65,22 @@ properties.
 
 use strict;
 use vars qw/ $VERSION /;
+use Carp;
+use Astro::Coords;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+# Radians to arcseconds
+# Copied from Astro::SLA just in case Astro::Coords ever loses Astro::SLA
+# dependency. I am not really happy about this - TJ
+use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
+
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.6 2002/03/29 17:40:17 aa Exp $
+$Id: Star.pm,v 1.7 2003/07/24 02:50:12 timj Exp $
 
 =head1 METHODS
 
@@ -87,8 +94,7 @@ Create a new instance from a hash of options
 
 
   $star = new Astro::Catalog::Star( ID         => $id, 
-                                    RA         => $ra,
-                                    Dec        => $dec,
+                                    Coords     => new Astro::Coords(),
                                     Magnitudes => \%magnitudes,
                                     MagErr     => \%mag_errors,
                                     Colours    => \%colours,
@@ -103,6 +109,9 @@ Create a new instance from a hash of options
 
 returns a reference to an Astro::Catalog::Star object.
 
+The coordinates can also be specified as individual RA and Dec values
+(sexagesimal format) if they are known to be J2000.
+
 =cut
 
 sub new {
@@ -111,17 +120,16 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { ID         => undef,
-                      RA         => undef,
-                      DEC        => undef, 
-                      MAGNITUDES => {}, 
+                      MAGNITUDES => {},
                       MAGERR     => {},
                       COLOURS    => {},
-                      COLERR     => {}, 
+                      COLERR     => {},
                       QUALITY    => undef,
-                      FIELD      => undef, 
-                      GSC        => undef, 
-                      DISTANCE   => undef, 
+                      FIELD      => undef,
+                      GSC        => undef,
+                      DISTANCE   => undef,
                       POSANGLE   => undef,
+		      COORDS     => undef,
                       X          => undef,
                       Y          => undef }, $class;
 
@@ -157,46 +165,186 @@ sub id {
   return $self->{ID};
 }
 
+=item B<coords>
 
+Return or set the coordinates of the star as an C<Astro::Coords>
+object.
 
-=item B<RA>
+  $c = $star->coords();
+  $star->coords( $c );
 
-Return (or set) the current object R.A. 
+The object returned by this method is the actual object stored
+inside this Star object and not a clone. If the coordinates
+are changed through this object the coordinate of the star is
+also changed.
+
+Currently, if you modify the RA or Dec through the ra() 
+or dec() methods of Star, the internal object associated with
+the Star will change.
+
+Returns undef if the coordinates have never been specified.
+
+=cut
+
+sub coords {
+  my $self = shift;
+  if (@_) {
+    my $c = shift;
+    croak "Coordinates must be an Astro::Coords object"
+      unless UNIVERSAL::isa($c, "Astro::Coords");
+    $self->{COORDS} = $c;
+  }
+  return $self->{COORDS};
+}
+
+=item B<ra>
+
+Return (or set) the current object R.A. (J2000).
 
    $ra = $star->ra();
+
+If the Star is associated with a moving object such as a planet,
+comet or asteroid this method will return the J2000 RA associated
+with the time and observer position associated with the coordinate
+object itself (by default current time, longitude of 0 degrees).
+Returns undef if no coordinate has been associated with this star.
+
    $star->ra( $ra );
+
+The RA can be changed using this method but only if the coordinate
+object is associated with a fixed position. Attempting to change the
+J2000 RA of a moving object will fail. If an attempt is made to
+change the RA when no coordinate is associated with this object then
+a new Astro::Coords object will be created (with a
+Dec of 0.0).
+
+RA accepted by this method must be in sexagesimal format, space or
+colon-separated. Returns a space-separated sexagesimal number.
+
 
 =cut
 
 sub ra {
   my $self = shift;
   if (@_) {
-    $self->{RA} = shift;
+    my $ra = shift;
+
+    # Get the coordinate object
+    my $c = $self->coords;
+    if (defined $c) {
+      # Need to tweak RA?
+      croak "Can only adjust RA with Astro::Coords::Equatorial coordinates"
+	unless $c->isa("Astro::Coords::Equatorial");
+
+      # For now need to kluge since Astro::Coords does not allow
+      # you to change the position (it is an immutable object)
+      $c = $c->new( type => 'J2000',
+		    dec => $c->dec(format => 's'),
+		    ra => $ra,
+		  );
+
+    } else {
+      $c = new Astro::Coords( type => 'J2000',
+			      ra => $ra,
+			      dec => '0',
+			    );
+    }
+
+    # Update the object
+    $self->coords($c);
+
+    print $c->status;
   }
-  return $self->{RA};
+
+  my $outc = $self->coords;
+  return unless defined $outc;
+
+  # Astro::Coords inserts colons by default
+  my $outra = $outc->ra(format => 's');
+
+  # Tidy for backwards compatibility
+  $outra =~ s/:/ /g;
+  $outra =~ s/^\s*//;
+
+  return $outra;
 }
 
-=item B<Dec>
+=item B<dec>
 
-Return (or set) the current target Declination defined for the DSS query
+Return (or set) the current object Dec (J2000).
 
-   $dec = $dss->dec();
-   $dss->dec( $dec );
+   $dec = $star->dec();
 
-where $dec should be a string of the form "+-HH MM SS.SS", e.g. +43 35 09.5
-or -40 25 67.89
+If the Star is associated with a moving object such as a planet,
+comet or asteroid this method will return the J2000 Dec associated
+with the time and observer position associated with the coordinate
+object itself (by default current time, longitude of 0 degrees).
+Returns undef if no coordinate has been associated with this star.
+
+   $star->dec( $dec );
+
+The Dec can be changed using this method but only if the coordinate
+object is associated with a fixed position. Attempting to change the
+J2000 Dec of a moving object will fail. If an attempt is made to
+change the Dec when no coordinate is associated with this object then
+a new Astro::Coords object will be created (with a
+Dec of 0.0).
+
+Dec accepted by this method must be in sexagesimal format, space or
+colon-separated. Returns a space-separated sexagesimal number
+with a leading sign.
 
 =cut
 
-sub dec { 
+sub dec {
   my $self = shift;
   if (@_) {
-    $self->{DEC} = shift;
+    my $dec = shift;
+    print "Reading DEc: $dec\n";
+    use Data::Dumper;
+    print Dumper([caller]);
+
+    # Get the coordinate object
+    my $c = $self->coords;
+    if (defined $c) {
+      # Need to tweak RA?
+      croak "Can only adjust Dec with Astro::Coords::Equatorial coordinates"
+	unless $c->isa("Astro::Coords::Equatorial");
+
+      # For now need to kluge since Astro::Coords does not allow
+      # you to change the position (it is an immutable object)
+      $c = $c->new( type => 'J2000',
+		    ra => $c->ra(format => 's'),
+		    dec => $dec,
+		  );
+
+    } else {
+      $c = new Astro::Coords( type => 'J2000',
+			      dec => $dec,
+			      ra => 0,
+			    );
+    }
+
+    # Update the object
+    $self->coords($c);
   }
-  return $self->{DEC};
+
+  my $outc = $self->coords;
+  return unless defined $outc;
+
+  # Astro::Coords inserts colons by default
+  my $outdec = $outc->dec(format => 's');
+  $outdec =~ s/:/ /g;
+  $outdec =~ s/^\s*//;
+
+  # require leading sign for backwards compatibility
+  # Sign will be there for negative
+  $outdec = (substr($outdec,0,1) eq '-' ? '' : '+' ) . $outdec;
+
+  return $outdec;
 }
 
-=item B<Magnitudes>
+=item B<magnitudes>
 
 Set the UBVRIHK magnitudes of the object, takes a reference to a hash of 
 magnitude values
@@ -209,7 +357,7 @@ magnitude values, magnitudes for filters already existing will be over-written.
 
 =cut
 
-sub magnitudes { 
+sub magnitudes {
   my $self = shift;
   if (@_) {
     my $mags = shift;
@@ -217,7 +365,7 @@ sub magnitudes {
   }
 }
 
-=item B<MagErr>
+=item B<magerr>
 
 Set the error in UBVRIHK magnitudes of the object, takes a reference to a
 hash of error values
@@ -230,7 +378,7 @@ errors for filters already existing will be over-written.
 
 =cut
 
-sub magerr { 
+sub magerr {
   my $self = shift;
   if (@_) {
     my $magerr = shift;
@@ -251,7 +399,7 @@ be over-written.
 
 =cut
 
-sub colours { 
+sub colours {
   my $self = shift;
   if (@_) {
     my $cols = shift;
@@ -273,7 +421,7 @@ be over-written.
 
 =cut
 
-sub colerr { 
+sub colerr {
   my $self = shift;
   if (@_) {
     my $col_err = shift;
@@ -296,18 +444,18 @@ have defined magnitudes in the object.
 
 sub what_filters {
   my $self = shift;
-  
+
   # define output array
   my @mags;
-  
+
   foreach my $key (sort keys %{$self->{MAGNITUDES}}) {
       # push the filters onto the output array
       push ( @mags, $key );
   }
-  
+
   # return array of filters or number if called in scalar context
   return wantarray ? @mags : scalar( @mags );
-}    
+}
 
 =item B<what_colours>
 
@@ -323,19 +471,19 @@ have defined values in the object.
 
 sub what_colours {
   my $self = shift;
-  
+
   # define output array
   my @cols;
-  
+
   foreach my $key (sort keys %{$self->{COLOURS}}) {
       # push the colours onto the output array
       push ( @cols, $key );
   }
-  
+
   # return array of colours or number if called in scalar context
   return wantarray ? @cols : scalar( @cols );
-}  
-  
+}
+
 =item B<get_magnitude>
 
 Returns the magnitude for the supplied filter if available
@@ -346,23 +494,23 @@ Returns the magnitude for the supplied filter if available
 
 sub get_magnitude {
   my $self = shift;
-  
+
   my $magnitude;
-  if (@_) {  
-  
+  if (@_) {
+
      # grab passed filter
      my $filter = shift;
      foreach my $key (sort keys %{$self->{MAGNITUDES}}) {
-         
+
          # grab magnitude for filter
          if( $key eq $filter ) {
             $magnitude = ${$self->{MAGNITUDES}}{$key};
-         }   
+         }
      }
   }
   return $magnitude;
-}  
-    
+}
+
 =item B<get_errors>
 
 Returns the error in the magnitude value for the supplied filter if available
@@ -373,22 +521,22 @@ Returns the error in the magnitude value for the supplied filter if available
 
 sub get_errors {
   my $self = shift;
-  
+
   my $mag_error;
-  if (@_) {  
-  
+  if (@_) {
+
      # grab passed filter
      my $filter = shift;
      foreach my $key (sort keys %{$self->{MAGERR}}) {
-         
+
          # grab magnitude for filter
          if( $key eq $filter ) {
             $mag_error = ${$self->{MAGERR}}{$key};
-         }   
+         }
      }
   }
   return $mag_error;
-}  
+}
 
 =item B<get_colour>
 
@@ -400,22 +548,22 @@ Returns the value of the supplied colour if available
 
 sub get_colour {
   my $self = shift;
-  
+
   my $value;
-  if (@_) {  
-  
+  if (@_) {
+
      # grab passed colour
      my $colour = shift;
      foreach my $key (sort keys %{$self->{COLOURS}}) {
-         
+
          # grab magnitude for colour
          if( $key eq $colour ) {
             $value = ${$self->{COLOURS}}{$key};
-         }   
+         }
      }
   }
   return $value;
-}  
+}
 
 =item B<get_colourerror>
 
@@ -427,23 +575,23 @@ Returns the error in the colour value for the supplied colour if available
 
 sub get_colourerr {
   my $self = shift;
-  
+
   my $col_error;
-  if (@_) {  
-  
+  if (@_) {
+
      # grab passed colour
      my $colour = shift;
      foreach my $key (sort keys %{$self->{COLERR}}) {
-         
+
          # grab values for the colour
          if( $key eq $colour ) {
             $col_error = ${$self->{COLERR}}{$key};
-         }   
+         }
      }
   }
   return $col_error;
-}  
-   
+}
+
 =item B<quality>
 
 Return (or set) the quality flag of the star
@@ -451,8 +599,18 @@ Return (or set) the quality flag of the star
    $quality = $star->quailty();
    $star->quality( 0 );
 
-for example for the USNO-A2 catalogue, 0 denotes good quality, and 1 denotes
-a possible problem object. In the generic case any flag value, including a boolean, could be used.
+for example for the USNO-A2 catalogue, 0 denotes good quality, and 1
+denotes a possible problem object. In the generic case any flag value,
+including a boolean, could be used.
+
+These quality flags are standardised sybolically across catalogues and
+have the following definitions:
+
+  STARGOOD
+  STARBAD
+
+TBD. Need to provide quality constants and mapping to and from these
+constants on catalog I/O.
 
 =cut
 
@@ -462,7 +620,7 @@ sub quality {
     $self->{QUALITY} = shift;
   }
   return $self->{QUALITY};
-}  
+}
 
 =item B<field>
 
@@ -492,6 +650,7 @@ the flag is TRUE if the object is known to be in the Guide Star Catalogue,
 and FALSE otherwise.
 
 =cut
+
 sub gsc {
   my $self = shift;
   if (@_) {
@@ -510,6 +669,7 @@ Return (or set) the distance from the field centre
 e.g. for the USNO-A2 catalogue.
 
 =cut
+
 sub distance {
   my $self = shift;
   if (@_) {
@@ -528,6 +688,7 @@ Return (or set) the position angle from the field centre
 e.g. for the USNO-A2 catalogue.
 
 =cut
+
 sub posangle {
   my $self = shift;
   if (@_) {
@@ -585,11 +746,15 @@ Configures the object from multiple pieces of information.
   $star->configure( %options );
 
 Takes a hash as argument with the list of keywords.
+The keys are not case-sensitive.
 
 =cut
 
 sub configure {
   my $self = shift;
+
+  use Data::Dumper;
+  print Dumper(\@_);
 
   # return unless we have arguments
   return undef unless @_;
@@ -597,14 +762,64 @@ sub configure {
   # grab the argument list
   my %args = @_;
 
-  # Loop over the allowed keys storing the values
-  # in the object if they exist
-  for my $key (qw / ID RA Dec Magnitudes MagErr Colours ColErr
-                    Quality Field GSC Distance PosAngle X Y /) {
-      my $method = lc($key);
-      $self->$method( $args{$key} ) if exists $args{$key};
+  # First check for duplicate keys (case insensitive) with different
+  # values and store the unique lower-cased keys
+  my %check;
+  for my $key (keys %args) {
+    my $lckey = lc($key);
+    if (exists $check{$lckey} && $check{$lckey} ne $args{$key}) {
+      carp "Duplicated key in constructor [$lckey] with differing values ".
+	" '$check{$lckey}' and '$args{$key}'\n";
+    }
+    $check{$lckey} = $args{$key};
   }
 
+  # Now that we have lower cased keys we can look to see if we have
+  # ra & dec as well as coords and also verify that they are actually
+  # the same if we have them
+  if (exists $check{coords} && (exists $check{ra} || exists $check{dec})) {
+    # coords + one of ra or dec is a mistake
+    if (exists $check{ra} && exists $check{dec}) {
+      # Create a new coords object - assume J2000
+      my $c = new Astro::Coords( type => 'J2000',
+				 ra => $check{ra},
+				 dec => $check{dec},
+#				 units => 'sex',
+			       );
+
+      # Make sure we have the same reference place and time
+      $c->datetime( $check{coords}->datetime ) 
+	if $check{coords}->has_datetime;
+      $c->telescope( $check{coords}->telescope ) 
+	if defined $check{coords}->telescope;
+
+
+      # Check the distance
+      my $d = $c->distance( $check{coords} );
+
+      # Raise warn if the error is more than 1 arcsecond
+      my $arcsec = $d * DR2AS;
+      carp "Coords and RA/Dec were specified and they differ by more than 1 arcsec [$arcsec sec]. Ignoring RA/Dec keys.\n"
+	if $arcsec > 1;
+
+    } elsif (!exists $check{ra}) {
+      carp "Dec specified in addition to Coords but without RA. Ignoring it.";
+    } elsif (!exists $check{dec}) {
+      carp "RA specified in addition to Coords but without Dec. Ignoring it.";
+    }
+
+    # Whatever happens we do not want ra and dec here
+    delete $check{dec};
+    delete $check{ra};
+  }
+
+  # Loop over the allowed keys storing the values
+  # in the object if they exist. Case insensitive.
+  for my $key (keys %check) {
+    my $method = lc($key);
+    $self->$method( $check{$key} ) if $self->can( $method );
+  }
+  return;
 }
 
 =item B<freeze>
@@ -626,6 +841,8 @@ sub freeze {
 =head1 COPYRIGHT
 
 Copyright (C) 2001 University of Exeter. All Rights Reserved.
+Some modification are Copyright (C) 2003 Particle Physics and
+Astronomy Research Council. All Rights Reserved.
 
 This program was written as part of the eSTAR project and is free software;
 you can redistribute it and/or modify it under the terms of the GNU Public
@@ -635,9 +852,11 @@ License.
 =head1 AUTHORS
 
 Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
+Tim Jenness E<lt>tjenness@cpan.orgE<gt>,
 
 =cut
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;      
+1;
+
