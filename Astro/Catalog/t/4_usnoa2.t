@@ -4,7 +4,7 @@
 use strict;
 
 #load test
-use Test::More tests => 38;
+use Test::More tests => 306;
 
 use Data::Dumper;
 
@@ -139,7 +139,7 @@ $catalog_data->fieldcentre( RA => '01 10 12.9', Dec => '+60 04 35.9', Radius => 
 
 my $usno_byname = new Astro::Catalog::Query::USNOA2( Target => 'HT Cas',
                                                      Radius => '1' );
-                                                     
+
 print "# Connecting to ESO/ST-ECF USNO-A2 Catalogue\n";
 my $catalog_byname = $usno_byname->querydb();
 print "# Continuing tests\n";
@@ -150,28 +150,37 @@ print "# Continuing tests\n";
 print "# DAT has " . $catalog_data->sizeof() . " stars\n";
 print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
-is( $catalog_data->sizeof(), $catalog_byname->sizeof(), "compare star count" );
-
-# grab the 1st star in both catalogues
-# ------------------------------------
-my $star_dat = $catalog_data->starbyindex( 0 );
-my $star_net = $catalog_byname->starbyindex( 0 );
-
-compare_star( $star_dat, $star_net );
-
-# grab the last star in both catalogues
-# ------------------------------------
-$star_dat = $catalog_data->starbyindex( $catalog_data->sizeof() - 1 );
-$star_net = $catalog_byname->starbyindex( $catalog_byname->sizeof() - 1 );
-
-compare_star( $star_dat, $star_net );
+# Now compare the stars in the catalogues in order
+#-------------------------------------------------
+compare_catalog( $catalog_data, $catalog_byname);
 
 exit;
 
+# for now, just compares stars within a catalog
+sub compare_catalog {
+  my ($refcat, $cmpcat) = @_;
+
+  isa_ok( $refcat, "Astro::Catalog", "Check ref catalog type" );
+  isa_ok( $cmpcat, "Astro::Catalog", "Check cmp catalog type" );
+
+  # Star count
+  is( $refcat->sizeof(), $cmpcat->sizeof(), "compare star count" );
+
+  for my $i (0.. ($refcat->sizeof()-1)) {
+    compare_star( $refcat->starbyindex($i), $cmpcat->starbyindex($i));
+  }
+}
+
+# Just compare two stars and report tests for component values
 sub compare_star {
   my ($refstar, $newstar) = @_;
 
+  isa_ok( $refstar, "Astro::Catalog::Star", "Check ref star type");
+  isa_ok( $newstar, "Astro::Catalog::Star", "Check cmp star type");
+
   is( $refstar->id(), $newstar->id(), "compare star ID" );
+
+  ok( $refstar->coords->distance( $newstar->coords ) < 0.001, "compare distance between stars" );
   is( $refstar->ra(), $newstar->ra(), "compare star RA" );
   is( $refstar->dec(), $newstar->dec(), "Compare star Dec" );
 
