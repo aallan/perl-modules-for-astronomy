@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.14 2003/06/10 23:29:12 aa Exp $
+#     $Id: Parse.pm,v 1.15 2003/06/10 23:35:09 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.14 2003/06/10 23:29:12 aa Exp $
+$Id: Parse.pm,v 1.15 2003/06/10 23:35:09 aa Exp $
 
 =head1 METHODS
 
@@ -318,6 +318,17 @@ sub snr {
   return ${${${$self->{OBSERVATION}}{Schedule}}{Exposure}}{tag_value};
 }
 
+=item B<flux>
+
+Return the Flux defining the signal-to-noise ratio required
+
+  $flux = $rtml->flux();
+
+=cut
+sub dec {
+  my $self = shift;
+  return ${${${$self->{OBSERVATION}}{Target}}{Coordinates}}{Flux};
+}
 
 
 # C O N F I G U R E ----------------------------------------------------------
