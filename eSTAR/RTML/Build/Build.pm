@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.9 2003/06/27 13:56:02 aa Exp $
+#     $Id: Build.pm,v 1.10 2003/06/27 16:57:27 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -57,6 +57,7 @@ constructed, these being score and observation request documents.
 use strict;
 use vars qw/ $VERSION /;
 
+use Socket;
 use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
@@ -64,13 +65,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.9 2003/06/27 13:56:02 aa Exp $
+$Id: Build.pm,v 1.10 2003/06/27 16:57:27 aa Exp $
 
 =head1 METHODS
 
@@ -159,13 +160,9 @@ sub score_observation {
   # IntelligentAgent Tag
   # --------------------
   
-  # grab the fully resolved hostname
-  my $hostname = ${$self->{OPTIONS}}{HOST} . "." . 
-                 ${$self->{OPTIONS}}{DOMAIN};
-  
   # identify the IA               
   $self->{WRITER}->startTag( 'IntelligentAgent', 
-                             'host' => $hostname,
+                             'host' => ${$self->{OPTIONS}}{HOST},
                              'port' =>  ${$self->{OPTIONS}}{PORT} ); 
   
   # unique IA identity sting
@@ -310,13 +307,9 @@ sub request_observation {
   # IntelligentAgent Tag
   # --------------------
   
-  # grab the fully resolved hostname
-  my $hostname = ${$self->{OPTIONS}}{HOST} . "." . 
-                 ${$self->{OPTIONS}}{DOMAIN};
-  
   # identify the IA               
   $self->{WRITER}->startTag( 'IntelligentAgent', 
-                             'host' => $hostname,
+                             'host' =>  ${$self->{OPTIONS}}{HOST},
                              'port' =>  ${$self->{OPTIONS}}{PORT} ); 
   
   # unique IA identity sting
@@ -452,12 +445,12 @@ sub dump_rtml {
 =item B<port>
 
 Sets (or returns) the port which the Discovey Node should send RTML 
-messages to
+messages to (ie the port on which the IA is listening).
 
-   $message->port( '2000' );
+   $message->port( '8080' );
    $port = $message->port();
 
-defautls to 2220.
+defautls to 8000.
 
 =cut
 
@@ -470,6 +463,28 @@ sub port {
 
   # return the current port
   return ${$self->{OPTIONS}}{PORT};
+} 
+  
+=item B<host>
+
+Sets (or returns) the machine on which the IA is running
+
+   $message->host( $hostname );
+   $host = $message->host();
+
+defaults to the current machine's IP address
+
+=cut
+
+sub host {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{HOST} = shift;
+  }
+
+  # return the current port
+  return ${$self->{OPTIONS}}{HOST};
 }   
 
 =item B<id>
@@ -815,9 +830,9 @@ sub configure {
   
   # use the RTML Namespace as defined by the v2.1 DTD
   ${$self->{OPTIONS}}{DTD} = "http://www.astro.livjm.ac.uk/HaGS/rtml2.1.dtd"; 
-  ${$self->{OPTIONS}}{HOST} = hostname();
-  ${$self->{OPTIONS}}{DOMAIN} = hostdomain(); 
-  ${$self->{OPTIONS}}{PORT} = '2220';
+  
+  ${$self->{OPTIONS}}{HOST} = hostname() . "." . hostdomain(); 
+  ${$self->{OPTIONS}}{PORT} = '8000';
   
   ${$self->{OPTIONS}}{EQUINOX} = 'J2000';
   
@@ -832,7 +847,7 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Port ID User Name Institution Email / ) {
+  for my $key (qw / Port ID User Name Institution Email Host / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }

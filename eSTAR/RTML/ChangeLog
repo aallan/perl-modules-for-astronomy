@@ -3,6 +3,10 @@
          * Build.pm: Fixed the request_observation() routine to handle SNR
            and Flux correctly.
            
+         * Build.pm: Fixed so that it actually takes acount of the host
+           parameter passed when the object is created. It was ignoring it
+           and setting the IA host to $host = hostname() . "." . hostdomain();
+           
 2003-06-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Parse.pm: Fixed ra() and dec() which were incorrectly looking
