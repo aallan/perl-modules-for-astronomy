@@ -4,9 +4,24 @@ Astro::SIMBAD modules
 What is it?
 -----------
 
+The Astro::SIMBAD module is an objected orientated Perl interface to the
+SIMBAD astronomical database. SIMBAD provides basic data, cross-identifications
+and bibliography for astronomical objects outside the solar system.
+
+Currently the module is in the inital stages of development, and I'm following
+the release early, release often paradigm. SIMBAD can currently be queried by
+co-ordinates and by identifier, alrhough not yet by bibcode. Only minimal
+information is mined, although URLs pointing to further, and more detailed,
+information are stored along with this data.
+
+More functionality should arrive soon.
 
 Why do it?
 ----------
+
+Due to the requirements of the eSTAR project for which this module was
+written I needed a modern object-orientated interface I could use for
+data mining SIMBAD. This module was the result.
 
 Requirements
 ------------
@@ -15,11 +30,23 @@ The module requires the libwww-perl-5.60 package written by Gisle Aas
 <gisle@ActiveState.com> v5.53 or above. This package can be obtained
 via CPAN at http://search.cpan.org/search?dist=libwww-perl
 
+Also required is the Net::Domain module, v2.13 or above, by Graham
+Barr <gbarr@pobox.com>. This module has been included in the base
+distribution since Perl 5.7.2, but otherwise can be downloaded from
+CPAN as part of the libnet package, see
+http://search.cpan.org/search?dist=libnet
+
 Provides
 --------
 
+The package provides the following classes
+
+    Astro::SIMBAD::Query
+    Astro::SIMBAD::Result
+    Astro::SIMBAD::Result::Object
+    
 Where can I get it?
--------------------------
+-------------------
 
 The package is availabe from CPAN <http://www.cpan.org/> and from
 http://www.astro.ex.ac.uk/people/aa/pages/computing/estar.html
