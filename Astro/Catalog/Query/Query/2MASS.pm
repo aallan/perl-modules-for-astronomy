@@ -15,7 +15,7 @@ Astro::Catalog::Query::2MASS - A query request to the 2MASS Catalog
 
 =head1 WARNING
 
-This code should be generated automatically from the skycat.cfg file.
+This code should be superceeded by the generic Vizier query class.
 
 =head1 DESCRIPTION
 
@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: 2MASS.pm,v 1.4 2003/08/04 09:45:18 timj Exp $
+$Id: 2MASS.pm,v 1.5 2003/08/04 10:10:37 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
