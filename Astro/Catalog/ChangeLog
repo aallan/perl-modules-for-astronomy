@@ -1,3 +1,9 @@
+2004-02-25  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* Catalog.pm: added fielddate method.
+
+	* Star/Star.pm: added insertdate method.
+	
 2004-02-23  Tim Jenness  <tjenness@cpan.org>
 
 	* IO/GaiaPick.pm: Add GaiaPick log file support
