@@ -5,6 +5,8 @@
           class. While future web and GRID service classes will inherit from
           related classes. All the Astro::Catalog::Transport classes inherit
           from Tim's BaseQuery class.
+          
+        * Moved REST specific setup from BaseQuery to Transport::REST class  
 
         * t/*.t: Test scripts modified to work within new framework.
         
