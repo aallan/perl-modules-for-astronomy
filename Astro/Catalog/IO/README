@@ -28,3 +28,16 @@ Other catalogue formats that we are considering:
 
  Gaia/SkyCat Pick Object format
    The output from a "Pick Object" in GAIA
+
+ OASIS
+
+  Text format from oasis. See
+
+ http://irsa.ipac.caltech.edu/applications/Oasis/svc/index.html
+
+ http://irsa.ipac.caltech.edu/cgi-bin/Oasis/CatSearch/nph-catsearch?server=%40rmt_gravel&database=iras&catalog=iraspsc&sql=select+ra%2C+dec%2C+fnu_12+from+iraspsc&within=2+degrees&objstr=M31
+
+this is an MSX query. We need to know what the column names are in the actual MSX database
+table (!!):
+
+ http://irsa.ipac.caltech.edu/cgi-bin/Oasis/CatSearch/nph-catsearch?server=%40rmt_gravel&database=msx&catalog=msxtable&sql=select+ra%2C+dec+from+msxtable&within=2+degrees&objstr=M18
