@@ -1,3 +1,6 @@
+2004-11-23  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+	* Star/Morphology.pm: Add simple support for object morphology.
+
 2004-11-22  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
         * IO/SExtractor.pm: Add simple reader for output from SExtractor.
