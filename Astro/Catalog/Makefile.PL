@@ -11,7 +11,7 @@ WriteMakefile(
                'PREREQ_PM'      => { 'LWP'              => 5.53,
                                      'Net::Domain'      => 2.13,
                                      'Pod::Usage'       => 1.14,
-                                     'Astro::Coords'    => 0.05,
+                                     'Astro::Coords'    => 0.07,
                                      'File::Spec'       => 0.84,
                                      'Test::More'       => 0.47,
                                      'Astro::Telescope' => 0.50,
