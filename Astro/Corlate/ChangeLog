@@ -1,3 +1,7 @@
+2003-09-26  Tim Naylor <timn@astro.ex.ac.uk>
+
+        * Modified to work with LX200 and UKIRT (one parameter)
+        
 2003-08-27  Tim Naylor <timn@astro.ex.ac.uk>
         
         * Modified  fortran subroutines for 2MASS use
