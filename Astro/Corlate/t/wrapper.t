@@ -20,14 +20,14 @@ use Data::Dumper;
 ok(1);
 
 # define filenames
-my $file_name_1=File::Spec->catfile(File::Spec->curdir(),'t','archive.cat');
-my $file_name_2=File::Spec->catfile(File::Spec->curdir(),'t','new.cat');
-my $file_name_3=File::Spec->catfile(File::Spec->curdir(),'t','corlate.log');
-my $file_name_4=File::Spec->catfile(File::Spec->curdir(),'t','corlate.cat');
-my $file_name_5=File::Spec->catfile(File::Spec->curdir(),'t','colfit.cat');
-my $file_name_6=File::Spec->catfile(File::Spec->curdir(),'t','colfit.fit');
-my $file_name_7=File::Spec->catfile(File::Spec->curdir(),'t','hist.dat');
-my $file_name_8=File::Spec->catfile(File::Spec->curdir(),'t','info.dat');
+my $file_name_1 = File::Spec->catfile(File::Spec->curdir(),'t','archive.cat');
+my $file_name_2 = File::Spec->catfile(File::Spec->curdir(),'t','new.cat');
+my $file_name_3 = File::Spec->catfile(File::Spec->curdir(),'t','corlate.log');
+my $file_name_4 = File::Spec->catfile(File::Spec->curdir(),'t','corlate.cat');
+my $file_name_5 = File::Spec->catfile(File::Spec->curdir(),'t','colfit.cat');
+my $file_name_6 = File::Spec->catfile(File::Spec->curdir(),'t','colfit.fit');
+my $file_name_7 = File::Spec->catfile(File::Spec->curdir(),'t','hist.dat');
+my $file_name_8 = File::Spec->catfile(File::Spec->curdir(),'t','info.dat');
 
 my $status = corlate( $file_name_1, $file_name_2, $file_name_3,
                       $file_name_4, $file_name_5, $file_name_6, 

@@ -1,6 +1,11 @@
 2001-12-12  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Astro::Corlate::Wrapper code now works correctly. 
+        * Inital release version.
+        
+        * Corlate.pm: Added minimum necessary functionality
+        
+        * t/corlate.t: Checks info.dat file in $ESTAR_DATA to see if
+          the correct contents have been generated.
 
         * Wrapper/Makefile.PL: Changed to link using f95, undocumented
           feature in ExtUtils::F77
