@@ -3,6 +3,9 @@
         * Moved Astro::Catalog::BaseQuery to be Astro::Catalog::Query in
           preparation for it be a 'proprt' polymorphic factory class for
           generic catalogue queries.
+        
+        * Moved actualy query sub-classes down a directory level to allow
+          for the Query.pm file  
           
 2003-07-28  Alasdair Allan <aa@astro.ex.ac.uk>
 

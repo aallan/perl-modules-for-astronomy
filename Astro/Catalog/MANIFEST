@@ -11,10 +11,11 @@ IO/Cluster.pm
 IO/Simple.pm
 IO/Makefile.PL
 Query/Query.pm
-Query/USNOA2.pm
-Query/GSC.pm
-Query/SuperCOSMOS.pm
 Query/Makefile.PL
+Query/Query/USNOA2.pm
+Query/Query/GSC.pm
+Query/Query/SuperCOSMOS.pm
+Query/Query/Makefile.PL
 Transport/REST.pm
 Transport/Makefile.PL
 t/1_compile.t
