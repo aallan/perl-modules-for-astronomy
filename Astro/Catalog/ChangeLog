@@ -26,6 +26,9 @@
           object if it is passed a VOTable.
           
         * t/2_votable.t: Added test harness for reading VOTables.  
+
+        * Minor documenation cleanup in various files, no actual
+          functionality changes.
           
 2003-10-16  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.4.0)
 
@@ -133,23 +136,23 @@
 2003-08-03  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Query/Query/SIMBAD.pm: All the functionality of Astro::SIMBAD
-	integrated into Astro::Catalog... 
+  	  integrated into Astro::Catalog... 
 
 	* Star/Star.pm: Add startype, spectype, longstartype and moreinfo
-	needed by SIMBAD query.
+	  needed by SIMBAD query.
 
 2003-08-02  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Transport/*.pm: Reorganized as part of SkyCat work 
 
 	* Query/Query/*.pm: All Query classes reorganised to make SkyCat
-	easier. 
+	  easier. 
 
 	* Query/Query.pm: Much reorganization to support SkyCat class. 
 
 	* Query/Query/SkyCat.pm: Now forms a query and parses the results
-	for an abritrary SkyCat-enabled server. Still not ready for prime
-	time.
+	  for an abritrary SkyCat-enabled server. Still not ready for prime
+	  time.
 
 	* t/4_*.t: All query tests now use helper.pl
 	
@@ -158,8 +161,9 @@
 2003-08-01  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Transport/REST.pm (useragent): Instantiate useragent on demand
-	rather than via configure (useful for skycat interface). Separate
-	construction of URL from retrieval of URL to allow simpler subclassing.
+	  rather than via configure (useful for skycat interface). Separate
+	  construction of URL from retrieval of URL to allow simpler
+          subclassing.
 
 2003-07-30  Tim Jenness  <timj@jach.hawaii.edu>
 
@@ -213,7 +217,7 @@
 	* BaseQuery/BaseQuery.pm: Write base class for catalog query classes.
 
 	* Catalog.pm (_read_cluster): No longer use ra() and dec() methods
-	to set the ra and dec (store the Astro::Coords object directly)
+	  to set the ra and dec (store the Astro::Coords object directly)
 
 	* Star/Star.pm: ra($ra) and dec($dec) methods now deprecated.
 

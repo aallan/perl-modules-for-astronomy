@@ -65,19 +65,19 @@ for my $module (@modules) {
     #     print "ok # Skip $module (Astro::Aladin module not available)\n";
     #     exit;
     #   } else {
-         eval "use $module ();";
-         if( $@ ) {
-           warn "require failed with '$@'\n";
-	   $not = 'not ';
+    #     eval "use $module ();";
+    #     if( $@ ) {
+    #      warn "require failed with '$@'\n";
+    #      $not = 'not ';
     #     }
     #   }
-    } else {
+    #} else {
       eval "use $module ();";
       if( $@ ) {
         warn "require failed with '$@'\n";
 	$not = 'not ';
       }
-    }
+    #}
     # Combine $not with the single print since some OSes do
     # insert automatic new lines
     print $not ."ok - $module\n";

@@ -39,6 +39,7 @@ The madatory requirement of the Astro::Catalog package are,
   Carp
   VOTable
 
+
 See http://heasarc.gsfc.nasa.gov/classx/votable/index.html to obtain the GSFC
 VOTable package. You need a version dated on (or after) the 9th October 2003.
 
@@ -84,10 +85,13 @@ The package provides the following user level classes
     the functionaliy of the Astro::SIMBAD module.
      
   Astro::Catalog::Query::SkyCat
-    A class that generates SkyCat catalogue queries
+    A class that generates generic SkyCat catalogue queries, parsing of the
+    returned catalogue isn't always going to work. In some cases the URLs
+    of the resources may break the module's parsing code.
     
   Astro::Catalog::Query::Vizier  
-    A class that generates Vizier catalogue queries
+    A class that generates generic Vizier catalogue queries, parsing of the
+    returned catalogue isn't always going to work.
 
 Additional classes provided by the package handle things that you don't
 need to concern yourself with, unless you want to write your own I/O or
@@ -96,8 +100,8 @@ query plugins, these are
   Astro::Catalog::IO::Cluster
   Astro::Catalog::IO::JCMT
   Astro::Catalog::IO::Simple
-  Astro::Catalog::IO::TST      (read only)
-  Astro::Catalog::IO::VOTable  (write only)
+  Astro::Catalog::IO::TST   (read only)
+  Astro::Catalog::IO::VOTable 
   Astro::Catalog::Transport::REST
   Astro::Catalog::Transport::WebService
   Astro::Catalog::Query
@@ -108,11 +112,15 @@ class Astro::Catalog::Query. The Astro::Catalog::IO modules provide pluggable
 polymorphic input/output.
 
 It should be noted that Astro::Catalog::IO::TST does not currently provide
+<<<<<<< README
+a _write_catalog() function.
+=======
 a _write_catalog() function, and that Astro::Catalog::IO::VOTable does not
 provide a _read_catalog() function.
 
 While Astro::Catalog::IO::Cluster writes old style numeric quality flag Cluster
 files there is (limited) support for reading new style character quality flags.
+>>>>>>> 1.14
  
 Where can I get it?
 -------------------

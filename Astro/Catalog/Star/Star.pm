@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.17 2003/08/26 19:53:02 aa Exp $
+#     $Id: Star.pm,v 1.18 2004/02/12 18:15:44 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -34,24 +34,24 @@ Astro::Catalog::Star - A generic star object in a stellar catalogue.
 
 =head1 SYNOPSIS
 
-  $star = new Astro::Catalog::Star( ID         => $id, 
-                                    Coords     => new Astro::Coords(),
-                                    Magnitudes => \%magnitudes,
-                                    MagErr     => \%mag_errors,
-                                    Colours    => \%colours,
-                                    ColErr     => \%colour_errors,
-                                    Quality    => $quality_flag,
-                                    Field      => $field,
-                                    GSC        => $in_gsc,
-                                    Distance   => $distance_to_centre,
-                                    PosAngle   => $position_angle,
-                                    X          => $x_pixel_coord,
-                                    Y          => $y_pixel_coord,
-                                    Comment    => $comment_string
-				    SpecType   => $spectral_type,
-				    StarType   => $star_type,
-				    LongStarType=> $long_star_type,
-				    MoreInfo   => $url,
+  $star = new Astro::Catalog::Star( ID           => $id, 
+                                    Coords       => new Astro::Coords(),
+                                    Magnitudes   => \%magnitudes,
+                                    MagErr       => \%mag_errors,
+                                    Colours      => \%colours,
+                                    ColErr       => \%colour_errors,
+                                    Quality      => $quality_flag,
+                                    Field        => $field,
+                                    GSC          => $in_gsc,
+                                    Distance     => $distance_to_centre,
+                                    PosAngle     => $position_angle,
+                                    X            => $x_pixel_coord,
+                                    Y            => $y_pixel_coord,
+                                    Comment      => $comment_string
+				    SpecType     => $spectral_type,
+				    StarType     => $star_type,
+				    LongStarType => $long_star_type,
+				    MoreInfo     => $url,
 				  );
 
 =head1 DESCRIPTION
@@ -84,7 +84,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -232,7 +232,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.17 2003/08/26 19:53:02 aa Exp $
+$Id: Star.pm,v 1.18 2004/02/12 18:15:44 aa Exp $
 
 =head1 METHODS
 
@@ -245,24 +245,24 @@ $Id: Star.pm,v 1.17 2003/08/26 19:53:02 aa Exp $
 Create a new instance from a hash of options
 
 
-  $star = new Astro::Catalog::Star( ID         => $id, 
-                                    Coords     => new Astro::Coords(),
-                                    Magnitudes => \%magnitudes,
-                                    MagErr     => \%mag_errors,
-                                    Colours    => \%colours,
-                                    ColErr     => \%colour_errors,
-                                    Quality    => $quality_flag,
-                                    Field      => $field,
-                                    GSC        => $in_gsc,
-                                    Distance   => $distance_to_centre,
-                                    PosAngle   => $position_angle,
-                                    X          => $x_pixel_coord,
-                                    Y          => $y_pixel_coord,
-                                    Comment    => $comment_string
-				    SpecType   => $spectral_type,
-				    StarType   => $star_type,
-				    LongStarType=> $long_star_type,
-				    MoreInfo   => $url,
+  $star = new Astro::Catalog::Star( ID           => $id, 
+                                    Coords       => new Astro::Coords(),
+                                    Magnitudes   => \%magnitudes,
+                                    MagErr       => \%mag_errors,
+                                    Colours      => \%colours,
+                                    ColErr       => \%colour_errors,
+                                    Quality      => $quality_flag,
+                                    Field        => $field,
+                                    GSC          => $in_gsc,
+                                    Distance     => $distance_to_centre,
+                                    PosAngle     => $position_angle,
+                                    X            => $x_pixel_coord,
+                                    Y            => $y_pixel_coord,
+                                    Comment      => $comment_string
+				    SpecType     => $spectral_type,
+				    StarType     => $star_type,
+				    LongStarType => $long_star_type,
+				    MoreInfo     => $url,
 				  );
 
 returns a reference to an Astro::Catalog::Star object.
