@@ -37,3 +37,4 @@ ok( $message->id(), 'IA:aa@bofh.astro.ex.ac.uk:2000:0001' );
 my $doc = $message->dump_rtml();
 
 print $doc;
+

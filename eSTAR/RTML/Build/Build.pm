@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.2 2002/03/18 12:24:48 aa Exp $
+#     $Id: Build.pm,v 1.3 2002/03/18 12:44:41 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -59,13 +59,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.2 2002/03/18 12:24:48 aa Exp $
+$Id: Build.pm,v 1.3 2002/03/18 12:44:41 aa Exp $
 
 =head1 METHODS
 
@@ -220,6 +220,129 @@ sub score_observation {
   return 1;
 
 }
+
+=item B<request_observation>
+
+Build a request document
+
+   $status = $message->request_observation();
+
+=cut
+
+sub request_observation {
+  my $self = shift;
+
+  # grab the argument list
+  my %args = @_;
+
+  # Loop over the allowed keys and modify the default query options
+  for my $key (qw / Target RA Dec Equinox Score Time / ) {
+      my $method = lc($key);
+      $self->$method( $args{$key} ) if exists $args{$key};
+  }
+  
+  # open the document
+  $self->{WRITER}->xmlDecl( 'US-ASCII' );
+  $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
+ 
+  # open the RTML document
+  # ======================
+  $self->{WRITER}->startTag( 'RTML',
+                             'version' => '2.1',
+                             'type' => 'request' );
+  
+  # IntelligentAgent Tag
+  # --------------------
+  
+  # grab the fully resolved hostname
+  my $hostname = ${$self->{OPTIONS}}{HOST} . "." . 
+                 ${$self->{OPTIONS}}{DOMAIN};
+  
+  # identify the IA               
+  $self->{WRITER}->startTag( 'IntelligentAgent', 
+                             'host' => $hostname,
+                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
+  
+  # unique IA identity sting
+  $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
+  
+  $self->{WRITER}->endTag( 'IntelligentAgent' );
+  
+  # Contact Tag
+  # -----------
+  $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
+                             
+     $self->{WRITER}->startTag( 'User');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
+     $self->{WRITER}->endTag( 'User' );
+  
+     $self->{WRITER}->startTag( 'Name');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );  
+      
+     $self->{WRITER}->startTag( 'Institution');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' ); 
+      
+     $self->{WRITER}->startTag( 'Email');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' ); 
+
+  $self->{WRITER}->endTag( 'Contact' ); 
+  
+  # Observation tag
+  # ---------------
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
+  
+     $self->{WRITER}->startTag( 'Target', 'type' => 'normal' );
+    
+        $self->{WRITER}->startTag( 'TargetName' );
+        $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
+        $self->{WRITER}->endTag( 'TargetName' );
+
+        $self->{WRITER}->startTag( 'Coordinates', 'type' => 'equatorial' );
+        
+           $self->{WRITER}->startTag( 'RightAscension', 
+                                    'format' => 'hh mm ss.s', units => 'hms' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{RA} );
+           $self->{WRITER}->endTag( 'RightAscension' );
+           
+           $self->{WRITER}->startTag( 'Declination', 
+                                    'format' => 'sdd mm ss.s', units => 'dms' );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           $self->{WRITER}->endTag( 'Declination' );   
+
+           $self->{WRITER}->startTag( 'Equinox'  );
+           $self->{WRITER}->characters( ${$self->{OPTIONS}}{EQUINOX} );
+           $self->{WRITER}->endTag( 'Equinox' );
+
+        $self->{WRITER}->endTag( 'Coordinates' );
+                               
+           
+     $self->{WRITER}->endTag( 'Target' );
+
+  $self->{WRITER}->endTag( 'Observation' );  
+   
+  # Score Tags
+  # ---------- 
+  $self->{WRITER}->startTag( 'Score' );
+  $self->{WRITER}->characters( ${$self->{OPTIONS}}{SCORE} );
+  $self->{WRITER}->endTag( 'Score' );
+  $self->{WRITER}->startTag( 'CompletionTime' );
+  $self->{WRITER}->characters( ${$self->{OPTIONS}}{COMPLETIONTIME} );
+  $self->{WRITER}->endTag( 'CompletionTime' );
+  
+    
+  # close the RTML document
+  # =======================
+  $self->{WRITER}->endTag( 'RTML' );
+  $self->{WRITER}->end();
+
+  # return a good status (GLOBUS_TRUE)
+  return 1;
+
+}
+
 
 =item B<dump_rtml>
 
@@ -459,6 +582,50 @@ sub equinox {
   return ${$self->{OPTIONS}}{EQUINOX};
 }  
 
+ 
+=item B<score>
+
+Sets (or returns) the target score
+
+   $message->score( $score );
+   $score = $message->score();
+
+the score will be between 0.0 and 1.0
+
+=cut
+
+sub score {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{SCORE} = shift;
+  }
+
+  # return the current target score
+  return ${$self->{OPTIONS}}{SCORE};
+}
+   
+=item B<time>
+
+Sets (or returns) the target completion time
+
+   $message->time( $time );
+   $time = $message->time();
+
+the completion time should be of the format YYYY-MM-DDTHH:MM:SS
+
+=cut
+
+sub score {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{COMPLETIONTIME} = shift;
+  }
+
+  # return the current target score
+  return ${$self->{OPTIONS}}{COMPLETIONTIME};
+}  
 
 # C O N F I G U R E -------------------------------------------------------
 
