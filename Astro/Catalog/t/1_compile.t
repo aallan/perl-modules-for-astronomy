@@ -59,18 +59,18 @@ for my $module (@modules) {
     die "cannot fork: $!" unless defined $pid;
 
     my $not = '';
-    if ( $module eq "Astro::Catalog::Query::SuperCOSMOS" ) {
-       eval "use Astro::Aladin";
-       if ($@) {
-         print "ok # Skip $module (Astro::Aladin module not available)\n";
-         exit;
-       } else {
+    #if ( $module eq "Astro::Catalog::Query::SuperCOSMOS" ) {
+    #   eval "use Astro::Aladin";
+    #   if ($@) {
+    #     print "ok # Skip $module (Astro::Aladin module not available)\n";
+    #     exit;
+    #   } else {
          eval "use $module ();";
          if( $@ ) {
            warn "require failed with '$@'\n";
 	   $not = 'not ';
-         }
-       }
+    #     }
+    #   }
     } else {
       eval "use $module ();";
       if( $@ ) {
