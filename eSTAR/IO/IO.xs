@@ -5,7 +5,6 @@
 #include "globus_common.h"
 #include "globus_io.h"
 #include "estar_io.h"
-#include "client.h"
 
 MODULE = eSTAR::IO   PACKAGE = eSTAR::IO  PREFIX = eSTAR_IO_
     
@@ -14,6 +13,22 @@ eSTAR_IO_report_error()
   CODE:
     eSTAR_IO_Error();
 
+int 
+eSTAR_IO_module_activate()
+  CODE:
+    printf("module_activateXS\n");
+    RETVAL = eSTAR_IO_Module_Activate( );
+  OUTPUT:
+    RETVAL
+
+int 
+eSTAR_IO_module_deactivate()
+  CODE:
+    printf("module_deactivateXS\n");
+    RETVAL = eSTAR_IO_Module_Deactivate( );
+  OUTPUT:
+    RETVAL   
+     
 int
 eSTAR_IO_write_message( handle, message )
     globus_io_handle_t * handle

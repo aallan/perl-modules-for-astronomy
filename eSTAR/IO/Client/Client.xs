@@ -5,7 +5,6 @@
 #include "globus_common.h"
 #include "globus_io.h"
 #include "estar_io.h"
-#include "client.h"
 
 static globus_io_handle_t handle;
     
@@ -20,7 +19,7 @@ open_client( hostname, port )
   CODE:
     printf("open_clientXS globus_io_handle %p\n", &handle);
     printf("open_clientXS handle->fd = %i\n", handle.fd);
-    status = open_client( hostname, port, &handle );
+    status = eSTAR_IO_Open_Client( hostname, port, &handle );
     RETVAL = &handle;  
     printf("open_clientXS globus_io_handle %p\n", &handle);
     printf("open_clientXS handle->fd = %i\n", handle.fd);
@@ -33,5 +32,9 @@ open_client( hostname, port )
 int
 close_client( handle )
     globus_io_handle_t * handle
-    
+  CODE:
+    printf("close_clientXS globus_io_handle %p\n", &handle);
+    RETVAL = eSTAR_IO_Close_Client( handle );
+  OUTPUT:
+    RETVAL    
 

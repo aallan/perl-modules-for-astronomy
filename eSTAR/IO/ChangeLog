@@ -1,3 +1,14 @@
+2002-03-11  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Updated to use the new eSTAR IO library which
+          includes functions to actiavte and deactivate
+          the GLOBUS modules. This means I can dispose
+          of the libClient stuff, only one version of
+          the GLOBUS IO library is being accessed. The
+          problem was that the modules were being activated
+          in the version of IO linked against eSTAR::Globus
+          not that linked against eSTAR::IO (static linking!)
+
 2002-03-07  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Total re-write due to unforseen problems with
