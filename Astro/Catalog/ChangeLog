@@ -1,6 +1,13 @@
+2003-07-23  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Star/Star.pm: Now uses Astro::Coords internally.
+
+	* Catalog.pm: Now uses Astro::Coords internally. Switch to lexical
+	filehandles.
+
 2003-07-19  Alasdair Allan <aa@astro.ex.ac.uk> (version 2.1.3)
 
-        * Catalog.pm: added patch by Brad Cavangh to popstarbyid()
+        * Catalog.pm: added patch by Brad Cavanagh to popstarbyid()
         
 2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk> (version 2.1.2)
 
