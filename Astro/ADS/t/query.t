@@ -12,7 +12,7 @@ use Astro::ADS::Query;
 use Astro::ADS::Result;
 
 # debugging
-#use Data::Dumper;
+use Data::Dumper;
 
 # T E S T   H A R N E S S --------------------------------------------------
 
@@ -63,12 +63,12 @@ my $author_logic = $query->authorlogic("AND");
 ok( $author_logic, "AND" );
 
 # for verbose=1
-print "Connecting to ADS\n";
+print "# Connecting to ADS\n";
 
 # query ADS
 my $result = $query->querydb();
-print Dumper($result);
-print "Continuing Tests\n";
+# print Dumper($result);
+print "# Continuing Tests\n";
 
 # grab the comparison from the DATA block
 my @data = <DATA>;
@@ -108,13 +108,13 @@ my $obj_logic = $query2->objectlogic("AND");
 ok( $obj_logic, "AND" );
 
 # for verbose=1
-print "Connecting to ADS\n";
+print "# Connecting to ADS\n";
 
 # query ADS
 my $other_result = $query2->querydb();
 #print Dumper($other_result);
 
-print "Continuing Tests\n";
+print "# Continuing Tests\n";
 
 # check the number of papers returned, right now(!) it should be 304,
 # but by default we should get the first 100 abstracts only...
@@ -128,13 +128,13 @@ $objects[3] = "M32";
 $query2->objects( \@objects );
 
 # for verbose=1
-print "Connecting to ADS\n";
+print "# Connecting to ADS\n";
 
 # query ADS
 my $next_result = $query2->querydb();
 #print Dumper($next_result);
 
-print "Continuing Tests\n";
+print "# Continuing Tests\n";
 
 #my %hash = $query2->_dump_options();
 #for my $key ( keys %hash ) {

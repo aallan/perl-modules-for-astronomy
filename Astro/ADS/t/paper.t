@@ -156,25 +156,25 @@ ok( $paper->score(), $score );
 
 
 # do a followup query
-print "Connecting to ADS\n";
+print "# Connecting to ADS\n";
 my $refs = $paper->references();
-print "Continuing Tests\n";
+print "# Continuing Tests\n";
 
 # should be 27 references on ADS for this paper
 ok( $refs->sizeof(), 27 );
 
 # do a followup query
-print "Connecting to ADS\n";
+print "# Connecting to ADS\n";
 my $cites = $paper->citations();
-print "Continuing Tests\n";
+print "# Continuing Tests\n";
 
 # currently should be 6 citations on ADS for this paper
 ok( $cites->sizeof(), 6 );
 
 # shouldn't be a TOC with this paper
-print "Connecting to ADS\n";
+print "# Connecting to ADS\n";
 my $toc = $paper->tableofcontents();
-print "Continuing Tests\n";
+print "# Continuing Tests\n";
 ok( $toc, undef );
 
 exit;
