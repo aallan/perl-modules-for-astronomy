@@ -1,0 +1,26 @@
+2003-05-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* JCMT.pm (writeCatalog): Make sure that we can match the spec
+	used by the JCMT where the target name can be 15 characters
+	long. This is different to the stated spec in the catalogue headers.
+
+2003-04-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* JCMT.pm (writeCatalog): Correctly remove spaces from the target
+	name. Rationalise $name usage.
+
+2003-02-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* JCMT.pm (_parse_line): Throw an exception if we have an error
+	converting a line to an Astro::Coords.
+
+2002-12-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* JCMT.pm (_parse_line): Separate out the parsing of the lines and
+	allow for the catalog to be submitted as a string rather than a
+	file name
+
+2002-09-27  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* JCMT.pm (readSourceFromFile): 
+
