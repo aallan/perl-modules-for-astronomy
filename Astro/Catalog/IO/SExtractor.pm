@@ -68,14 +68,14 @@ sub _read_catalog {
     croak "Must supply catalogue contents as a reference to an array";
   }
 
-  if( defined( $args{'filter'} ) &&
-      ! UNIVERSAL::isa( $args{'filter'}, "Astro::WaveBand" ) ) {
+  if( defined( $args{'Filter'} ) &&
+      ! UNIVERSAL::isa( $args{'Filter'}, "Astro::WaveBand" ) ) {
     croak "Filter as passed to SExtractor->_read_catalog must be an Astro::WaveBand object";
   }
 
   my $filter;
-  if( defined( $args{'filter'} ) ) {
-    $filter = $args{'filter'}->natural;
+  if( defined( $args{'Filter'} ) ) {
+    $filter = $args{'Filter'}->natural;
   } else {
     $filter = 'unknown';
   }
@@ -247,7 +247,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.4 2005/02/01 23:14:58 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.5 2005/02/15 20:37:21 cavanagh Exp $
 
 =head1 FORMAT
 
