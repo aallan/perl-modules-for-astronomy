@@ -1,7 +1,8 @@
 2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query/Query/BSC.pm: Added a Vizier Bright Star Catalogue query
-          sub-class to figure out how Tim has written the 2MASS class.
+        * Query/Query/CMC.pm: Added a Vizier Carlsberg Meridian Catalogue
+          (CMC/11) query sub-class to try and figure out how Tim has written 
+          the 2MASS (Vizier generic) classes.
 
         * Query/Query/2MASS.pm: Moved colour generation for 2MASS catalogue
           from the more generic IO/TST.pm module.

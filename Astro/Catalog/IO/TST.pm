@@ -30,7 +30,7 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
-$DEBUG = 0;
+$DEBUG = 1;
 $VERSION = '0.03';
 
 =begin __PRIVATE_METHODS__
@@ -266,12 +266,15 @@ sub _read_catalog {
   # Now convert the information into a star object
 
   # This is a back-of-the-envelope data dictionary from looking at USNO 
-  # and 2MASS. Maps, A::C::Star methods to different columns names
+  # and 2MASS and Bright Star Catalogues. Maps, Aastro::Catlog::Star methods 
+  # to different columns names
   my %datadict = (
 		  field => [ qw/ field /],
 		  quality => [ qw/ qual /, qw/ qflg / ],
 		  distance => [ "d'" ],
-		  posangle => [ qw/ pa /],
+		  posangle => [ qw/ pa /, qw/ _r / ],
+                  #ra => [ qw / raj2000 / ],
+                  #dec => [ qw / dej2000 / ], 
 		 );
 
 
@@ -322,7 +325,7 @@ sub _read_catalog {
 
     # DEBUGGING, prints out everything we've parsed from the catalogue
     #
-    #print "\n\n\n" . Dumper( $star ) . "\n\n\n";
+    print "\n\n\n" . Dumper( $star ) . "\n\n\n";
 
     # Assume that some field names are standardised. This is
     # probably rubbish (whoever heard of standards!).
@@ -454,7 +457,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.7 2003/09/24 17:03:51 aa Exp $
+ $Id: TST.pm,v 1.8 2003/09/24 17:54:31 aa Exp $
 
 =head1 FORMAT
 

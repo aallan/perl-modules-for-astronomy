@@ -1,12 +1,12 @@
-package Astro::Catalog::Query::BSC;
+package Astro::Catalog::Query::CMC;
 
 =head1 NAME
 
-Astro::Catalog::Query::BSC - A query request to the Bright Star Catalog
+Astro::Catalog::Query::CMC - A query request to the Carlsberg Meridian Catalog
 
 =head1 SYNOPSIS
 
-  $gsc = new Astro::Catalog::Query::BSC( RA        => $ra,
+  $gsc = new Astro::Catalog::Query::CMC( RA        => $ra,
 					 Dec       => $dec,
 					 Radius    => $radius,
 					 Nout      => $number_out );
@@ -20,10 +20,10 @@ This code should be superceeded by the generic Vizier query class.
 =head1 DESCRIPTION
 
 The module is an object orientated interface to the online 
-Bright Star Catalogue.
+Carlsberg Meridian Catalogues (CMC11)
 
 Stores information about an prospective query and allows the query to
-be made, returning an Astro::Catalog::Query::BSC object.
+be made, returning an Astro::Catalog::Query::CMC object.
 
 The object will by default pick up the proxy information from the HTTP_PROXY 
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: BSC.pm,v 1.3 2003/09/24 17:17:10 aa Exp $
+$Id: CMC.pm,v 1.1 2003/09/24 17:54:31 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -107,7 +107,7 @@ Get the default query state.
 sub _get_default_options {
   return (
 	  # Internal
-	  catalog => 'V/50/catalog',
+	  catalog => 'I/256/stars',
 
 	  # Target information
 	  ra => undef,
@@ -130,13 +130,9 @@ make and parse the results.
 sub _parse_query {
   my $self = shift;
 
-  #print $self->{BUFFER};
+  print $self->{BUFFER};
   return new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER},
-			     Origin => 'Bright Star Catalogue',
-			     ReadOpt => {
-					 ra_col => 1,
-					 dec_col => 2,
-					}
+			     Origin => 'Carlsberg Meridian Catalogue (CMC/11)'
 			   );
 }
 

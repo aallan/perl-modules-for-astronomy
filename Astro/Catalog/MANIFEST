@@ -16,7 +16,7 @@ Query/Query.pm
 Query/Makefile.PL
 Query/Query/USNOA2.pm
 Query/Query/GSC.pm
-Query/Query/BSC.pm
+Query/Query/CMC.pm
 Query/Query/SuperCOSMOS.pm
 Query/Query/Sesame.pm
 Query/Query/SIMBAD.pm
