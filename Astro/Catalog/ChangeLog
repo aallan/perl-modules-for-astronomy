@@ -1,14 +1,14 @@
 2003-07-29  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Moved Astro::Catalog::BaseQuery to be Astro::Catalog::Query in
-          preparation for it be a 'proprt' polymorphic factory class for
+          preparation for it be a proper polymorphic factory class for
           generic catalogue queries.
         
         * Moved actualy query sub-classes down a directory level to allow
           for the Query.pm file 
           
         * Added a WebService transport class, probably needs some added
-          generalisation, but our sample of web services is still small
+          generalisation, but our sample of web services is still small.
           
         * Added a Sesame.pm class to do CDS Sesame lookups by target name
           using the new WebService transport class. 

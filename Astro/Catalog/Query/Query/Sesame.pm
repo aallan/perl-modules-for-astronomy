@@ -31,11 +31,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Sesame.pm,v 1.1 2003/07/30 00:23:39 aa Exp $
+$Id: Sesame.pm,v 1.2 2003/07/30 03:35:04 aa Exp $
 
 =head1 METHODS
 
@@ -162,6 +162,20 @@ sub _set_default_options {
 
   $self->_set_query_options( %defaults );
   return;
+}
+
+
+=item B<_get_supported_init>
+
+Return the list of initialization methods supported by this catalogue.
+This is not the same as the allowed options since some methods are
+not related to options and other methods that are related to options
+use different names.
+
+=cut
+
+sub _get_supported_init {
+  return (qw/ Target URN Endpoint Proxy /);
 }
 
 =item B<_parse_query>

@@ -11,7 +11,7 @@ WriteMakefile(
                'PREREQ_PM'      => { },
 	       'dist'           => { COMPRESS => "gzip -9f"},
 	       ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-	       ( ABSTRACT       => 'Generic base class for catalog queries',
+	       ( ABSTRACT       => 'Base classes for catalogue transport',
 		 AUTHOR         => 'Tim Jenness <timj@jach.hawaii.edu') : ()),
              );
 

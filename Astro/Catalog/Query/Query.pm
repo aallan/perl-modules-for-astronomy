@@ -29,13 +29,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.3 2003/07/30 00:49:47 timj Exp $
+$Id: Query.pm,v 1.4 2003/07/30 03:35:04 aa Exp $
 
 =head1 METHODS
 
@@ -112,8 +112,6 @@ sub query_options {
     my $opt = lc(shift);
     my %allow = $self->_get_allowed_options;
 
-    #print "\$opt = $opt\n";
-    #print "\$allow{\$opt} = $allow{$opt}\n";
     if (!exists $allow{$opt}) {
       warnings::warnif("Option $opt not supported by this cataloge");
       return;
@@ -444,7 +442,7 @@ Returns a list. The default list is:
 =cut
 
 sub _get_supported_init {
-  return (qw/ RA Dec Target Radius Bright Faint Sort Number
+  return (qw/ Target Radius Bright Faint Sort Number
                     URL Timeout Proxy /);
 }
 
@@ -468,15 +466,8 @@ sub _set_query_options {
 
   my %allow = $self->_get_allowed_options();
 
-  #foreach my $i ( sort keys %newopt ) {
-  #   print "newopt $i = $newopt{$i} \n";
-  #}  
-    
-  #foreach my $i ( sort keys %allow ) {
-  #  print "allow  $i = $allow{$i} \n";
-  #}   
-
   for my $newkey (keys %newopt) {
+  
     if (!exists $allow{$newkey}) {
       warnings::warnif("Option $newkey not supported by catalog ".
 		       ref($self)."\n");

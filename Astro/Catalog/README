@@ -6,18 +6,86 @@ What is it?
 
 The module is a generic object orientated astronomical catalogue object.
 
-What has changed recently?
---------------------------
+Version 3.0
+-----------
 
+Verison 3.0 of the Astro::Catalog breaks the existing v1.x and v2.x API. There
+are many good reasons for this, chiefly the introduction of new features that
+would have been hard to implement and maintain backwards compatibility.
+
+New features for v3.0 include pluggable I/O support, filtering and inline
+sorting of retrieved catalogues. However alot of the improvements are readily
+noticable by the user as alot of work has gone into the infrastructure of
+the package. This means that adding additional I/O and Query support has been
+made alot easier.
 
 Requirements
 ------------
 
+The madatory requirement of the Astro::Catalog package are,
+ 
+  Astro::Coords
+  Astro::Telescope
+  Astro::SLA
+  Time::Piece
+  File::Spec
+  Math::Libm
+  Net::Domain
+  LWP::UserAgent
+  SOAP::Lite
+  Test
+  Test::More
+  Data::Dumper
+  Carp
   
+Additionally,if you wish to use the Astro::Catalog::Query::SuperCOSMOS
+module, the package requires that the Astro::Aladin module (and associated
+CDS Java Aladin infrastructure) are installed.
+
 Provides
 --------
 
+The package provides the following user level classes
 
+  Astro::Catalog
+    A generic catalogue object, includes pluggable I/O support.
+  
+  Astro::Catalog::Star
+    A generic catalogue item.
+    
+  Astro::Catalog::Query::USNOA2
+    A class to automatically retrieves a objects in the USNO-A2.0 catalogue
+    matching query parameters and returns an Astro::Catalog object. 
+
+  Astro::Catalog::Query::GSC
+    A class to automatically retrieves a objects in the GSC catalogue
+    matching query parameters and returns an Astro::Catalog object.
+     
+  Astro::Catalog::Query::SuperCOSMOS
+    A class to automatically retrieves a objects in the SuperCOSMOS catalogue
+    matching query parameters and returns an Astro::Catalog object. 
+    
+  Astro::Catalog::Query::Sesame
+    A class that does a name lookup using the CDS Sesame Web Service and
+    returns an Astro::Catalog object containing a single Astro::Catalog::Star
+    object.
+
+Additional classes provided by the package handle things that you don't
+need to concern yourself with, unless you want to write your own I/O or
+query plugins, these are
+
+  Astro::Catalog::IO::Cluster
+  Astro::Catalog::IO::JCMT
+  Astro::Catalog::IO::Simple
+  Astro::Catalog::Transport::REST
+  Astro::Catalog::Transport::WebService
+  Astro::Catalog::Query
+
+The user level query classes inherit from the Astro::Catalog::Transport::XXX
+classes, which in turn all inherit basic functionality from the Query base
+class Astro::Catalog::Query. The Astro::Catalog::IO modules provide pluggable
+polymor
+ 
 Where can I get it?
 -------------------
 
