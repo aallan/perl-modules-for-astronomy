@@ -1,8 +1,0 @@
-2003-07-24  Tim Jenness  <timj@jach.hawaii.edu>
-
-	* Query/Query.pm: Now uses subclass of BaseQuery
-
-2002-08-14  Alasdair Allan <aa@astro.ex.ac.uk>
-
-        * Original version, not fully functional
-
