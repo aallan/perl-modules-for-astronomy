@@ -66,7 +66,7 @@ sub _read_catalog {
   my @lines = @$lines; # Dereference, make own copy.
   for ( @lines ) {
     my $line = $_;
-    next unless $line =~ /^\s*([\w.]+)\s+([\w.]+)\s+([\w.]+)(?:\s+(.+))*$/;
+    next unless $line =~ /^\s*([\w\-.]+)\s+([\w\-.]+)\s+([\w\-.]+)(?:\s+(.+))*$/;
     my $id = $1;
     my $x = $2;
     my $y = $3;
@@ -102,8 +102,9 @@ As the Starlink FINDOFF is ID in column 1, X position in column 2,
 Y position in column 3, and miscellaneous information in the remaining
 columns that gets carried through to the output file, this method
 writes the ID, X, and Y in the first three columns followed by
-the ID, X, Y, RA, and Dec (latter two in colon-separated sexagesimal
-and in J2000).
+the ID again. The ID is duplicated because FINDOFF carries the comment
+column through to its output while creating new IDs for each object;
+carrying the ID through allows one to link up the new ID with the old.
 
 =cut
 
@@ -127,17 +128,7 @@ sub _write_catalog {
               ! defined( $star->id ) );
 
     # Start off the output string.
-    $output_line = join( ' ', $star->id, $star->x, $star->y, $star->id, $star->x, $star->y );
-
-    # And append the RA/Dec, if we have them.
-    if( defined( $star->coords ) ) {
-      my $coords = $star->coords;
-      my $ra = $coords->ra2000;
-      my $dec = $coords->dec2000;
-      $ra->str_delim(':');
-      $dec->str_delim(':');
-      $output_line .= " $ra $dec";
-    }
+    $output_line = join( ' ', $star->id, $star->x, $star->y, $star->id );
 
     # And push this string to the output array.
     push @output, $output_line;
@@ -152,7 +143,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: FINDOFF.pm,v 1.1 2005/01/15 01:35:52 cavanagh Exp $
+ $Id: FINDOFF.pm,v 1.2 2005/02/01 23:14:03 cavanagh Exp $
 
 =head1 SEE ALSO
 
