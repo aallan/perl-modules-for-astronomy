@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.47 2004/11/23 01:17:26 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.48 2005/01/15 01:36:18 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.47 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.48 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.47 2004/11/23 01:17:26 cavanagh Exp $
+$Id: Catalog.pm,v 1.48 2005/01/15 01:36:18 cavanagh Exp $
 
 =head1 METHODS
 
@@ -1432,6 +1432,7 @@ sub _load_io_plugin {
   $format = 'GaiaPick' if $format eq 'Gaiapick';
   $format = 'UKIRTBS' if $format eq 'Ukirtbs';
   $format = 'SExtractor' if $format eq 'Sextractor';
+  $format = 'FINDOFF' if $format eq 'Findoff';
 
   my $class = "Astro::Catalog::IO::" . $format;
 
