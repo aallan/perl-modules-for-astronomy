@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.11 2003/07/24 02:53:11 timj Exp $
+#     $Id: Catalog.pm,v 1.12 2003/07/24 19:43:13 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -50,21 +50,24 @@ an ARK Cluster format catalogue.
 
 # L O A D   M O D U L E S --------------------------------------------------
 
+use 5.006;
 use strict;
+use warnings;
+use warnings::register;
 use vars qw/ $VERSION /;
 
 use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.11 2003/07/24 02:53:11 timj Exp $
+$Id: Catalog.pm,v 1.12 2003/07/24 19:43:13 timj Exp $
 
 =head1 METHODS
 
@@ -115,14 +118,14 @@ Will write the catalogue object to an standard ARK Cluster format file
 
    $status = $catalog->write_catalog( $file_name, \@mags, \@colour );
 
-returns zero on sucess and non-zero if the write failed. Only magnitudes 
+returns zero on sucess and non-zero if the write failed. Only magnitudes
 and colours passed in the array will be written to the file, e.g.
 
    my @mags = ( 'R' );
    my @colour = ( 'B-R', 'B-V' );
    $status = $catalog->write_catalog( $file_name, \@mags, \@colour );
 
-will write a catalogue with R, B-R and B-V.   
+will write a catalogue with R, B-R and B-V.
 
 =cut
 
@@ -602,9 +605,10 @@ These methods are for internal use only.
 
 =over 4
 
-=itemB<_read_cluster>
+=item B<_read_cluster>
 
-Reads and parses a scalar containing an ARK Format Cluster file into the object.
+Reads and parses a scalar containing an ARK Format Cluster file into
+the object.
 
 =cut
 
@@ -638,11 +642,17 @@ sub _read_cluster {
 
       # ra
       my $objra = "$separated[2] $separated[3] $separated[4]";
-      $star->ra( $objra );
 
       # dec
       my $objdec = "$separated[5] $separated[6] $separated[7]";
-      $star->dec( $objdec );
+
+      # Assume J2000
+      $star->coords( new Astro::Coords(type => 'J2000',
+				       units => 'sex',
+				       ra => $objra,
+				       dec => $objdec,
+				       name => $star->id)
+		   );
 
       # x & y
       $star->x( $separated[8] );

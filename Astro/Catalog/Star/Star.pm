@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.7 2003/07/24 02:50:12 timj Exp $
+#     $Id: Star.pm,v 1.8 2003/07/24 19:43:13 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -63,24 +63,30 @@ properties.
 
 # L O A D   M O D U L E S --------------------------------------------------
 
+use 5.006;
 use strict;
+use warnings;
 use vars qw/ $VERSION /;
 use Carp;
 use Astro::Coords;
 
+# Register an Astro::Catalog::Star warning category
+use warnings::register;
+
 # Radians to arcseconds
 # Copied from Astro::SLA just in case Astro::Coords ever loses Astro::SLA
 # dependency. I am not really happy about this - TJ
+# This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.7 2003/07/24 02:50:12 timj Exp $
+$Id: Star.pm,v 1.8 2003/07/24 19:43:13 timj Exp $
 
 =head1 METHODS
 
@@ -229,6 +235,11 @@ sub ra {
   if (@_) {
     my $ra = shift;
 
+    # Issue a warning specifically for this call
+    my @info = caller();
+    warnings::warnif("deprecated","Use of ra() method for setting RA now deprecated. Please use the coords() method instead, at $info[1] line $info[2]");
+
+
     # Get the coordinate object
     my $c = $self->coords;
     if (defined $c) {
@@ -300,6 +311,11 @@ sub dec {
   my $self = shift;
   if (@_) {
     my $dec = shift;
+
+    # Issue a warning specifically for this call
+    my @info = caller();
+    warnings::warnif("deprecated","Use of ra() method for setting RA now deprecated. Please use the coords() method instead, at $info[1] line $info[2]");
+
     print "Reading DEc: $dec\n";
     use Data::Dumper;
     print Dumper([caller]);
@@ -746,7 +762,10 @@ Configures the object from multiple pieces of information.
   $star->configure( %options );
 
 Takes a hash as argument with the list of keywords.
-The keys are not case-sensitive.
+The keys are not case-sensitive and map to accessor methods.
+
+Note that RA and Dec keys are allowed. The values should be
+sexagesimal.
 
 =cut
 
@@ -768,8 +787,8 @@ sub configure {
   for my $key (keys %args) {
     my $lckey = lc($key);
     if (exists $check{$lckey} && $check{$lckey} ne $args{$key}) {
-      carp "Duplicated key in constructor [$lckey] with differing values ".
-	" '$check{$lckey}' and '$args{$key}'\n";
+      warnings::warnif("Duplicated key in constructor [$lckey] with differing values ".
+	" '$check{$lckey}' and '$args{$key}'\n");
     }
     $check{$lckey} = $args{$key};
   }
@@ -799,18 +818,28 @@ sub configure {
 
       # Raise warn if the error is more than 1 arcsecond
       my $arcsec = $d * DR2AS;
-      carp "Coords and RA/Dec were specified and they differ by more than 1 arcsec [$arcsec sec]. Ignoring RA/Dec keys.\n"
+      warnings::warnif( "Coords and RA/Dec were specified and they differ by more than 1 arcsec [$arcsec sec]. Ignoring RA/Dec keys.\n")
 	if $arcsec > 1;
 
     } elsif (!exists $check{ra}) {
-      carp "Dec specified in addition to Coords but without RA. Ignoring it.";
+      warnings::warnif("Dec specified in addition to Coords but without RA. Ignoring it.");
     } elsif (!exists $check{dec}) {
-      carp "RA specified in addition to Coords but without Dec. Ignoring it.";
+      warnings::warnif("RA specified in addition to Coords but without Dec. Ignoring it.");
     }
 
     # Whatever happens we do not want ra and dec here
     delete $check{dec};
     delete $check{ra};
+  } elsif (exists $check{ra} || $check{dec}) {
+    # Generate a Astro::Coords object here in one go rather than
+    # relying on the old ra() dec() methods individually
+    my $ra = $check{ra} || 0.0;
+    my $dec = $check{dec} || 0.0;
+    $check{coords} = new Astro::Coords( type => 'J2000',
+					ra => $ra,
+					dec => $dec );
+    delete $check{ra};
+    delete $check{dec};
   }
 
   # Loop over the allowed keys storing the values

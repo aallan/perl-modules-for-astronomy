@@ -1,3 +1,10 @@
+2003-07-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Catalog.pm (_read_cluster): No longer use ra() and dec() methods
+	to set the ra and dec (store the Astro::Coords object directly)
+
+	* Star/Star.pm: ra($ra) and dec($dec) methods now deprecated.
+
 2003-07-23  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Star/Star.pm: Now uses Astro::Coords internally.
