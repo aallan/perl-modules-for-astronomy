@@ -11,6 +11,9 @@ BEGIN { plan tests => 56 };
 use Astro::ADS::Query;
 use Astro::ADS::Result;
 
+# debugging
+use Data::Dumper;
+
 # T E S T   H A R N E S S --------------------------------------------------
 
 # test the test system
@@ -64,6 +67,8 @@ print "Connecting to ADS\n";
 
 # query ADS
 my $result = $query->querydb();
+
+print Dumper($result);
 
 # grab the comparison from the DATA block
 my @data = <DATA>;

@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.4 2001/11/01 18:57:46 aa Exp $
+#     $Id: Query.pm,v 1.5 2001/11/01 19:35:06 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -55,13 +55,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.4 2001/11/01 18:57:46 aa Exp $
+$Id: Query.pm,v 1.5 2001/11/01 19:35:06 aa Exp $
 
 =head1 METHODS
 
@@ -114,7 +114,6 @@ Returns an Astro::ADS::Result object
 
 sub querydb {
   my $self = shift;
-  use Data::Dumper;
 
   # call the private method to make the actual ADS query
   $self->_make_query();
@@ -165,7 +164,8 @@ sub querydb {
         $counter++;
                 
         # LOOP THROUGH PAPER
-        my ( @title, @authors, @affil );
+        my ( @title, @authors, @affil, @journal, @pubdate,
+             @keywords );
         while ( substr( $buffer[$counter], 0, 2 ) ne "%R" &&
                 $counter < $#buffer ) {
            
@@ -234,6 +234,61 @@ sub querydb {
               }
            }
            
+           # JOURNAL REF
+           # -----------
+           if( $tag eq "J" ) {
+             
+              #do we have the start of an journal block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @journal, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@journal, $buffer[$counter] );
+                
+              }  
+           }
+           
+           # PUBLICATION DATE
+           # ----------------
+           if( $tag eq "D" ) {
+             
+              #do we have the start of an publication date block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @pubdate, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@pubdate, $buffer[$counter] );
+                
+              }  
+           }
+           
+           # KEYWORDS
+           # --------
+           if( $tag eq "K" ) {
+             
+              #do we have the start of an keyword block?
+              if ( substr( $buffer[$counter], 0, 1 ) eq "%") {
+              
+                 # push the end of line substring onto array
+                 push ( @keywords, substr( $buffer[$counter], 3 ) );
+                 
+              } else {
+                 
+                 # push the entire line onto the array
+                 push (@keywords, $buffer[$counter] );
+                
+              }  
+           }
+           
+           
 
            # increment the line counter
            $counter = $counter + 1;
@@ -280,8 +335,42 @@ sub querydb {
         my @paper_affil = split( /\), /, $affil_line );
         $paper->affil( \@paper_affil );
         
+        # PUSH JOURNAL INTO PAPER OBJECT
+        # ------------------------------
+        chomp @journal;
+        my $journal_ref = "";
+        for my $i ( 0 ... $#journal ) {
+           # drop it onto one line
+           $journal_ref = $journal_ref . $journal[$i];      
+        }
+        $paper->journal( $journal_ref );
         
-           
+        # PUSH PUB DATE INTO PAPER OBJECT
+        # -------------------------------
+        chomp @pubdate;
+        my $pub_date = "";
+        for my $i ( 0 ... $#pubdate ) {
+           # drop it onto one line
+           $pub_date = $pub_date . $pubdate[$i];      
+        }
+        $paper->published( $pub_date ); 
+        
+        # PUSH KEYWORDS INTO PAPER OBJECT
+        # -------------------------------
+        chomp @keywords;
+        my $key_line = "";
+        for my $i ( 0 ... $#keywords ) {
+           # drop it onto one line
+           $key_line = $key_line . $keywords[$i];      
+        }
+        # get rid of leading spaces before author names
+        $key_line =~ s/, /,/g;
+        
+        my @paper_keys = split( /,/, $key_line );
+        $paper->keywords( \@paper_keys );
+        
+        
+          
      }
         
      # increment the line counter to the correct index for the next paper
@@ -296,7 +385,8 @@ sub querydb {
      
    }   
 
-   print Dumper($result);
+   # return an Astro::ADS::Result object on success
+   return $result;
 }
 
 =item B<Authors>
