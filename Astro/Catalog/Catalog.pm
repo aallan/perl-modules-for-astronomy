@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.12 2003/07/24 19:43:13 timj Exp $
+#     $Id: Catalog.pm,v 1.13 2003/07/26 23:17:20 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.12 2003/07/24 19:43:13 timj Exp $
+$Id: Catalog.pm,v 1.13 2003/07/26 23:17:20 aa Exp $
 
 =head1 METHODS
 
@@ -328,9 +328,9 @@ sub popstar {
 
 =item B<popstarbyid>
 
-Return the C<Astro::Catalog::Star> objects that have the given ID.
+Return C<Astro::Catalog::Star> objects that have the given ID.
 
-  @stars = $catalog->popstarbyid( $id );
+  @stars = $catalog->starbyid( $id );
 
 The method deletes the stars and returns the deleted C<Astro::Catalog::Star>
 objects. If no star exists with the given ID, the method returns undef.
@@ -360,15 +360,17 @@ sub popstarbyid {
 =item B<stars>
 
 Return a list of all the C<Astro::Catalog::Star> objects
-stored in the results object.
 
   @stars = $catalog->stars();
+
+in list context the copy of the array is returned, while in scalar
+context a reference to the array is retrun.
 
 =cut
 
 sub stars {
   my $self = shift;
-  return @{ $self->{STARS} };
+  return wantarray ? @{ $self->{STARS} } : $self->{STARS};
 }
 
 =item B<starbyindex>
