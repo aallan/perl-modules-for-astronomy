@@ -89,7 +89,18 @@ sub _write_catalog {
   $ra_cen =~ s/[:dhms]/ /g;
   $dec_cen =~ s/[:dhms]/ /g;
 
-  push @output, "~ $ra_cen $dec_cen J2000 2000.0";
+# Get the epoch of observation. This can be obtained from the
+# first star, so just pop it off, read the epoch, and pop it
+# back on.
+  my $epoch_star = $catalog->popstar;
+  my $wcs = $epoch_star->wcs;
+  $catalog->pushstar( $epoch_star );
+  my $epoch = $wcs->GetC("Epoch");
+  if( ! defined( $epoch ) ) {
+    $epoch = "2000.0";
+  }
+
+  push @output, "~ $ra_cen $dec_cen J2000 $epoch";
 
 # For each star, write the RA, Dec, epoch, X and Y coordinates.
   foreach my $star ( $catalog->stars ) {
@@ -107,7 +118,13 @@ sub _write_catalog {
     $ra =~ s/[:dhms]/ /g;
     $dec =~ s/[:dhms]/ /g;
 
-    $output_line = "$ra $dec J2000 2000.0";
+# Get the star's epoch.
+    $epoch = $star->wcs->GetC("Epoch");
+    if( ! defined( $epoch ) ) {
+      $epoch = "2000.0";
+    }
+
+    $output_line = "$ra $dec J2000 $epoch";
     push @output, $output_line;
 
     my $x = $star->x;
@@ -124,7 +141,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: Astrom.pm,v 1.2 2005/02/02 20:07:52 cavanagh Exp $
+ $Id: Astrom.pm,v 1.3 2005/02/15 20:10:40 cavanagh Exp $
 
 =head1 SEE ALSO
 
