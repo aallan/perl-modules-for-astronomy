@@ -1,3 +1,5 @@
+package Astro::Catalog::IO::JCMT;
+
 =head1 NAME
 
 Astro::Catalog::IO::JCMT - JCMT catalogue I/O for Astro::Catalog
