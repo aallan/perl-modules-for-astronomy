@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.14 2003/07/22 03:41:23 aa Exp $
+#     $Id: Build.pm,v 1.15 2005/02/08 00:09:56 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -65,13 +65,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.14 2003/07/22 03:41:23 aa Exp $
+$Id: Build.pm,v 1.15 2005/02/08 00:09:56 aa Exp $
 
 =head1 METHODS
 
@@ -124,6 +124,7 @@ sub new {
 Build a score document
 
    $status = $message->score_observation( Target        => $target_name,
+                                          TargetType    => "normal",
                                           RA            => $ra,
                                           Dec           => $dec,
                                           Equinox       => $equinox,
@@ -143,7 +144,8 @@ sub score_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Exposure Snr Flux Filter / ) {
+  for my $key (qw / Target TargetType RA Dec Equinox Exposure 
+                    Snr Flux Filter / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -205,7 +207,8 @@ sub score_observation {
   # ---------------
   $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
   
-     $self->{WRITER}->startTag( 'Target', 'type' => 'normal' );
+     $self->{WRITER}->startTag( 'Target', 
+                                'type' => ${$self->{OPTIONS}}{TARGETTYPE} );
     
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
@@ -295,16 +298,17 @@ sub score_observation {
 
 Build a score response document
 
-   $status = $message->score_response( Target        => $target_name,
-                                          RA            => $ra,
-                                          Dec           => $dec,
-                                          Equinox       => $equinox,
-                                          Exposure      => $seconds,
-                                          Snr           => $snr,
-                                          Flux          => $mag,
-                                          Score         => $score,
-                                          Time          => $completion_time,
-                                          Filter        => filter );
+   $status = $message->score_response( Target        => $target_name, 
+                                       TargetType    => "normal",
+                                       RA            => $ra,
+                                       Dec           => $dec,
+                                       Equinox       => $equinox,
+                                       Exposure      => $seconds,
+                                       Snr           => $snr,
+                                       Flux          => $mag,
+                                       Score         => $score,
+                                       Time          => $completion_time,
+                                       Filter        => filter );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -317,7 +321,7 @@ sub score_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Exposure 
+  for my $key (qw / Target TargetType RA Dec Equinox Exposure 
                     Snr Flux Score Time Filter/ ) {
   
      # print "Calling " . lc($key) ."()\n";
@@ -382,7 +386,8 @@ sub score_response {
   # ---------------
   $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
   
-     $self->{WRITER}->startTag( 'Target', 'type' => 'normal' );
+     $self->{WRITER}->startTag( 'Target',
+                                'type' => ${$self->{OPTIONS}}{TARGETTYPE} );
     
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
@@ -478,16 +483,17 @@ sub score_response {
 
 Build a request document
 
-   $status = $message->request_observation( Target   => $target_name,
-                                            RA       => $ra,
-                                            Dec      => $dec,
-                                            Equinox  => $equinox,
-                                            Score    => $score,
-                                            Time     => $completion_time,
-                                            Exposure => $exposure,
-                                            Snr      => $snr,
-                                            Flux     => $mag,
-                                            Filter        => filter );
+   $status = $message->request_observation( Target     => $target_name,
+                                            TargetType => "normal",
+                                            RA         => $ra,
+                                            Dec        => $dec,
+                                            Equinox    => $equinox,
+                                            Score      => $score,
+                                            Time       => $completion_time,
+                                            Exposure   => $exposure,
+                                            Snr        => $snr,
+                                            Flux       => $mag,
+                                            Filter     => filter );
 
 Use "Exposure", or "Snr" and "Flux", but not both. );
 
@@ -500,7 +506,7 @@ sub request_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Score Time 
+  for my $key (qw / Target TargetType RA Dec Equinox Score Time 
                 Exposure Snr Flux Filter/ ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
@@ -563,7 +569,8 @@ sub request_observation {
   # ---------------
   $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
   
-     $self->{WRITER}->startTag( 'Target', 'type' => 'normal' );
+     $self->{WRITER}->startTag( 'Target', , 
+                                'type' => ${$self->{OPTIONS}}{TARGETTYPE} );
     
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
@@ -661,15 +668,16 @@ sub request_observation {
 Build a confirm response document
 
    $status = $message->confirm_response( Target        => $target_name,
-                                          RA            => $ra,
-                                          Dec           => $dec,
-                                          Equinox       => $equinox,
-                                          Exposure      => $seconds,
-                                          Snr           => $snr,
-                                          Flux          => $mag,
-                                          Score         => $score,
-                                          Time          => $completion_time,
-                                          Filter        => filter );
+                                         TargetType   => "normal",
+                                         RA            => $ra,
+                                         Dec           => $dec,
+                                         Equinox       => $equinox,
+                                         Exposure      => $seconds,
+                                         Snr           => $snr,
+                                         Flux          => $mag,
+                                         Score         => $score,
+                                         Time          => $completion_time,
+                                         Filter        => filter );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -682,7 +690,7 @@ sub confirm_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Exposure 
+  for my $key (qw / Target TargetType RA Dec Equinox Exposure 
                     Snr Flux Score Time Filter/ ) {
   
      # print "Calling " . lc($key) ."()\n";
@@ -747,7 +755,8 @@ sub confirm_response {
   # ---------------
   $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
   
-     $self->{WRITER}->startTag( 'Target', 'type' => 'normal' );
+     $self->{WRITER}->startTag( 'Target', , 
+                                'type' => ${$self->{OPTIONS}}{TARGETTYPE} );
     
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
@@ -845,6 +854,7 @@ sub confirm_response {
 Build a update response document
 
    $status = $message->update_response( Target        => $target_name,
+                                        TargetType    => "normal",
                                         RA            => $ra,
                                         Dec           => $dec,
                                         Equinox       => $equinox,
@@ -869,7 +879,7 @@ sub update_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Exposure Snr Flux Score 
+  for my $key (qw / Target TargetType RA Dec Equinox Exposure Snr Flux Score 
                     Time Filter Catalogue Headers ImageURI / ) {
   
      # print "Calling " . lc($key) ."()\n";
@@ -1054,6 +1064,7 @@ sub update_response {
 Build a complete response document
 
    $status = $message->complete_response( Target        => $target_name,
+                                          TargetType    => "normal",
                                         RA            => $ra,
                                         Dec           => $dec,
                                         Equinox       => $equinox,
@@ -1078,7 +1089,7 @@ sub complete_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Exposure Snr Flux Score 
+  for my $key (qw / Target TargetType RA Dec Equinox Exposure Snr Flux Score 
                     Time Filter Catalogue Headers ImageURI / ) {
   
      # print "Calling " . lc($key) ."()\n";
@@ -1143,7 +1154,8 @@ sub complete_response {
   # ---------------
   $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
   
-     $self->{WRITER}->startTag( 'Target', 'type' => 'normal' );
+     $self->{WRITER}->startTag( 'Target', , 
+                                'type' => ${$self->{OPTIONS}}{TARGETTYPE} ); 
     
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
@@ -1785,7 +1797,29 @@ sub snr {
   return ${$self->{OPTIONS}}{SNR};
 }  
 
- 
+  
+=item B<targettype>
+
+Sets (or returns) the target type for the image
+
+   $message->targettype( $type );
+   $type = $message->targettype();
+
+the target type defaults to "normal" if unspecified.
+
+=cut
+
+sub targettype {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{TARGETTYPE} = shift;
+  }
+
+  # return the current target type
+  return ${$self->{OPTIONS}}{TARGETTYPE};
+}  
+
 =item B<flux>
 
 Sets (or returns) the flux of teh object needed for signal to noise
@@ -1908,7 +1942,7 @@ sub configure {
   # --------
   
   # use the RTML Namespace as defined by the v2.1 DTD
-  ${$self->{OPTIONS}}{DTD} = "http://www.astro.livjm.ac.uk/HaGS/rtml2.1.dtd"; 
+  ${$self->{OPTIONS}}{DTD} = "http://www.estar.org.uk/documents/rtml2.1.dtd"; 
   
   #${$self->{OPTIONS}}{HOST} = hostname() . "." . hostdomain(); 
   ${$self->{OPTIONS}}{HOST} = "127.0.0.1";
@@ -1916,6 +1950,9 @@ sub configure {
   
   ${$self->{OPTIONS}}{EQUINOX} = 'J2000';
   
+  
+  ${$self->{OPTIONS}}{TARGETTYPE} = 'normal';
+ 
     
   # ARGUEMENTS
   # ----------

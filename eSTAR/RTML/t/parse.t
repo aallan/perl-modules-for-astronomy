@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 23 };
+BEGIN { plan tests => 24 };
 
 # load modules
 use eSTAR::RTML;
@@ -125,6 +125,9 @@ ok( $type, 'score' );
 
 # pass it to the Parse module
 my $score_message = new eSTAR::RTML::Parse( RTML => $ers_score );
+
+my $target_type = $score_message->targettype();
+ok( $target_type, 'normal' );
 
 # check the parsed document
 ok( $score_message->dtd(), '2.1' );

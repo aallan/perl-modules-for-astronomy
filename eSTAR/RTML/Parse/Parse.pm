@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.18 2003/07/18 01:58:09 aa Exp $
+#     $Id: Parse.pm,v 1.19 2005/02/08 00:09:56 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.18 2003/07/18 01:58:09 aa Exp $
+$Id: Parse.pm,v 1.19 2005/02/08 00:09:56 aa Exp $
 
 =head1 METHODS
 
@@ -267,6 +267,19 @@ Return the name of the target
 sub target {
   my $self = shift;
   return ${${${$self->{OBSERVATION}}{Target}}{Targetname}}{tag_value};
+}
+
+
+=item B<targettype>
+
+Return the type of observation we want to make the document
+
+  $type = $rtml->targettype();
+
+=cut
+sub targettype {
+  my $self = shift;  
+  return ${${$self->{OBSERVATION}}{Target}}{type};
 }
 
 =item B<ra>

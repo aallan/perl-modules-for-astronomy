@@ -1,3 +1,11 @@
+2005-02-08  Alasdair Allan <aa@astro.ex.ac.uk>
+
+         * Build.pm & Parse.pm: Added targettype() method so we can now 
+           specify the TargetType attribute in the <Target type=""></Target>
+           tag.
+           
+         * t/parse.t & t/build.t: Tested this new tag.
+          
 2003-07-21  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Build.pm: Added failure_response(), update_response() and

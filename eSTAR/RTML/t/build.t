@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 17 };
+BEGIN { plan tests => 24 };
 
 # load modules
 use eSTAR::RTML;
@@ -127,3 +127,35 @@ $message4->score_response(
 # dump out the request
 my $doc4 = $message4->dump_rtml();
 #print $doc4;
+
+
+# Create an RTML object
+my $message5 = new eSTAR::RTML::Build( 
+             Port        => '2000',
+             ID          => 'IA:aa@bofh.astro.ex.ac.uk:2000:0005',
+             User        => 'aa',
+             Name        => 'Alasdair Allan',
+             Institution => 'University of Exeter',
+             Email       => 'aa@astro.ex.ac.uk' );
+             
+# build a score request
+$status = $message5->request_observation(
+             Target => 'Test Target',
+             TargetType => 'very odd',
+             RA     => '09 00 00',
+             Dec    => '+60 00 00', 
+             Snr    => '5.0',
+             Flux   => '12.0' );
+
+# check some tag information
+ok( $message5->port(), 2000 );
+ok( $message5->id(), 'IA:aa@bofh.astro.ex.ac.uk:2000:0005' );
+ok( $message5->ra(), '09 00 00' );
+ok( $message5->dec(), '+60 00 00' );
+ok( $message5->snr(), '5.0' );
+ok( $message5->flux(), '12.0' );
+ok( $message5->targettype(), 'very odd' );
+
+# dump out the request
+my $doc5 = $message5->dump_rtml();
+#print $doc5;
