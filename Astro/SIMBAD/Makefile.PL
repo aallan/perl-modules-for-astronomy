@@ -1,12 +1,8 @@
 use ExtUtils::MakeMaker;
-use File::Spec;
-
-my $file = File::Spec->catfile(File::Spec->curdir, "Query", "Query.pm");
-
 
 WriteMakefile( 
                'NAME'           => 'Astro::SIMBAD',
-	       'VERSION_FROM'   => $file,
+	       'VERSION'        => '1.9',
                'PREREQ_PM'      => { LWP => 5.53 },
 	       'dist'           => { COMPRESS => "gzip -9f"},
 	       ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
