@@ -97,6 +97,20 @@ my $callback = sub {
 
    print FILE @{$reply}[0];
    close(FILE);
+   print "# Closing $ENV{ESTAR_DATA}/server_message.xml\n"; 
+   
+   print "# Re-opening $ENV{ESTAR_DATA}/server_message.xml\n";
+
+   my $obs = new eSTAR::RTML( File => File::Spec->catfile( $ENV{"ESTAR_DATA"},
+                                                 "server_message.xml" )  );
+
+   my $type = $obs->determine_type();
+   print "# Got a '" . $type . "' RTML file from ERS server at $opt{dn_host}\n";
+
+   my $parsed = new eSTAR::RTML::Parse( RTML => $obs );   
+   
+   print Dumper( $parsed );
+   
    print "#\n# Leaving Callback\n";
       
    return GLOBUS_TRUE 
@@ -117,8 +131,13 @@ if( $status == GLOBUS_FALSE) {
 
 # wait for response RTML from dn1.ex.ac.uk
 print "# Starting server process on port $server_port\n";
-start_server( $server_port, $callback );
-
+$status = start_server( $server_port, $callback );
+if( $status == GLOBUS_FALSE) {
+   report_error();
+   print "# Deactvating modules\n#\n";
+   $status = module_deactivate();
+   exit;
+} 
 # --------------------------------------------------------------------------
 
 exit;

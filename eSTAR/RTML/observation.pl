@@ -47,7 +47,7 @@ $ENV{"ESTAR_DATA"} = File::Spec->tmpdir();
 use Data::Dumper;
 
 # CVS revision tag
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # T E S T   H A R N E S S ---------------------------------------------------
 
@@ -279,8 +279,8 @@ my $message2 = new eSTAR::RTML::Build(
              
 $status = $message2->request_observation(
              Target   => 'Test Target',
-             RA       => '09 00 00',
-             Dec      => '+60 00 00',
+             RA       => $opt{"ra"},
+             Dec      => $opt{"dec"},
              Score    => $score,
              Time     => $completion_time,
              Exposure => $opt{"exposure"}
