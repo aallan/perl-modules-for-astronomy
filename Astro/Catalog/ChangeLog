@@ -1,3 +1,27 @@
+2005-03-30  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/ASCII.pm: base class for ASCII-based IO
+
+	* IO/Binary.pm: base class for binary-based IO
+
+	* Catalog.pm: added FITSTable support; modified IO class handling
+	to farm off to IO classes that inherit from either IO/ASCII.pm
+	or IO/Binary.pm to allow for reading in of different types of
+	files; modify ID matching to use string comparison instead of
+	numerical comparison in case IDs aren't numbers.
+
+	* IO/Astrom.pm, IO/Cluster.pm, IO/FINDOFF.pm, IO/GaiaPick.pm,
+	IO/JCMT.pm, IO/SExtractor.pm, IO/STL.pm, IO/Simple.pm,
+	IO/TST.pm, IO/UKIRTBS.pm, IO/VOTable.pm: inherit from IO/ASCII.pm.
+
+	* IO/FITSTable.pm: new module to allow reading in of binary FITS
+	tables.
+
+2005-03-22  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/FINDOFF.pm: Remove letters from ID string before writing.
+	This is done because FINDOFF doesn't understand non-integers.
+
 2005-02-25  Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 	* Catalog.pm (filter_by_id): Use quotemeta function to make sure
