@@ -5,7 +5,9 @@
           in search.cpan.org
           
         * t/query.t: Fixed broken test case.  
-          
+
+        * Fixed MANIFEST problem released as v1.9.5
+                  
 2002-05-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * t/query.t: Applied bug fix patch file for test harness

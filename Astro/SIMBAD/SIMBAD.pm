@@ -12,7 +12,7 @@ the L<Astro::SIMBAD::Query> module.
 
 =head1 REVISION
 
-$Id: SIMBAD.pm,v 1.1 2003/07/15 20:35:57 aa Exp $
+$Id: SIMBAD.pm,v 1.2 2003/07/16 18:59:02 aa Exp $
 
 =head1 METHODS
 
@@ -35,6 +35,6 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 use strict;
 use vars qw/ $VERSION /;
-$VERSION = '1.9.4'
+$VERSION = '1.9.5'
 
 1;                                                                  

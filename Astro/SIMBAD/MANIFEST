@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 GPL
 ChangeLog
+SIMBAD.pm
 Query/Query.pm
 Query/Makefile.PL
 Result/Result.pm
