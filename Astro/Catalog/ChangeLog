@@ -2,6 +2,8 @@
 
 	* IO/SExtractor.pm: allow filter to be passed as argument to
 	  _read_catalog method.
+	* IO/Astrom.pm, t/2_astrom.t: support for Starlink ASTROM input 
+	  file format
 
 2004-12-21  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
