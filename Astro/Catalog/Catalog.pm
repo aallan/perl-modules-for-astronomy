@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.15 2003/07/27 00:26:46 aa Exp $
+#     $Id: Catalog.pm,v 1.16 2003/07/27 00:33:52 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.15 2003/07/27 00:26:46 aa Exp $
+$Id: Catalog.pm,v 1.16 2003/07/27 00:33:52 timj Exp $
 
 =head1 METHODS
 
@@ -99,7 +99,8 @@ sub new {
                       RADIUS => undef }, $class;
 
   # If we have arguments configure the object
-  $block->configure( @_ ) if @_;
+  # Note that configuration can result in a new object
+  $block = $block->configure( @_ ) if @_;
 
   return $block;
 
@@ -308,24 +309,20 @@ sub sizeof {
 
 =item B<pushstar>
 
-Push a new star onto the end of the C<Astro::Catalog> object
+Push a new star (or stars) onto the end of the C<Astro::Catalog> object
 
-   $catalog->pushstar( $star );
+   $catalog->pushstar( @stars );
 
-returns the number of stars now in the Catalog object.
+returns the number of stars now in the Catalog object (even if no
+arguments were supplied).
 
 =cut
 
 sub pushstar {
   my $self = shift;
 
-  # return unless we have arguments
-  return undef unless @_;
-
-  my $star = shift;
-
   # push the new item onto the stack 
-  return push( @{$self->{STARS}}, $star );
+  return push( @{$self->{STARS}}, @_);
 }
 
 =item B<popstar>
@@ -436,22 +433,22 @@ sub fieldcentre {
   # return unless we have arguments
   return () unless @_;
 
-  # grab the argument list
-  my %args = @_;
+  # grab the argument list and normalize hash
+  my %args = _normalize_hash( @_ );
 
-  if (defined $args{Coords}) {
-    $self->{COORDS} = $args{Coords};
-  } elsif ( defined $args{RA} && defined $args{Dec}) {
+  if (defined $args{coords}) {
+    $self->{COORDS} = $args{coords};
+  } elsif ( defined $args{ra} && defined $args{dec}) {
     my $c = new Astro::Coords( type => 'J2000',
-			       ra => $args{RA},
-			       dec => $args{Dec},
+			       ra => $args{ra},
+			       dec => $args{dec},
 			     );
     $self->{COORDS} = $c;
   }
 
   # set field radius
-  if ( defined $args{Radius} ) {
-     $self->{RADIUS} = $args{Radius};
+  if ( defined $args{radius} ) {
+     $self->{RADIUS} = $args{radius};
   }
 
 }
@@ -537,7 +534,29 @@ Configures the object from multiple pieces of information.
 
   $catalog->configure( %options );
 
-Takes a hash as argument with the list of keywords.
+Takes a hash as argument with the list of keywords. Supported options
+are:
+
+  Format => Format of supplied catalog
+  File => File name for catalog on disk. Not used if 'Data' supplied.
+  Data => Contents of catalogue, either as a scalar variable,
+          reference to array of lines or reference to glob (file handle).
+          This key is used in preference to 'File' if both are present
+
+  Stars => Array of Astro::Catalog::Star objects. Supercedes all other options.
+
+If Format is supplied without any other options, a default file is requested
+from the class implementing the formatted read. If no default file is
+forthcoming the method croaks.
+
+If no options are specified the method does nothing, assumes you will
+be supplying stars at a later time.
+
+The options are case-insensitive.
+
+Note that in some cases (when reading a catalogue) this method will
+act as a constructor. In any case, always returns a catalog object
+(either the same one that went in or a modified one).
 
 =cut
 
@@ -545,74 +564,88 @@ sub configure {
   my $self = shift;
 
   # return unless we have arguments
-  return undef unless @_;
+  return $self unless @_;
 
   # grab the argument list
   my %args = @_;
 
+  # Go through hash and downcase all keys
+  %args = _normalize_hash( %args );
+
+  use Data::Dumper;
+  print Dumper(\%args);
+
+  # Check for deprecation
+  if ( exists $args{cluster} ) {
+    warnings::warnif("deprecated", "Cluster option now deprecated. Use Format=>'Cluster',File=>file instead");
+    $args{file} = $args{cluster};
+    $args{format} = 'Cluster';
+  }
+
   # Define the actual catalogue
   # ---------------------------
 
-  if ( defined $args{Stars} ) {
+  # Stars has priority
+  if ( defined $args{stars} ) {
 
     # grab the array reference and stuff it into the object
-    @{$self->{STARS}} = @{$args{Stars}};
+    $self->pushstar( @{ $args{stars} } );
 
-  } elsif ( defined $args{Cluster} ) {
+  } elsif ( defined $args{format} ) {
 
-    # build from Cluster file
-    my $file_name = $args{Cluster};
-    my $CAT;
-    unless ( open( $CAT, $file_name ) ) {
-       croak("Astro::Catalog - Cannont open ARK Cluster file $file_name");
+    # Need to read the IO class
+    my $ioclass = _load_io_plugin( $args{format} );
+    return unless defined $ioclass;
+
+    # Lines for the content
+    my @lines;
+
+    # Now need to either look for some data or read a file
+    if ( defined $args{data}) {
+
+
+
+    } else {
+      # Look for a filename or the default file
+      my $file;
+      if ( defined $args{file} ) {
+	$file = $args{file};
+      } else {
+	# Need to ask for the default file
+	$file = $ioclass->_default_file()
+	  if $ioclass->can( '_default_file' );
+	croak "Unable to read catalogue since no file specified and ".
+	  "no default known." unless defined $file;
+      }
+
+      # Open the file
+      my $CAT;
+      croak("Astro::Catalog - Cannot open catalogue file $file: $!")
+	unless open( $CAT, "< $file" );
+
+      # read from file
+      local $/ = "\n";
+      @lines = <$CAT>;
+      close($CAT);
+
     }
-    # read from file
-    $/ = "\n";
-    my @catalog = <$CAT>;
-    close($CAT);
-    chomp @catalog;
 
-    #print "File is $file_name\n";
+    # remove new lines
+    chomp @lines;
 
-    #print "Grabbed " . $#catalog . " lines of cluster catalog\n";
-    #foreach my $loop ( 0 ... $#catalog ) {
-    #   print "$loop# " . $catalog[$loop] . "\n";
-    #}
+    # Now read the catalog (overwriting $self)
+    $self =  $ioclass->_read_catalog( \@lines );
 
-    # read catalogue
-     _read_cluster( $self, @catalog );
-
-  } elsif ( defined $args{Scalar} ) {
-
-    # Split the catalog out from its single scalar
-    my @catalog = split( /\n/, $args{Scalar} );
-
-    # read catalogue from file
-     _read_cluster( $self, @catalog );
-
-  } else {
-
-     # no build arguements
-     croak("Astro::Catalog - Bad constructor, no arguements supplied");
   }
 
   # Define the field centre if provided
   # -----------------------------------
   $self->fieldcentre( %args );
 
-  return;
-}
+  use Data::Dumper;
+  print Dumper( $self );
 
-=item B<freeze>
-
-Method to return a blessed reference to the object so that we can store
-ths object on disk using Data::Dumper module.
-
-=cut
-
-sub freeze {
-  my $self = shift;
-  return bless $self, 'Astro::Catalog';
+  return $self;
 }
 
 # H A N D L E   C L U S T E R   F I L E S ------------------------------------
@@ -627,122 +660,74 @@ These methods are for internal use only.
 
 =over 4
 
-=item B<_read_cluster>
+=item B<_normalize_hash>
 
-Reads and parses a scalar containing an ARK Format Cluster file into
-the object.
+Given a hash, returns a new hash with each key down cased. If a 
+key is duplicated after downcasing a warning is issued if the keys
+contain differing values.
+
+  %n = _normalize_hash( %args );
 
 =cut
 
-sub _read_cluster {
-   my $self = shift;
-   my @catalog = @_;
+sub _normalize_hash {
+  my %args = @_;
 
-   # loop through catalog
-   foreach my $i ( 3 .. $#catalog ) {
+  my %out;
 
-      # remove leading spaces
-      $catalog[$i] =~ s/^\s+//;
+  for my $key ( keys %args ) {
+    my $outkey = lc($key);
+    if (exists $out{$outkey} && $out{$outkey} ne $args{$key}) {
+      warnings::warnif("Key '$outkey' supplied more than once with differing values. Ignoring second version");
+      next;
+    }
 
-      # split each line
-      my @separated = split( /\s+/, $catalog[$i] );
+    # Store the key in the new hash
+    $out{$outkey} = $args{$key};
 
-      # debugging (leave in)
-      #print "$i # id $separated[1]\n";
-      #foreach my $thing ( 0 .. $#separated ) {
-      #   print "   $thing # $separated[$thing] #\n";
-      #}
+  }
 
-      # temporary star object
-      my $star = new Astro::Catalog::Star();
+  return %out;
+}
 
-      # field
-      $star->field( $separated[0] );
+=item B<_load_io_plugin>
 
-      # id
-      $star->id( $separated[1] );
+Given a file format, load the corresponding IO class. In general the
+IO class is lower case except for the first letter. JCMT is an exception.
+All plugins are in hierarchy C<Astro::Catalog::IO>.
 
-      # ra
-      my $objra = "$separated[2] $separated[3] $separated[4]";
+Returns the class name on successful load. If the class can not be found
+a warning is issued and false is returned.
 
-      # dec
-      my $objdec = "$separated[5] $separated[6] $separated[7]";
+=cut
 
-      # Assume J2000
-      $star->coords( new Astro::Coords(type => 'J2000',
-				       units => 'sex',
-				       ra => $objra,
-				       dec => $objdec,
-				       name => $star->id)
-		   );
+sub _load_io_plugin {
+  my $format = shift;
 
-      # x & y
-      $star->x( $separated[8] );
-      $star->y( $separated[9] );
+  # Force case
+  $format = ucfirst( lc( $format ) );
 
-      # number of magnitudes and colours
-      $catalog[1] =~ s/^\s+//;
-      my @colours = split( /\s+/, $catalog[1] );
+  # Horrible kluge since I prefer "JCMT" to "Jcmt".
+  # Maybe we should not try to fudge case at all?
+  $format = 'JCMT' if $format eq 'Jcmt'; 
 
-      my @quality;
-      foreach my $j ( 0 .. $#colours ) {
+  my $class = "Astro::Catalog::IO::" . $format;
 
-         # colours have minus signs
-         if( lc($colours[$j]) =~ "-" ) {
-
-            # colours
-            my %colours = ( $colours[$j] => $separated[3*$j+10] );
-            $star->colours( \%colours );
-
-            # errors
-            my %col_errors = ( $colours[$j] => $separated[3*$j+11] );
-            $star->colerr( \%col_errors );
-
-            # quality flags
-            $quality[$j] = $separated[3*$j+12];
-
-         } else {
-
-            # mags
-            my %magnitudes = ( $colours[$j] => $separated[3*$j+10] );
-            $star->magnitudes( \%magnitudes );
-
-            # errors
-            my %mag_errors = ( $colours[$j] => $separated[3*$j+11] );
-            $star->magerr( \%mag_errors );
-
-            # quality flags
-            $quality[$j] = $separated[3*$j+12];
-
-            # increment counter
-            $j = $j + 2;
-
-         }
-
-      }
-
-      # set default "good" quality
-      $star->quality( 0 );
-
-      # check and set quality flag
-      foreach my $k( 0 .. $#colours ) {
-
-         # if quality not good then set bad flag
-         if( $quality[$k] != 0 ) {
-            $star->quality( 1 );
-         }
-      }
-
-      # push it onto the stack
-      push ( @{$self->{STARS}}, $star );
-
-   }
+  eval { require $class; };
+  if ($@) {
+    warnings::warnif("Error reading IO plugin $class: $@");
+    return;
+  } else {
+    return $class;
+  }
 
 }
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 
 =back
+
+=end __PRIVATE_METHODS__
 
 =head1 COPYRIGHT
 
