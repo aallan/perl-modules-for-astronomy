@@ -67,7 +67,7 @@ print "Connecting to ADS\n";
 
 # query ADS
 my $result = $query->querydb();
-
+print Dumper($result);
 print "Continuing Tests\n";
 
 # grab the comparison from the DATA block
