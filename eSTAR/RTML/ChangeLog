@@ -1,3 +1,8 @@
+2002-03-28  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Parse.pm: Added a whole bunch of query methods needed by
+          the IA to rebuild follow on requests.
+          
 2002-03-22  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Working version, ready to ship as an alpha.

@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.9 2002/03/20 18:33:48 aa Exp $
+#     $Id: Parse.pm,v 1.10 2002/03/28 02:04:50 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.9 2002/03/20 18:33:48 aa Exp $
+$Id: Parse.pm,v 1.10 2002/03/28 02:04:50 aa Exp $
 
 =head1 METHODS
 
@@ -206,6 +206,104 @@ Return the unqiue ID of the observation
 sub id {
   my $self = shift;
   return ${$self->{INTELLIGENTAGENT}}{tag_value};
+}
+
+=item B<real_name>
+
+Return the real name of the observer
+
+  $real_name = $rtml->real_name();
+
+=cut
+sub real_name {
+  my $self = shift;
+  return ${${$self->{CONTACT}}{Name}}{tag_value};
+}
+
+=item B<user_name>
+
+Return the user name of the observer
+
+  $user_name = $rtml->user_name();
+
+=cut
+sub user_name {
+  my $self = shift;
+  return ${${$self->{CONTACT}}{User}}{tag_value};
+}
+
+=item B<institution>
+
+Return the institution that the observer has claimed affiliation to,
+
+  $inst = $rtml->institution();
+
+=cut
+sub institution {
+  my $self = shift;
+  return ${${$self->{CONTACT}}{Institution}}{tag_value};
+}
+
+=item B<email_address>
+
+Return the email address of the observer
+
+  $email = $rtml->email_address();
+
+=cut
+sub email_address {
+  my $self = shift;
+  return ${${$self->{CONTACT}}{Email}}{tag_value};
+}
+
+=item B<target_name>
+
+Return the name of the target
+
+  $target_name = $rtml->target_name();
+
+=cut
+sub target_name {
+  my $self = shift;
+  return ${${${$self->{OBSERVATION}}{Target}}{Targetname}}{tag_value};
+}
+
+=item B<ra>
+
+Return the R.A. of the target
+
+  $ra = $rtml->ra();
+
+=cut
+sub ra {
+  my $self = shift;
+  return ${${${${$self->{OBSERVATION}}{Target}}{Coordinates}}
+         {RightAscension}}{tag_value};
+}
+
+=item B<dec>
+
+Return the Dec. of the target
+
+  $dec = $rtml->dec();
+
+=cut
+sub dec {
+  my $self = shift;
+  return ${${${${$self->{OBSERVATION}}{Target}}{Coordinates}}
+         {Declination}}{tag_value};
+}
+
+=item B<exposure>
+
+Return the exposure time required
+
+  $exposure_time = $rtml->exposure();
+
+=cut
+sub exposure {
+  my $self = shift;
+  return ${${${$self->{OBSERVATION}}{SChedule}}{Exposure}}{tag_value};
 }
 
 # C O N F I G U R E ----------------------------------------------------------
