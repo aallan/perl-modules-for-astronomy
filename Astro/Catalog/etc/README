@@ -1,0 +1,6 @@
+
+This directory contains the SkyCat configuration files
+
+Current files are
+
+ sss.cfg - SuperCOSMOS configuration for Astro::Catalog::Query::SuperCOSMOS

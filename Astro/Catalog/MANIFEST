@@ -42,3 +42,5 @@ t/4_usnoa2.t
 t/4_simbad.t
 t/4_skycat_usno.t
 t/4_skycat_gsc.t
+etc/README
+etc/sss.cfg
