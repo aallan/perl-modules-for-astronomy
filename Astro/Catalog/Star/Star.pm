@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.9 2003/07/25 00:45:43 timj Exp $
+#     $Id: Star.pm,v 1.10 2003/07/27 02:31:54 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -79,14 +79,14 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.9 2003/07/25 00:45:43 timj Exp $
+$Id: Star.pm,v 1.10 2003/07/27 02:31:54 timj Exp $
 
 =head1 METHODS
 
@@ -161,12 +161,19 @@ Return (or set) the ID of the star
    $id = $star->id();
    $star->id( $id );
 
+If an Astro::Coords object is associated with the Star, the name
+field is set in the underlying Astro::Coords object as well as in
+the current Star object.
+
 =cut
 
 sub id {
   my $self = shift;
   if (@_) {
     $self->{ID} = shift;
+
+    my $c = $self->coords;
+    $c->name( $self->{ID} ) if defined $c;
   }
   return $self->{ID};
 }
@@ -190,6 +197,9 @@ the Star will change.
 
 Returns undef if the coordinates have never been specified.
 
+If the name() field is defined in the Astro::Coords object
+the id() field is set in the current Star object.
+
 =cut
 
 sub coords {
@@ -199,6 +209,9 @@ sub coords {
     croak "Coordinates must be an Astro::Coords object"
       unless UNIVERSAL::isa($c, "Astro::Coords");
     $self->{COORDS} = $c;
+
+    # force the ID
+    $self->id( $c->name ) if defined $c->name;
   }
   return $self->{COORDS};
 }
