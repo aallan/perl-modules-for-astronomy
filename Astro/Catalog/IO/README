@@ -3,17 +3,19 @@ This directory contains the "plugins" for catalogue I/O.
 
 Currently supported formats are:
 
- Simple   - Simple ID, RA, Dec format
- Cluster  - Cluster Collaboration format
- JCMT     - JCMT source catalogue
- TST      - Tab Separated Table see SSN/75 for more information.               
- VOTable  - The new standard for Virtual Observatory interoperability,
-            see http://www.ivoa.net/ for more information
- GaiaPick - Gaia/SkyCat Pick Object format. The output from a "Pick Object"
-            in GAIA
- STL      - Starlink's Small Text List format, see SUN/190 and SSN/75
+ Astrom     - Starlink's ASTROM input file format, see SUN/5.
+ Cluster    - Cluster Collaboration format
+ FINDOFF    - Starlink's FINDOFF input/output file format, see SUN/139.
+ GaiaPick   - Gaia/SkyCat Pick Object format. The output from a "Pick Object"
+              in GAIA
+ JCMT       - JCMT source catalogue
  SExtractor - ASCII_HEAD output from SExtractor.
- UKIRTBS  - UKIRT Bright Standard catalogue.
+ STL        - Starlink's Small Text List format, see SUN/190 and SSN/75
+ Simple     - Simple ID, RA, Dec format
+ TST        - Tab Separated Table see SSN/75 for more information.
+ UKIRTBS    - UKIRT Bright Standard catalogue.
+ VOTable    - The new standard for Virtual Observatory interoperability,
+              see http://www.ivoa.net/ for more information
 
 Other catalogue formats that we are considering:
 
