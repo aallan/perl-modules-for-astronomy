@@ -31,14 +31,16 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+use Data::Dumper;
+
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.4 2003/07/27 00:47:01 aa Exp $
+$Id: Cluster.pm,v 1.5 2003/07/27 01:50:04 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -199,7 +201,7 @@ will write a catalogue with R, B-R and B-V.
 =cut
 
 sub _write_catalog {
-  croak ( 'Usage: _write_cluster( $catalog, [%opts] ') unless scalar(@_) >= 1;
+  croak ( 'Usage: _write_catalog( $catalog, [%opts] ') unless scalar(@_) >= 1;
   my $class = shift;
   my $catalog = shift;
 
@@ -222,10 +224,11 @@ sub _write_catalog {
   if ( @_ ) {
     my %args = @_;
   
-    if( defined $args{Colours} ) {
-      $cols = $args{Colours};
-    } elsif( defined $args{Magnitudes} ) {
-      $mags = $args{Magnitudes};
+    if( defined $args{colours} ) {
+      $cols = $args{colours};
+    }
+    if( defined $args{magnitudes} ) {
+      $mags = $args{magnitudes};
     }
       
   } else {
@@ -239,7 +242,8 @@ sub _write_catalog {
   # if we want fewer magnitudes than we have in the object
   # to be written to the cluster file
   foreach my $m ( 0 .. $#{$mags} ) {
-     foreach my $n ( 0 .. $num_mags ) {
+     foreach my $n ( 0 .. $num_mags-1 ) {
+        #print "${$mags}[$m] == $filters[$n]\n";
         if ( ${$mags}[$m] eq $filters[$n] ) {
            push( @out_mags, ${$mags}[$m] );
         }   
@@ -248,7 +252,8 @@ sub _write_catalog {
 
   # same for colours
   foreach my $k ( 0 .. $#{$cols} ) {
-     foreach my $l ( 0 .. $num_cols ) {
+     foreach my $l ( 0 .. $num_cols-1 ) {
+        #print "${$cols}[$k] == $colours[$l]\n";
         if ( ${$cols}[$k] eq $colours[$l] ) {
            push( @out_cols, ${$cols}[$k] );
         }   
@@ -266,11 +271,21 @@ sub _write_catalog {
   push( @output, "$total colours were created\n" );
   push( @output, "@out_mags @out_cols\n" );
   
-  $output_line = $catalog->origin() . 
-      ", Field centre at RA ".$catalog->get_ra().", Dec ".$catalog->get_dec();
+  # wierd and odd
+  $output_line = 
+    "Origin: " . $catalog->origin() . ", " if defined $catalog->origin();
+    
+  if( defined $catalog->get_ra() && defined $catalog->get_dec() ) {
+     $output_line = $output_line . 
+       " Field centre at RA " . $catalog->get_ra() . 
+       ", Dec " . $catalog->get_dec() . ", ";
+  }
+       
   $output_line = $output_line . 
-      ", Radius ".$catalog->get_radius()." arcminutes\n";
+      " Radius " . $catalog->get_radius() . 
+      " arcminutes" if defined $catalog->get_radius();
 
+  $output_line = $output_line . "\n";
   push( @output, $output_line );
 
   # write body
@@ -295,7 +310,7 @@ sub _write_catalog {
      }   
 
      # magnitudes
-     foreach my $i ( 0 .. $num_mags-1 ) {
+     foreach my $i ( 0 .. $#$mags ) {
 
         my $doit = 0;
 
@@ -305,7 +320,7 @@ sub _write_catalog {
 
            $doit = -1;
            # check to see if we have a valid filter
-           foreach my $m ( 0 .. $#out_mags ) {
+           foreach my $m ( 0 .. $#out_mags ) {           
               $doit = 1 if ( $out_mags[$m] eq ${$mags}[$i] );
            }
         }
@@ -323,7 +338,7 @@ sub _write_catalog {
 
 
      # magnitudes
-     foreach my $i ( 0 .. $num_cols-1 ) {
+     foreach my $i ( 0 .. $#$cols ) {
 
         my $doit = 0;
 
