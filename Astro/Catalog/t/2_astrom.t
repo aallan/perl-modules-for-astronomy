@@ -57,7 +57,8 @@ ok( $catalog->write_catalog( Format => 'Astrom', File => $tempfile ),
     "Check catalog write" );
 
 # Now we need to read in the catalogue into an array.
-open my $fh, $tempfile;
+my $fh;
+open $fh, $tempfile;
 my @written_cat = <$fh>;
 chomp @written_cat;
 close $fh;
