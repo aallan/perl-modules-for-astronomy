@@ -37,6 +37,8 @@ The package provides the following classes
 
     Astro::DSS
 
+further information can be found in the POD included in DSS.pm
+
 Where can I get it?
 -------------------
 

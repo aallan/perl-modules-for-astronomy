@@ -19,7 +19,7 @@ package Astro::DSS;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: DSS.pm,v 1.3 2001/12/11 02:27:04 aa Exp $
+#     $Id: DSS.pm,v 1.4 2001/12/11 02:31:26 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -54,7 +54,8 @@ The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
-It will save returned files into the ESTAR_DATA directory,
+It will save returned files into the ESTAR_DATA directory or to TMP if
+the ESTAR_DATA environment variable is not defined.
 
 =cut
 
@@ -68,13 +69,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec qw(tmpdir);
 use Carp;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: DSS.pm,v 1.3 2001/12/11 02:27:04 aa Exp $
+$Id: DSS.pm,v 1.4 2001/12/11 02:31:26 aa Exp $
 
 =head1 METHODS
 
