@@ -1,5 +1,9 @@
 2001-11-28 Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Result.pm: listofobjects() method added
+        
+2001-11-27 Alasdair Allan <aa@astro.ex.ac.uk>
+
         * Inital release, minimal functionality
 
 2001-11-12 Alasdair Allan <aa@astro.ex.ac.uk>
