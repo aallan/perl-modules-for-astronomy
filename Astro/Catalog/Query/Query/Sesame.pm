@@ -31,11 +31,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Sesame.pm,v 1.4 2003/09/12 22:38:59 aa Exp $
+$Id: Sesame.pm,v 1.5 2003/09/30 11:48:25 aa Exp $
 
 =head1 METHODS
 
@@ -202,7 +202,15 @@ sub _parse_query {
   #print Dumper( @result );
   
   # grab line from return result
-  my $line = $result[2];
+  my $coord_line = undef;
+  foreach my $i ( 0 ... $#result ) {
+     if ( $result[$i] =~ /^%J / ) {
+       $coord_line = $i;
+       last;
+     }  
+  }
+  
+  my $line = $result[$coord_line];
   
   # split it on \s+
   my @coords = split( /\s+/,$line);

@@ -1,3 +1,8 @@
+2003-09-30  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query/Query/Sesame.pm: Modified to cope with change in return
+          format by CDS. 
+                  
 2003-09-24  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query/SIMBAD.pm: Removed debugging statements which 
@@ -44,7 +49,7 @@
         
 2003-09-12  Alasdair Allan <aa@astro.ex.ac.uk>
 
-        * Query/Query/Sesame.pm: Modified to copy with change in return
+        * Query/Query/Sesame.pm: Modified to cope with change in return
           format by CDS.
 
         * Query/Query/USNOA2.pm: Fixed problem with USNO-A2 having bogus

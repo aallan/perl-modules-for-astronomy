@@ -45,3 +45,4 @@ t/4_skycat_supercos.t
 etc/README
 etc/sss.cfg
 etc/skycat.cfg
+META.yml                                Module meta-data (added by MakeMaker)
