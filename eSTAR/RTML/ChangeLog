@@ -1,3 +1,24 @@
+2002-03-18  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Parse.pm: Parsing routine folded back so that no tags need mentioned
+          specifically by name, should now parse RTML reliably without missing
+          any "suprise" tags. However the parsing routine isn't properly
+          recursive so it will run out of steam four levels down the tree.
+          While we currently don't need this much recursion, if we ever do
+          it might be worth replacing the current _parse_tag routine with
+          something properly recursive. Right now I'm too lazy...
+
+          Value query methods except for dtd() and type() not yet implemented,
+          I'll do it as I go along and actually need the values. I'll pass
+          back something easy to interprate rather than the current tree
+          structure held in $self->{DOCUMENT}.
+          
+        * t/parse.t: Not entirely a proper harness, while it parses the
+          documents in t/rtml/* it doesn't check for values except the 
+          values of $self->{DTD} and $self->{TYPE}.
+          
+        * r/rtml/*: Test documents added.
+          
 2002-03-14  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Most of the parsing stuff implemented, no message creation code.

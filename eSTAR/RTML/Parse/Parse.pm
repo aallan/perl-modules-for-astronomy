@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.2 2002/03/15 05:26:13 aa Exp $
+#     $Id: Parse.pm,v 1.3 2002/03/18 05:32:00 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -55,13 +55,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.2 2002/03/15 05:26:13 aa Exp $
+$Id: Parse.pm,v 1.3 2002/03/18 05:32:00 aa Exp $
 
 =head1 METHODS
 
@@ -73,7 +73,7 @@ $Id: Parse.pm,v 1.2 2002/03/15 05:26:13 aa Exp $
 
 Create a new instance from a hash of options
 
-  $message = new eSTAR::RTML::Parse( $rtml );
+  $message = new eSTAR::RTML::Parse( RTML => $rtml );
 
 returns a reference to an message object.
 
@@ -221,7 +221,9 @@ These methods are for internal use only.
 
 =item B<_parse_rtml>
 
-Private method to parse the RTML document.
+Private method to parse the RTML document. I can't see why you'd want to call
+this from outside the C<eSTAR::RTML::Parse> module, since its called via the
+rtml() method directly during construction of the object.
 
 =cut
 
@@ -236,359 +238,14 @@ sub _parse_rtml {
    
    # parse the remainder of the RTML document
    for ( my $i = 3; $i <= $#document; $i++ ) {
-      print "# $i = $document[$i]";
+      print "# $i = $document[$i](*)\n";
       
-      # CONTACT TAG
-      # -----------
-      if( $document[$i] eq 'Contact' ) {
-         print "*\n";
-         
-         # grab section
-         my @contact = @{$document[$i+1]};
-         
-         # check for attributes
-         if( defined ${$contact[0]}{'PI'} ) {
-            ${$SELF->{CONTACT}}{'PI'} = ${$contact[0]}{'PI'};
-         }   
-         
-         # loop through sub-tags
-         for ( my $j = 3; $j <= $#contact; $j++ ) {
-            print "#    $j = $contact[$j]*\n";
-            
-            # grab the hash entry
-            my $entry = ${$contact[$j+1]}[2];
-            chomp($entry);
-           
-            # remove leading spaces
-            $entry =~ s/^\s+//;
-            
-            # remove trailing spaces
-            $entry =~ s/\s+$//;
-            
-            chomp($entry);
-            
-            # assign the entry
-            ${$SELF->{CONTACT}}{$contact[$j]} = $entry;
-            
-            # increment counter
-            $j = $j + 3;
-         }
-      }
-      
-      # LOCATION TAG
-      # ------------
-      elsif( $document[$i] eq 'Location' ) {
-         print "*\n";
-         
-         # grab section
-         my @location = @{$document[$i+1]};
-         
-         # loop through sub-tags
-         for ( my $j = 3; $j <= $#location; $j++ ) {
-            print "#    $j = $location[$j]*\n";
-            
-            # grab the hash entry
-            my $entry = ${$location[$j+1]}[2];
-            chomp($entry);
-           
-            # remove leading spaces
-            $entry =~ s/^\s+//;
-            
-            # remove trailing spaces
-            $entry =~ s/\s+$//;
-            
-            chomp($entry);
-            
-            # assign the entry
-            ${$SELF->{LOCATION}}{$location[$j]} = $entry;
-            
-            # increment counter
-            $j = $j + 3;
-         }
-      }
-      
-      # INTELLIGENT AGENT TAG
-      # ---------------------
-      elsif( $document[$i] eq 'IntelligentAgent' ) {
-         print "*\n";
-         
-         # grab section
-         my @agent = @{$document[$i+1]};
-         
-         # check for attributes
-         if( defined ${$agent[0]}{'host'} ) {
-            ${$SELF->{IA}}{'host'} = ${$agent[0]}{'host'};
-         }
-         if( defined ${$agent[0]}{'port'} ) {
-            ${$SELF->{IA}}{'port'} = ${$agent[0]}{'port'};
-         }
-         
-         # check for CDATA
-         if( defined $agent[2] ) { 
-         
-            # clean up CDATA
-            my $entry = $agent[2];           
-            $entry =~ s/^\s+//;            
-            $entry =~ s/\s+$//;
-            chomp($entry);
-            
-            # push into object
-            ${$SELF->{IA}}{'identity'} = $entry;
-         }
-            
-         # loop through sub-tags
-         for ( my $j = 3; $j <= $#agent; $j++ ) {
-            print "#    $j = $agent[$j]*\n";
-            
-            # grab the hash entry
-            my $entry = ${$agent[$j+1]}[2];
-            chomp($entry);
-           
-            # remove leading spaces
-            $entry =~ s/^\s+//;
-            
-            # remove trailing spaces
-            $entry =~ s/\s+$//;
-            
-            chomp($entry);
-            
-            # assign the entry
-            ${$SELF->{IA}}{$agent[$j]} = $entry;
-            
-            # increment counter
-            $j = $j + 3;
-         }
-      }      
-      
-      # PROJECT TAG
-      # -----------
-      elsif( $document[$i] eq 'Project' ) {
-         print "*\n";
-         
-         # grab section
-         my @project = @{$document[$i+1]};
-         
-         # loop through sub-tags
-         for ( my $j = 3; $j <= $#project; $j++ ) {
-            print "#    $j = $project[$j]*\n";
-            
-            # grab the hash entry
-            my $entry = ${$project[$j+1]}[2];
-            chomp($entry);
-           
-            # remove leading spaces
-            $entry =~ s/^\s+//;
-            
-            # remove trailing spaces
-            $entry =~ s/\s+$//;
-            
-            chomp($entry);
-            
-            # assign the entry
-            ${$SELF->{PROJECT}}{$project[$j]} = $entry;
-            
-            # increment counter
-            $j = $j + 3;
-         }
-      }      
-      
-      # OBSERVATION TAG
-      # ---------------
-      elsif( $document[$i] eq 'Observation' ) {
-         print "*\n";
-         
-         # grab section
-         my @obs = @{$document[$i+1]};
-         
-         # check for attributes
-         if( defined ${$obs[0]}{'status'} ) {
-            ${$SELF->{OBSERVATION}}{'status'} = ${$obs[0]}{'status'};
-         }
-         
-         # loop through sub-tags
-         for ( my $j = 3; $j <= $#obs; $j++ ) {
-            print "#    $j = $obs[$j]";
-            
-            # TARGET
-            # ------
-            if ( $obs[$j] eq 'Target' ) {
-               print "*\n";
-           
-               # grab section
-               my @target = @{$obs[$j+1]};
-            
-               # check for attributes
-               if( defined ${$obs[0]}{'status'} ) {
-                 ${$SELF->{OBSERVATION}}{'Target'}{'type'} =
-                                              ${$target[0]}{'type'};
-               }
-               
-               # loop through sub-tags
-               for ( my $k = 3; $k <= $#target; $k++ ) {
-                  print "#       $k = $target[$k]";
-            
-                  if ( $target[$k] eq 'Flux' ) {
-                  
-                     # FLUX
-                     # ----
-                     print "*\n";
-                     
-                     my @flux = @{$target[$k+1]};
-                     
-                     # check for attributes
-                     if( defined ${$flux[0]}{'type'} ) {
-                      ${$SELF->{OBSERVATION}}{'Target'}{'Flux'}{'type'} =
-                                              ${$flux[0]}{'type'};
-                     }
-                     if( defined ${$flux[0]}{'units'} ) {
-                      ${$SELF->{OBSERVATION}}{'Target'}{'Flux'}{'units'} =
-                                              ${$flux[0]}{'units'};
-                     }
-                     if( defined ${$flux[0]}{'wavelength'} ) {
-                      ${$SELF->{OBSERVATION}}{'Target'}{'Flux'}{'wavelength'} =
-                                              ${$flux[0]}{'wavelength'};
-                     }
-                     
-                     # grab tag value
-                     if( defined $flux[2] ) { 
-                        my $entry = $flux[2];
-                        $entry =~ s/^\s+//;
-                        $entry =~ s/\s+$//;
-                        chomp($entry);
-                        ${$SELF->{OBSERVATION}}{'Target'}{'Flux'}{'tag_value'} =
-                                               $entry;
-                     }
-                     
-                 
-                  } elsif ( $target[$k] eq 'Coordinates' ) {
-
-                    # COORDINATES
-                    # -----------
-                    print "*\n";
-                    
-                    # grab section
-                    my @coords = @{$target[$k+1]};
-                    
-                    # check for attributes
-                    if( defined ${$obs[0]}{'status'} ) {
-                      ${$SELF->{OBSERVATION}}{'Target'}{'Coordinates'}{'type'} =
-                                              ${$coords[0]}{'type'};
-                    }
-                    
-                    # loop through sub-tags
-                    for ( my $l = 3; $l <= $#coords; $l++ ) {
-                       print "#          $l = $coords[$l]*\n";
-                    
-                       # grab the hash entry
-                       my $entry = ${$coords[$l+1]}[2];
-                       chomp($entry);
-           
-                       # remove leading spaces
-                       $entry =~ s/^\s+//;
-            
-                       # remove trailing spaces
-                       $entry =~ s/\s+$//;
-            
-                       chomp($entry);
-             
-                       # assign the entry
-                  ${$SELF->{OBSERVATION}}{'Target'}{'Coordinates'}{$coords[$l]} 
-                                                = $entry;
-                       
-                     
-                       # increment counter
-                       $l = $l + 3;
-                    }                  
-                  
-                  } elsif ( $target[$k] eq 'Device' ) {
-                 
-                     # DEVICE
-                     # ------
-                     print "?\n";
-
-
-
-
-                  } elsif ( $target[$k] eq 'TrackRate' ) {
-                      print "*\n";
-                    
-                     # TRACKRATE
-                     # ---------
-                     my @rate = @{$target[$k+1]};
-
-                     # check for attributes
-                     if( defined ${$rate[0]}{'type'} ) {
-                      ${$SELF->{OBSERVATION}}{'Target'}{'TrackRate'}{'type'} =
-                                              ${$rate[0]}{'type'};
-                     }
-                  
-                  }
-                  
-                  # "normal" entry
-                  else {
-                     print "*\n";
-                     
-                     # grab the hash entry
-                     my $entry = ${$target[$k+1]}[2];
-                     chomp($entry);
-           
-                     # remove leading spaces
-                     $entry =~ s/^\s+//;
-            
-                     # remove trailing spaces
-                     $entry =~ s/\s+$//;
-            
-                     chomp($entry);
-             
-                     # assign the entry
-                     ${$SELF->{OBSERVATION}}{'Target'}{$target[$k]} = $entry;
-                  
-                  } 
-             
-                  # increment counter
-                  $k = $k + 3;
-               }
-            }
-            
-            # SCHEDULE
-            # --------
-            elsif ( $obs[$j] eq 'Schedule' ) {
-               print "%\n";
-            
-            }
-            
-            # CALIBRATION
-            # -----------
-            elsif ( $obs[$j] eq 'Calibration' ) {
-               print "%\n";
-
-            }
-            
-            # UNKOWN
-            # ------
-            
-            else {
-               # icky!
-               print "?\n";
-            }
-            
-            # increment counter
-            $j = $j + 3;
-         }
-      }           
-      
-      # UNKOWN TAG
-      # ----------
-      else {
-         # icky!
-         print "?\n";
-      }
-      
-      
+      my @tag = @{$document[$i+1]};
+      # parse the tag
+      _parse_tag( $document[$i], \@tag );
       
       # increment counter
       $i = $i + 3;
-    
       
    }
    
@@ -597,7 +254,317 @@ sub _parse_rtml {
 
 }
 
+=item B<_parse_tag>
 
+Private method to parse individual tags within the RTML, called from the
+private method C<_parse_rtml>. Trust me, you don't want to call this from
+outside the C<eSTAR::RTML::Parse> module, it'll almost certainly do odd
+things unless you can figure out exactly what sort of array reference you
+need to pass in. 
+
+=cut
+
+sub _parse_tag {
+  croak 'Parse.pm: _parse_tag() usage error'
+    unless scalar(@_) == 2 ;
+
+  # read arguements
+  my ( $name, $array_reference ) = @_;
+  my @array = @$array_reference;
+
+  # grab section
+  my @obs = @$array_reference;
+         
+  # check for attributes         
+  _parse_sub_attrib( $name, \%{$obs[0]} );  
+         
+  # check for CDATA
+  _parse_sub_value( $name, \@obs );  
+        
+  # loop through sub-tags individually, nearly all have
+  # their own sub-tags so need to deal with them individually
+         
+  for ( my $j = 3; $j <= $#obs; $j++ ) {
+     print "#    $j = $obs[$j]*\n";
+         
+     # grab section
+     my @generic = @{$obs[$j+1]};
+         
+     # check for attributes
+     _parse_sub_sub_attrib( $name, $obs[$j],
+                            \%{$generic[0]} );
+         
+     # check for CDATA
+     _parse_sub_sub_value( $name, $obs[$j], 
+                                     \@generic ); 
+               
+     # loop through sub-tags
+     for ( my $k = 3; $k <= $#generic; $k++ ) {
+        print "#       $k = $generic[$k]*\n";
+                  
+        # grab sub-tag array reference
+        my @array = @{$generic[$k+1]};
+
+        # check for attributes
+        _parse_sub_sub_sub_attrib( $name, $obs[$j],
+                                   $generic[$k], \%{$array[0]} );
+        # loop through sub-tags
+        _parse_sub_sub_sub_tag( $name, $obs[$j], 
+                                $generic[$k], \@array );
+        # check for CDATA
+        _parse_sub_sub_sub_value( $name, $obs[$j], 
+                                  $generic[$k] , \@array ); 
+            
+        # increment counter
+        $k = $k + 3;
+        
+        ##########################################################
+        #                                                        #
+        # NB: This is where to add another sub loop if we end    #
+        #     up having sub-sub-sub-sub tags at any point. The   #
+        #     entire thing should really be replaced with a      #
+        #     recursive parse routine at some point.             #
+        #                                                        #
+        #     Unfortunately I'm just to lazy to do it the right  #
+        #     way so you'll have to live with this...            #
+        #                                                        #
+        ##########################################################
+               
+      }                             
+               
+      # increment counter
+      $j = $j + 3;
+   }
+
+}
+
+# These routines are so private the don't even get POD documentation, I can
+# just about see a reason why someone should want to _parse_rtml() from
+# outside the module, and maybe (just maybe) _parse_tag(). But they'd have
+# to be insane if they wanted to call any of these routines. They do the
+# work of the recursive parsing down the XML tree (and yes, I really should
+# write something properly recursive to do this when I get time.
+
+# _parse_sub*_tag() routines: these parse the sub tag content
+
+sub _parse_sub_tag {
+  croak 'Parse.pm: _parse_sub_tag() usage error'
+    unless scalar(@_) == 2 ;
+
+  # read arguements
+  my ( $name, $array_reference ) = @_;
+  my @array = @$array_reference;
+   
+  for ( my $j = 3; $j <= $#array; $j++ ) {
+     print "#    $j = $array[$j]*\n";
+            
+     # grab the hash entry
+     my $entry = ${$array[$j+1]}[2];
+     chomp($entry);
+           
+     # remove leading spaces
+     $entry =~ s/^\s+//;
+            
+     # remove trailing spaces
+     $entry =~ s/\s+$//;
+            
+     chomp($entry);
+            
+     # assign the entry
+     ${$SELF->{uc($name)}}{$array[$j]} = $entry;
+            
+     # increment counter
+     $j = $j + 3;
+   }
+
+}
+
+sub _parse_sub_sub_tag {
+  croak 'Parse.pm: _parse_sub_sub_tag() usage error'
+    unless scalar(@_) == 3 ;
+
+  # read arguements
+  my ( $name, $sub_name, $array_reference ) = @_;
+  my @array = @$array_reference;
+  
+  # loop through sub-tags
+  for ( my $l = 3; $l <= $#array; $l++ ) {
+     print "#          $l = $array[$l]*\n";
+                    
+     # grab the hash entry
+     my $entry = ${$array[$l+1]}[2];
+     chomp($entry);
+           
+     # remove leading spaces
+     $entry =~ s/^\s+//;
+            
+     # remove trailing spaces
+     $entry =~ s/\s+$//;
+            
+     chomp($entry);
+             
+     # assign the entry
+     ${$SELF->{uc($name)}}{ucfirst(lc($sub_name))}{$array[$l]}  = $entry;
+     
+     # increment counter
+     $l = $l + 3;
+     
+   }  
+} 
+
+sub _parse_sub_sub_sub_tag {
+  croak 'Parse.pm: _parse_sub_sub_sub_tag() usage error'
+    unless scalar(@_) == 4 ;
+
+  # read arguements
+  my ( $name, $sub_name, $subsub_name, $array_reference ) = @_;
+  my @array = @$array_reference;
+  
+  # loop through sub-tags
+  for ( my $l = 3; $l <= $#array; $l++ ) {
+     print "#          $l = $array[$l]*\n";
+                    
+     # grab the hash entry
+     my $entry = ${$array[$l+1]}[2];
+     chomp($entry);
+           
+     # remove leading spaces
+     $entry =~ s/^\s+//;
+            
+     # remove trailing spaces
+     $entry =~ s/\s+$//;
+            
+     chomp($entry);
+             
+     # assign the entry
+     ${$SELF->{uc($name)}}
+       {ucfirst(lc($sub_name))}
+       {ucfirst(lc($subsub_name))}{$array[$l]} = $entry;
+     
+     # increment counter
+     $l = $l + 3;
+   }  
+} 
+
+# _parse_sub*_attrib() routines: these parse the sub tag attributes
+
+sub _parse_sub_attrib { 
+  croak 'Parse.pm: _parse_sub_attrib() usage error'
+    unless scalar(@_) == 2 ;
+
+  # read arguements
+  my ( $name, $hash_reference ) = @_;
+  my %hash = %$hash_reference;
+
+  # loop through hash and drop all the keys into the parsed output
+  # as hash items in the list. This isn't really neat, perhaps a 
+  # hash of hashs would be better?
+  foreach my $key ( sort keys %hash ) {
+     ${$SELF->{uc($name)}}{$key} = $hash{$key};
+  }
+  
+}
+
+sub _parse_sub_sub_attrib { 
+  croak 'Parse.pm: _parse_sub_sub_attrib() usage error'
+    unless scalar(@_) == 3 ;
+
+  # read arguements
+  my ( $name, $sub_name, $hash_reference ) = @_;
+  my %hash = %$hash_reference;
+
+  # loop through hash and drop all the keys into the parsed output
+  # as hash items in the list. This isn't really neat, perhaps a 
+  # hash of hashs would be better?
+  foreach my $key ( sort keys %hash ) {
+     ${$SELF->{uc($name)}}{ucfirst(lc($sub_name))}{$key} = $hash{$key};
+  }
+  
+}
+sub _parse_sub_sub_sub_attrib { 
+  croak 'Parse.pm: _parse_sub_sub_sub_attrib() usage error'
+    unless scalar(@_) == 4 ;
+
+  # read arguements
+  my ( $name, $sub_name, $subsub_name, $hash_reference ) = @_;
+  my %hash = %$hash_reference;
+
+  # loop through hash and drop all the keys into the parsed output
+  # as hash items in the list. This isn't really neat, perhaps a 
+  # hash of hashs would be better?
+  foreach my $key ( sort keys %hash ) {
+     ${$SELF->{uc($name)}}
+        {ucfirst(lc($sub_name))}
+        {ucfirst(lc($subsub_name))}{$key} = $hash{$key};
+  }
+  
+}
+
+# _parse_sub*_value() routines: these grab the tags CDATA
+
+sub _parse_sub_value {
+  croak 'Parse.pm: _parse_sub_value() usage error'
+    unless scalar(@_) == 2 ;
+
+  # read arguements
+  my ( $name, $array_reference ) = @_;
+  my @array = @$array_reference;
+       
+  # grab tag value
+  if( defined $array[2] ) { 
+     my $entry = $array[2];
+     $entry =~ s/^\s+//;
+     $entry =~ s/\s+$//;
+     chomp($entry);
+     
+     if( $entry ne '' ) {
+        ${$SELF->{uc($name)}}{'tag_value'} = $entry;
+     }   
+  }
+}  
+
+sub _parse_sub_sub_value {
+  croak 'Parse.pm: _parse_sub_sub_value() usage error'
+    unless scalar(@_) == 3 ;
+
+  # read arguements
+  my ( $name, $sub_name, $array_reference ) = @_;
+  my @array = @$array_reference;
+       
+  # grab tag value
+  if( defined $array[2] ) { 
+     my $entry = $array[2];
+     $entry =~ s/^\s+//;
+     $entry =~ s/\s+$//;
+     chomp($entry);
+     if( $entry ne '' ) {
+        ${$SELF->{uc($name)}}{ucfirst(lc($sub_name))}{'tag_value'} = $entry;
+     }   
+  }
+}
+
+sub _parse_sub_sub_sub_value {
+  croak 'Parse.pm: _parse_sub_sub_sub_value() usage error'
+    unless scalar(@_) == 4 ;
+
+  # read arguements
+  my ( $name, $sub_name, $subsub_name, $array_reference ) = @_;
+  my @array = @$array_reference;
+       
+  # grab tag value
+  if( defined $array[2] ) { 
+     my $entry = $array[2];
+     $entry =~ s/^\s+//;
+     $entry =~ s/\s+$//;
+     chomp($entry);
+     if( $entry ne '' ) {
+        ${$SELF->{uc($name)}}
+           {ucfirst(lc($sub_name))}
+           {ucfirst(lc($subsub_name))}{'tag_value'} = $entry;
+     }      
+  }
+}
+                  
 =head1 COPYRIGHT
 
 Copyright (C) 2002 University of Exeter. All Rights Reserved.
