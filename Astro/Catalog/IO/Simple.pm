@@ -33,14 +33,14 @@ use Astro::Coords;
 
 use Data::Dumper;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Simple.pm,v 1.3 2003/07/28 00:34:16 timj Exp $
+$Id: Simple.pm,v 1.4 2003/07/28 00:40:15 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -103,9 +103,6 @@ sub _read_catalog {
 		         \s*
                          (?:\#\s*(.*))?$                    # comment [8]
 		/xi);
-
-      use Data::Dumper;
-      print Dumper(\@match);
 
       # Abort if we do not have matches for the first 8 fields
       # type is optional
@@ -248,9 +245,6 @@ sub _write_catalog {
     } else {
       $comment = "Star $chunks[0] has no coordinates.";
     }
-
-    use Data::Dumper;
-    print Dumper($star);
 
     # now the line. If we have comment set this is just a comment line
     if (defined $comment) {
