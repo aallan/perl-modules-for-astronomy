@@ -4,4 +4,4 @@ Makefile.PL
 GPL
 ChangeLog
 Query/Query.pm
-t/query.t.t
+t/query.t
