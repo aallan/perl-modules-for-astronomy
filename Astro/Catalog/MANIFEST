@@ -36,4 +36,4 @@ SuperCOSMOS/Query/Makefile.PL
 SuperCOSMOS/t/query.t
 t/star.t
 t/catalog.t
-META.yml                                Module meta-data (added by MakeMaker)
+t/1_compile.t
