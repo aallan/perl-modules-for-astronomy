@@ -63,7 +63,7 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 $VERSION = '0.01';
 $DEBUG = 0;
@@ -84,7 +84,7 @@ my %CONFIG;
 
 =head1 REVISION
 
-$Id: SuperCOSMOS.pm,v 1.6 2003/09/25 21:54:32 aa Exp $
+$Id: SuperCOSMOS.pm,v 1.7 2003/09/25 23:28:14 aa Exp $
 
 =head1 METHODS
 
@@ -522,6 +522,12 @@ sub cfg_file {
     
     # reset to the default
     $cfg_file = File::Spec->catfile( $directory, "sss.cfg" );    
+    
+    # debugging and testing purposes
+    unless ( -f $cfg_file ) {
+      # use blib version!
+      $cfg_file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
+    }    
   }
   
   #print "SuperCOSMOS.pm: \$cfg_file in cfg_file() is $cfg_file\n" if $DEBUG;
