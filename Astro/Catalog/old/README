@@ -25,3 +25,9 @@ implementations that I want to keep around just in case I need them again.
     the GSC is one of these cases. So, currently, the custom GSC module and
     the SkyCat GSC module don't return the same thing. I'm saving this code
     until they do and it becomes useful again.
+
+ test.pl
+ 
+    A simple test script which resolves a target using the 
+    Astro::Catalog::Query::SIMBAD module, then retrieves a small cone
+    search around the target.
