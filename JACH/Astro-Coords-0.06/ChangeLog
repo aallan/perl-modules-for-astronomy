@@ -1,0 +1,54 @@
+2003-07-19  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Makefile.PL: Incrememnted module version number to go with
+          Tim's changes.
+
+2003-07-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm: Add rise/set/transit time and definitions
+	of twilight.
+
+2003-03-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (calculate): Trap zero increment
+
+2003-02-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm: Add lst to the return hash in calculate method
+
+2002-11-10  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (calculate): Add calculate method
+
+2002-11-08  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (_cvt_fromrad): Fix "array" formatting of seconds
+
+2002-09-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (comment): Add comment method
+
+2002-08-16  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords/Elements.pm (_apparent): Add perturbation calculation 
+
+	* lib/Astro/Coords.pm (dec&ra): Add J2000 RA&Dec for all modes.
+
+2002-08-04  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* lib/Astro/Coords.pm (usenow): Add usenow method
+
+2002-08-03  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* t/basic.t: Test now works for orbital elements
+
+	* lib/Astro/Coords/Elements.pm (new): Now support '1999 Apr 1.445' 
+	format for Epoch
+
+	* lib/Astro/Coords.pm (new): Add support for Interpolated coordinates
+
+	* lib/Astro/Coords/Interpolated.pm: Create
+
+	* lib/Astro/Coords.pm: Add name accessor method
+
+
