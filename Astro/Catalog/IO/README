@@ -8,12 +8,10 @@ Currently supported formats are:
  JCMT    - JCMT source catalogue
  TST     - Tab Separated Table                 
            http://www.starlink.rl.ac.uk/star/docs/ssn75.htx//ssn75.html  
+ VOTable - The new standard for Virtual Observatory interoperability
+           http://www.ivoa.net
 
 Other catalogue formats that we are considering:
-
- VOTable
-   The new standard for Virtual Observatory interoperability
-    http://www.ivoa.net
 
  STL     - Small Text List (Starlink)
    http://www.starlink.rl.ac.uk/star/docs/sun190.htx//sun190.html
@@ -28,14 +26,5 @@ Other catalogue formats that we are considering:
    The output from a "Pick Object" in GAIA
 
  OASIS
-
-  Text format from oasis. See
-
- http://irsa.ipac.caltech.edu/applications/Oasis/svc/index.html
-
- http://irsa.ipac.caltech.edu/cgi-bin/Oasis/CatSearch/nph-catsearch?server=%40rmt_gravel&database=iras&catalog=iraspsc&sql=select+ra%2C+dec%2C+fnu_12+from+iraspsc&within=2+degrees&objstr=M31
-
-this is an MSX query. We need to know what the column names are in the actual MSX database
-table (!!):
-
- http://irsa.ipac.caltech.edu/cgi-bin/Oasis/CatSearch/nph-catsearch?server=%40rmt_gravel&database=msx&catalog=msxtable&sql=select+ra%2C+dec+from+msxtable&within=2+degrees&objstr=M18
+  Text format from oasis.
+  http://irsa.ipac.caltech.edu/applications/Oasis/svc/index.html

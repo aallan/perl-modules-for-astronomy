@@ -111,7 +111,8 @@ $catalog_data->fieldcentre( RA => '01 10 12.9',
 # Grab comparison from ESO/ST-ECF Archive Site
 # --------------------------------------------
 
-my $gsc_byname = new Astro::Catalog::Query::GSC( Target => 'HT Cas',
+my $gsc_byname = new Astro::Catalog::Query::GSC(  RA => "01 10 12.9",
+                                                  Dec => "+60 04 35.9",
                                                   Radius => '5' );
                                                      
 print "# Connecting to ESO/ST-ECF GSC Catalogue\n";

@@ -6,7 +6,7 @@ my $cfg_to_install = "sss.cfg skycat.cfg";
 
 WriteMakefile( 
                'NAME'           => 'Astro::Catalog',
-	       'VERSION'        => '3.2.5',
+	       'VERSION'        => '3.3.0',
                'EXE_FILES'      => [ ],
                'PREREQ_PM'      => { 'LWP'              => 5.53,
                                      'Net::Domain'      => 2.13,
@@ -21,7 +21,8 @@ WriteMakefile(
                                      'SOAP::Lite'       => 0.00,
                                      'Test'             => 1.24,
                                      'Carp'             => 1.01,
-                                     'Data::Dumper'     => 2.12
+                                     'Data::Dumper'     => 2.12,
+                                     'VOTable'          => 0.01
 	                           },
 	       'dist'           => { COMPRESS => "gzip -9f"},
 	       ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

@@ -1,3 +1,8 @@
+2003-10-13  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.3.0)
+
+        * Added VOTable support (write only) as a pluggable IO module
+          along with associated test harness.
+          
 2003-09-30  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Query/Query/Sesame.pm: Modified to cope with change in return

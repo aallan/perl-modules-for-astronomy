@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.37 2003/09/12 22:38:59 aa Exp $
+#     $Id: Catalog.pm,v 1.38 2003/10/13 10:38:20 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,7 +64,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.37 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.38 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -72,7 +72,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.37 2003/09/12 22:38:59 aa Exp $
+$Id: Catalog.pm,v 1.38 2003/10/13 10:38:20 aa Exp $
 
 =head1 METHODS
 
@@ -1354,6 +1354,7 @@ sub _load_io_plugin {
   # and assume uppercase elsewhere.
   $format = 'JCMT' if $format eq 'Jcmt';
   $format = 'TST'  if $format eq 'Tst';
+  $format = 'VOTable' if $format eq 'Votable';
 
   my $class = "Astro::Catalog::IO::" . $format;
 

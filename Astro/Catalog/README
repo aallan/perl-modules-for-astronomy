@@ -37,6 +37,10 @@ The madatory requirement of the Astro::Catalog package are,
   Test::More
   Data::Dumper
   Carp
+  VOTable
+
+See http://heasarc.gsfc.nasa.gov/classx/pub/votable/ to obtain the GSFC
+VOTable package.
 
 Provides
 --------
@@ -92,7 +96,8 @@ query plugins, these are
   Astro::Catalog::IO::Cluster
   Astro::Catalog::IO::JCMT
   Astro::Catalog::IO::Simple
-  Astro::Catalog::IO::TST
+  Astro::Catalog::IO::TST      (read only)
+  Astro::Catalog::IO::VOTable  (write only)
   Astro::Catalog::Transport::REST
   Astro::Catalog::Transport::WebService
   Astro::Catalog::Query
@@ -103,7 +108,8 @@ class Astro::Catalog::Query. The Astro::Catalog::IO modules provide pluggable
 polymorphic input/output.
 
 It should be noted that Astro::Catalog::IO::TST does not currently provide
-a _write_catalog() function.
+a _write_catalog() function, and that Astro::Catalog::IO::VOTable does not
+provide a _read_catalog() function.
  
 Where can I get it?
 -------------------
