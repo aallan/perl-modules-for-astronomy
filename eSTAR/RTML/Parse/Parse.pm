@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.13 2003/06/03 17:35:15 aa Exp $
+#     $Id: Parse.pm,v 1.14 2003/06/10 23:29:12 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.13 2003/06/03 17:35:15 aa Exp $
+$Id: Parse.pm,v 1.14 2003/06/10 23:29:12 aa Exp $
 
 =head1 METHODS
 
@@ -278,8 +278,7 @@ Return the R.A. of the target
 =cut
 sub ra {
   my $self = shift;
-  return ${${${${$self->{OBSERVATION}}{Target}}{Coordinates}}
-         {RightAscension}}{tag_value};
+  return ${${${$self->{OBSERVATION}}{Target}}{Coordinates}}{RightAscension};
 }
 
 =item B<dec>
@@ -291,8 +290,7 @@ Return the Dec. of the target
 =cut
 sub dec {
   my $self = shift;
-  return ${${${${$self->{OBSERVATION}}{Target}}{Coordinates}}
-         {Declination}}{tag_value};
+  return ${${${$self->{OBSERVATION}}{Target}}{Coordinates}}{Declination};
 }
 
 =item B<exposure>
