@@ -33,14 +33,14 @@ use Astro::Coords;
 
 use Data::Dumper;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.8 2003/07/27 03:55:58 aa Exp $
+$Id: Cluster.pm,v 1.9 2003/08/19 18:28:51 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -162,7 +162,7 @@ sub _read_catalog {
       foreach my $k( 0 .. $#colours ) {
 
          # if quality not good then set bad flag
-         if( $quality[$k] != 0 ) {
+         if( defined $quality[$k] && $quality[$k] != 0 ) {
             $star->quality( 1 );
          }
       }
@@ -205,6 +205,17 @@ sub _write_catalog {
   croak ( 'Usage: _write_catalog( $catalog, [%opts] ') unless scalar(@_) >= 1;
   my $class = shift;
   my $catalog = shift;
+
+  # debugging, drop the catalogue to disk as it flys right by...
+  #use Data::Dumper;
+  #print "Dumping Catalogue to disk 'catalog_dump.cat'\n";
+  #my $status = open my $fh, ">catalog_dump.cat";
+  #if (!$status) {
+  #    print "Error: cannot open dump file catalog_dump.cat\n";
+  #    return;
+  #}
+  #print $fh Dumper($catalog);
+  #close( $fh );
 
   # real list of filters and colours in the catalogue
   my @filters = $catalog->starbyindex(0)->what_filters();
@@ -269,8 +280,8 @@ sub _write_catalog {
   # check to see if we're outputing all the filters and colours
   my $total = scalar(@out_mags) + scalar(@out_cols);
 
-  push( @output, "$total colours were created\n" );
-  push( @output, "@out_mags @out_cols\n" );
+  push( @output, "$total colours were created" );
+  push( @output, "@out_mags @out_cols" );
   
   # wierd and odd
   $output_line = 
@@ -286,7 +297,7 @@ sub _write_catalog {
       "  Catalogue Radius: " . $catalog->get_radius() . 
       " arcmin" if defined $catalog->get_radius();
 
-  $output_line = $output_line . "\n";
+  $output_line = $output_line;
   push( @output, $output_line );
 
   # write body
@@ -308,9 +319,15 @@ sub _write_catalog {
         $output_line = $output_line . ${$stars}[$star]->id() . "  ";
      } else {
         $output_line = $output_line . $star . " ";
-     }   
+     } 
+     
+     # fiddle with the dec, olv versions of the Fortran Cluster
+     # parser don't like + signs for northern hemisphere dec's
+     my $dec = ${$stars}[$star]->dec();
+     $dec =~ s/\+//;
+     
      $output_line = $output_line . ${$stars}[$star]->ra() . "  ";
-     $output_line = $output_line . ${$stars}[$star]->dec() . "  ";
+     $output_line = $output_line . $dec . "  ";
      
      if ( defined ${$stars}[$star]->x() && defined ${$stars}[$star]->y() ) {
         $output_line = $output_line . 
@@ -375,7 +392,7 @@ sub _write_catalog {
      }
 
      # next star
-     $output_line = $output_line . "\n";
+     $output_line = $output_line;
      push (@output, $output_line );
 
   }

@@ -1,3 +1,13 @@
+2003-08-03  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * IO/Cluster.pm: Fiddled with the quality flags for Cluster output,
+          to get rid of an uninitalised value warning. Still need to go to
+          character quality flags.
+          
+        * Query/Query/USNOA2.pm: Changed the id() of the downloaded USNO-A2
+          stars to be numberic, otherwise we break the cluster format which
+          requires numeric id's.
+        
 2003-08-03  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Query/Query/SIMBAD.pm: All the functionality of Astro::SIMBAD

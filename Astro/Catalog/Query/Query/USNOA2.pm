@@ -46,11 +46,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: USNOA2.pm,v 1.3 2003/08/03 06:18:35 timj Exp $
+$Id: USNOA2.pm,v 1.4 2003/08/19 18:28:51 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -207,11 +207,9 @@ sub _parse_query {
 
               # ID
               my $id = $separated[1];
-              $star->id( $id );
-
-              # debugging
-              #my $num = $counter - $line -2;
+              my $num = $counter - $line -2;
               #print "# ID $id star $num\n"; 
+              $star->id( $num );
 
               # RA
               my $objra = "$separated[2] $separated[3] $separated[4]";
@@ -223,7 +221,7 @@ sub _parse_query {
 					       dec => $objdec,
 					       units => 'sex',
 					       type => 'J2000',
-					       name => $id,
+					       name => $star->id(),
 					       ),
 			   );
 
