@@ -1,5 +1,7 @@
 2004-08-11  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* TkAstroCatalog/AstroCatalog.pm: Add demo Catalog browser for Tk
+
 	* Catalog.pm: Add auto_filter_observability
 
 	* IO/JCMT.pm: Publish a method for cleaning the target name (so
