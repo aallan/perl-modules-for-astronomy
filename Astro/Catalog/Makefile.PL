@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 use Data::Dumper;
 
 my $cfg_directory = '$(PERLPREFIX)/etc';
-my $cfg_to_install = "sss.cfg";
+my $cfg_to_install = "sss.cfg skycat.cfg";
 
 WriteMakefile( 
                'NAME'           => 'Astro::Catalog',

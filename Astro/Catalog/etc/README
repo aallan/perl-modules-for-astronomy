@@ -35,3 +35,5 @@ This directory contains the SkyCat configuration files. Current files are:
            catalogue servers at ROE for this catalogue. The generic SkyCat
            module is unable to do so due to the rather odd URL's for the
            catalogue servers.
+
+ skycat.cfg - Generic config file for Astronomical Catalogs
