@@ -1,3 +1,7 @@
+2005-01-18  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * MANIFEST: Fixed problems with MANIFEST file
+
 2005-01-14  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* Catalog.pm, IO/FINDOFF.pm, t/2_findoff.t: support for Starlink 

@@ -7,7 +7,6 @@ ChangeLog
 Catalog.pm
 Star/Star.pm
 Star/Makefile.PL
-Star/Morphology
 Star/Morphology/Makefile.PL
 Star/Morphology/Morphology.pm
 IO/README
@@ -59,4 +58,3 @@ t/helper.pl
 etc/README
 etc/sss.cfg
 etc/skycat.cfg
-META.yml                                Module meta-data (added by MakeMaker)
