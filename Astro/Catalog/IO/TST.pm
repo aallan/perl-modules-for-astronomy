@@ -407,23 +407,23 @@ sub _read_catalog {
     
     # generate the colours
     my $j_minus_h = $star->get_magnitude( 'J' ) -
-                    $star->get_magnitude( 'H' );
+                    $star->get_magnitude( 'H' ) if defined $star;
                     
     my $j_minus_k = $star->get_magnitude( 'J' ) -
-                    $star->get_magnitude( 'K' );
+                    $star->get_magnitude( 'K' ) if defined $star;
                     
     my $h_minus_k = $star->get_magnitude( 'H' ) -
-                    $star->get_magnitude( 'K' );
+                    $star->get_magnitude( 'K' ) if defined $star;
      
     # generate the deltas
-    my $delta_j = $star->get_errors( 'J' );
-    my $delta_h = $star->get_errors( 'H' );
-    my $delta_k = $star->get_errors( 'K' );
+    my $delta_j = $star->get_errors( 'J' ) if defined $star;
+    my $delta_h = $star->get_errors( 'H' ) if defined $star;
+    my $delta_k = $star->get_errors( 'K' ) if defined $star;
        
     # quick kludge, stars without errors will get flagged bad anyway   
-    $delta_j = 0.000 unless defined  $delta_j;
-    $delta_h = 0.000 unless defined  $delta_h;
-    $delta_k = 0.000 unless defined  $delta_k;
+    $delta_j = 0.000 unless defined $delta_j;
+    $delta_h = 0.000 unless defined $delta_h;
+    $delta_k = 0.000 unless defined $delta_k;
     
     my $delta_jmh = ( ( $delta_j ** 2.0 ) + ( $delta_h ** 2.0 ) ) ** (1.0/2.0);
     my $delta_jmk = ( ( $delta_j ** 2.0 ) + ( $delta_k ** 2.0 ) ) ** (1.0/2.0);
@@ -511,7 +511,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.5 2003/08/27 01:33:08 timj Exp $
+ $Id: TST.pm,v 1.6 2003/09/04 20:41:10 aa Exp $
 
 =head1 FORMAT
 
