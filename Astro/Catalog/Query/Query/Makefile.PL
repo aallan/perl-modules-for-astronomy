@@ -1,8 +1,10 @@
 use ExtUtils::MakeMaker;
 
 WriteMakefile( 
-               
-               'NAME'           => 'Astro::Catalog::Query',
+               # Name has XXX so that the modules appear in Astro/Catalog/Query
+               # Directory. This requires that DISTNAME is set manually
+               'NAME'           => 'Astro::Catalog::Query::XXX',
+               'DISTNAME'       => 'Astro-Catalog-Query',
 
                # Version of distribution not any given module
 	       'VERSION'        => '0.01',

@@ -51,7 +51,7 @@ use Astro::Catalog::Star;
 
 =head1 REVISION
 
-$Id: GSC.pm,v 1.1 2003/07/29 00:10:06 aa Exp $
+$Id: GSC.pm,v 1.1 2003/07/29 20:33:25 aa Exp $
 
 =begin __PRIVATE_METHODS__
 

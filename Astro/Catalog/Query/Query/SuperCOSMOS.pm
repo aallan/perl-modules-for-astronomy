@@ -55,7 +55,7 @@ use Astro::Aladin;
 
 =head1 REVISION
 
-$Id: SuperCOSMOS.pm,v 1.1 2003/07/29 00:10:06 aa Exp $
+$Id: SuperCOSMOS.pm,v 1.1 2003/07/29 20:33:25 aa Exp $
 
 =head1 METHODS
 

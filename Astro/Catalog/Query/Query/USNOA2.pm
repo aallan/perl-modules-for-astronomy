@@ -50,7 +50,7 @@ use Astro::Catalog::Star;
 
 =head1 REVISION
 
-$Id: USNOA2.pm,v 1.1 2003/07/29 00:10:06 aa Exp $
+$Id: USNOA2.pm,v 1.1 2003/07/29 20:33:25 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
