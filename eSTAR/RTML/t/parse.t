@@ -147,7 +147,8 @@ my $update_message = new eSTAR::RTML::Parse( RTML => $ers_obs );
 # check the parsed document
 ok( $update_message->dtd(), '2.1' );
 ok( $update_message->type(), 'update' );
+ok( $update_message->score(), undef );
 
-print Dumper($update_message);
+#print Dumper($update_message);
 
 exit;

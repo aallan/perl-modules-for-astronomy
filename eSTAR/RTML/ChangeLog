@@ -1,7 +1,17 @@
+
+2002-03-18  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Working system which will move the telescope, when combined
+          with eSTAR::IO modules. Added observation.pl and server.pl
+          scripts to module (should make separate?).
+          
 2002-03-17  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Build.pm: Basic RTML construction for "score" and "request"
           documents in place.
+          
+        * Parse.pm: Added score() and time() methods needed to build
+          the observing request RTML message.  
 
 2002-03-17  Alasdair Allan <aa@astro.ex.ac.uk>
 
