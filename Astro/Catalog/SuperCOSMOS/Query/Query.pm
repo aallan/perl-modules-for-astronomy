@@ -20,7 +20,7 @@ package Astro::Catalog::SuperCOSMOS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.1 2003/02/21 21:51:38 aa Exp $
+#     $Id: Query.pm,v 1.2 2003/02/24 22:31:09 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -71,13 +71,13 @@ use Astro::Catalog::Star;
 # aladin stuff
 use Astro::Aladin;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.1 2003/02/21 21:51:38 aa Exp $
+$Id: Query.pm,v 1.2 2003/02/24 22:31:09 aa Exp $
 
 =head1 METHODS
 
@@ -334,6 +334,7 @@ sub _make_query {
    my $file = File::Spec->catfile( File::Spec->tmpdir() , $filename );
    
    # make query
+   
    my $aladin = new Astro::Aladin();
    my $status = $aladin->supercos_catalog( RA     => $self->{RA},
                                            Dec    => $self->{DEC},
@@ -383,7 +384,7 @@ sub _parse_query {
   # loop round the returned buffer and stuff the contents into star 
   # objects, skip the first two lines, they're just headers 
   foreach my $i ( 2 ... $#buffer ) {
-  
+    
      # break the line down into bits
      my @line = split( /\t+/,$buffer[$i]);
               
@@ -393,9 +394,75 @@ sub _parse_query {
      # ID
      $star->id( $line[2] );
      
-     # RA & Dec
-     $star->ra( $line[0] );
-     $star->dec( $line[1] );
+     # RA & Dec - Need to convert to sextuplets
+     my $ra_deg = $line[0];
+     $ra_deg = $ra_deg/15.0;  # should this be cos(delta) here?
+     
+     #print "1: $ra_deg\n";
+     
+     my $period = index( $ra_deg, ".");
+     my $length = length( $ra_deg );
+     my $ra_min = substr( $ra_deg, -($length-$period-1));
+     $ra_min = "0." . $ra_min;
+     $ra_min = $ra_min*60.0;
+
+     #print "2: $ra_deg $ra_min\n";
+     
+     $ra_deg = substr( $ra_deg, 0, $period);
+     $period = index( $ra_min, ".");
+     $length = length( $ra_min );
+
+     #print "3: $ra_deg $ra_min\n";
+     
+     my $ra_sec = substr( $ra_min, -($length-$period-1));
+     $ra_sec = "0." . $ra_sec;
+     $ra_sec = $ra_sec*60.0;
+     $ra_min = substr( $ra_min, 0, $period);
+
+     #print "4: $ra_deg $ra_min $ra_sec\n";
+     
+     my $dec_deg = $line[1];
+
+     #print "1: $dec_deg\n";
+     
+     my $sign = "pos";
+     if ( $dec_deg =~ "-" ) {
+        $dec_deg =~ s/-//;
+        $sign = "neg";
+     }   
+
+     #print "2: $dec_deg\n";
+     
+     my $period = index( $dec_deg, ".");
+     my $length = length( $dec_deg );
+     my $dec_min = substr( $dec_deg, -($length-$period-1));
+     $dec_min = "0." . $dec_min;
+     $dec_min = $dec_min*60.0;
+
+     #print "3: $dec_deg $dec_min\n";
+     
+     $dec_deg = substr( $dec_deg, 0, $period);
+     $period = index( $dec_min, ".");
+     $length = length( $dec_min );
+
+     #print "4: $dec_deg $dec_min\n";
+     
+     my $dec_sec = substr( $dec_min, -($length-$period-1));
+     $dec_sec = "0." . $dec_sec;
+     $dec_sec = $dec_sec*60.0;
+     $dec_min = substr( $dec_min, 0, $period);     
+
+     #print "5: $dec_deg $dec_min $dec_sec\n";
+     
+     if( $sign == "neg" ) {
+        $dec_deg = "-" . $dec_deg;
+     }
+     
+     #print "6: $dec_deg $dec_min $dec_sec\n\n";
+     
+     
+     $star->ra( "$ra_deg $ra_min $ra_sec" );
+     $star->dec( "$dec_deg $dec_min $dec_sec" );
      
      # Magnitudes
      $star->magnitudes( {Bj => $line[10]} );
@@ -499,4 +566,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+;

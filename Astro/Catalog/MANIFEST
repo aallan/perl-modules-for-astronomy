@@ -1,6 +1,9 @@
 README
 MANIFEST
 Makefile.PL
+catalogs.PL
+supercosmos.PL
+finder.PL
 GPL
 ChangeLog
 Catalog.pm
