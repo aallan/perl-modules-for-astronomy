@@ -29,13 +29,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.2 2003/07/30 00:23:39 aa Exp $
+$Id: Query.pm,v 1.3 2003/07/30 00:49:47 timj Exp $
 
 =head1 METHODS
 
@@ -198,12 +198,18 @@ sub target {
     # grab the new object name
     my $ident = shift;
 
+    # Need to clear RA and Dec iff they are allowed options
+    my %allow = $self->_get_allowed_options();
+
+    my %clear;
+    $clear{ra} = undef if exists $allow{ra};
+    $clear{dec} = undef if exists $allow{dec};
+
     # mutilate it and stuff it into ${$self->{OPTIONS}}{object}
     $ident =~ s/\s/\+/g;
     $self->_set_query_options(
 			      object => $ident,
-			      dec => undef,
-			      ra => undef,
+			      %clear
 			     );
   }
   return $self->query_options("object");
@@ -461,7 +467,7 @@ sub _set_query_options {
   my %newopt = @_;
 
   my %allow = $self->_get_allowed_options();
-  
+
   #foreach my $i ( sort keys %newopt ) {
   #   print "newopt $i = $newopt{$i} \n";
   #}  
