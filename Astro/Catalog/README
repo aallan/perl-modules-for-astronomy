@@ -59,6 +59,9 @@ The module was written by Alasdair Allan <aa@astro.ex.ac.uk>, of the
 University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/) 
 as part of his work for the eSTAR project.
 
+The latest version of the module includes patches supplied by Stephen
+Quinney <S.J.Quinney@durham.ac.uk> of Durham University.
+
 License
 -------
 This package is free software; you can redistribute it and/or modify it under
