@@ -33,14 +33,14 @@ use Astro::Coords;
 
 use Data::Dumper;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Simple.pm,v 1.4 2003/07/28 00:40:15 timj Exp $
+$Id: Simple.pm,v 1.5 2003/07/28 00:43:52 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -84,16 +84,16 @@ sub _read_catalog {
       my @match = ( $lines[$i] =~ m/^(.*?)  # Target name (non greedy)
 		          \s*   # optional trailing space
                           (\d{1,2}) # 1 or 2 digits [RA:h] [greedy]
-		          \s+       # separator
+		          [:\s]+       # separator
 		          (\d{1,2}) # 1 or 2 digits [RA:m]
-		          \s+       # separator
+		          [:\s]+       # separator
 		          (\d{1,2}(?:\.\d*)?) # 1|2 digits opt .fraction [RA:s]
 		                    # no capture on fraction
-		          \s+
+		          [:\s]+
 		          ([+-]?\s*\d{1,2}) # 1|2 digit [dec:d] inc sign
-		          \s+
+		          [:\s]+
 		          (\d{1,2}) # 1|2 digit [dec:m]
-		          \s+
+		          [:\s]+
 		          (\d{1,2}(?:\.\d*)?) # arcsecond (optional fraction)
                                               # no capture on fraction
                           \s*
@@ -122,8 +122,6 @@ sub _read_catalog {
 
       # Comment can be undefined
       my $comment = $match[8];
-
-      print "Found a comment - $comment\n";
 
       # push the target id
       $star->id( $target );
