@@ -10,8 +10,7 @@ IO/JCMT.pm
 IO/Cluster.pm
 IO/Simple.pm
 IO/Makefile.PL
-BaseQuery/BaseQuery.pm
-BaseQuery/Makefile.PL
+Query/Query.pm
 Query/USNOA2.pm
 Query/GSC.pm
 Query/SuperCOSMOS.pm
