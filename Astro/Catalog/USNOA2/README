@@ -1,43 +1,25 @@
-Astro::DDS module
------------------  
+Astro::Catalog::USNOA2 module
+-----------------------------  
 
 What is it?
 -----------
 
-The module is an object orientated interface to the both the first and second
-Digital Sky Surveys at the ESO-ECF online archive. While the first sky survey
-is 100% complete, the second survey covers 98% of the sky in Red, 45% of the 
-sky in Blue and 27% of the sky in the Infra-red.
-
-Why do it?
-----------
-
-While other, currently undistributed, interfaces to the sky survey are in
-existance, there isn't one generally available. This module, while not as
-feature complete as some other interfaces is a quick and dirty interface
-was fairly easy to code up using bits and pieces of other eSTAR modules,
-see Astro::SIMBAD and Astro::ADS for instance.
+The module is an object orientated interface to the USNO-A2 catalogue.
 
 Requirements
 ------------
 
-The module requires the libwww-perl-5.60 package written by Gisle Aas
-<gisle@ActiveState.com> v5.53 or above. This package can be obtained
-via CPAN at http://search.cpan.org/search?dist=libwww-perl
+The module requires the Astro::Catalog and Astro::Catalog::Star modules to
 
-Also required is the Net::Domain module, v2.13 or above, by Graham
-Barr <gbarr@pobox.com>. This module has been included in the base
-distribution since Perl 5.7.2, but otherwise can be downloaded from
-CPAN as part of the libnet package, see http://search.cpan.org/search?dist=libnet
 
 Provides
 --------
 
 The package provides the following classes
 
-    Astro::DSS
+    Astro::Catalog::USNOA2::Query
 
-further information can be found in the POD included in DSS.pm
+further information can be found in the POD included in Query.pm
 
 Where can I get it?
 -------------------

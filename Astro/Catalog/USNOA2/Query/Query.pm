@@ -19,7 +19,7 @@ package Astro::Catalog::USNOA2::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.1 2001/12/22 20:35:30 aa Exp $
+#     $Id: Query.pm,v 1.2 2002/01/10 03:18:04 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -38,7 +38,9 @@ Astro::Catalog::USNOA2::Query - A query request to the USNO-A2.0 Catalog
                                              Dec       => $dec,
                                              Radius    => $radius,
                                              Bright    => $magbright,
-                                             Faint     => $magfaint );
+                                             Faint     => $magfaint,
+                                             Sort      => $sort_type,
+                                             Nout      => $number_out );
       
   my $catalog = $usno->querydb();
 
@@ -63,13 +65,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.1 2001/12/22 20:35:30 aa Exp $
+$Id: Query.pm,v 1.2 2002/01/10 03:18:04 aa Exp $
 
 =head1 METHODS
 
@@ -85,7 +87,9 @@ Create a new instance from a hash of options
                                              Dec       => $dec,
                                              Radius    => $radius,
                                              Bright    => $magbright,
-                                             Faint     => $magfaint );
+                                             Faint     => $magfaint,
+                                             Sort      => $sort_type,
+                                             Nout      => $number_out );
       
 
 returns a reference to an USNO-A2 query object.
@@ -421,7 +425,7 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / RA Dec Object Radius Bright Faint Format Sort Number
+  for my $key (qw / RA Dec Object Radius Bright Faint Sort Number
                     URL Timeout Proxy / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
