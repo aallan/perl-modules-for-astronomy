@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.23 2003/07/27 02:22:22 timj Exp $
+#     $Id: Catalog.pm,v 1.24 2003/07/27 02:40:19 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -60,14 +60,14 @@ use Astro::Coords;
 use Astro::Catalog::Star;
 use Carp;
 
-'$Revision: 1.23 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.24 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.23 2003/07/27 02:22:22 timj Exp $
+$Id: Catalog.pm,v 1.24 2003/07/27 02:40:19 timj Exp $
 
 =head1 METHODS
 
@@ -185,7 +185,7 @@ sub write_catalog {
   print $fh join("\n", @$lines) ."\n";
 
   # close file if we opened it
-  if ($isglob) {
+  if (! $isglob) {
     my $status = close($fh);
     if (!$status) {
       $self->errstr(__PACKAGE__.": Error closing catalog file $file: $!");
