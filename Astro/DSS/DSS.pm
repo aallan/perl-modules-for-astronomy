@@ -19,7 +19,7 @@ package Astro::DSS;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: DSS.pm,v 1.1 2001/12/11 00:30:06 aa Exp $
+#     $Id: DSS.pm,v 1.2 2001/12/11 01:31:27 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -63,15 +63,16 @@ use vars qw/ $VERSION /;
 
 use LWP::UserAgent;
 use Net::Domain qw(hostname hostdomain);
+use File::Spec;
 use Carp;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: DSS.pm,v 1.1 2001/12/11 00:30:06 aa Exp $
+$Id: DSS.pm,v 1.2 2001/12/11 01:31:27 aa Exp $
 
 =head1 METHODS
 
@@ -449,7 +450,7 @@ sub format {
     my $format = shift;
     if( $format eq "FITS" ) {
        ${$self->{OPTIONS}}{"mime-type"} = "download-fits";
-    } else if ( $format eq "FITS.gz" ) {
+    } elsif ( $format eq "FITS.gz" ) {
        ${$self->{OPTIONS}}{"mime-type"} = "download-gz-fits";
     } else {
        ${$self->{OPTIONS}}{"mime-type"} = "download-gif";
@@ -500,6 +501,13 @@ sub configure {
   # Grab Proxy details from local environment
   $self->{USERAGENT}->env_proxy();
 
+  # Grab data directory from local environment
+  $self->{DATADIR} = $ENV{"ESTAR_DATA"} if exists $ENV{"ESTAR_DATA"};
+  unless ( opendir (DIR, File::Spec->catdir($ENV{"ESTAR_DATA"}) ) ) {
+     croak("Cannot open ESTAR_DATA directory, set environment variable");
+  }   
+  closedir DIR;
+  
   # configure the default options
   ${$self->{OPTIONS}}{"ra"}          = undef;
   ${$self->{OPTIONS}}{"dec"}         = undef;
@@ -563,7 +571,8 @@ sub _make_query {
 
    # loop round all the options keys and build the query
    foreach my $key ( keys %{$self->{OPTIONS}} ) {
-      $options = $options . "&$key=${$self->{OPTIONS}}{$key}";
+      $options = $options . 
+        "&$key=${$self->{OPTIONS}}{$key}" if defined ${$self->{OPTIONS}}{$key};
    }
 
    # build final query URL
@@ -575,12 +584,36 @@ sub _make_query {
    # grab page from web
    my $reply = $ua->request($request);
 
+   # declare file name
+   my $file_name;
+   
    if ( ${$reply}{"_rc"} eq 200 ) {
-      use Data::Dumper;
-      print Dumper($reply);
+      if ( ${${$reply}{"_headers"}}{"content-type"} 
+            eq "application/octet-stream" ) {
+            
+         # mangle filename from $ENV and returned unique(?) filename   
+         $file_name = ${${$reply}{"_headers"}}{"content-disposition"};
+         my $start_index = index( $file_name, q/"/ );
+         my $last_index = rindex( $file_name, q/"/ );
+         $file_name = substr( $file_name, $start_index+1, 
+                              $last_index-$start_index-1);
+         $file_name = File::Spec->catfile( $ENV{"ESTAR_DATA"}, $file_name);                       
+         # Open output file
+         unless ( open ( FH, ">$file_name" )) {
+            croak("Error: Cannont open output file $file_name");
+         }   
+
+         # Write to output file
+         my $length = length(${$reply}{"_content"});
+         syswrite( FH, ${$reply}{"_content"}, $length );
+         close(FH);
+ 
+      }
    } else {
       croak("Error ${$reply}{_rc}: Failed to establish network connection");
    }
+   
+   return $file_name;
 }
 
 
