@@ -1,4 +1,9 @@
-2002-07-02  Alasdair Allan <aa@astro.ex.ac.uk>
+2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * ADS.pm: Introduced a placeholder class to get round a documentation
+          bug on search.cpan.org.
+          
+2003-07-02  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Removed some tests from t/*.t since the things they were based
           on kept changing and I had to update the module every time. The

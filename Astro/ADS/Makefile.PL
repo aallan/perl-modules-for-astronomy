@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( 
                'NAME'           => 'Astro::ADS',
-	       'VERSION'        => '1.20.5',
+	       'VERSION_FROM'   => 'ADS.pm',
                'EXE_FILES'      => [ 'adsquery' ],
                'PREREQ_PM'      => { LWP         => 5.53,
                                      Net::Domain => 2.13,
