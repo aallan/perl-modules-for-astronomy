@@ -6,7 +6,7 @@ my $cfg_to_install = "sss.cfg skycat.cfg";
 
 WriteMakefile( 
                'NAME'           => 'Astro::Catalog',
-	       'VERSION'        => '3.3.0',
+	       'VERSION'        => '3.3.1',
                'EXE_FILES'      => [ ],
                'PREREQ_PM'      => { 'LWP'              => 5.53,
                                      'Net::Domain'      => 2.13,

@@ -1,3 +1,8 @@
+2003-10-16  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.3.0)
+
+        * IO/VOTable.pm: Fixed VOTable output to actually have some
+          meta-data, now readable by treeview.
+          
 2003-10-13  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.3.0)
 
         * Added VOTable support (write only) as a pluggable IO module

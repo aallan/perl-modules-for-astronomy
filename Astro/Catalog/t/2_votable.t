@@ -1,7 +1,7 @@
 #!perl
 
 # Astro::Catalog test harness
-use Test::More tests => 63;
+use Test::More tests => 64;
 
 # strict
 use strict;
@@ -114,7 +114,7 @@ foreach my $i ( 0 .. $#buffer ) {
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
 END {
-  #unlink "$tempfile";
+  unlink "$tempfile";
 }
 
 
@@ -129,20 +129,21 @@ __DATA__
 <VOTABLE>
   <RESOURCE>
     <TABLE>
-      <FIELD name="ID_MAIN"/>
-      <FIELD name="POS_EQ_RA_MAIN"/>
-      <FIELD name="POS_EQ_DEC_MAIN"/>
-      <FIELD name="PHOT_MAG_B"/>
-      <FIELD name="PHOT_MAG_B_ERROR"/>
-      <FIELD name="PHOT_MAG_R"/>
-      <FIELD name="PHOT_MAG_R_ERROR"/>
-      <FIELD name="PHOT_MAG_V"/>
-      <FIELD name="PHOT_MAG_V_ERROR"/>
-      <FIELD name="PHOT_CI_B-R"/>
-      <FIELD name="PHOT_CI_B-R_ERROR"/>
-      <FIELD name="PHOT_CI_B-V"/>
-      <FIELD name="PHOT_CI_B-V_ERROR"/>
-      <FIELD name="CODE_QUALITY"/>
+      <DESCRIPTION>Created using Astro::Catalog::IO::VOTable</DESCRIPTION>
+      <FIELD name="Identifier" ucd="ID_MAIN" datatype="char" unit=""/>
+      <FIELD name="RA" ucd="POS_EQ_RA_MAIN" datatype="char" unit=""/>
+      <FIELD name="Dec" ucd="POS_EQ_DEC_MAIN" datatype="char" unit=""/>
+      <FIELD name="B Magnitude" ucd="PHOT_MAG_B" datatype="double" unit="mag"/>
+      <FIELD name="B Error" ucd="CODE_ERROR" datatype="double" unit="mag"/>
+      <FIELD name="R Magnitude" ucd="PHOT_MAG_R" datatype="double" unit="mag"/>
+      <FIELD name="R Error" ucd="CODE_ERROR" datatype="double" unit="mag"/>
+      <FIELD name="V Magnitude" ucd="PHOT_MAG_V" datatype="double" unit="mag"/>
+      <FIELD name="V Error" ucd="CODE_ERROR" datatype="double" unit="mag"/>
+      <FIELD name="B-R Colour" ucd="PHOT_CI_B-R" datatype="double" unit="mag"/>
+      <FIELD name="B-R Error" ucd="CODE_ERROR" datatype="double" unit="mag"/>
+      <FIELD name="B-V Colour" ucd="PHOT_CI_B-V" datatype="double" unit="mag"/>
+      <FIELD name="B-V Error" ucd="CODE_ERROR" datatype="double" unit="mag"/>
+      <FIELD name="Quality" ucd="CODE_QUALITY" datatype="int" unit=""/>
       <DATA>
         <TABLEDATA>
           <TR>

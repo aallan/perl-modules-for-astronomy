@@ -34,14 +34,14 @@ use VOTable::Document;
 
 use Data::Dumper;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOTable.pm,v 1.3 2003/10/14 10:06:41 aa Exp $
+$Id: VOTable.pm,v 1.4 2003/10/16 09:10:44 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -129,20 +129,66 @@ sub _write_catalog {
 
   # generate the field headers
   # --------------------------
-  my @field_names;
-  push @field_names, "ID_MAIN";
-  push @field_names, "POS_EQ_RA_MAIN";
-  push @field_names, "POS_EQ_DEC_MAIN";
+  my ( @field_names, @field_ucds, @field_datatypes, @field_units );
+   
+  # field names
+  push @field_names, "Identifier";
+  push @field_names, "RA";
+  push @field_names, "Dec";
   foreach my $i ( 0 .. $#mags ) {
-    push @field_names, "PHOT_MAG_" . $mags[$i];
-    push @field_names, "PHOT_MAG_" . $mags[$i] . "_ERROR";
+    push @field_names, $mags[$i] . " Magnitude";
+    push @field_names, $mags[$i] . " Error";
   }
   foreach my $i ( 0 .. $#cols ) {
-    push @field_names, "PHOT_CI_" . $cols[$i];
-    push @field_names, "PHOT_CI_" . $cols[$i] . "_ERROR";
+    push @field_names, $cols[$i] . " Colour";
+    push @field_names, $cols[$i] . " Error";
   } 
-  push @field_names, "CODE_QUALITY"; 
+  push @field_names, "Quality"; 
  
+  # field ucds
+  push @field_ucds, "ID_MAIN";
+  push @field_ucds, "POS_EQ_RA_MAIN";
+  push @field_ucds, "POS_EQ_DEC_MAIN";
+  foreach my $i ( 0 .. $#mags ) {
+    push @field_ucds, "PHOT_MAG_" . $mags[$i];
+    #push @field_ucds, "PHOT_MAG_" . $mags[$i] . "_ERROR";
+    push @field_ucds, "CODE_ERROR";
+  }
+  foreach my $i ( 0 .. $#cols ) {
+    push @field_ucds, "PHOT_CI_" . $cols[$i];
+    #push @field_ucds, "PHOT_CI_" . $cols[$i] . "_ERROR";
+    push @field_ucds, "CODE_ERROR";
+  } 
+  push @field_ucds, "CODE_QUALITY";   
+
+  # field datatypes
+  push @field_datatypes, "char";
+  push @field_datatypes, "char";
+  push @field_datatypes, "char";
+  foreach my $i ( 0 .. $#mags ) {
+    push @field_datatypes, "double";
+    push @field_datatypes, "double";
+  }
+  foreach my $i ( 0 .. $#cols ) {
+    push @field_datatypes, "double";
+    push @field_datatypes, "double";
+  } 
+  push @field_datatypes, "int"; 
+
+  # field units
+  push @field_units, "";
+  push @field_units, "";
+  push @field_units, "";
+  foreach my $i ( 0 .. $#mags ) {
+    push @field_units, "mag";
+    push @field_units, "mag";
+  }
+  foreach my $i ( 0 .. $#cols ) {
+    push @field_units, "mag";
+    push @field_units, "mag";
+  } 
+  push @field_units, ""; 
+     
   # generate the data table
   # -----------------------
   my @data;
@@ -224,13 +270,17 @@ sub _write_catalog {
   # Create the TABLE element and add it to the RESOURCE.
   my $table = new VOTable::TABLE();
   $resource->set_TABLE($table);
-
+  $table->set_DESCRIPTION($description);
+  
   # Create and add the FIELD elements to the TABLE.
   my($i);
   my($field);
   for ($i = 0; $i < @field_names; $i++) {
       $field = new VOTable::FIELD();
       $field->set_name($field_names[$i]);
+      $field->set_ucd($field_ucds[$i]);
+      $field->set_datatype($field_datatypes[$i]);
+      $field->set_unit($field_units[$i]);
       $table->append_FIELD($field);
   }
 
