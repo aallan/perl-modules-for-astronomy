@@ -19,9 +19,15 @@ use Astro::SIMBAD::Query;
 ok(1);
 
 my $query = new Astro::SIMBAD::Query( RA        => "01 10 12.98",
-                                      DEC       => "+60 04 35.9",
-                                      ERROR     => 10,
-                                      ERRORUNIT => "arcsec" );
+                                      Dec      => "+60 04 35.9",
+                                      Error     => 10,
+                                      Units     => "arcsec" );
                                       
+print "# Connecting to SIMBAD\n";
 $query->querydb();
-$query->_dump_raw();
+print "# Continuing Tests\n";
+
+my @buffer = $query->_dump_raw();
+print "@buffer";
+
+#print Dumper($query);

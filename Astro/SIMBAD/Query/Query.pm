@@ -1,4 +1,4 @@
-package Astro::ADS::Query;
+package Astro::SIMBAD::Query;
 
 # ---------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.2 2001/11/28 01:06:10 aa Exp $
+#     $Id: Query.pm,v 1.3 2001/11/28 01:23:03 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -61,13 +61,13 @@ use Carp;
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.2 2001/11/28 01:06:10 aa Exp $
+$Id: Query.pm,v 1.3 2001/11/28 01:23:03 aa Exp $
 
 =head1 METHODS
 
@@ -244,9 +244,6 @@ sub ra {
 
   # SETTING R.A.
   if (@_) { 
-
-    # clear the ra 
-    $self->{RA} = "";
     
     # grab the new R.A.
     my $ra = shift;
@@ -263,7 +260,7 @@ sub ra {
     ${$self->{OPTIONS}}{"Ident"} = "$ra+$dec";
   }
   
-  return $ra;
+  return $self->{RA};
 }
 
 =item B<Dec>
@@ -284,9 +281,6 @@ sub dec {
   # SETTING DEC
   if (@_) { 
 
-    # clear the dec
-    $self->{DEC} = "";
-    
     # grab the new Dec
     my $dec = shift;
     
@@ -295,7 +289,7 @@ sub dec {
     $dec =~ s/\+/%2B/g;
     $dec =~ s/\s/\+/g;
     $self->{DEC} = $dec;
-
+    
     # grab the currently set RA
     my $ra = $self->{RA};
     
@@ -303,7 +297,7 @@ sub dec {
     ${$self->{OPTIONS}}{"Ident"} = "$ra+$dec";
   }
   
-  return $dec;
+  return $self->{DEC};
 
 }
 
@@ -335,7 +329,7 @@ sub identifier {
     ${$self->{OPTIONS}}{"Ident"} = $ident;
   }
   
-  return $ident;
+  return ${$self->{OPTIONS}}{"Ident"};
 
 }
 
@@ -343,7 +337,7 @@ sub identifier {
 
 The error radius to be searched for SIMBAD objects around the target R.A. 
 and Dec, the radius defaults to 10 arc seconds, with the radius unit being
-set using the errorunit() method.
+set using the units() method.
 
 
    $error = $query->error();
@@ -362,19 +356,19 @@ sub error {
 
 }
 
-=item B<Error>
+=item B<Units>
 
 The unit for the error radius to be searched for SIMBAD objects around the
 target R.A.  and Dec, the radius defaults to 10 arc seconds, with the radius itself being set using the error() method
 
-   $error = $query->errorunit();
-   $query->errorunit( "arcmin" );
+   $error = $query->units();
+   $query->units( "arcmin" );
 
 valid unit types are "arcsec", "arcmin" and "deg".
 
 =cut
 
-sub errorunit {
+sub units {
   my $self = shift;
 
   if (@_) {
@@ -419,6 +413,11 @@ sub configure {
 
   # CONFIGURE DEFAULTS
   # ------------------
+
+  # default the R.A. and DEC to blank strings to avoid uninitialized 
+  # value problems when creating the object
+  $self->{RA} = "";
+  $self->{DEC} = "";
 
   # define the default base URLs
   $self->{URL} = "simbad.u-strasbg.fr";
@@ -479,7 +478,7 @@ sub configure {
   # that due to the order these are called in supplying both and RA and Dec
   # and an object Identifier (e.g. HT Cas) will cause the query to default
   # to using the identifier rather than the supplied co-ordinates.
-  for my $key (qw / RA Dec Identifier Error ErrorUnit Frame Epoch Equinox / ) {
+  for my $key (qw / RA Dec Identifier Error Units Frame Epoch Equinox / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -525,7 +524,7 @@ sub _make_query {
 
    # build final query URL
    $URL = $URL . $options;
-
+   
    # build request
    my $request = new HTTP::Request('GET', $URL);
 
@@ -583,7 +582,7 @@ the raw output of the last SIMBAD query made using querydb().
 
 sub _dump_raw {
    my $self = shift;
-
+   
    # split the BUFFER into an array
    my @portable = split( /\n/,$self->{BUFFER});
    chomp @portable;
