@@ -22,6 +22,7 @@ Query/Query/Makefile.PL
 Transport/REST.pm
 Transport/WebService.pm
 Transport/Makefile.PL
+t/helper.pl
 t/1_compile.t
 t/2_cluster.t
 t/2_simple.t

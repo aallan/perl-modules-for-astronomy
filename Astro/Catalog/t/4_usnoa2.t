@@ -6,6 +6,11 @@ use strict;
 #load test
 use Test::More tests => 306;
 
+# Load the generic test code
+chdir "t" if -d "t";
+do "helper.pl" or die "Error reading test functions: $!";
+
+
 use Data::Dumper;
 
 # load modules
@@ -156,64 +161,6 @@ compare_catalog( $catalog_data, $catalog_byname);
 
 exit;
 
-# for now, just compares stars within a catalog
-sub compare_catalog {
-  my ($refcat, $cmpcat) = @_;
-
-  isa_ok( $refcat, "Astro::Catalog", "Check ref catalog type" );
-  isa_ok( $cmpcat, "Astro::Catalog", "Check cmp catalog type" );
-
-  # Star count
-  is( $refcat->sizeof(), $cmpcat->sizeof(), "compare star count" );
-
-  for my $i (0.. ($refcat->sizeof()-1)) {
-    compare_star( $refcat->starbyindex($i), $cmpcat->starbyindex($i));
-  }
-}
-
-# Just compare two stars and report tests for component values
-sub compare_star {
-  my ($refstar, $newstar) = @_;
-
-  isa_ok( $refstar, "Astro::Catalog::Star", "Check ref star type");
-  isa_ok( $newstar, "Astro::Catalog::Star", "Check cmp star type");
-
-  is( $refstar->id(), $newstar->id(), "compare star ID" );
-
-  ok( $refstar->coords->distance( $newstar->coords ) < 0.001, "compare distance between stars" );
-  is( $refstar->ra(), $newstar->ra(), "compare star RA" );
-  is( $refstar->dec(), $newstar->dec(), "Compare star Dec" );
-
-  my @dat_filters = $refstar->what_filters();
-  my @net_filters = $newstar->what_filters();
-  foreach my $filter ( 0 ... $#net_filters ) {
-    is( $dat_filters[$filter], $net_filters[$filter],"compare filter $filter" );
-    is( $refstar->get_magnitude($dat_filters[$filter]),
-	$newstar->get_magnitude($net_filters[$filter]),
-	"compare magnitude $filter");
-    is( $refstar->get_errors($dat_filters[$filter]),
-	$newstar->get_errors($net_filters[$filter]),
-	"compare magerr $filter");
-  }
-
-  my @dat_cols = $refstar->what_colours();
-  my @net_cols = $newstar->what_colours();
-  foreach my $col ( 0 ... $#net_cols ) {
-    is( $dat_cols[$col], $net_cols[$col],"compare color $col" );
-    is( $refstar->get_colour($dat_cols[$col]), 
-	$newstar->get_colour($net_cols[$col]),
-	"compare value of color $col");
-    is( $refstar->get_colourerr($dat_cols[$col]), 
-	$newstar->get_colourerr($net_cols[$col]),"compare color error $col" );
-  }
-
-  is( $refstar->quality(), $newstar->quality(), "check quality" );
-  is( $refstar->field(), $newstar->field(), "check field" );
-  is( $refstar->gsc(), $newstar->gsc() , "check GSC flag");
-  is( $refstar->distance(), $newstar->distance() ,"check distance");
-  is( $refstar->posangle(), $newstar->posangle(), "check posangle" );
-
-}
 
 # D A T A   B L O C K  -----------------------------------------------------
 
