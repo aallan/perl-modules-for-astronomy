@@ -1,3 +1,8 @@
+2001-11-02 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Now queries ADS successfully, and can carry out a limited
+          selection of followup queries on the results.
+
 2001-10-31 Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Minimum functionality implemented, passess test harness
