@@ -46,11 +46,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: USNOA2.pm,v 1.5 2003/08/19 18:46:35 aa Exp $
+$Id: USNOA2.pm,v 1.6 2003/08/26 19:53:02 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -207,9 +207,9 @@ sub _parse_query {
 
               # ID
               my $id = $separated[1];
-              my $num = $counter - $line -2;
+              #my $num = $counter - $line -2;
               #print "# ID $id star $num\n"; 
-              $star->id( $num );
+              $star->id( $id );
 
               # RA
               my $objra = "$separated[2] $separated[3] $separated[4]";
@@ -217,14 +217,19 @@ sub _parse_query {
               # Dec
               my $objdec = "$separated[5] $separated[6] $separated[7]";
 
-	      $star->coords( new Astro::Coords(ra => $objra,
-					       dec => $objdec,
-					       units => 'sex',
-					       type => 'J2000',
-					       name => $star->id(),
-					       ),
-			   );
-
+              # only generate coordinates if the seconds field of the
+              # dec isn't 60.0, if it is, lets just dump this star as
+              # currently the Astro::Coords object gives totally bogus
+              # answers due to the bogus answers its getting from SLALIB.
+              unless ( $separated[7] == 60 ) {
+                  $star->coords( new Astro::Coords(  ra => $objra,
+		   			             dec => $objdec,
+					             units => 'sex',
+					             type => 'J2000',
+					             name => $star->id(),
+					          ) );
+              }
+              
               # R Magnitude
               my %r_mag = ( R => $separated[8] );
               $star->magnitudes( \%r_mag );
@@ -266,7 +271,7 @@ sub _parse_query {
            # correctly defined. The Dec might be bogus since the
            # USNO-A2 catalogue has its seconds field out of 
            # normal range (0-59.9) in some cases.
-           if( $star->coords()->dec(format => 's') ) {
+           if( $star->coords() ) {
               $catalog->pushstar( $star );
            }
            

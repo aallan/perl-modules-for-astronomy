@@ -31,7 +31,7 @@ use Astro::Catalog::Star;
 use Astro::Coords;
 
 $DEBUG = 0;
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 =begin __PRIVATE_METHODS__
 
@@ -265,11 +265,11 @@ sub _read_catalog {
 
   # Now convert the information into a star object
 
-  # This is a back-of-the-envelope data dictionary from looking
-  # at USNO. Maps, A::C::Star methods to different columns names
+  # This is a back-of-the-envelope data dictionary from looking at USNO 
+  # and 2MASS. Maps, A::C::Star methods to different columns names
   my %datadict = (
 		  field => [ qw/ field /],
-		  quality => [ qw/ qual /],
+		  quality => [ qw/ qual /, qw/ qflg / ],
 		  distance => [ "d'" ],
 		  posangle => [ qw/ pa /],
 		 );
@@ -320,6 +320,9 @@ sub _read_catalog {
 
     }
 
+    # DEBUGGING, prints out everything we've parsed from the catalogue
+    #
+    #print "\n\n\n" . Dumper( $star ) . "\n\n\n";
 
     # Assume that some field names are standardised. This is
     # probably rubbish (whoever heard of standards!).
@@ -329,6 +332,7 @@ sub _read_catalog {
     for my $starkey (keys %datadict) {
       for my $colname (@{ $datadict{$starkey} }) {
 	if (exists $star->{$colname}) {
+        
 	  $construct{$starkey} = $star->{$colname};
 
 	  # stop looking
@@ -389,6 +393,60 @@ sub _read_catalog {
 
     # Modify the array in place
     $star = new Astro::Catalog::Star( id => $star->{id}, %construct );
+    
+    # Ungodly hack warning...
+    # -----------------------
+    # If we have J, H and K magnitudes, we probably also want some 
+    # colours, so lets generate some here and push it into the star object. 
+    #
+    # This is for 2MASS catalogues, and we need something a bit more
+    # generic here. Yes Tim, I'll fix it later.
+    
+    # generate the colours
+    my $j_minus_h = $star->get_magnitude( 'J' ) -
+                    $star->get_magnitude( 'H' );
+                    
+    my $j_minus_k = $star->get_magnitude( 'J' ) -
+                    $star->get_magnitude( 'K' );
+                    
+    my $h_minus_k = $star->get_magnitude( 'H' ) -
+                    $star->get_magnitude( 'K' );
+     
+    # generate the deltas
+    my $delta_j = $star->get_errors( 'J' );
+    my $delta_h = $star->get_errors( 'H' );
+    my $delta_k = $star->get_errors( 'K' );
+       
+    # quick kludge, stars without errors will get flagged bad anyway   
+    $delta_j = 0.000 unless defined  $delta_j;
+    $delta_h = 0.000 unless defined  $delta_h;
+    $delta_k = 0.000 unless defined  $delta_k;
+    
+    my $delta_jmh = ( ( $delta_j ** 2.0 ) + ( $delta_h ** 2.0 ) ) ** (1.0/2.0);
+    my $delta_jmk = ( ( $delta_j ** 2.0 ) + ( $delta_k ** 2.0 ) ) ** (1.0/2.0);
+    my $delta_hmk = ( ( $delta_h ** 2.0 ) + ( $delta_k ** 2.0 ) ) ** (1.0/2.0);
+
+    # fudge accuracy for readable catalogues
+    $j_minus_h = sprintf("%.4f", $j_minus_h );
+    $j_minus_k = sprintf("%.4f", $j_minus_k );
+    $h_minus_k = sprintf("%.4f", $h_minus_k );     
+    $delta_jmh = sprintf("%.4f", $delta_jmh );
+    $delta_jmk = sprintf("%.4f", $delta_jmk );
+    $delta_hmk = sprintf("%.4f", $delta_hmk );
+
+    # generate the hashes
+    my %colours = ( 'J-H' => $j_minus_h,
+                    'J-K' => $j_minus_k, 
+                    'H-K' => $h_minus_k );
+    
+    my %col_errors = ( 'J-H' => $delta_jmh,
+                       'J-K' => $delta_jmk, 
+                       'H-K' => $delta_hmk );
+    
+    # append to star object
+    $star->colours( \%colours );
+    $star->colerr( \%col_errors );
+    
 
   }
 
@@ -450,7 +508,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.3 2003/08/03 11:20:35 timj Exp $
+ $Id: TST.pm,v 1.4 2003/08/26 19:53:02 aa Exp $
 
 =head1 FORMAT
 

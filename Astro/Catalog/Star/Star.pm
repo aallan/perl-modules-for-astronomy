@@ -19,7 +19,7 @@ package Astro::Catalog::Star;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Star.pm,v 1.16 2003/08/04 05:31:08 timj Exp $
+#     $Id: Star.pm,v 1.17 2003/08/26 19:53:02 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -84,7 +84,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -232,7 +232,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Star.pm,v 1.16 2003/08/04 05:31:08 timj Exp $
+$Id: Star.pm,v 1.17 2003/08/26 19:53:02 aa Exp $
 
 =head1 METHODS
 
@@ -804,7 +804,48 @@ constants on catalog I/O.
 sub quality {
   my $self = shift;
   if (@_) {
-    $self->{QUALITY} = shift;
+  
+    # 2MASS hack
+    # ----------
+    # quick, dirty and ultimately icky hack. The entire quality flag
+    # code is going to have to be rewritten so it works like mag errors,
+    # and gets assocaited with a magnitude. For now, if the JHK QFlag
+    # for 2MASS is A,B or C then the internal quality flag is 0 (good),
+    # otherwise it gets set to 1 (bad). This pretty much sucks.
+    
+    # Yes Tim, I know I'm doing this in the wrong place. I'm panicing 
+    # I'll fix it later. I've moved the Cluster specific hack about the
+    # star ID's out of Astro::Catalog::query::USNOA2 and into the Cluster
+    # IO module and used Scalar::Util to figure out whether I've got a
+    # number (neat solution) before blowing it away.
+    
+    # Anyway...
+    my $quality = shift;
+    if ( $quality =~ /^[A-Z][A-Z][A-Z]$/ ) {
+       
+       $_ = $quality;
+       m/^([A-Z])([A-Z])([A-Z])$/;
+       
+       my $j_quality = $1;
+       my $h_quality = $2;
+       my $k_quality = $3;
+       
+       if ( ($j_quality eq 'A' || $j_quality eq 'B' || $j_quality eq 'C') &&
+            ($h_quality eq 'A' || $h_quality eq 'B' || $h_quality eq 'C') ) {
+       
+          # good quality
+          $self->{QUALITY} = 0;
+          
+       } else { 
+          # bad quality  
+          $self->{QUALITY} = 1;
+       }
+       
+    } else {
+    
+       $self->{QUALITY} = $quality;
+    }
+          
   }
   return $self->{QUALITY};
 }

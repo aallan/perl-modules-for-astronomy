@@ -1,3 +1,14 @@
+2003-08-26  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Star/Star.pm: Modified quality() routine so it knows about
+          TST quality flags. Not a particularly good solution, need to
+          generalise this and move it to the IO::TST module.
+          
+        * IO/Cluster.pm: Moved id() changes for USNO-A2 to generic code
+          in the pluggable IO module
+          
+        * IO/TST.pm: Modified to generate colours and quality flags for 2MASS  
+
 2003-08-03  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * IO/Cluster.pm: Fiddled with the quality flags for Cluster output,

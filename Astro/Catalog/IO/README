@@ -6,16 +6,14 @@ Currently supported formats are:
  Simple  - Simple ID, RA, Dec format
  Cluster - ARK Cluster format
  JCMT    - JCMT source catalogue
+ TST     - Tab Separated Table                 
+           http://www.starlink.rl.ac.uk/star/docs/ssn75.htx//ssn75.html  
 
 Other catalogue formats that we are considering:
 
  VOTable
    The new standard for Virtual Observatory interoperability
     http://www.ivoa.net
-
- TST     - Tab Separated Table format (standard for Astronomical
-           Catalog Servers)
-   http://www.starlink.rl.ac.uk/star/docs/ssn75.htx//ssn75.html  
 
  STL     - Small Text List (Starlink)
    http://www.starlink.rl.ac.uk/star/docs/sun190.htx//sun190.html

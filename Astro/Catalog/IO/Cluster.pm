@@ -25,6 +25,7 @@ use strict;
 use warnings;
 use warnings::register;
 use vars qw/ $VERSION /;
+use Scalar::Util;
 use Carp;
 
 use Astro::Catalog;
@@ -33,14 +34,14 @@ use Astro::Coords;
 
 use Data::Dumper;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.9 2003/08/19 18:28:51 aa Exp $
+$Id: Cluster.pm,v 1.10 2003/08/26 19:53:02 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -220,7 +221,7 @@ sub _write_catalog {
   # real list of filters and colours in the catalogue
   my @filters = $catalog->starbyindex(0)->what_filters();
   my @colours = $catalog->starbyindex(0)->what_colours();
-
+  
   # number of stars in catalogue
   my $number = $catalog->sizeof();
   
@@ -315,11 +316,12 @@ sub _write_catalog {
         $output_line = "0 ";
      }
      
-     if ( defined ${$stars}[$star]->id() ) {
-        $output_line = $output_line . ${$stars}[$star]->id() . "  ";
-     } else {
+     #if ( defined ${$stars}[$star]->id() && 
+     #     looks_like_number( ${$stars}[$star]->id() ) ) {
+     #   $output_line = $output_line . ${$stars}[$star]->id() . "  ";
+     #} else {
         $output_line = $output_line . $star . " ";
-     } 
+     #} 
      
      # fiddle with the dec, olv versions of the Fortran Cluster
      # parser don't like + signs for northern hemisphere dec's
@@ -354,12 +356,25 @@ sub _write_catalog {
 
         # so long as $doit isn't -1 then we have a valid filter
         if( $doit != -1 ) {
-          $output_line = $output_line . 
+        
+          if ( defined ${$stars}[$star]->get_magnitude(${$mags}[$i]) ) {
+             $output_line = $output_line . 
                          ${$stars}[$star]->get_magnitude(${$mags}[$i]) . "  ";
-          $output_line = $output_line . 
+          } else {
+             $output_line = $output_line . "0.000 ";
+          } 
+          if ( defined ${$stars}[$star]->get_errors(${$mags}[$i]) ) {
+             $output_line = $output_line . 
                          ${$stars}[$star]->get_errors(${$mags}[$i]) . "  ";
-          $output_line = $output_line . 
+          } else {
+             $output_line = $output_line . "0.000 ";
+          }
+          if ( defined ${$stars}[$star]->quality() ) {
+             $output_line = $output_line . 
                          ${$stars}[$star]->quality() . "  ";
+          } else {
+             $output_line = $output_line . "0 ";
+          }                
         }
      }
 

@@ -14,10 +14,10 @@ are many good reasons for this, chiefly the introduction of new features that
 would have been hard to implement and maintain backwards compatibility.
 
 New features for v3.0 include pluggable I/O support, filtering and inline
-sorting of retrieved catalogues. However alot of the improvements are readily
-noticable by the user as alot of work has gone into the infrastructure of
-the package. This means that adding additional I/O and Query support has been
-made alot easier.
+sorting of retrieved catalogues. However alot of the improvements are not 
+readily noticable by the user as alot of work has gone into the infrastructure
+of the package. This means that adding additional I/O and Query support has 
+been made alot easier.
 
 Requirements
 ------------
@@ -60,7 +60,11 @@ The package provides the following user level classes
   Astro::Catalog::Query::GSC
     A class to automatically retrieves a objects in the GSC catalogue
     matching query parameters and returns an Astro::Catalog object.
-     
+ 
+  Astro::Catalog::Query::2MASS
+   A class to automatically retrieves a objects in the 2MASS catalogue
+   matching query parameters and returns an Astro::Catalog object.
+        
   Astro::Catalog::Query::SuperCOSMOS
     A class to automatically retrieves a objects in the SuperCOSMOS catalogue
     matching query parameters and returns an Astro::Catalog object. 
@@ -69,6 +73,16 @@ The package provides the following user level classes
     A class that does a name lookup using the CDS Sesame Web Service and
     returns an Astro::Catalog object containing a single Astro::Catalog::Star
     object.
+    
+  Astro::Catalog::Query::SIMBAD
+    A class that does an object lookup on CDS SIMBAD, implements most of
+    the functionaliy of the Astro::SIMBAD module.
+     
+  Astro::Catalog::Query::SkyCat
+    A class that generates SkyCat catalogue queries
+    
+  Astro::Catalog::Query::Vizier  
+    A class that generates Vizier catalogue queries
 
 Additional classes provided by the package handle things that you don't
 need to concern yourself with, unless you want to write your own I/O or
@@ -77,6 +91,7 @@ query plugins, these are
   Astro::Catalog::IO::Cluster
   Astro::Catalog::IO::JCMT
   Astro::Catalog::IO::Simple
+  Astro::Catalog::IO::TST
   Astro::Catalog::Transport::REST
   Astro::Catalog::Transport::WebService
   Astro::Catalog::Query
@@ -84,7 +99,7 @@ query plugins, these are
 The user level query classes inherit from the Astro::Catalog::Transport::XXX
 classes, which in turn all inherit basic functionality from the Query base
 class Astro::Catalog::Query. The Astro::Catalog::IO modules provide pluggable
-polymor
+polymorphic input/output.
  
 Where can I get it?
 -------------------
