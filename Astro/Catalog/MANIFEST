@@ -33,6 +33,7 @@ t/2_tst.t
 t/3_catalog.t
 t/3_star.t
 t/4_gsc.t
+t/4_gsc_cmp_skycat.t
 t/4_supercos.t
 t/4_usnoa2.t
 t/4_simbad.t
