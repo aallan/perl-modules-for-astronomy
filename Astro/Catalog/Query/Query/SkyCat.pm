@@ -360,7 +360,7 @@ contents into the query object itself.
   my $cfg_file;
   if( exists $ENV{SKYCAT_CFG} ) {
      $cfg_file = $ENV{SKYCAT_CFG};
-  } elsif ( exists File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg") ){
+  } elsif ( -f File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg") ){
      $cfg_file = File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg");
   } else {
     # generate the default path to the $PERLPRFIX/etc/skycat.cfg file,
@@ -376,7 +376,13 @@ contents into the query object itself.
     my $directory = File::Spec->catdir( @path, 'etc' );
     
     # reset to the default
-    $cfg_file = File::Spec->catfile( $directory, "skycat.cfg" );     
+    $cfg_file = File::Spec->catfile( $directory, "skycat.cfg" ); 
+    
+    # debugging and testing purposes
+    unless ( -f $cfg_file ) {
+      # use blib version!
+      $cfg_file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
+    }    
   }
   
   sub cfg_file {

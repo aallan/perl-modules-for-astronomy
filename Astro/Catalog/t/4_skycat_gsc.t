@@ -118,7 +118,7 @@ my $gsc_byname = new Astro::Catalog::Query::SkyCat( # Target => 'HT Cas',
 						  );
 print "# Reseting \$cfg_file to local copy in ./etc \n";
 my $file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
-$supercos->cfg_file( $file ); 
+$gsc_byname->cfg_file( $file ); 
                                                                
 print "# Connecting to ESO/ST-ECF GSC Catalogue\n";
 my $catalog_byname = $gsc_byname->querydb();
