@@ -7,7 +7,11 @@
 use 5.006;
 use strict;
 use warnings;
-use Test; # Not really needed since we don't use ok()
+
+# Test module only used for planning
+# Note that we can not use Test::More since Test::More
+# will lose count of its tests and complain (through the fork)
+use Test;
 
 use File::Find;
 
@@ -29,7 +33,7 @@ find({ wanted => \&wanted,
        }, "blib");
 
 # Start the tests
-plan tests => scalar(@modules);
+plan tests => (scalar(@modules));
 
 
 # Loop through each module and try to run it
@@ -53,27 +57,30 @@ for my $module (@modules) {
   } else {
     # Child
     die "cannot fork: $!" unless defined $pid;
-    
+
+    my $not = '';
     if ( $module eq "Astro::Catalog::Query::SuperCOSMOS" ) {
        eval "use Astro::Aladin";
        if ($@) {
-         print "ok - $module (skipped: Astro::Aladin module not available)\n";
+         print "ok # Skip $module (Astro::Aladin module not available)\n";
          exit;
        } else {
          eval "use $module ();";
          if( $@ ) {
            warn "require failed with '$@'\n";
-           print "not ";
+	   $not = 'not ';
          }
-       }        
+       }
     } else {
       eval "use $module ();";
       if( $@ ) {
         warn "require failed with '$@'\n";
-        print "not ";
+	$not = 'not ';
       }
-    }  
-    print "ok - $module\n";
+    }
+    # Combine $not with the single print since some OSes do
+    # insert automatic new lines
+    print $not ."ok - $module\n";
     # Must remember to exit from the fork
     exit;
   }
