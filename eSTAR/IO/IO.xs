@@ -20,6 +20,8 @@ HANDLE()
 void
 Error()
 
+MODULE = eSTAR::IO::Client   PACKAGE = globus_io_handle_tPtr PREFIX = eSTAR_IO_
+
 int
 Write_Message( handle, message )
     char * message
