@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.15 2001/11/08 03:46:27 timj Exp $
+#     $Id: Query.pm,v 1.16 2001/11/10 17:35:52 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -62,13 +62,13 @@ use Astro::ADS::Result;
 use Astro::ADS::Result::Paper;
 use Carp;
 
-'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.15 2001/11/08 03:46:27 timj Exp $
+$Id: Query.pm,v 1.16 2001/11/10 17:35:52 aa Exp $
 
 =head1 METHODS
 
@@ -376,6 +376,29 @@ sub objectlogic {
   return ${$self->{OPTIONS}}{"obj_logic"};
 }
 
+=item B<Bibcode>
+
+Return (or set) the current bibcode used for the ADS query.
+
+   $bibcode = $query->bibcode();
+   $query->bibcode( "1996PhDT........42J" );
+
+=cut
+
+sub bibcode {
+  my $self = shift;
+
+  # SETTING BIBCODE
+  if (@_) { 
+
+    # set the bibcode option  
+    ${$self->{OPTIONS}}{"bibcode"} = shift;
+  }
+
+  # RETURNING BIBCODE
+  return ${$self->{OPTIONS}}{"bibcode"};
+}
+
 # C O N F I G U R E -------------------------------------------------------
 
 =back
@@ -464,6 +487,7 @@ sub configure {
   ${$self->{OPTIONS}}{"ttl_sco"}          = "YES";
   ${$self->{OPTIONS}}{"txt_sco"}          = "YES";
   ${$self->{OPTIONS}}{"version"}          = "1";
+  ${$self->{OPTIONS}}{"bibcode"}          = "";
 
   # Set the data_type option to PORTABLE so our regular expressions work!
   ${$self->{OPTIONS}}{"data_type"}        = "PORTABLE";
@@ -478,7 +502,7 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Authors AuthorLogic Objects ObjectLogic / ) {
+  for my $key (qw / Authors AuthorLogic Objects ObjectLogic Bibcode / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }

@@ -1,4 +1,9 @@
-2001-11-07  Tim Jenness  <t.jenness@jach.hawaii.edu>
+2001-11-10 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Query.pm: Added bibcode() method and associated $self->{OPTIONS}
+          hash entry as requested by Tim.
+
+2001-11-07 Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 	* Result/Result.pm (summary): Add summary and stringify
 

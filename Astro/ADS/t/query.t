@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 63 };
+BEGIN { plan tests => 64 };
 
 # load modules
 use Astro::ADS::Query;
@@ -155,6 +155,22 @@ $query2->timeout(60);
 my $time = $query2->timeout();
 
 ok( $time , 60 );
+
+# test bibcode query for Tim Jenness
+my $query3 = new Astro::ADS::Query( Bibcode => "1996PhDT........42J" );
+
+# query ADS
+print "# Connecting to ADS\n";
+my $bibcode_result = $query3->querydb();
+#print Dumper($bibcode_result);
+print "# Continuing Tests\n";
+
+# check we have the right object
+my $timj_thesis = $bibcode_result->paperbyindex( 0 );
+my @timj_abstract = $timj_thesis->abstract();
+
+# should have 32 lines of text!
+ok( @timj_abstract, 32 );
 
 exit;
 
