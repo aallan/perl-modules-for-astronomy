@@ -1,0 +1,51 @@
+Astro::Coords
+=============
+
+A wrapper class around Astro::SLA that simplifies the handling of
+astronomical coordinate systems. It can be used to convert between
+J2000, B1950, Galactic and super Galactic coordinates.  It can
+calculate the azimuth and elevation of a source specified in
+equatorial coordinates, orbital elements or by name (if a planet).
+It can also determine whether the specified coordinates are observable
+for the given telescope.
+
+This software is still an alpha release. The interfaces may still
+change slightly.
+
+Requirements
+------------
+
+This class uses Astro::SLA, Astro::Telescope and Time::Piece.
+
+
+Building
+--------
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The test calculates the azimuth and elevation of a 3 sources
+including a planet and a comet (Hale Bopp).
+
+
+Author
+------
+
+This module was written by Tim Jenness  <t.jenness@jach.hawaii.edu>
+of the Joint Astronomy Centre.
+
+Copyright (C) 2001-2002 Particle Physics and Astronomy Research Council.
+All Rights Reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+Changes
+-------
+
+ v0.01 - initial test release to CPAN
+
+ v0.02 - Add Astro::Coords::Calibration and Astro::Coords::Fixed
+
+ v0.03 - Add isObservable method
+	 Spun off AStro::Telescope into its own CPAN distribution

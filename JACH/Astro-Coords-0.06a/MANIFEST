@@ -1,0 +1,13 @@
+Makefile.PL
+ChangeLog
+MANIFEST
+README
+t/basic.t
+t/rev.t
+lib/Astro/Coords.pm
+lib/Astro/Coords/Planet.pm
+lib/Astro/Coords/Equatorial.pm
+lib/Astro/Coords/Elements.pm
+lib/Astro/Coords/Fixed.pm
+lib/Astro/Coords/Calibration.pm
+lib/Astro/Coords/Interpolated.pm
