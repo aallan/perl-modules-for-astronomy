@@ -21,7 +21,7 @@ package Astro::Corlate;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Corlate.pm,v 1.4 2001/12/12 07:22:56 aa Exp $
+#     $Id: Corlate.pm,v 1.5 2001/12/18 23:48:14 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -42,7 +42,7 @@ Astro::Corlate - Object a catalog corelation
                                  Observation =>  $observation );
 
   # run the corelation routine
-  my $status = $corlate->run_corrlate();
+  $corlate->run_corrlate();
   
   # get the log file
   my $log = $corlate->logfile();
@@ -80,13 +80,13 @@ use Astro::Corlate::Wrapper qw / corlate /;
 use File::Spec;
 use Carp;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Corlate.pm,v 1.4 2001/12/12 07:22:56 aa Exp $
+$Id: Corlate.pm,v 1.5 2001/12/18 23:48:14 aa Exp $
 
 =head1 METHODS
 
