@@ -1,0 +1,28 @@
+To Do
+-----
+ 
+ * Add support for FITS binary tables  
+   
+ * Work with Astro::Catalog::IO::VOTable to provide better reader support
+  
+ * Need to added Epoch and Equinox support, possibly inside Astro::Coords
+   rather than in Astro::Catalog::Star itself?
+
+ * Add proper motion support to Astro::Catalog::Star (or Astro::Coords?)
+ 
+ * Fix Astro::Catalog::Query::CMC module to correctly parse the CMC TST files
+ 
+ * Add writing support for TST files to Astro::Catalog::IO::TST
+
+ * Fix Astro::Catalog::Query::SkyCat and Astro::Catalog::Query::Vizier to
+   be truely generic (or at least work in more cases out of the box).
+   
+ * Change Astro::Catalog::Query::Vizier to use VOTables for easier parsing?
+ 
+ * Add support for Gaia/SkyCat pick object format
+ 
+ * Add support for STL format
+ 
+ * Add support for (S)Extractor format
+ 
+ * Add further catalogue query classes?
