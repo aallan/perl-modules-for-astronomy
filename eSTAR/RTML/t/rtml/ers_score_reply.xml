@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE RTML SYSTEM "http://astro.livjm.ac.uk/HaGS/rtml2.1.dtd" >
+<!DOCTYPE RTML SYSTEM "http://www.astro.livjm.ac.uk/HaGS/rtml2.1.dtd" >
 
 <RTML version="2.1" type="score">
 
@@ -183,7 +183,7 @@
 	    <Device name="RATCAM" region="optical" type="camera">
 	        LT RATCAM
 		<Filter>
-		    <FilterType type="R-Johnson" />
+		    <FilterType>R-Johnson</FilterType>
 		</Filter>
 	    </Device>
 	</Target>

@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.17 2003/07/15 08:16:51 aa Exp $
+#     $Id: Parse.pm,v 1.18 2003/07/18 01:58:09 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.17 2003/07/15 08:16:51 aa Exp $
+$Id: Parse.pm,v 1.18 2003/07/18 01:58:09 aa Exp $
 
 =head1 METHODS
 
@@ -343,6 +343,19 @@ sub equinox {
 }
 
 
+=item B<filter>
+
+Return the filter type of the observation
+
+  $filter = $rtml->filter();
+
+=cut
+sub filter {
+  my $self = shift;  
+  return ${${${$self->{OBSERVATION}}{Device}}{Filter}}{FilterType};
+ 
+}
+
 =item B<host>
 
 Return the host of the IA origininating the document
@@ -531,6 +544,9 @@ sub _parse_tag {
 
   # grab section
   my @obs = @$array_reference;
+
+  #use Data::Dumper;
+  #print Dumper( @obs );
          
   # check for attributes         
   _parse_sub_attrib( $name, \%{$obs[0]} );  
@@ -561,6 +577,10 @@ sub _parse_tag {
                   
         # grab sub-tag array reference
         my @array = @{$generic[$k+1]};
+        #use Data::Dumper; print Dumper( @array );
+
+        #print "ATTRIBUTE\n$name\n$obs[$j]\n$generic[$k]\n";
+        #print "array[0] is $array[0]\n";
 
         # check for attributes
         _parse_sub_sub_sub_attrib( $name, $obs[$j],
@@ -571,10 +591,7 @@ sub _parse_tag {
         # check for CDATA
         _parse_sub_sub_sub_value( $name, $obs[$j], 
                                   $generic[$k] , \@array ); 
-            
-        # increment counter
-        $k = $k + 3;
-        
+           
         ##########################################################
         #                                                        #
         # NB: This is where to add another sub loop if we end    #
@@ -586,7 +603,9 @@ sub _parse_tag {
         #     way so you'll have to live with this...            #
         #                                                        #
         ##########################################################
-               
+         
+        # increment counter
+        $k = $k + 3;               
       }                             
                
       # increment counter
@@ -702,6 +721,40 @@ sub _parse_sub_sub_sub_tag {
      $l = $l + 3;
    }  
 } 
+sub _parse_sub_sub_sub_sub_tag {
+  croak 'Parse.pm: _parse_sub_sub_sub_sub_tag() usage error'
+    unless scalar(@_) == 5 ;
+
+  # read arguements
+  my ( $name, $sub_name, $subsub_name, $subsubsub_name, $array_reference ) = @_;
+  my @array = @$array_reference;
+  
+  # loop through sub-tags
+  for ( my $l = 3; $l <= $#array; $l++ ) {
+     print "#          $l = $array[$l] *\n";
+                    
+     # grab the hash entry
+     my $entry = ${$array[$l+1]}[2];
+     chomp($entry);
+           
+     # remove leading spaces
+     $entry =~ s/^\s+//;
+            
+     # remove trailing spaces
+     $entry =~ s/\s+$//;
+            
+     chomp($entry);
+             
+     # assign the entry
+     ${$SELF->{uc($name)}}
+       {ucfirst(lc($sub_name))}
+       {ucfirst(lc($subsub_name))}
+       {ucfirst(lc($subsubsub_name))}{$array[$l]} = $entry;
+     
+     # increment counter
+     $l = $l + 3;
+   }  
+} 
 
 # _parse_sub*_attrib() routines: these parse the sub tag attributes
 
@@ -738,6 +791,7 @@ sub _parse_sub_sub_attrib {
   }
   
 }
+
 sub _parse_sub_sub_sub_attrib { 
   croak 'Parse.pm: _parse_sub_sub_sub_attrib() usage error'
     unless scalar(@_) == 4 ;
@@ -746,13 +800,44 @@ sub _parse_sub_sub_sub_attrib {
   my ( $name, $sub_name, $subsub_name, $hash_reference ) = @_;
   my %hash = %$hash_reference;
 
+  #use Data::Dumper; print "ATTRIB " . Dumper(%hash) . "\n";
+  
   # loop through hash and drop all the keys into the parsed output
   # as hash items in the list. This isn't really neat, perhaps a 
   # hash of hashs would be better?
   foreach my $key ( sort keys %hash ) {
+
+     #print "ATTRIB $key = $hash{$key}\n";
+     #print "ATTRIB $name, $sub_name, $subsub_name, $key\n";
      ${$SELF->{uc($name)}}
         {ucfirst(lc($sub_name))}
         {ucfirst(lc($subsub_name))}{$key} = $hash{$key};
+  }
+  
+}
+
+
+sub _parse_sub_sub_sub_sub_attrib { 
+  croak 'Parse.pm: _parse_sub_sub_sub_sub_attrib() usage error'
+    unless scalar(@_) == 5 ;
+
+  # read arguements
+  my ( $name, $sub_name, $subsub_name, $subsubsub_name, $hash_reference ) = @_;
+  my %hash = %$hash_reference;
+
+  #use Data::Dumper; print "ATTRIB " . Dumper(%hash) . "\n";
+  
+  # loop through hash and drop all the keys into the parsed output
+  # as hash items in the list. This isn't really neat, perhaps a 
+  # hash of hashs would be better?
+  foreach my $key ( sort keys %hash ) {
+
+     #print "ATTRIB $key = $hash{$key}\n";
+     #print "ATTRIB $name, $sub_name, $subsub_name, $subsubsub_name, $key\n";
+     ${$SELF->{uc($name)}}
+        {ucfirst(lc($sub_name))}
+        {ucfirst(lc($subsub_name))}
+        {ucfirst(lc($subsubsub_name))}{$key} = $hash{$key};
   }
   
 }
@@ -822,6 +907,28 @@ sub _parse_sub_sub_sub_value {
   }
 }
 
+sub _parse_sub_sub_sub_sub_value {
+  croak 'Parse.pm: _parse_sub_sub_sub_sub_value() usage error'
+    unless scalar(@_) == 5 ;
+
+  # read arguements
+  my ( $name, $sub_name, $subsub_name, $subsubsub_name, $array_reference ) = @_;
+  my @array = @$array_reference;
+       
+  # grab tag value
+  if( defined $array[2] ) { 
+     my $entry = $array[2];
+     $entry =~ s/^\s+//;
+     $entry =~ s/\s+$//;
+     chomp($entry);
+     if( $entry ne '' ) {
+        ${$SELF->{uc($name)}}
+           {ucfirst(lc($sub_name))}
+           {ucfirst(lc($subsub_name))}
+           {ucfirst(lc($subsubsub_name))}{'tag_value'} = $entry;
+     }      
+  }
+}
 
 # L A S T  O R D E R S ------------------------------------------------------
 

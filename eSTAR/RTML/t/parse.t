@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 23 };
+BEGIN { plan tests => 24 };
 
 # load modules
 use eSTAR::RTML;
@@ -130,7 +130,7 @@ my $score_message = new eSTAR::RTML::Parse( RTML => $ers_score );
 ok( $score_message->dtd(), '2.1' );
 ok( $score_message->type(), 'score' );
 
-#print Dumper($score_message);
+print Dumper($score_message);
 
 # UPDATE
 # ------

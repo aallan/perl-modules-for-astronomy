@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.11 2003/07/15 08:16:51 aa Exp $
+#     $Id: Build.pm,v 1.12 2003/07/18 01:58:09 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -65,13 +65,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.11 2003/07/15 08:16:51 aa Exp $
+$Id: Build.pm,v 1.12 2003/07/18 01:58:09 aa Exp $
 
 =head1 METHODS
 
@@ -129,7 +129,8 @@ Build a score document
                                           Equinox       => $equinox,
                                           Exposure      => $seconds,
                                           Snr           => $snr,
-                                          Flux          => $mag );
+                                          Flux          => $mag,
+                                          Filter        => filter );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -142,7 +143,7 @@ sub score_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Exposure Snr Flux / ) {
+  for my $key (qw / Target RA Dec Equinox Exposure Snr Flux Filter / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -229,14 +230,39 @@ sub score_observation {
         $self->{WRITER}->endTag( 'Coordinates' );
         
         if( defined ${$self->{OPTIONS}}{SNR} ) {
-           $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'v' );
+
+           if( defined ${$self->{OPTIONS}}{FILTER} ) {
+              $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
+           } else {        
+              $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
-
-     $self->{WRITER}->endTag( 'Target' );
         
+     $self->{WRITER}->endTag( 'Target' );
+
+        
+     $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
+        
+           $self->{WRITER}->startTag( 'Filter' ); 
+
+           if( defined ${$self->{OPTIONS}}{FILTER} ) {
+              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
+              $self->{WRITER}->endTag( 'FilterType' ); 
+           } else {          
+              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->characters( 'V' );
+              $self->{WRITER}->endTag( 'FilterType' ); 
+           }
+           
+           $self->{WRITER}->endTag( 'Filter' );
+     $self->{WRITER}->endTag( 'Device' );                                    
+                        
      $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
@@ -277,7 +303,8 @@ Build a score response document
                                           Snr           => $snr,
                                           Flux          => $mag,
                                           Score         => $score,
-                                          Time          => $completion_time );
+                                          Time          => $completion_time,
+                                          Filter        => filter );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -290,7 +317,8 @@ sub score_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Exposure Snr Flux Score Time / ) {
+  for my $key (qw / Target RA Dec Equinox Exposure 
+                    Snr Flux Score Time Filter/ ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -377,15 +405,39 @@ sub score_response {
            $self->{WRITER}->endTag( 'Equinox' );
 
         $self->{WRITER}->endTag( 'Coordinates' );
-        
+
         if( defined ${$self->{OPTIONS}}{SNR} ) {
-           $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'v' );
+
+           if( defined ${$self->{OPTIONS}}{FILTER} ) {
+              $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
+           } else {        
+              $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
 
-     $self->{WRITER}->endTag( 'Target' );
+     $self->{WRITER}->endTag( 'Target' );        
+     
+     $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
+        
+           $self->{WRITER}->startTag( 'Filter' ); 
+ 
+           if( defined ${$self->{OPTIONS}}{FILTER} ) {
+              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
+              $self->{WRITER}->endTag( 'FilterType' ); 
+           } else {          
+              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->characters( 'V' );
+              $self->{WRITER}->endTag( 'FilterType' ); 
+           }
+           
+           $self->{WRITER}->endTag( 'Filter' );
+     $self->{WRITER}->endTag( 'Device' );    
         
      $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
 
@@ -434,7 +486,8 @@ Build a request document
                                             Time     => $completion_time,
                                             Exposure => $exposure,
                                             Snr      => $snr,
-                                            Flux     => $mag );
+                                            Flux     => $mag,
+                                            Filter        => filter );
 
 Use "Exposure", or "Snr" and "Flux", but not both. );
 
@@ -447,7 +500,8 @@ sub request_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Score Time Exposure Snr Flux / ) {
+  for my $key (qw / Target RA Dec Equinox Score Time 
+                Exposure Snr Flux Filter/ ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -532,15 +586,39 @@ sub request_observation {
            $self->{WRITER}->endTag( 'Equinox' );
 
         $self->{WRITER}->endTag( 'Coordinates' );
-        
+ 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
-           $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'v' );
+
+           if( defined ${$self->{OPTIONS}}{FILTER} ) {
+              $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
+           } else {        
+              $self->{WRITER}->startTag( 'Flux', 
+               'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
                                        
      $self->{WRITER}->endTag( 'Target' );
+        
+     $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
+        
+           $self->{WRITER}->startTag( 'Filter' ); 
+
+           if( defined ${$self->{OPTIONS}}{FILTER} ) {
+              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
+              $self->{WRITER}->endTag( 'FilterType' ); 
+           } else {          
+              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->characters( 'V' );
+              $self->{WRITER}->endTag( 'FilterType' ); 
+           }
+           
+           $self->{WRITER}->endTag( 'Filter' );
+     $self->{WRITER}->endTag( 'Device' );    
         
      $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
 
@@ -578,6 +656,83 @@ sub request_observation {
 
 }
 
+
+=item B<reject_response>
+
+Build a reject document
+
+   $status = $message->reject_response( );
+
+=cut
+
+sub reject_response {
+  my $self = shift;
+
+  # grab the argument list
+  my %args = @_;
+
+  # Loop over the allowed keys and modify the default query options
+  for my $key (qw / / ) {
+  
+     # print "Calling " . lc($key) ."()\n";
+      my $method = lc($key);
+      $self->$method( $args{$key} ) if exists $args{$key};
+  }
+  
+  # open the document
+  $self->{WRITER}->xmlDecl( 'US-ASCII' );
+  $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
+ 
+  # open the RTML document
+  # ======================
+  $self->{WRITER}->startTag( 'RTML',
+                             'version' => '2.1',
+                             'type' => 'reject' );
+  
+  # IntelligentAgent Tag
+  # --------------------
+  
+  # identify the IA               
+  $self->{WRITER}->startTag( 'IntelligentAgent', 
+                             'host' => ${$self->{OPTIONS}}{HOST},
+                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
+  
+  # unique IA identity sting
+  $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
+  
+  $self->{WRITER}->endTag( 'IntelligentAgent' );
+ 
+  # Contact Tag
+  # -----------
+  $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
+                             
+     $self->{WRITER}->startTag( 'User');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
+     $self->{WRITER}->endTag( 'User' );
+  
+     $self->{WRITER}->startTag( 'Name');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );  
+      
+     $self->{WRITER}->startTag( 'Institution');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' ); 
+      
+     $self->{WRITER}->startTag( 'Email');                          
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' ); 
+
+  $self->{WRITER}->endTag( 'Contact' ); 
+ 
+  # close the RTML document
+  # =======================
+  $self->{WRITER}->endTag( 'RTML' );
+  $self->{WRITER}->end();
+
+  # return a good status (GLOBUS_TRUE)
+  return 1;
+
+}
 
 =item B<dump_rtml>
 
@@ -860,6 +1015,27 @@ sub score {
 
   # return the current target score
   return ${$self->{OPTIONS}}{SCORE};
+}
+
+ 
+=item B<filter>
+
+Sets (or returns) the target filter required
+
+   $message->filter( $filter );
+   $filter = $message->filter();
+
+=cut
+
+sub filter {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{FILTER} = shift;
+  }
+
+  # return the current filter
+  return ${$self->{OPTIONS}}{FILTER};
 }
    
 =item B<time>
