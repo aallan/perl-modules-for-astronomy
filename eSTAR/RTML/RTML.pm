@@ -19,7 +19,7 @@ package eSTAR::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.4 2003/06/03 21:24:50 aa Exp $
+#     $Id: RTML.pm,v 1.5 2003/07/15 20:58:11 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -30,7 +30,7 @@ package eSTAR::RTML;
 
 =head1 NAME
 
-eSTAR::RTML - module handling RTML for the intelligetn agent
+eSTAR::RTML - Object Orientatied interface to create and parse RTML messages
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,10 @@ eSTAR::RTML - module handling RTML for the intelligetn agent
 
 =head1 DESCRIPTION
 
-The module handles RTML for the intelligent agent 
+The module creates and parses RTML v2.1, the eSTAR version of the V2.x
+language specification. It provides a simple interface to automatically
+generate RTML messages used by the eSTAR project, but should be tweakable
+for more generic use fairly easily.
 
 =cut
 
@@ -54,13 +57,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.4 2003/06/03 21:24:50 aa Exp $
+$Id: RTML.pm,v 1.5 2003/07/15 20:58:11 aa Exp $
 
 =head1 METHODS
 
