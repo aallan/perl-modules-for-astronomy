@@ -5,6 +5,8 @@
           with eSTAR::IO modules. Added observation.pl and server.pl
           scripts to module (should make separate?).
           
+        * Build.pm: Minmal set of tags should be in palce.
+          
 2002-03-17  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Build.pm: Basic RTML construction for "score" and "request"

@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.4 2002/03/18 13:15:26 aa Exp $
+#     $Id: Build.pm,v 1.5 2002/03/18 17:05:53 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -35,8 +35,13 @@ eSTAR::RTML::Build - module which creates valid RTML messages
 
 =head1 SYNOPSIS
 
-   $message = new eSTAR::RTML::Build( Port => $port,
-                                      ID   => $id );
+   $message = new eSTAR::RTML::Build( Host        => $ia_host,
+                                      Port        => $ia_port,
+                                      ID          => $id,
+                                      User        => $user_name,
+                                      Name        => $real_name,
+                                      Institution => $institution,
+                                      Email       => $email_address );
  
 
 =head1 DESCRIPTION
@@ -59,13 +64,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.4 2002/03/18 13:15:26 aa Exp $
+$Id: Build.pm,v 1.5 2002/03/18 17:05:53 aa Exp $
 
 =head1 METHODS
 
@@ -77,8 +82,13 @@ $Id: Build.pm,v 1.4 2002/03/18 13:15:26 aa Exp $
 
 Create a new instance from a hash of options
 
-  $message = new eSTAR::RTML::Build( Port => $port,
-                                     ID   => $id );
+  $message = new eSTAR::RTML::Build( Host        => $ia_host,
+                                     Port        => $ia_port,
+                                     ID          => $id,
+                                     User        => $user_name,
+                                     Name        => $real_name,
+                                     Institution => $institution,
+                                     Email       => $email_address);
 
 returns a reference to an object.
 
@@ -112,7 +122,11 @@ sub new {
 
 Build a score document
 
-   $status = $message->score_observation();
+   $status = $message->score_observation( Target    => $target_name,
+                                          RA        => $ra,
+                                          Dec       => $dec,
+                                          Equinox   => $equinox,
+                                          Exposure  => $seconds );
 
 =cut
 
@@ -123,7 +137,7 @@ sub score_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox / ) {
+  for my $key (qw / Target RA Dec Equinox Exposure / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -155,6 +169,10 @@ sub score_observation {
   
   $self->{WRITER}->endTag( 'IntelligentAgent' );
   
+  # Telescope Tag
+  # -------------
+  $self->{WRITER}->emptyTag( 'Telescope' );
+  
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
@@ -177,6 +195,10 @@ sub score_observation {
 
   $self->{WRITER}->endTag( 'Contact' ); 
   
+  # Project Tag
+  # -------------
+  $self->{WRITER}->emptyTag( 'Project' );
+    
   # Observation tag
   # ---------------
   $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
@@ -204,10 +226,17 @@ sub score_observation {
            $self->{WRITER}->endTag( 'Equinox' );
 
         $self->{WRITER}->endTag( 'Coordinates' );
-                               
-           
-     $self->{WRITER}->endTag( 'Target' );
 
+     $self->{WRITER}->endTag( 'Target' );
+        
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
+
+        $self->{WRITER}->startTag( 'Exposure', 'time' => 'seconds' );
+        $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
+        $self->{WRITER}->endTag( 'Exposure' );
+
+     $self->{WRITER}->endTag( 'Schedule' );
+                  
   $self->{WRITER}->endTag( 'Observation' );  
      
     
@@ -225,7 +254,13 @@ sub score_observation {
 
 Build a request document
 
-   $status = $message->request_observation();
+   $status = $message->request_observation( Target   => $target_name,
+                                            RA       => $ra,
+                                            Dec      => $dec,
+                                            Equinox  => $equinox,
+                                            Score    => $score,
+                                            Time     => $completion_time,
+                                            Exposure => $exposure );
 
 =cut
 
@@ -236,7 +271,7 @@ sub request_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target RA Dec Equinox Score Time / ) {
+  for my $key (qw / Target RA Dec Equinox Score Time Exposure / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -268,6 +303,10 @@ sub request_observation {
   
   $self->{WRITER}->endTag( 'IntelligentAgent' );
   
+  # Telescope Tag
+  # -------------
+  $self->{WRITER}->emptyTag( 'Telescope' );
+    
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
@@ -290,6 +329,10 @@ sub request_observation {
 
   $self->{WRITER}->endTag( 'Contact' ); 
   
+  # Project Tag
+  # -------------
+  $self->{WRITER}->emptyTag( 'Project' );
+      
   # Observation tag
   # ---------------
   $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
@@ -318,9 +361,16 @@ sub request_observation {
 
         $self->{WRITER}->endTag( 'Coordinates' );
                                
-           
      $self->{WRITER}->endTag( 'Target' );
+        
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
 
+        $self->{WRITER}->startTag( 'Exposure', 'time' => 'seconds' );
+        $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
+        $self->{WRITER}->endTag( 'Exposure' );
+
+     $self->{WRITER}->endTag( 'Schedule' );
+     
   $self->{WRITER}->endTag( 'Observation' );  
    
   # Score Tags
@@ -625,6 +675,29 @@ sub time {
 
   # return the current target score
   return ${$self->{OPTIONS}}{COMPLETIONTIME};
+} 
+ 
+=item B<exposure>
+
+Sets (or returns) the exposure time for the image
+
+   $message->exposure( $time );
+   $time = $message->time();
+
+the time should be in seconds, alternatively you can supply a C<flux()> and
+C<snr()> rather than a time to expose on target.
+
+=cut
+
+sub exposure {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{EXPOSURE} = shift;
+  }
+
+  # return the current target score
+  return ${$self->{OPTIONS}}{EXPOSURE};
 }  
 
 # C O N F I G U R E -------------------------------------------------------
