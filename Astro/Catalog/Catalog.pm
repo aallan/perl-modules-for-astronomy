@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.34 2003/07/31 02:07:33 timj Exp $
+#     $Id: Catalog.pm,v 1.35 2003/07/31 08:37:31 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -64,7 +64,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.34 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.35 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -72,7 +72,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.34 2003/07/31 02:07:33 timj Exp $
+$Id: Catalog.pm,v 1.35 2003/07/31 08:37:31 timj Exp $
 
 =head1 METHODS
 
@@ -1347,7 +1347,10 @@ sub _load_io_plugin {
 
   # Horrible kluge since I prefer "JCMT" to "Jcmt".
   # Maybe we should not try to fudge case at all?
+  # Getting out of hand - maybe we should special case Cluster
+  # and assume uppercase elsewhere.
   $format = 'JCMT' if $format eq 'Jcmt';
+  $format = 'TST'  if $format eq 'Tst';
 
   my $class = "Astro::Catalog::IO::" . $format;
 
