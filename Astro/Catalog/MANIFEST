@@ -19,6 +19,7 @@ Query/Query/GSC.pm
 Query/Query/SuperCOSMOS.pm
 Query/Query/Sesame.pm
 Query/Query/SIMBAD.pm
+Query/Query/Vizier.pm
 Query/Query/Makefile.PL
 Transport/REST.pm
 Transport/WebService.pm
