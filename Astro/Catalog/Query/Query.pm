@@ -29,13 +29,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.6 2003/08/03 08:18:59 timj Exp $
+$Id: Query.pm,v 1.7 2003/08/04 05:31:38 timj Exp $
 
 =head1 METHODS
 
@@ -582,7 +582,14 @@ provided in the form of _from_$opt. ie:
   ($outkey, $outvalue) = $q->_from_ra();
   ($outkey, $outvalue) = $q->_from_object();
 
-The base class only includes one to one mappings.
+Items that have a one-to-one mapping can be declared by the query
+subclass using the C<_translate_one_to_one> method which returns
+a list of options that support the simplest mapping. If an explicit
+method exists it is always used.
+
+If an option has no translation method and is not declared as
+a one-to-one mapping, the translator will assume one-to-one but
+issue a warning.
 
 =item B<_translate_options>
 
@@ -600,6 +607,7 @@ sub _translate_options {
 
   my %outhash;
   my %allow = $self->_get_allowed_options();
+  my %one_one = $self->_translate_one_to_one();
 
   foreach my $key ( keys %allow ) {
     # Need to translate them...
@@ -608,8 +616,13 @@ sub _translate_options {
     if ($self->can($cvtmethod)) {
       ($outkey, $outvalue) = $self->$cvtmethod();
     } else {
-      # Currently assume everything is one to one
-      warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping.\n");
+      # This is the one-to-one mapping section
+      # issue a warning if the method has not been declared
+      # as supporting that simply mapping
+      warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping.\n")
+	  unless exists $one_one{$key};
+
+      # Translate the key and copy the value
       $outkey = $allow{$key};
       $outvalue = $self->query_options($key);
     }
@@ -618,6 +631,20 @@ sub _translate_options {
   return %outhash;
 }
 
+=item B<_translate_one_to_one>
+
+Returns (hash) indicating which of the standard options support
+a one-to-one mapping when forming a URL (etc).
+
+=cut
+
+sub _translate_one_to_one {
+  # convert to a hash-list
+  return map { $_, undef }(qw/
+			   object radmax radmin magfaint magbright
+			   nout format
+			   /);
+}
 
 
 # RA and Dec replace spaces with pluses and + sign with special code
@@ -684,63 +711,17 @@ sub _from_sort {
   return ($allow{$key}, $sort);
 }
 
-# one to one mapping
+# This is a template methdo that can be extended. This one
+# implements a one to one mapping
 
-sub _from_object {
-  my $self = shift;
-  my $key = "object";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
+#sub _from_XXX {
+#  my $self = shift;
+#  my $key = "XXX";
+#  my $value = $self->query_options($key);
+#  my %allow = $self->_get_allowed_options();
+#  return ($allow{$key}, $value);
+#}
 
-sub _from_radmax {
-  my $self = shift;
-  my $key = "radmax";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
-
-sub _from_radmin {
-  my $self = shift;
-  my $key = "radmin";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
-
-sub _from_magfaint {
-  my $self = shift;
-  my $key = "magfaint";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
-
-sub _from_magbright {
-  my $self = shift;
-  my $key = "magbright";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
-
-sub _from_nout {
-  my $self = shift;
-  my $key = "nout";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
-
-sub _from_format {
-  my $self = shift;
-  my $key = "format";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
-}
 
 =end __PRIVATE_METHODS__
 

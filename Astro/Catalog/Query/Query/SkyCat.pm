@@ -736,6 +736,8 @@ http://vizier.u-strasbg.fr/doc/asu.html
 (at least for GSC) ie  hh:mm:ss.s+/-dd:mm:ss
 or decimal degrees.
 
+=over 4
+
 =cut
 
 sub _from_dec {
@@ -763,15 +765,32 @@ sub _from_ra {
   return ($allow{ra},$ra);
 }
 
-# Do not know what cond does yet
-sub _from_cond {
+=item B<_translate_one_to_one>
+
+Return a list of internal options (as defined in C<_get_allowed_options>)
+that are known to support a one-to-one mapping of the internal value
+to the external value.
+
+  %one = $q->_translate_one_to_one();
+
+Returns a hash with keys and no values (this makes it easy to
+check for the option).
+
+This method also returns, the values from the parent class.
+
+=cut
+
+sub _translate_one_to_one {
   my $self = shift;
-  my $key = "cond";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
+  # convert to a hash-list
+  return ($self->SUPER::_translate_one_to_one,
+	  map { $_, undef }(qw/
+			    cond
+			    /)
+	 );
 }
 
+=back
 
 =end __PRIVATE_METHODS__
 

@@ -49,13 +49,13 @@ use Astro::Catalog::Star;
 # aladin stuff
 use Astro::Aladin;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: SuperCOSMOS.pm,v 1.2 2003/08/03 06:18:35 timj Exp $
+$Id: SuperCOSMOS.pm,v 1.3 2003/08/04 05:31:38 timj Exp $
 
 =head1 METHODS
 
@@ -376,6 +376,8 @@ provided in the form of _from_$opt. ie:
 
 The base class only includes one to one mappings.
 
+=over 4
+
 =cut
 
 # RA and Dec replace spaces with pluses and + sign with special code
@@ -405,15 +407,32 @@ sub _from_dec {
   return ($allow{dec},$dec);
 }
 
-# one to one mapping
+=item B<_translate_one_to_one>
 
-sub _from_band {
+Return a list of internal options (as defined in C<_get_allowed_options>)
+that are known to support a one-to-one mapping of the internal value
+to the external value.
+
+  %one = $q->_translate_one_to_one();
+
+Returns a hash with keys and no values (this makes it easy to
+check for the option).
+
+This method also returns, the values from the parent class.
+
+=cut
+
+sub _translate_one_to_one {
   my $self = shift;
-  my $key = "band";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
+  # convert to a hash-list
+  return ($self->SUPER::_translate_one_to_one,
+	  map { $_, undef }(qw/
+			    band
+			    /)
+	 );
 }
+
+=back
 
 =end __PRIVATE_METHODS__
 

@@ -48,11 +48,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: 2MASS.pm,v 1.2 2003/08/03 06:18:35 timj Exp $
+$Id: 2MASS.pm,v 1.3 2003/08/04 05:31:38 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -149,16 +149,34 @@ provided in the form of _from_$opt. ie:
 
 The base class only includes one to one mappings.
 
+=over 4
+
+=item B<_translate_one_to_one>
+
+Return a list of internal options (as defined in C<_get_allowed_options>)
+that are known to support a one-to-one mapping of the internal value
+to the external value.
+
+  %one = $q->_translate_one_to_one();
+
+Returns a hash with keys and no values (this makes it easy to
+check for the option).
+
+This method also returns, the values from the parent class.
+
 =cut
 
-
-sub _from_catalogue {
+sub _translate_one_to_one {
   my $self = shift;
-  my $key = "catalogue";
-  my $value = $self->query_options($key);
-  my %allow = $self->_get_allowed_options();
-  return ($allow{$key}, $value);
+  # convert to a hash-list
+  return ($self->SUPER::_translate_one_to_one,
+	  map { $_, undef }(qw/
+			    catalogue
+			    /)
+	 );
 }
+
+=back
 
 =end __PRIVATE_METHODS__
 
