@@ -19,7 +19,7 @@ package Astro::Catalog::USNOA2::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.7 2003/07/25 00:45:43 timj Exp $
+#     $Id: Query.pm,v 1.8 2003/07/25 02:01:32 timj Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -70,11 +70,11 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.7 2003/07/25 00:45:43 timj Exp $
+$Id: Query.pm,v 1.8 2003/07/25 02:01:32 timj Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -100,23 +100,53 @@ sub _default_url_path {
   return "skycat/servers/usnoa_res?";
 }
 
+=item B<_get_allowed_options>
+
+Returns a hash with keys, being the internal options supported
+by this subclass, and values being the key name actually required
+by the remote system (and to be included in the query).
+
+=cut
+
+sub _get_allowed_options {
+  my $self = shift;
+  return (
+	  ra => 'ra',
+	  dec => 'dec',
+	  object => 'object',
+	  radmax => 'radmax',
+	  magbright => 'magbright',
+	  magfaint => 'magfaint',
+	  sort => 'sort',
+	  nout => 'nout',
+	  format => 'format',
+	 );
+}
+
 =item B<_set_default_options>
+
+Set the default query state.
 
 =cut
 
 sub _set_default_options {
   my $self = shift;
 
-  ${$self->{OPTIONS}}{"ra"}          = undef;
-  ${$self->{OPTIONS}}{"dec"}         = undef;
-  ${$self->{OPTIONS}}{"object"}      = undef;
+  my %defaults = (
+		  ra => undef,
+		  dec => undef,
+		  object => undef,
 
-  ${$self->{OPTIONS}}{"radmax"}      = 5;
-  ${$self->{OPTIONS}}{"magbright"}   = 0;
-  ${$self->{OPTIONS}}{"magfaint"}    = 100;
-  ${$self->{OPTIONS}}{"format"}      = 1;
-  ${$self->{OPTIONS}}{"sort"}        = "ra";
-  ${$self->{OPTIONS}}{"nout"}        = "2000";
+		  radmax => 5,
+		  magbright => 0,
+		  magfaint => 100,
+		  format => 1,
+		  sort => 'ra',
+		  nout => 2000,
+		 );
+
+  $self->_set_query_options( %defaults );
+  return;
 }
 
 =item B<_parse_query>

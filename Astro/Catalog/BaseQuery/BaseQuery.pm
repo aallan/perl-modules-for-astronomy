@@ -33,13 +33,13 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: BaseQuery.pm,v 1.1 2003/07/25 00:45:43 timj Exp $
+$Id: BaseQuery.pm,v 1.2 2003/07/25 02:01:32 timj Exp $
 
 =head1 METHODS
 
@@ -93,6 +93,42 @@ sub new {
 =head2 Accessor Methods
 
 =over 4
+
+=item B<query_options>
+
+Hash representing the query options to be used to query the catalog
+server. This keys in this hash are restricted by the subclass. Some
+keys are not usable by all catalogues.
+
+Returns a copy of the options hash when.
+
+  %options = $q->query_options();
+
+Note that the hash keys included here are not necessarily the keys
+used to form a remote query.
+
+If an argument is supplied, the value for that option is returned
+I<if> the option is supported.
+
+  $ra = $q->query_options( "ra" );
+
+Values can not  be set directly. Please use the provided accessor methods.
+
+=cut
+
+sub query_options {
+  my $self = shift;
+  if (@_) {
+    my $opt = lc(shift);
+    my %allow = $self->_get_allowed_options;
+    if (!exists $allow{$opt}) {
+      warnings::warnif("Option $opt not supported by this cataloge");
+      return;
+    }
+    return $self->{OPTIONS}->{$opt};
+  }
+  return %{ $self->{OPTIONS} };
+}
 
 =item B<useragent>
 
@@ -300,11 +336,11 @@ sub ra {
     
     # mutilate it and stuff it and the current $self->{RA} 
     $ra =~ s/\s/\+/g;
-    ${$self->{OPTIONS}}{"ra"} = $ra;
+    $self->_set_query_options( ra => $ra );
   }
   
   # un-mutilate and return a nicely formated string to the user
-  my $ra = ${$self->{OPTIONS}}{"ra"};
+  my $ra = $self->query_options("ra");
   $ra =~ s/\+/ /g;
   return $ra;
 }
@@ -333,11 +369,12 @@ sub dec {
     # mutilate it and stuff it and the current $self->{DEC} 
     $dec =~ s/\+/%2B/g;
     $dec =~ s/\s/\+/g;
-    ${$self->{OPTIONS}}{"dec"} = $dec;
+
+    $self->_set_query_options( dec => $dec );
   }
   
   # un-mutilate and return a nicely formated string to the user
-  my $dec = ${$self->{OPTIONS}}{"dec"};
+  my $dec = $self->query_options("dec");
   $dec =~ s/\+/ /g;
   $dec =~ s/%2B/\+/g;
   return $dec;
@@ -368,16 +405,16 @@ sub target {
 
     # grab the new object name
     my $ident = shift;
-    
+
     # mutilate it and stuff it into ${$self->{OPTIONS}}{object}
     $ident =~ s/\s/\+/g;
-    ${$self->{OPTIONS}}{"object"} = $ident;
-    ${$self->{OPTIONS}}{"ra"} = undef;
-    ${$self->{OPTIONS}}{"dec"} = undef;
+    $self->_set_query_options( 
+			      object => $ident,
+			      dec => undef,
+			      ra => undef,
+			     );
   }
-  
-  return ${$self->{OPTIONS}}{"object"};
-
+  return $self->query_options("object");
 }
 
 =item B<Radius>
@@ -393,12 +430,11 @@ arc minutes, the radius defaults to 5 arc minutes.
 sub radius {
   my $self = shift;
 
-  if (@_) { 
-    ${$self->{OPTIONS}}{"radmax"} = shift;
+  if (@_) {
+    $self->_set_query_options( radmax => shift );
   }
-  
-  return ${$self->{OPTIONS}}{"radmax"};
 
+  return $self->query_options("radmax");
 }
 
 =item B<Faint>
@@ -413,12 +449,11 @@ Set (or query) the faint magnitude limit for inclusion on the results
 sub faint {
   my $self = shift;
 
-  if (@_) { 
-    ${$self->{OPTIONS}}{"magfaint"} = shift;
+  if (@_) {
+    $self->_set_query_options( magfaint => shift );
   }
-  
-  return ${$self->{OPTIONS}}{"magfaint"};
 
+  return $self->query_options("magfaint");
 }
 
 =item B<Bright>
@@ -433,12 +468,11 @@ Set (or query) the bright magnitude limit for inclusion on the results
 sub bright {
   my $self = shift;
 
-  if (@_) { 
-    ${$self->{OPTIONS}}{"magbright"} = shift;
+  if (@_) {
+    $self->_set_query_options( magbright => shift );
   }
-  
-  return ${$self->{OPTIONS}}{"magbright"};
 
+  return $self->query_options("magbright");
 }
 
 =item B<Sort>
@@ -457,49 +491,38 @@ sub sort {
   my $self = shift;
 
   if (@_) {
-     
+
     my $option = shift;
-     
+    my $sort;
     # pick an option
     if( $option eq "RA" ) {
-    
-       # sort by RA
-       ${$self->{OPTIONS}}{"sort"} = "ra";
-       
+      # sort by RA
+      $sort = "ra";
     } elsif ( $option eq "DEC" ) {
-    
-       # sort by Dec
-       ${$self->{OPTIONS}}{"sort"} = "dec";
-       
+      # sort by Dec
+      $sort = "dec";
     } elsif ( $option eq "RMAG" ) {
-    
-       # sort by R magnitude
-       ${$self->{OPTIONS}}{"sort"} = "mr";
-       
+      # sort by R magnitude
+      $sort = "mr";
     } elsif ( $option eq "BMAG" ) {
-    
-       # sort by B magnitude
-       ${$self->{OPTIONS}}{"sort"} = "mb";
-       
+      # sort by B magnitude
+      $sort = "mb";
     } elsif ( $option eq "DIST" ) {
-    
-       # sort by distance from field centre
-       ${$self->{OPTIONS}}{"sort"} = "d";
-       
+      # sort by distance from field centre
+      $sort = "d";
     } elsif ( $option eq "POS" ) {
-    
-       # sort by position angle to field centre
-       ${$self->{OPTIONS}}{"sort"} = "pos";
-       
+      # sort by position angle to field centre
+      $sort = "pos";
     } else {
-    
-       # in case there are no valid options sort by RA
-       ${$self->{OPTIONS}}{"sort"} = "ra";
-    }   
+      # in case there are no valid options sort by RA
+      warnings::warnif("Unknown sort type: using ra");
+      $sort = "ra";
+    }
+    $self->_set_query_options( sort => $sort );
   }
-  
+
   # return the sort option
-  return ${$self->{OPTIONS}}{"sort"};
+  return $self->query_options("sort");
 
 }
 
@@ -517,16 +540,16 @@ if a (very) large sample radius is requested.
 sub number {
   my $self = shift;
 
-  if (@_) { 
-    ${$self->{OPTIONS}}{"nout"} = shift;
+  if (@_) {
+    $self->_set_query_options( nout => shift );
   }
-  
-  return ${$self->{OPTIONS}}{"nout"};
+
+  return $self->query_options("nout");
 }
 
 sub nout {
   my $self = shift;
-  warnings::warnif("deprecated","The nout() method is deprecated. Please us number()");
+  warnings::warnif("deprecated","The nout() method is deprecated. Please use number()");
   return $self->number( @_ );
 }
 
@@ -547,10 +570,10 @@ sub multi {
   my $self = shift;
 
   if (@_) { 
-    ${$self->{OPTIONS}}{"multi"} = shift;
+    $self->_set_query_options( multi => shift );
   }
-  
-  return ${$self->{OPTIONS}}{"multi"};
+
+  return $self->query_options("multi");
 }
 
 
@@ -619,6 +642,37 @@ sub configure {
 These methods are for internal use only.
 
 =over 4
+
+=item B<_set_query_options>
+
+Set the query options.
+
+  $q->_set_query_options( %newopt );
+
+Keys are standardised and are not necessarily those used
+in the query. A warning is issued if an attempt is made to
+set an option for an option that is not used by the particular
+subclass.
+
+=cut
+
+sub _set_query_options {
+  my $self = shift;
+  my %newopt = @_;
+
+  my %allow = $self->_get_allowed_options();
+
+  for my $newkey (keys %newopt) {
+    if (!exists $allow{$newkey}) {
+      warnings::warnif("Option $newkey not supported by catalog ".
+		       ref($self)."\n");
+      next;
+    }
+    # set the option
+    $self->{OPTIONS}->{$newkey} = $newopt{$newkey};
+  }
+  return;
+}
 
 =item B<_default_remote_host>
 
@@ -702,10 +756,13 @@ sub _make_query {
    my $options = "";
 
    # loop round all the options keys and build the query
-   foreach my $key ( keys %{$self->{OPTIONS}} ) {
-      $options = $options . 
-        "&$key=${$self->{OPTIONS}}{$key}" if defined ${$self->{OPTIONS}}{$key};
+   my %allow = $self->_get_allowed_options;
+   foreach my $key ( keys %allow ) {
+     # Need to translate them...
+     $options .= "&$key=". $self->query_options($key)
+       if defined $self->query_options($key);
    }
+   print "Options: $options\n";
 
    # build final query URL
    $URL = $URL . $options;
@@ -736,7 +793,7 @@ the raw output of the last USNO-A2.0 query made using querydb().
 
 sub _dump_raw {
    my $self = shift;
-   
+
    # split the BUFFER into an array
    my @portable = split( /\n/,$self->{BUFFER});
    chomp @portable;
@@ -754,7 +811,7 @@ the current query options as a hash.
 sub _dump_options {
    my $self = shift;
 
-   return %{$self->{OPTIONS}};
+   return $self->query_options;
 }
 
 =back
