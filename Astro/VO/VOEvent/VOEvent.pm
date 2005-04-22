@@ -36,13 +36,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOEvent.pm,v 1.2 2005/04/22 12:44:41 aa Exp $
+$Id: VOEvent.pm,v 1.3 2005/04/22 13:25:01 aa Exp $
 
 =head1 METHODS
 
@@ -189,6 +189,11 @@ overly complex. It is probably one or more convenience methods will be
 put ontop of this routine to make it easier to use. See the t/2_simple.t
 file in the test suite for an example which makes use of the complex form
 of the What tag above.
+
+NB: This is the low level interface to build a message, this is subject
+to change without notice as higher level "easier to use" accessor methods
+are added to the module. It may eventually be reclassified as a PRIVATE
+method.
  
 =cut
 
@@ -425,18 +430,23 @@ sub build {
   # HPOTHESIS
   if ( exists $args{Hypothesis} ) {
      $self->{WRITER}->startTag( 'Hypothesis' );
-      
-      
-     print Dumper( $args{Hypothesis} );
-     
+           
      if ( exists ${$args{Hypothesis}}{Classification} ) {
-       $self->{WRITER}->startTag( 'Classification', 
+        if ( exists ${${$args{Hypothesis}}{Classification}}{Probability} ) {
+          $self->{WRITER}->startTag( 'Classification', 
           'probability' => ${${$args{Hypothesis}}{Classification}}{Probability},
           'units'       => 'percent',
           'type'        => ${${$args{Hypothesis}}{Classification}}{Type});
-       $self->{WRITER}->characters( 
+          $self->{WRITER}->characters( 
                         ${${$args{Hypothesis}}{Classification}}{Description} );
-       $self->{WRITER}->endTag( 'Classification' );
+          $self->{WRITER}->endTag( 'Classification' );
+        } else {
+          $self->{WRITER}->startTag( 'Classification', 
+                   'type' => ${${$args{Hypothesis}}{Classification}}{Type});
+          $self->{WRITER}->characters( 
+                        ${${$args{Hypothesis}}{Classification}}{Description} );
+          $self->{WRITER}->endTag( 'Classification' );
+        }         
      }    
       
      if ( exists ${$args{Hypothesis}}{Identification} ) {
