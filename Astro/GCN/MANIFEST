@@ -3,7 +3,6 @@ MANIFEST
 Makefile.PL
 GPL
 ChangeLog
-GCN.pm
 Constants/Makefile.PL
 Constants/Constants.pm
 Parse/Makefile.PL

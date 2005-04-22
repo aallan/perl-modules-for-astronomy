@@ -30,13 +30,13 @@ use Astro::GCN::Constants qw(:packet_types);
 use Astro::GCN::Util;
 use Astro::GCN::Util::SWIFT;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.2 2005/04/22 08:19:14 aa Exp $
+$Id: Parse.pm,v 1.3 2005/04/22 13:36:06 aa Exp $
 
 =head1 METHODS
 
@@ -315,7 +315,84 @@ sub burst_error {
      
 }
 
-=item B<burst_error>
+
+=item B<ra_degrees>
+
+Return the RA in degrees. The precise defintion of this 
+varies depending on the type of the original packet.
+
+  $ra = $message->ra_degrees();
+
+For now this method will only return a value for SWIFT packets.
+
+=cut
+
+sub ra_degrees {
+  my $self = shift;
+  return undef unless $self->is_swift();
+  if ( $self->type() == 60 || $self->type == 62 ||
+       ( $self->type() >= 74 && $self->type <= 75 ) ) {
+     return undef;
+  }   
+  
+  my $ra = Astro::GCN::Util::convert_ra_to_degrees( $self->{MESSAGE}[7] );
+  return $ra;  
+     
+}
+
+=item B<dec_degrees>
+
+Return the Declination in degrees. The precise defintion 
+of this varies depending on the type of the original packet.
+
+  $dec = $message->dec_degrees();
+
+For now this method will only return a value for SWIFT packets.
+
+=cut
+
+sub dec_degrees {
+  my $self = shift;
+  return undef unless $self->is_swift();
+  if ( $self->type() == 60 || $self->type == 62 ||
+       ( $self->type() >= 74 && $self->type <= 75 ) ) {
+     return undef;
+  }   
+  
+  my $dec = Astro::GCN::Util::convert_dec_to_degrees( $self->{MESSAGE}[8] );
+  return $dec;  
+     
+}
+
+=item B<burst_error_degrees>
+
+Return the error in RA & Declination in degrees. The precise 
+defintion of the original values of RA & Declination will vary depending 
+on the type of the original packet.
+
+  $error = $message->burst_error_degrees();
+
+For now this method will only return a value for the relevant SWIFT packets,
+these being types 61, 67, 81 and 84.
+
+=cut
+
+sub burst_error_degrees {
+  my $self = shift;
+  return undef unless $self->is_swift();
+  unless ( $self->type() == 61 || $self->type == 67 ||
+           $self->type() == 81 || $self->type == 84 ) {
+     return undef;
+  }   
+  
+  my $error = 
+    Astro::GCN::Util::convert_burst_error_to_degrees ( $self->{MESSAGE}[11] );
+    
+  return $error;  
+     
+}
+
+=item B<solution_status>
 
 Return the type of solution for relevant BAT messages.
 
@@ -444,92 +521,6 @@ sub packet {
   # parse the document using private methods.
   push @{$self->{MESSAGE}}, unpack( "N40", $self->{BUFFER} );
   $self->{TYPE} = $self->{MESSAGE}[0];
-  
-      
-  if ( $self->type() == TYPE_IM_ALIVE ) {
-      print "Recieved a TYPE_IM_ALIVE packet at " . ctime() ."\n"; 
-               
-  } elsif ( $self->type() >= 60 && $self->type() <= 83 ) {
-      print "Recieved a SWIFT (type " .
-             $self->type() . ") packet at " . ctime() ."\n"; 
-  
-     # TYPE_SWIFT_BAT_GRB_ALERT_SRC (type 60)
-     # SWIFT BAT GRB ALERT message
-     # --------------------------------------
-     if ( $self->type() == 60 ) {
-        print "Recieved a TYPE_SWIFT_BAT_GRB_ALERT_SRC message\n";   
-        
-        my $trig_num = $self->trigger_num();
-        my $obs_num = $self->obs_num();        
-        print "Trigger = $trig_num, Observation = $obs_num\n";    
-
-        
-     # TYPE_SWIFT_BAT_GRB_POS_ACK_SRC (type 61)
-     # SWIFT BAT GRB Position Acknowledge message
-     # ------------------------------------------
-     } elsif ( $self->type() == 61 ) {
-        print "Recieved a TYPE_SWIFT_BAT_GRB_POS_ACK_SRC message\n";
-
-        my $trig_num = $self->trigger_num();
-        my $obs_num = $self->obs_num();   
-        print "Trigger = $trig_num, Observation = $obs_num\n";  
-        
-        my $ra = $self->ra();  
-        my $dec = $self->dec();  
-        my $error = $self->burst_error();  
-        print "Possible GRB detected at $ra, $dec +- $error acrmin\n"; 
-  
-        my %status = $self->solution_status();
-        foreach my $key ( sort keys %status ) {
-           print "Solution Status: $key = $status{$key}\n";
-        }   
-                               
-     # TYPE_SWIFT_BAT_GRB_POS_NACK_SRC (type 62)
-     # SWIFT BAT GRB Position NOT Acknowledge message
-     # ----------------------------------------------
-     } elsif ( $self->type() == 62 ) {
-        print "Recieved a TYPE_SWIFT_BAT_GRB_POS_NACK_SRC message\n";
-
-        my $trig_num = $self->trigger_num();
-        my $obs_num = $self->obs_num();        
-        print "Trigger = $trig_num, Observation = $obs_num\n";    
-
-        
-     # TYPE_SWIFT_XRT_POSITION_SRC (type 67)
-     # SWIFT XRT Position message
-     # -------------------------------------
-     } elsif ( $self->type() == 67 ) {
-        print "Recieved a TYPE_SWIFT_XRT_POSITION_SRC message\n";   
-
-        my $trig_num = $self->trigger_num();
-        my $obs_num = $self->obs_num();        
-        print "Trigger = $trig_num, Observation = $obs_num\n";    
-        
-        my $ra = $self->ra();  
-        my $dec = $self->dec();  
-        my $error = $self->burst_error();  
-        print "Possible GRB detected at $ra, $dec +- $error acrmin\n"; 
-        
-       
-     # TYPE_SWIFT_XRT_CENTROID_SRC (type 71)
-     # SWIFT XRT Position NOT Ack message (Centroid Error)
-     # ---------------------------------------------------
-     } elsif ( $self->type() == 71 ) {
-        print "Recieved a TYPE_SWIFT_XRT_CENTROID_SRC message\n";  
-
-        my $trig_num = $self->trigger_num();
-        my $obs_num = $self->obs_num();        
-        print "Trigger = $trig_num, Observation = $obs_num\n";    
-        
-     
-     }
-  
-  } else {
-     print "Recieved a " . $self->type() . " packet at " . ctime() ."\n"; 
-  
-  }
-   
-     
 
 }
 

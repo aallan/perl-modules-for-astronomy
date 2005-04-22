@@ -24,9 +24,12 @@ use vars qw/$VERSION @EXPORT_OK @ISA /;
 @ISA = qw/Exporter/;
 @EXPORT_OK = qw/ convert_ra_to_sextuplets 
                  convert_dec_to_sextuplets 
-                 convert_burst_error_to_arcmin/;
+                 convert_burst_error_to_arcmin
+                 convert_ra_to_degrees 
+                 convert_dec_to_degrees 
+                 convert_burst_error_to_degrees /;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 sub convert_ra_to_sextuplets {
@@ -106,12 +109,56 @@ sub convert_burst_error_to_arcmin {
   
    return $error;
 } 
+
+sub convert_ra_to_degrees {
+   my $ra = shift;   
+      
+   # convert RA to sextuplets
+   print "Converting R.A. to sextuplets...\n";
+   my $ra_deg = $ra/10000.0;
+   $ra_deg = $ra_deg/15.0;
+
+ 
+   return $ra_deg;
+}
+   
+sub convert_dec_to_degrees {
+   my $dec = shift;   
+
+   print "Converting Declination to sextuplets...\n";
+      
+   # repack Dec
+   print "Repacking declination into a big-endian long...\n";
+   $dec = pack("N", $dec );
+   print "Repacking declination into a small-endian long...\n";
+   $dec = pack("V", unpack( "N", $dec ) );
+   
+   $dec = unpack( "l", $dec);
+   print "Unpacking to signed long integer ($dec)...\n";   
+   
+   # convert Dec to sextuplets
+   print "Converting to sextuplets...\n";
+   my $dec_deg = $dec;
+   $dec_deg = $dec_deg/10000.0;
+  
+   return $dec_deg;
+}
+
+sub convert_burst_error_to_degrees {
+   my $error = shift;   
+      
+   print "Converting error to arcminutes...\n";
+   $error = $error/10000.0;  
+  
+   return $error;
+} 
+
   
 =back
 
 =head1 REVISION
 
-$Id: Util.pm,v 1.1 2005/04/22 07:48:38 aa Exp $
+$Id: Util.pm,v 1.2 2005/04/22 13:36:06 aa Exp $
 
 =head1 AUTHORS
 
