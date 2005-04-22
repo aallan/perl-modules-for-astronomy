@@ -30,13 +30,13 @@ use Astro::GCN::Constants qw(:packet_types);
 use Astro::GCN::Util;
 use Astro::GCN::Util::SWIFT;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.1 2005/04/22 07:48:38 aa Exp $
+$Id: Parse.pm,v 1.2 2005/04/22 08:19:14 aa Exp $
 
 =head1 METHODS
 
@@ -339,6 +339,48 @@ sub solution_status {
     
   return %soln_status;  
      
+}
+
+=item B<bat_ipeak>
+
+Return the height of the peak in the sky-image plane in counts
+
+  $error = $message->burst_error();
+
+This is valid for SWIFT BAT only (packet types 61 or 82)
+
+=cut
+
+sub bat_ipeak {
+  my $self = shift;
+  return undef unless $self->is_swift();
+  unless ( $self->type() == 61 || $self->type == 82 ) {
+     return undef;
+  }   
+  
+  return $self->{MESSAGE}[10];
+         
+}
+
+
+=item B<uvot_mag>
+
+Return the magnitude of the SWIFT UVOT pointing
+
+  $error = $message->uvot_mag();
+
+This is valid for SWIFT UVOT only (packet types 81)
+
+=cut
+
+sub uvot_mag {
+  my $self = shift;
+  unless ( $self->type() == 81 ) {
+     return undef;
+  }   
+  
+  return ( $self->{MESSAGE}[9] / 100.0 );
+         
 }
 
 # C O N F I G U R E ----------------------------------------------------------
