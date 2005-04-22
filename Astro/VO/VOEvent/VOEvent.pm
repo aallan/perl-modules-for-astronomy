@@ -36,13 +36,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOEvent.pm,v 1.1 2005/04/22 09:33:59 aa Exp $
+$Id: VOEvent.pm,v 1.2 2005/04/22 12:44:41 aa Exp $
 
 =head1 METHODS
 
@@ -96,45 +96,100 @@ Build a VOEvent document
 
 or 
   
-  $xml = $object->build( Type       => $string,
-                         Role       => $string,
-                         ID         => $url,
-                         Curation   => { Publisher => $url,
-                                         DateStamp => $string },
-                         WhereWhen  => { RA    => $ra,
-                                         Dec   => $dec,
-                                         Error => $error,
-                                         Time  => $time },
-                         How        => { Name     => $string,
-                                         Location => $string,
-                                         RTML     => $url ), 
-                         What       => [ { Name  => $strig,
-                                           UCD   => $string,
-                                           Value => $string },
-                                             .
-                                             .
-                                             .
-                                         { Name  => $strig,
-                                           UCD   => $string,
-                                           Value => $string } ],
-                         Hypothesis => [ Class => { Prob        => $string,
-                                                    Units       => $string,
-                                                    Type        => $string,
-                                                    Description => string },
-                                                     .
-                                                     .
-                                                     . 
-                                         Ident => { Type        => $string,
-                                                    Description => string } ]
-                        );
+  $xml = $object->build( Type        => $string,
+                         Role        => $string,
+                         ID          => $url,
+                         Description => $string,
+                         Citations   => [ { ID   => $strig,
+                                            Cite => $string },
+                                              .
+                                              .
+                                              .
+                                          { ID   => $string,
+                                            Cite => $string }],
+                         Curation    => { Publisher => $url,
+                                          Contact => { Name      => $string,
+                                                       Institution => $string,
+                                                       Address   => $string,
+                                                       Telephone => $string,
+                                                       Email     => $string, },
+                                          Date    => $string },
+                         WhereWhen   => { RA    => $ra,
+                                          Dec   => $dec,
+                                          Error => $error,
+                                          Time  => $time },
+                         How         => { Name     => $string,
+                                          Location => $string,
+                                          RTML     => $url ), 
+                         What        => [ { Name  => $strig,
+                                            UCD   => $string,
+                                            Value => $string },
+                                              .
+                                              .
+                                              .
+                                          { Name  => $string,
+                                            UCD   => $string,
+                                            Value => $string } ],
+                         Hypothesis  => { Classification => { 
+                                                   Probability  => $string,
+                                                   Type         => $string,
+                                                   Description  => string },
+                                                       .
+                                                       .
+                                                       . 
+                                          Identification => { 
+                                                   Type        => $string,
+                                                   Description => string } }
+                       );
                          
   
 this will create a document from the options passed to the method, most
 of the hash keys are optional and if missed out the relevant keywords will
-be blank or missing entirely from the built document.
+be blank or missing entirely from the built document. Type, Role, ID and 
+either Reference or WhereWhen (and their sub-tags) are mandatory.
 
-MANDATORY TAGS: "Type", "Role", "ID" and either "Reference" or "WhereWhen"
+The <Group> tag can be utilised from within the <What> tag as follows
 
+                         What => [ Group => [ { Name  => $string,
+                                                UCD   => $string,
+                                                Value => $string,
+                                                Units => $string },
+                                                  .
+                                                  .
+                                                  .
+                                              { Name  => $string,
+                                                UCD   => $string,
+                                                Value => $string,
+                                                Units => $string } ],
+                                  Group => [ { Name  => $string,
+                                                UCD   => $string,
+                                                Value => $string,
+                                                Units => $string },
+                                                  .
+                                                  .
+                                                  .
+                                              { Name  => $string,
+                                                UCD   => $string,
+                                                Value => $string,
+                                                Units => $string } ],
+                                  { Name  => $string,
+                                    UCD   => $string,
+                                    Value => $string,
+                                    Units => $string },
+                                      .
+                                      .
+                                      .
+                                  { Name  => $string,
+                                    UCD   => $string,
+                                    Value => $string,
+                                    Units => $string } ],
+
+this will probably NOT be the final API for the build() method, as it is
+overly complex. It is probably one or more convenience methods will be
+put ontop of this routine to make it easier to use. See the t/2_simple.t
+file in the test suite for an example which makes use of the complex form
+of the What tag above.
+ 
 =cut
 
 sub build {
@@ -165,6 +220,12 @@ sub build {
   # REFERENCE ONLY -------------------------------------------------------
                              
   if ( exists $args{Reference} ) {
+     if ( exists $args{Description} ) {
+        $self->{WRITER}->startTag( 'Description' );
+        $self->{WRITER}->characters( $args{Description} );
+        $self->{WRITER}->endTag( 'Description' );
+     }
+     
      $self->{WRITER}->emptyTag( 'Ref',
                                 'uri' => ${$args{Reference}}{URL},
                                 'type' => ${$args{Reference}}{Type} );
@@ -177,6 +238,225 @@ sub build {
   }
 
   # SKELETON DOCUMENT ----------------------------------------------------
+
+  # DESCRIPTION
+  if ( exists $args{Description} ) {
+     $self->{WRITER}->startTag( 'Description' );
+     $self->{WRITER}->characters( $args{Description} );
+     $self->{WRITER}->endTag( 'Description' );
+  }   
+ 
+  # CURATION
+  if ( exists $args{Curation} ) {
+     $self->{WRITER}->startTag( 'Curation' );
+  
+     if ( exists ${$args{Curation}}{Publisher} ) {
+       $self->{WRITER}->startTag( 'Publisher' );
+       $self->{WRITER}->characters( ${$args{Curation}}{Publisher} );
+       $self->{WRITER}->endTag( 'Publisher' );
+     }
+     if ( exists ${$args{Curation}}{Contact} ) {
+       $self->{WRITER}->startTag( 'Contact' );
+       if ( exists ${${$args{Curation}}{Contact}}{Name} ) {
+          $self->{WRITER}->startTag( 'Name' );
+          $self->{WRITER}->characters( 
+                             ${${$args{Curation}}{Contact}}{Name} );
+          $self->{WRITER}->endTag( 'Name' );          
+       }           
+       if ( exists ${${$args{Curation}}{Contact}}{Institution} ) {
+          $self->{WRITER}->startTag( 'Institution' );
+          $self->{WRITER}->characters( 
+                             ${${$args{Curation}}{Contact}}{Institution} );
+          $self->{WRITER}->endTag( 'Institution' );          
+       }
+       if ( exists ${${$args{Curation}}{Contact}}{Address} ) {
+          $self->{WRITER}->startTag( 'Address' );
+          $self->{WRITER}->characters( 
+                             ${${$args{Curation}}{Contact}}{Address} );
+          $self->{WRITER}->endTag( 'Address' );          
+       }   
+       if ( exists ${${$args{Curation}}{Contact}}{Telephone} ) {
+          $self->{WRITER}->startTag( 'Telephone' );
+          $self->{WRITER}->characters( 
+                             ${${$args{Curation}}{Contact}}{Telephone} );
+          $self->{WRITER}->endTag( 'Telephone' );          
+       }   
+       if ( exists ${${$args{Curation}}{Contact}}{Email} ) {
+          $self->{WRITER}->startTag( 'Email' );
+          $self->{WRITER}->characters( 
+                             ${${$args{Curation}}{Contact}}{Email} );
+          $self->{WRITER}->endTag( 'Email' );          
+       }    
+       $self->{WRITER}->endTag( 'Contact' );
+     }
+     if ( exists ${$args{Curation}}{Date} ) {
+       $self->{WRITER}->startTag( 'Date' );
+       $self->{WRITER}->characters( ${$args{Curation}}{Date} );
+       $self->{WRITER}->endTag( 'Date' );
+     }   
+     
+     $self->{WRITER}->endTag( 'Curation' );
+  }
+ 
+  # CITATIONS
+  if ( exists $args{Citations} ) {
+     $self->{WRITER}->startTag( 'Citations' );
+     
+     my @array = @{$args{Citations}};
+     foreach my $i ( 0 ... $#array ) {
+        $self->{WRITER}->emptyTag( 'Ref',
+                                   'id'   => ${$array[$i]}{ID},
+                                   'cite' => ${$array[$i]}{Cite} );
+     }
+     $self->{WRITER}->endTag( 'Citations' );
+  }
+   
+  # WHERE & WHEN  
+  $self->{WRITER}->startTag( 'WhereWhen' );
+  
+      $self->{WRITER}->startTag( 'stc:ObservationLocation' );
+      $self->{WRITER}->startTag( 'crd:AstroCoords',
+                                  'coord_system_id' => 'FK5-UTC' );
+      $self->{WRITER}->startTag( 'crd:Time', 'unit' => 's' );
+      $self->{WRITER}->startTag( 'crd:TimeInstant' );
+      $self->{WRITER}->startTag( 'crd:TimeScale' );
+      $self->{WRITER}->characters( 'UTC' );
+      $self->{WRITER}->endTag( 'crd:TimeScale' );
+      $self->{WRITER}->startTag( 'crd:ISOTime' );
+      $self->{WRITER}->characters( ${$args{WhereWhen}}{Time} );
+      $self->{WRITER}->endTag( 'crd:ISOTime' );
+      $self->{WRITER}->endTag( 'crd:TimeInstant' );
+      $self->{WRITER}->endTag( 'crd:Time' );
+      $self->{WRITER}->startTag( 'crd:Position2D', 'unit' => 'deg' );
+      $self->{WRITER}->startTag( 'crd:Value2');
+      my $position = ${$args{WhereWhen}}{RA} . " " . ${$args{WhereWhen}}{Dec};
+      $self->{WRITER}->characters( $position );
+      $self->{WRITER}->endTag( 'crd:Value2' );
+      $self->{WRITER}->startTag( 'crd:Error1Circle' );
+      $self->{WRITER}->startTag( 'crd:Size' );
+      $self->{WRITER}->characters( ${$args{WhereWhen}}{Error} );
+      $self->{WRITER}->endTag( 'crd:Size' );
+      $self->{WRITER}->endTag( 'crd:Error1Circle' );
+      $self->{WRITER}->endTag( 'crd:Position2D' );
+      $self->{WRITER}->endTag( 'crd:AstroCoords' );
+      $self->{WRITER}->endTag( 'stc:ObservationLocation' );
+   
+  $self->{WRITER}->endTag( 'WhereWhen' );
+   
+  # HOW
+  if ( exists $args{How} ) {
+     $self->{WRITER}->startTag( 'How' );
+     $self->{WRITER}->startTag( 'Instrument' );
+    
+     if ( exists ${$args{How}}{Name} ) {
+       $self->{WRITER}->startTag( 'Name' );
+       $self->{WRITER}->characters( ${$args{How}}{Name} );
+       $self->{WRITER}->endTag( 'Name' );
+     }           
+    
+     if ( exists ${$args{How}}{Location} ) {
+       $self->{WRITER}->startTag( 'Location' );
+       $self->{WRITER}->characters( ${$args{How}}{Location} );
+       $self->{WRITER}->endTag( 'Location' );
+     }     
+     if ( exists ${$args{How}}{RTML} ) {
+       $self->{WRITER}->emptyTag( 'Ref' , 
+                                   uri => ${$args{How}}{RTML}, 
+                                   type => 'rtml' );
+     }         
+        
+     $self->{WRITER}->endTag( 'Instrument' );
+     $self->{WRITER}->endTag( 'How' );
+  }
+
+  # WHAT
+  if ( exists $args{What} ) {
+     $self->{WRITER}->startTag( 'What' );
+     
+     my @array = @{$args{What}};
+     foreach my $i ( 0 ... $#array ) {
+     
+        my %hash = %{${$args{What}}[$i]};
+        
+        if ( exists $hash{Group} ) {
+           $self->{WRITER}->startTag( 'Group' );
+        
+           my @subarray = @{$hash{Group}};
+           foreach my $i ( 0 ... $#subarray ) {
+           
+              # Only UNITS is optional for Param tags
+              if ( exists ${$subarray[$i]}{Units} ) {
+                $self->{WRITER}->emptyTag('Param',
+                                          'name'  => ${$subarray[$i]}{Name},
+                                          'ucd'   => ${$subarray[$i]}{UCD},
+                                          'value' => ${$subarray[$i]}{Value},
+                                          'units' => ${$subarray[$i]}{Units} );
+              } else {
+                $self->{WRITER}->emptyTag('Param',
+                                          'name'  => ${$subarray[$i]}{Name},
+                                          'ucd'   => ${$subarray[$i]}{UCD},
+                                          'value' => ${$subarray[$i]}{Value},
+                                          'units' => ${$subarray[$i]}{Units} );
+              }    
+           }
+                                         
+           $self->{WRITER}->endTag( 'Group' );
+        
+        } else {
+           # Only UNITS is optional for Param tags
+           if ( exists $hash{Units} ) {
+              $self->{WRITER}->emptyTag('Param',
+                                        'name'  => $hash{Name},
+                                        'ucd'   => $hash{UCD},
+                                        'value' => $hash{Value},
+                                        'units' => $hash{Units} ); 
+           } else {
+              $self->{WRITER}->emptyTag('Param',
+                                        'name'  => $hash{Name},
+                                        'ucd'   => $hash{UCD},
+                                        'value' => $hash{Value} );  
+           } 
+        }                                                     
+     }    
+          
+     $self->{WRITER}->endTag( 'What' );
+  }
+  
+  # HPOTHESIS
+  if ( exists $args{Hypothesis} ) {
+     $self->{WRITER}->startTag( 'Hypothesis' );
+      
+      
+     print Dumper( $args{Hypothesis} );
+     
+     if ( exists ${$args{Hypothesis}}{Classification} ) {
+       $self->{WRITER}->startTag( 'Classification', 
+          'probability' => ${${$args{Hypothesis}}{Classification}}{Probability},
+          'units'       => 'percent',
+          'type'        => ${${$args{Hypothesis}}{Classification}}{Type});
+       $self->{WRITER}->characters( 
+                        ${${$args{Hypothesis}}{Classification}}{Description} );
+       $self->{WRITER}->endTag( 'Classification' );
+     }    
+      
+     if ( exists ${$args{Hypothesis}}{Identification} ) {
+       $self->{WRITER}->startTag( 'Identification', 
+             'type'   => ${${$args{Hypothesis}}{Identification}}{Type});
+       $self->{WRITER}->characters( 
+                        ${${$args{Hypothesis}}{Identification}}{Description} );
+       $self->{WRITER}->endTag( 'Identification' );
+     }         
+     
+     
+     $self->{WRITER}->endTag( 'Hypothesis' );
+  }  
+  
+  # END DOCUMENT --------------------------------------------------------- 
+  $self->{WRITER}->endTag( 'VOEvent' );
+  $self->{WRITER}->end();
+     
+  return $self->{BUFFER}->value();  
+   
      
 }
 
