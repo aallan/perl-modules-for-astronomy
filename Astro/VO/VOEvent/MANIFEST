@@ -1,0 +1,8 @@
+README
+MANIFEST
+Makefile.PL
+GPL
+ChangeLog
+VOEvent.pm
+t/1_ref.t
+t/2_simple.t
