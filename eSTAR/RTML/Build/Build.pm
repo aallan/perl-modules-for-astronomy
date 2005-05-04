@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.16 2005/02/08 14:26:11 aa Exp $
+#     $Id: Build.pm,v 1.17 2005/05/04 16:39:22 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -65,13 +65,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.16 2005/02/08 14:26:11 aa Exp $
+$Id: Build.pm,v 1.17 2005/05/04 16:39:22 aa Exp $
 
 =head1 METHODS
 
@@ -131,7 +131,13 @@ Build a score document
                                           Exposure      => $seconds,
                                           Snr           => $snr,
                                           Flux          => $mag,
-                                          Filter        => filter );
+                                          Filter        => $filter,
+                                          GroupCount    => $obs_per_group,
+                                          SeriesCount   => $obs_per_series,
+                                          Interval      => $interval,
+                                          Tolerance     => $tolerance,
+                                          TimeConstraint => [ $start_date,
+                                                              $end_date ] );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -145,7 +151,8 @@ sub score_observation {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                    Snr Flux Filter / ) {
+                Snr Flux Filter GroupCount SeriesCount Interval Tolerance 
+                TimeConstraint / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -157,7 +164,7 @@ sub score_observation {
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
-                             'version' => '2.1',
+                             'version' => '2.2',
                              'type' => 'score' );
   
   # IntelligentAgent Tag
@@ -271,13 +278,62 @@ sub score_observation {
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
            $self->{WRITER}->startTag( 'Exposure',
                                    'type' => 'time', 'units' => 'seconds' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }                        
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
         }                              
         $self->{WRITER}->endTag( 'Exposure' );
+        
+        if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
+            defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
+            
+             $self->{WRITER}->startTag( 'TimeConstraint' );
+             $self->{WRITER}->startTag( 'StartDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
+             $self->{WRITER}->endTag( 'StartDateTime' );
+             $self->{WRITER}->startTag( 'EndDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
+             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'TimeConstraint' );
+        }
+        
+        if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
+             defined ${$self->{OPTIONS}}{INTERVAL} &&
+             defined ${$self->{OPTIONS}}{TOLERANCE} ) {
+             
+             $self->{WRITER}->startTag( 'SeriesConstraint' );
+             
+             $self->{WRITER}->startTag( 'Count' );
+             $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
+             $self->{WRITER}->endTag( 'Count' );
+             
+             $self->{WRITER}->startTag( 'Interval' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->endTag( 'Interval' );               
+             
+             $self->{WRITER}->startTag( 'Tolerance' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->endTag( 'Tolerance' );               
+            
+             $self->{WRITER}->endTag( 'SeriesConstraint' );
+            
+        }
+             
+           
 
      $self->{WRITER}->endTag( 'Schedule' );
                   
@@ -309,7 +365,13 @@ Build a score response document
                                        Flux          => $mag,
                                        Score         => $score,
                                        Time          => $completion_time,
-                                       Filter        => filter );
+                                       Filter        => filter,
+                                          GroupCount    => $obs_per_group,
+                                          SeriesCount   => $obs_per_series,
+                                          Interval      => $interval,
+                                          Tolerance     => $tolerance,
+                                          TimeConstraint => [ $start_date,
+                                                              $end_date ]  );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -323,7 +385,8 @@ sub score_response {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                    Snr Flux Score Time Filter/ ) {
+                    Snr Flux Score Time Filter GroupCount SeriesCount 
+                    Interval Tolerance TimeConstraint / ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -450,13 +513,60 @@ sub score_response {
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
            $self->{WRITER}->startTag( 'Exposure',
                                    'type' => 'time', 'units' => 'seconds' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }                        
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
         }                              
         $self->{WRITER}->endTag( 'Exposure' );
+        
+        if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
+            defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
+            
+             $self->{WRITER}->startTag( 'TimeConstraint' );
+             $self->{WRITER}->startTag( 'StartDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
+             $self->{WRITER}->endTag( 'StartDateTime' );
+             $self->{WRITER}->startTag( 'EndDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
+             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'TimeConstraint' );
+        }
+        
+        if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
+             defined ${$self->{OPTIONS}}{INTERVAL} &&
+             defined ${$self->{OPTIONS}}{TOLERANCE} ) {
+             
+             $self->{WRITER}->startTag( 'SeriesConstraint' );
+             
+             $self->{WRITER}->startTag( 'Count' );
+             $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
+             $self->{WRITER}->endTag( 'Count' );
+             
+             $self->{WRITER}->startTag( 'Interval' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->endTag( 'Interval' );               
+             
+             $self->{WRITER}->startTag( 'Tolerance' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->endTag( 'Tolerance' );               
+            
+             $self->{WRITER}->endTag( 'SeriesConstraint' );
+            
+        }
 
      $self->{WRITER}->endTag( 'Schedule' );
                   
@@ -495,7 +605,13 @@ Build a request document
                                             Exposure   => $exposure,
                                             Snr        => $snr,
                                             Flux       => $mag,
-                                            Filter     => filter );
+                                            Filter     => filter,
+                                          GroupCount    => $obs_per_group,
+                                          SeriesCount   => $obs_per_series,
+                                          Interval      => $interval,
+                                          Tolerance     => $tolerance,
+                                          TimeConstraint => [ $start_date,
+                                                              $end_date ]  );
 
 Use "Exposure", or "Snr" and "Flux", but not both. );
 
@@ -509,7 +625,8 @@ sub request_observation {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Score Time 
-                Exposure Snr Flux Filter/ ) {
+                Exposure Snr Flux Filter GroupCount SeriesCount 
+                    Interval Tolerance TimeConstraint / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -634,13 +751,60 @@ sub request_observation {
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
            $self->{WRITER}->startTag( 'Exposure',
                                    'type' => 'time', 'units' => 'seconds' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }                        
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
         }                              
         $self->{WRITER}->endTag( 'Exposure' );
+        
+        if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
+            defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
+            
+             $self->{WRITER}->startTag( 'TimeConstraint' );
+             $self->{WRITER}->startTag( 'StartDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
+             $self->{WRITER}->endTag( 'StartDateTime' );
+             $self->{WRITER}->startTag( 'EndDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
+             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'TimeConstraint' );
+        }
+        
+        if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
+             defined ${$self->{OPTIONS}}{INTERVAL} &&
+             defined ${$self->{OPTIONS}}{TOLERANCE} ) {
+             
+             $self->{WRITER}->startTag( 'SeriesConstraint' );
+             
+             $self->{WRITER}->startTag( 'Count' );
+             $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
+             $self->{WRITER}->endTag( 'Count' );
+             
+             $self->{WRITER}->startTag( 'Interval' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->endTag( 'Interval' );               
+             
+             $self->{WRITER}->startTag( 'Tolerance' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->endTag( 'Tolerance' );               
+            
+             $self->{WRITER}->endTag( 'SeriesConstraint' );
+            
+        }
 
      $self->{WRITER}->endTag( 'Schedule' );
      
@@ -680,7 +844,13 @@ Build a confirm response document
                                          Flux          => $mag,
                                          Score         => $score,
                                          Time          => $completion_time,
-                                         Filter        => filter );
+                                         Filter        => filter,
+                                          GroupCount    => $obs_per_group,
+                                          SeriesCount   => $obs_per_series,
+                                          Interval      => $interval,
+                                          Tolerance     => $tolerance,
+                                          TimeConstraint => [ $start_date,
+                                                              $end_date ] );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -694,7 +864,8 @@ sub confirm_response {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                    Snr Flux Score Time Filter/ ) {
+                    Snr Flux Score Time Filter GroupCount SeriesCount 
+                    Interval Tolerance TimeConstraint / ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -821,13 +992,60 @@ sub confirm_response {
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
            $self->{WRITER}->startTag( 'Exposure',
                                    'type' => 'time', 'units' => 'seconds' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }                        
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
         }                              
         $self->{WRITER}->endTag( 'Exposure' );
+        
+        if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
+            defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
+            
+             $self->{WRITER}->startTag( 'TimeConstraint' );
+             $self->{WRITER}->startTag( 'StartDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
+             $self->{WRITER}->endTag( 'StartDateTime' );
+             $self->{WRITER}->startTag( 'EndDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
+             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'TimeConstraint' );
+        }
+        
+        if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
+             defined ${$self->{OPTIONS}}{INTERVAL} &&
+             defined ${$self->{OPTIONS}}{TOLERANCE} ) {
+             
+             $self->{WRITER}->startTag( 'SeriesConstraint' );
+             
+             $self->{WRITER}->startTag( 'Count' );
+             $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
+             $self->{WRITER}->endTag( 'Count' );
+             
+             $self->{WRITER}->startTag( 'Interval' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->endTag( 'Interval' );               
+             
+             $self->{WRITER}->startTag( 'Tolerance' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->endTag( 'Tolerance' );               
+            
+             $self->{WRITER}->endTag( 'SeriesConstraint' );
+            
+        }
 
      $self->{WRITER}->endTag( 'Schedule' );
                   
@@ -870,7 +1088,13 @@ Build a update response document
                                         Filter        => filter,
                                         Catalogue     => $cluster_catalog,
                                         Headers       => $fits_headers,
-                                        ImageURI      => $image_uri );
+                                        ImageURI      => $image_uri,
+                                          GroupCount    => $obs_per_group,
+                                          SeriesCount   => $obs_per_series,
+                                          Interval      => $interval,
+                                          Tolerance     => $tolerance,
+                                          TimeConstraint => [ $start_date,
+                                                              $end_date ]  );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -884,7 +1108,9 @@ sub update_response {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                    Snr Flux Score Time Filter Catalogue Headers ImageURI / ) {
+                    Snr Flux Score Time Filter Catalogue Headers ImageURI
+                     GroupCount SeriesCount Interval 
+                     Tolerance TimeConstraint / ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -1011,14 +1237,61 @@ sub update_response {
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
            $self->{WRITER}->startTag( 'Exposure',
                                    'type' => 'time', 'units' => 'seconds' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }                        
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
         }                              
         $self->{WRITER}->endTag( 'Exposure' );
-
+        
+        if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
+            defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
+            
+             $self->{WRITER}->startTag( 'TimeConstraint' );
+             $self->{WRITER}->startTag( 'StartDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
+             $self->{WRITER}->endTag( 'StartDateTime' );
+             $self->{WRITER}->startTag( 'EndDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
+             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'TimeConstraint' );
+        }
+        
+        if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
+             defined ${$self->{OPTIONS}}{INTERVAL} &&
+             defined ${$self->{OPTIONS}}{TOLERANCE} ) {
+             
+             $self->{WRITER}->startTag( 'SeriesConstraint' );
+             
+             $self->{WRITER}->startTag( 'Count' );
+             $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
+             $self->{WRITER}->endTag( 'Count' );
+             
+             $self->{WRITER}->startTag( 'Interval' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->endTag( 'Interval' );               
+             
+             $self->{WRITER}->startTag( 'Tolerance' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->endTag( 'Tolerance' );               
+            
+             $self->{WRITER}->endTag( 'SeriesConstraint' );
+            
+        }
+             
      $self->{WRITER}->endTag( 'Schedule' );
      
      # ObjectList
@@ -1082,7 +1355,13 @@ Build a complete response document
                                         Filter        => filter,
                                         Catalogue     => $cluster_catalog,
                                         Headers       => $fits_headers,
-                                        ImageURI      => $image_uri );
+                                        ImageURI      => $image_uri,
+                                          GroupCount    => $obs_per_group,
+                                          SeriesCount   => $obs_per_series,
+                                          Interval      => $interval,
+                                          Tolerance     => $tolerance,
+                                          TimeConstraint => [ $start_date,
+                                                              $end_date ]  );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -1096,7 +1375,9 @@ sub complete_response {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                    Snr Flux Score Time Filter Catalogue Headers ImageURI / ) {
+                    Snr Flux Score Time Filter Catalogue Headers ImageURI 
+                    GroupCount SeriesCount Interval 
+                    Tolerance TimeConstraint / ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -1223,13 +1504,60 @@ sub complete_response {
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
            $self->{WRITER}->startTag( 'Exposure',
                                    'type' => 'time', 'units' => 'seconds' );
+           if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
+               ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
+              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
+              $self->{WRITER}->endTag( 'Count' ); 
+           }                        
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
         }                              
         $self->{WRITER}->endTag( 'Exposure' );
+        
+        if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
+            defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
+            
+             $self->{WRITER}->startTag( 'TimeConstraint' );
+             $self->{WRITER}->startTag( 'StartDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
+             $self->{WRITER}->endTag( 'StartDateTime' );
+             $self->{WRITER}->startTag( 'EndDateTime' );
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
+             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'TimeConstraint' );
+        }
+        
+        if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
+             defined ${$self->{OPTIONS}}{INTERVAL} &&
+             defined ${$self->{OPTIONS}}{TOLERANCE} ) {
+             
+             $self->{WRITER}->startTag( 'SeriesConstraint' );
+             
+             $self->{WRITER}->startTag( 'Count' );
+             $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
+             $self->{WRITER}->endTag( 'Count' );
+             
+             $self->{WRITER}->startTag( 'Interval' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->endTag( 'Interval' );               
+             
+             $self->{WRITER}->startTag( 'Tolerance' );
+             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->endTag( 'Tolerance' );               
+            
+             $self->{WRITER}->endTag( 'SeriesConstraint' );
+            
+        }
 
      $self->{WRITER}->endTag( 'Schedule' );
      
@@ -1431,6 +1759,7 @@ sub failure_response {
   return 1;
 
 }
+
 =item B<dump_rtml>
 
 Dumps the contents of the RTML buffer in memory to a scalar
@@ -1937,6 +2266,100 @@ sub imageuri {
   return ${$self->{OPTIONS}}{IMAGE_URI};
 }  
 
+=item B<groupcount>
+
+Gets or sets the count on the monitoring group
+
+=cut
+
+sub groupcount {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{GROUPCOUNT} = shift;
+  }
+
+  return ${$self->{OPTIONS}}{GROUPCOUNT};
+
+}
+
+=item B<seriescount>
+
+Gets or sets the number of observations (monitor groups) to be taken
+
+=cut 
+
+sub  seriescount {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{SERIESCOUNT} = shift;
+  }
+
+  return ${$self->{OPTIONS}}{SERIESCOUNT};
+
+}
+
+=item B<interval>
+
+Gets or sets the interval between monitoring groups
+
+=cut  
+                  
+sub  interval {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{INTERVAL} = shift;
+  }
+
+  return ${$self->{OPTIONS}}{INTERVAL};
+
+}
+
+=item B<tolerance>
+
+Gets or sets the tolerance we have for the interval spacing
+
+=cut 
+
+sub  tolerance {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{TOLERANCE} = shift;
+  }
+
+  return ${$self->{OPTIONS}}{TOLERANCE};
+
+
+}
+
+
+=item B<tolerance>
+
+Gets or sets the time constraint, takes an array ref.
+
+=cut 
+
+sub timeconstraint {
+  my $self = shift;
+
+  if (@_) {
+    
+    my $ref = shift;
+    my @array = @{$ref};
+  
+    ${$self->{OPTIONS}}{STARTDATETIME} = $array[0];
+    ${$self->{OPTIONS}}{ENDDATETIME} = $array[1];
+  }
+
+  return (${$self->{OPTIONS}}{STARTDATETIME},${$self->{OPTIONS}}{ENDDATETIME});
+
+
+}
+
+
 
 # C O N F I G U R E -------------------------------------------------------
 
@@ -1963,14 +2386,15 @@ sub configure {
   # ------------------
   $self->{BUFFER} = new XML::Writer::String();  
   $self->{WRITER} = new XML::Writer( OUTPUT      => $self->{BUFFER},
-                                     DATA_MODE   => 1, 
+                                     DATA_MODE   => 1,
+                                     UNSAFE      => 1, 
                                      DATA_INDENT => 4 );
     
   # DEFAULTS
   # --------
   
-  # use the RTML Namespace as defined by the v2.1 DTD
-  ${$self->{OPTIONS}}{DTD} = "http://www.estar.org.uk/documents/rtml2.1.dtd"; 
+  # use the RTML Namespace as defined by the v2.2 DTD
+  ${$self->{OPTIONS}}{DTD} = "http://www.estar.org.uk/documents/rtml2.2.dtd"; 
   
   #${$self->{OPTIONS}}{HOST} = hostname() . "." . hostdomain(); 
   ${$self->{OPTIONS}}{HOST} = "127.0.0.1";
@@ -1981,8 +2405,7 @@ sub configure {
   
   ${$self->{OPTIONS}}{TARGETTYPE} = 'normal';
   ${$self->{OPTIONS}}{TARGETIDENT} = 'SingleExposure';
- 
-    
+     
   # ARGUEMENTS
   # ----------
   

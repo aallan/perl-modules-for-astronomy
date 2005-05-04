@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.20 2005/02/08 14:26:11 aa Exp $
+#     $Id: Parse.pm,v 1.21 2005/05/04 16:39:22 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.20 2005/02/08 14:26:11 aa Exp $
+$Id: Parse.pm,v 1.21 2005/05/04 16:39:22 aa Exp $
 
 =head1 METHODS
 
@@ -406,6 +406,58 @@ sub port {
   return ${$self->{INTELLIGENTAGENT}}{port};
 }
 
+
+=item B<group_count>
+
+Return the group count of the observation
+
+
+=cut
+sub group_count {
+  my $self = shift;  
+  return ${${${$self->{OBSERVATION}}{Schedule}}{Exposure}}{Count};
+ 
+}
+
+
+=item B<series_count>
+
+Return the series count of the observation
+
+
+=cut
+
+sub series_count {
+  my $self = shift;  
+  return ${${${$self->{OBSERVATION}}{Schedule}}{Seriesconstraint}}{Count};
+ 
+}
+
+=item B<interval>
+
+Return the interval between monitoring groups 
+
+
+=cut
+
+sub interval {
+  my $self = shift;  
+  return ${${${$self->{OBSERVATION}}{Schedule}}{Seriesconstraint}}{Interval};
+ 
+}
+
+=item B<tolerance>
+
+Return the interval between monitoring groups 
+
+
+=cut
+
+sub tolerance {
+  my $self = shift;  
+  return ${${${$self->{OBSERVATION}}{Schedule}}{Seriesconstraint}}{Tolerance};
+ 
+}
 
 # C O N F I G U R E ----------------------------------------------------------
 

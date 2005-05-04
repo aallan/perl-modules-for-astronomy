@@ -1,3 +1,8 @@
+2005-05-04  Alasdair Allan <aa@astro.ex.ac.uk>
+
+         * Added support for <Count> tag inside <Exposure> along with
+           the <TimeConstraint> and <SeriesConstraint> tags.
+
 2005-02-08  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Changed things so that we can now specify both the "type" and "ident"

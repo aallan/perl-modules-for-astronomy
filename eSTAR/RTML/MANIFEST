@@ -7,6 +7,8 @@ RTML.pm
 t/rtml.t
 t/build.t
 t/parse.t
+t/build2.2.t
+t/parse2.2.t
 Build/Makefile.PL
 Build/Build.pm
 Parse/Makefile.PL
@@ -18,3 +20,7 @@ t/rtml/ers_observation_accepted.xml
 t/rtml/ers_score_reply.xml            
 t/rtml/ers_observation_rejected.xml  
 t/rtml/ers_target_observed.xml
+t/rtml2.2/example_confirmation.xml
+t/rtml2.2/example_request.xml
+t/rtml2.2/example_score.xml
+t/rtml2.2/example_score_reply.xml

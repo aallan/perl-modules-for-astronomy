@@ -19,7 +19,7 @@ package eSTAR::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.5 2003/07/15 20:58:11 aa Exp $
+#     $Id: RTML.pm,v 1.6 2005/05/04 16:39:22 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -57,13 +57,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.5 2003/07/15 20:58:11 aa Exp $
+$Id: RTML.pm,v 1.6 2005/05/04 16:39:22 aa Exp $
 
 =head1 METHODS
 
@@ -88,6 +88,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { XML      => undef,
+                      BUFFER   => undef,
                       DOCUMENT => undef }, $class;
 
   # Configure the object
@@ -143,6 +144,19 @@ sub return_tree {
   return $reference;
 }
 
+=item B<dump_rtml>
+
+Dumps the contents of the RTML buffer in memory to a scalar
+
+   $string = $message->dump_rtml();
+
+=cut
+
+sub dump_rtml {
+  my $self = shift;
+  return $self->{BUFFER};
+
+}
 # C O N F I G U R E ---------------------------------------------------------
 
 =back
@@ -208,6 +222,16 @@ sub file {
   if (@_) { 
      my $file = shift;
      $self->{DOCUMENT} = $self->{XML}->parsefile( $file );
+     
+     my ( $FILE, $rtml );
+     return undef unless open ( $FILE, "<$file" );
+     {
+        local $/ = undef;
+        $rtml = <$FILE>;
+        close $FILE;
+        $self->{BUFFER} = $rtml;
+     }
+     
   }
   return ${${${$self->{DOCUMENT}}[1]}[0]}{'dtd'};
 }
@@ -228,6 +252,7 @@ sub source {
   if (@_) { 
      my $rtml = shift;
      $self->{DOCUMENT} = $self->{XML}->parse( $rtml );
+     $self->{BUFFER} = $rtml;
   }
   return ${${${$self->{DOCUMENT}}[1]}[0]}{'dtd'};
 }
