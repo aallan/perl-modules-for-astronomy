@@ -2,6 +2,9 @@
 
          * Parse.pm: Added parsing methods for <TimeConstraint> tags.
          
+         * Build.pm: Modified how the PT is pre-pended to the <Interval>
+           and <Tolerance> tags so it can't be added more than once.
+         
 2005-05-04  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Added support for <Count> tag inside <Exposure> along with

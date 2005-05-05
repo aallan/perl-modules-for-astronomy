@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.17 2005/05/04 16:39:22 aa Exp $
+#     $Id: Build.pm,v 1.18 2005/05/05 13:11:56 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -65,13 +65,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.17 2005/05/04 16:39:22 aa Exp $
+$Id: Build.pm,v 1.18 2005/05/05 13:11:56 aa Exp $
 
 =head1 METHODS
 
@@ -322,11 +322,11 @@ sub score_observation {
              $self->{WRITER}->endTag( 'Count' );
              
              $self->{WRITER}->startTag( 'Interval' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
              $self->{WRITER}->endTag( 'Interval' );               
              
              $self->{WRITER}->startTag( 'Tolerance' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
              $self->{WRITER}->endTag( 'Tolerance' );               
             
              $self->{WRITER}->endTag( 'SeriesConstraint' );
@@ -557,11 +557,11 @@ sub score_response {
              $self->{WRITER}->endTag( 'Count' );
              
              $self->{WRITER}->startTag( 'Interval' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
              $self->{WRITER}->endTag( 'Interval' );               
              
              $self->{WRITER}->startTag( 'Tolerance' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
              $self->{WRITER}->endTag( 'Tolerance' );               
             
              $self->{WRITER}->endTag( 'SeriesConstraint' );
@@ -795,11 +795,11 @@ sub request_observation {
              $self->{WRITER}->endTag( 'Count' );
              
              $self->{WRITER}->startTag( 'Interval' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
              $self->{WRITER}->endTag( 'Interval' );               
              
              $self->{WRITER}->startTag( 'Tolerance' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
              $self->{WRITER}->endTag( 'Tolerance' );               
             
              $self->{WRITER}->endTag( 'SeriesConstraint' );
@@ -1036,11 +1036,11 @@ sub confirm_response {
              $self->{WRITER}->endTag( 'Count' );
              
              $self->{WRITER}->startTag( 'Interval' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
              $self->{WRITER}->endTag( 'Interval' );               
              
              $self->{WRITER}->startTag( 'Tolerance' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
              $self->{WRITER}->endTag( 'Tolerance' );               
             
              $self->{WRITER}->endTag( 'SeriesConstraint' );
@@ -1281,11 +1281,11 @@ sub update_response {
              $self->{WRITER}->endTag( 'Count' );
              
              $self->{WRITER}->startTag( 'Interval' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
              $self->{WRITER}->endTag( 'Interval' );               
              
              $self->{WRITER}->startTag( 'Tolerance' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
              $self->{WRITER}->endTag( 'Tolerance' );               
             
              $self->{WRITER}->endTag( 'SeriesConstraint' );
@@ -1548,11 +1548,11 @@ sub complete_response {
              $self->{WRITER}->endTag( 'Count' );
              
              $self->{WRITER}->startTag( 'Interval' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{INTERVAL});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
              $self->{WRITER}->endTag( 'Interval' );               
              
              $self->{WRITER}->startTag( 'Tolerance' );
-             $self->{WRITER}->characters( "PT".${$self->{OPTIONS}}{TOLERANCE});
+             $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
              $self->{WRITER}->endTag( 'Tolerance' );               
             
              $self->{WRITER}->endTag( 'SeriesConstraint' );
@@ -2311,6 +2311,9 @@ sub  interval {
 
   if (@_) {
     ${$self->{OPTIONS}}{INTERVAL} = shift;
+    unless ( ${$self->{OPTIONS}}{INTERVAL} =~ "PT" ) {
+       ${$self->{OPTIONS}}{INTERVAL} = "PT" . ${$self->{OPTIONS}}{INTERVAL};
+    }   
   }
 
   return ${$self->{OPTIONS}}{INTERVAL};
@@ -2328,6 +2331,9 @@ sub  tolerance {
 
   if (@_) {
     ${$self->{OPTIONS}}{TOLERANCE} = shift;
+    unless ( ${$self->{OPTIONS}}{TOLERANCE} =~ "PT" ) {
+       ${$self->{OPTIONS}}{TOLERANCE} = "PT" . ${$self->{OPTIONS}}{TOLERANCE};
+    }   
   }
 
   return ${$self->{OPTIONS}}{TOLERANCE};
