@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile( 
                'NAME'           => 'eSTAR::RTML',
-	       'VERSION'        => '1.9.1',
+	       'VERSION'        => '2.0',
                'PREREQ_PM'      => {  },
 	       'dist'           => { COMPRESS => "gzip -9f"},
 	       ($] >= 5.005 ?    ## 

@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 8 };
+BEGIN { plan tests => 10 };
 
 # load modules
 use eSTAR::RTML;
@@ -44,6 +44,9 @@ ok( $message1->group_count(), 2 );
 ok( $message1->series_count(), 3 );
 ok( $message1->interval(), "PT1H" );
 ok( $message1->tolerance(), "PT30M" );
+
+ok( $message1->start_time(), "2005-01-01T12:00:00" );
+ok( $message1->end_time(), "2005-12-31T12:00:00" );
 
 #print Dumper($message1);
 

@@ -1,3 +1,7 @@
+2005-05-05  Alasdair Allan <aa@astro.ex.ac.uk>
+
+         * Parse.pm: Added parsing methods for <TimeConstraint> tags.
+         
 2005-05-04  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Added support for <Count> tag inside <Exposure> along with

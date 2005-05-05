@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.21 2005/05/04 16:39:22 aa Exp $
+#     $Id: Parse.pm,v 1.22 2005/05/05 12:00:08 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.22 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.21 2005/05/04 16:39:22 aa Exp $
+$Id: Parse.pm,v 1.22 2005/05/05 12:00:08 aa Exp $
 
 =head1 METHODS
 
@@ -458,6 +458,33 @@ sub tolerance {
   return ${${${$self->{OBSERVATION}}{Schedule}}{Seriesconstraint}}{Tolerance};
  
 }
+
+
+=item B<start_time>
+
+Return the start time constraint
+
+=cut
+
+sub start_time {
+  my $self = shift; 
+  return ${${${$self->{OBSERVATION}}{Schedule}}{Timeconstraint}}{StartDateTime};
+ 
+}
+
+
+=item B<end_time>
+
+Return the end time constraint
+
+=cut
+
+sub end_time {
+  my $self = shift;  
+  return ${${${$self->{OBSERVATION}}{Schedule}}{Timeconstraint}}{EndDateTime};
+ 
+}
+
 
 # C O N F I G U R E ----------------------------------------------------------
 
