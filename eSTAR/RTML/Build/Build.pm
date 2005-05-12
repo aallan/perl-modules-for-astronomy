@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.18 2005/05/05 13:11:56 aa Exp $
+#     $Id: Build.pm,v 1.19 2005/05/12 13:51:14 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -65,13 +65,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.18 2005/05/05 13:11:56 aa Exp $
+$Id: Build.pm,v 1.19 2005/05/12 13:51:14 aa Exp $
 
 =head1 METHODS
 
@@ -231,7 +231,12 @@ sub score_observation {
            
            $self->{WRITER}->startTag( 'Declination', 
                                     'format' => 'sdd mm ss.s', units => 'dms' );
-           $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+                                    
+           if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           } else {                       
+              $self->{WRITER}->characters( "+ " . ${$self->{OPTIONS}}{DEC} );
+           }
            $self->{WRITER}->endTag( 'Declination' );   
 
            $self->{WRITER}->startTag( 'Equinox'  );
@@ -467,7 +472,11 @@ sub score_response {
            
            $self->{WRITER}->startTag( 'Declination', 
                                     'format' => 'sdd mm ss.s', units => 'dms' );
-           $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           } else {                       
+              $self->{WRITER}->characters( "+ " . ${$self->{OPTIONS}}{DEC} );
+           }
            $self->{WRITER}->endTag( 'Declination' );   
 
            $self->{WRITER}->startTag( 'Equinox'  );
@@ -705,7 +714,11 @@ sub request_observation {
            
            $self->{WRITER}->startTag( 'Declination', 
                                     'format' => 'sdd mm ss.s', units => 'dms' );
-           $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           } else {                       
+              $self->{WRITER}->characters( "+ " . ${$self->{OPTIONS}}{DEC} );
+           }
            $self->{WRITER}->endTag( 'Declination' );   
 
            $self->{WRITER}->startTag( 'Equinox'  );
@@ -946,7 +959,11 @@ sub confirm_response {
            
            $self->{WRITER}->startTag( 'Declination', 
                                     'format' => 'sdd mm ss.s', units => 'dms' );
-           $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           } else {                       
+              $self->{WRITER}->characters( "+ " . ${$self->{OPTIONS}}{DEC} );
+           }
            $self->{WRITER}->endTag( 'Declination' );   
 
            $self->{WRITER}->startTag( 'Equinox'  );
@@ -1191,7 +1208,11 @@ sub update_response {
            
            $self->{WRITER}->startTag( 'Declination', 
                                     'format' => 'sdd mm ss.s', units => 'dms' );
-           $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           } else {                       
+              $self->{WRITER}->characters( "+ " . ${$self->{OPTIONS}}{DEC} );
+           }
            $self->{WRITER}->endTag( 'Declination' );   
 
            $self->{WRITER}->startTag( 'Equinox'  );
@@ -1458,7 +1479,11 @@ sub complete_response {
            
            $self->{WRITER}->startTag( 'Declination', 
                                     'format' => 'sdd mm ss.s', units => 'dms' );
-           $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
+              $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
+           } else {                       
+              $self->{WRITER}->characters( "+ " . ${$self->{OPTIONS}}{DEC} );
+           }
            $self->{WRITER}->endTag( 'Declination' );   
 
            $self->{WRITER}->startTag( 'Equinox'  );

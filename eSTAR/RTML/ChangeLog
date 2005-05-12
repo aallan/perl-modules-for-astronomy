@@ -1,3 +1,9 @@
+2005-05-12  Alasdair Allan <aa@astro.ex.ac.uk>
+
+         * Fixed modules to parse Declination with or without a plus sign
+           to denote positive declination. All documents are now built with
+           such a sign to placte the hoardes at LJM.
+           
 2005-05-05  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Parse.pm: Added parsing methods for <TimeConstraint> tags.

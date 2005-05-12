@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.22 2005/05/05 12:00:08 aa Exp $
+#     $Id: Parse.pm,v 1.23 2005/05/12 13:51:14 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.22 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.23 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.22 2005/05/05 12:00:08 aa Exp $
+$Id: Parse.pm,v 1.23 2005/05/12 13:51:14 aa Exp $
 
 =head1 METHODS
 
@@ -315,7 +315,9 @@ Return the Dec. of the target
 =cut
 sub dec {
   my $self = shift;
-  return ${${${$self->{OBSERVATION}}{Target}}{Coordinates}}{Declination};
+  my $dec = ${${${$self->{OBSERVATION}}{Target}}{Coordinates}}{Declination};
+  $dec =~ s/\+//;
+  return $dec;
 }
 
 =item B<exposure>
