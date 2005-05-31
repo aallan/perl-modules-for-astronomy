@@ -55,9 +55,50 @@ $cat = Astro::Catalog::IO::SExtractor->_read_catalog( \@lines );
 
 The catalogue lines must include column definitions as written using
 the 'ASCII_HEAD' catalogue type from SExtractor. This implementation
-currently only supports reading information from the NUMBER, X_IMAGE,
-Y_IMAGE, ALPHA_J2000, DELTA_J2000, MAG_ISOCOR, and MAGERR_ISOCOR output
-parameters.
+currently only supports reading information from the following output
+parameters:
+
+=item NUMBER - Astro::Catalog::Star id
+
+=item X_IMAGE - Astro::Catalog::Star x
+
+=item Y_IMAGE - Astro::Catalog::Star y
+
+=item X2_IMAGE
+
+=item Y2_IMAGE
+
+=item ERRX2_IMAGE
+
+=item ERRY2_IMAGE
+
+=item ALPHA_J2000 - Astro::Catalog::Star coords
+
+=item DELTA_J2000 - Astro::Catalog::Star coords
+
+=item MAG_ISO - Astro::Catalog::Star magnitudes
+
+=item MAGERR_ISO - Astro::Catalog::Star magerr
+
+=item FLUX_ISO
+
+=item FLUXERR_ISO
+
+=item ELLIPTICITY - Astro::Catalog::Star morphology
+
+=item THETA_IMAGE - Astro::Catalog::Star morphology
+
+=item THETA_WORLD - Astro::Catalog::Star morphology
+
+=item A_IMAGE - Astro::Catalog::Star morphology
+
+=item B_IMAGE - Astro::Catalog::Star morphology
+
+=item A_WORLD - Astro::Catalog::Star morphology
+
+=item B_WORLD - Astro::Catalog::Star morphology
+
+=item ISOAREA_IMAGE - Astro::Catalog::Star morphology
 
 =cut
 
@@ -90,13 +131,17 @@ sub _read_catalog {
   # Set up columns.
   my $id_column = -1;
   my $x_column = -1;
-  my $xerr_column = -1;
+  my $xvar_column = -1;
   my $y_column = -1;
-  my $yerr_column = -1;
+  my $yvar_column = -1;
+  my $xvarerr_column = -1;
+  my $yvarerr_column = -1;
   my $ra_column = -1;
   my $dec_column = -1;
   my $mag_column = -1;
   my $magerr_column = -1;
+  my $flux_column = -1;
+  my $fluxerr_column = -1;
   my $ell_column = -1;
   my $posang_pixel_column = -1;
   my $posang_world_column = -1;
@@ -126,11 +171,17 @@ sub _read_catalog {
         $y_column = $column[1] - 1;
         print "Y column is $y_column\n" if $DEBUG;
       } elsif( $column[2] =~ /^X2_IMAGE/ ) {
-        $xerr_column = $column[1] - 1;
-        print "X ERROR column is $xerr_column\n" if $DEBUG;
+        $xvar_column = $column[1] - 1;
+        print "X VARIANCE column is $xvar_column\n" if $DEBUG;
       } elsif( $column[2] =~ /^Y2_IMAGE/ ) {
-        $yerr_column = $column[1] - 1;
-        print "Y ERROR column is $yerr_column\n" if $DEBUG;
+        $yvar_column = $column[1] - 1;
+        print "Y VARIANCE column is $yvar_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^ERRX2_IMAGE/ ) {
+        $xvarerr_column = $column[1] - 1;
+        print "X VARIANCE ERROR column is $xvarerr_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^ERRY2_IMAGE/ ) {
+        $yvarerr_column = $column[1] - 1;
+        print "Y VARIANCE ERROR column is $yvarerr_column\n" if $DEBUG;
       } elsif( $column[2] =~ /^ALPHA_J2000/ ) {
         $ra_column = $column[1] - 1;
         print "RA column is $ra_column\n" if $DEBUG;
@@ -143,6 +194,12 @@ sub _read_catalog {
       } elsif( $column[2] =~ /^MAGERR_ISOCOR/ ) {
         $magerr_column = $column[1] - 1;
         print "MAG ERROR column is $magerr_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^FLUX_ISO/ ) {
+        $flux_column = $column[1] - 1;
+        print "FLUX_ISO column is $flux_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^FLUXERR_ISO/ ) {
+        $fluxerr_column = $column[1] - 1;
+        print "FLUXERR_ISO column is $fluxerr_column\n" if $DEBUG;
       } elsif( $column[2] =~ /^ELLIPTICITY/ ) {
         $ell_column = $column[1] - 1;
         print "ELLIPTICITY column is $ell_column\n" if $DEBUG;
@@ -249,7 +306,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.6 2005/03/31 01:24:53 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.7 2005/05/31 21:36:26 cavanagh Exp $
 
 =head1 FORMAT
 
