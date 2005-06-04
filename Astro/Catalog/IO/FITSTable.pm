@@ -366,7 +366,7 @@ sub _read_catalog {
         # Calculate the magnitude.
         my %mag;
         if( defined( $flux_value ) ) {
-          $mag{'unknown'} = -2.5 * log( $flux_value );
+          $mag{'unknown'} = -2.5 * log( $flux_value ) / log( 10 );
         }
 
         # And set up the Astro::Catalog::Star::Morphology object.
@@ -426,7 +426,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: FITSTable.pm,v 1.1 2005/03/31 01:26:42 cavanagh Exp $
+  $Id: FITSTable.pm,v 1.2 2005/06/04 00:46:29 cavanagh Exp $
 
 =head1 SEE ALSO
 
