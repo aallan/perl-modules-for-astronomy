@@ -36,6 +36,6 @@ is( $id, 672, "Last object's ID" );
 is( $star->dec, "-02 03 51.95", "Last object's Dec" );
 
 my $mag = $star->get_magnitude( 'unknown' );
-is( $mag, -17.6606562131603, "Last object's magnitude" );
+is( $mag, -7.66992554016591, "Last object's magnitude" );
 
 
