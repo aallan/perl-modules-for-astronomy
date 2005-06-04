@@ -1,3 +1,8 @@
+2005-06-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/FITSTable.pm: Convert flux to magnitudes with log_10,
+	not natural logarithm.
+	
 2005-03-30  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/ASCII.pm: base class for ASCII-based IO
