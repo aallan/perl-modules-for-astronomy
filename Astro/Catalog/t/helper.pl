@@ -118,9 +118,9 @@ sub compare_star {
     ok( 0, "Error calculating star separation. Too far?");
   } else {
     # check that DR2AS is defined, at one stage it was not
-    my $check = Astro::Catalog::Star::DR2AS;
+    my $check = Astro::Catalog::Item::DR2AS;
     die "Error obtaining DR2AS" if not defined $check;
-    my $assep = $radsep * Astro::Catalog::Star::DR2AS;
+    my $assep = $radsep * Astro::Catalog::Item::DR2AS;
     ok( $assep < $maxsec, "compare distance between stars ($assep<$maxsec arcsec)" );
   }
 
@@ -212,9 +212,9 @@ sub compare_mpc_star {
     ok( 0, "Error calculating star separation. Too far?");
   } else {
     # check that DR2AS is defined, at one stage it was not
-    my $check = Astro::Catalog::Star::DR2AS;
+    my $check = Astro::Catalog::Item::DR2AS;
     die "Error obtaining DR2AS" if not defined $check;
-    my $assep = $radsep * Astro::Catalog::Star::DR2AS;
+    my $assep = $radsep * Astro::Catalog::Item::DR2AS;
     ok( $assep < $maxsec, "compare distance between stars ($assep<$maxsec arcsec)" );
   }
 
