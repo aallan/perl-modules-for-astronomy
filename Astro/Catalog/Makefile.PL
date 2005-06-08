@@ -22,7 +22,11 @@ WriteMakefile(
                                      'Test'                => 1.24,
                                      'Carp'                => 1.01,
                                      'Data::Dumper'        => 2.12,
-                                     'Astro::VO::VOTable'  => 0.01
+                                     'Astro::VO::VOTable'  => 0.01,
+                                     'Scalar::Util'        => 1.14,
+                                     'Astro::FITS::CFITSIO'=> 1.03,
+                                     'File::Temp'          => 0.14,
+                                     'Class::Struct'       => 0.63,
 	                           },
 	       'dist'           => { COMPRESS => "gzip -9f"},
 	       ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
