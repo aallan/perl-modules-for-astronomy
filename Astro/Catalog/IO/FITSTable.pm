@@ -17,6 +17,7 @@ use Carp;
 use strict;
 
 use Astro::Catalog;
+use Astro::Catalog::Star;
 use Astro::Catalog::Star::Morphology;
 use Astro::Coords;
 use Astro::FITS::CFITSIO qw/ :longnames :constants /;
@@ -426,7 +427,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: FITSTable.pm,v 1.2 2005/06/04 00:46:29 cavanagh Exp $
+  $Id: FITSTable.pm,v 1.3 2005/06/08 03:29:25 aa Exp $
 
 =head1 SEE ALSO
 

@@ -27,6 +27,7 @@ use strict;
 # Bring in the Astro:: modules.
 use Astro::Catalog;
 use Astro::Catalog::Star;
+use Astro::Catalog::Star::Morphology;
 use Astro::Coords;
 use Astro::SLA;
 
@@ -306,7 +307,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.7 2005/05/31 21:36:26 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.8 2005/06/08 03:29:25 aa Exp $
 
 =head1 FORMAT
 
