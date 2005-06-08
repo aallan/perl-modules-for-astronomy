@@ -1,13 +1,23 @@
-To Do
------
- 
- * Add support for FITS binary tables  
+
+To Do (8th June 2004)
+---------------------
+
+ * Replace exisiting magnitude, colour and error API with handlers for the 
+   new Astro::Fluxes objects.
    
- * Work with Astro::Catalog::IO::VOTable to provide better reader support,
-   update it to support VOTable 1.1 when it gets finalised.
+ * Move Astro::Catalog::Star objects to the new Astro::Catalog::Item object,
+   retain Astro::Catalog::Star as an empty sub-class of the new Item object
+   for backwards compatibility.
+   
+ * Introduce support for quality flags with Astro::Catalog::Item::Quality  
+   object.
+   
+ * Fix things so all "values" are represented by the new Number::Uncertainty
+   object and can have associated errors.  
   
- * Need to added Epoch and Equinox support, possibly inside Astro::Coords
-   rather than in Astro::Catalog::Star itself?
+ * Add output support for FITS binary tables. 
+   
+ * Support the VOTable V1.1 standard.
  
  * Fix Astro::Catalog::Query::CMC module to correctly parse the CMC TST files,
    currently support is somewhat broken.

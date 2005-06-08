@@ -1,7 +1,18 @@
+2005-06-04  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.9.9)
+
+        * Updated documentation and released as version 3.9.9
+
+2005-06-04  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+        
+	* t/2_fitstable.t: Change magnitude test to use the log_10 of the 
+	  flux.
+
+        * t/4_mpc.t: Fix up MPC tests again
+
 2005-06-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/FITSTable.pm: Convert flux to magnitudes with log_10,
-	not natural logarithm.
+	  not natural logarithm.
 	
 2005-03-30  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
@@ -10,73 +21,73 @@
 	* IO/Binary.pm: base class for binary-based IO
 
 	* Catalog.pm: added FITSTable support; modified IO class handling
-	to farm off to IO classes that inherit from either IO/ASCII.pm
-	or IO/Binary.pm to allow for reading in of different types of
-	files; modify ID matching to use string comparison instead of
-	numerical comparison in case IDs aren't numbers.
+	  to farm off to IO classes that inherit from either IO/ASCII.pm
+	  or IO/Binary.pm to allow for reading in of different types of
+	  files; modify ID matching to use string comparison instead of
+	  numerical comparison in case IDs aren't numbers.
 
 	* IO/Astrom.pm, IO/Cluster.pm, IO/FINDOFF.pm, IO/GaiaPick.pm,
-	IO/JCMT.pm, IO/SExtractor.pm, IO/STL.pm, IO/Simple.pm,
-	IO/TST.pm, IO/UKIRTBS.pm, IO/VOTable.pm: inherit from IO/ASCII.pm.
+	  IO/JCMT.pm, IO/SExtractor.pm, IO/STL.pm, IO/Simple.pm,
+	  IO/TST.pm, IO/UKIRTBS.pm, IO/VOTable.pm: inherit from IO/ASCII.pm.
 
 	* IO/FITSTable.pm: new module to allow reading in of binary FITS
-	tables.
+	  tables.
 
 2005-03-22  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/FINDOFF.pm: Remove letters from ID string before writing.
-	This is done because FINDOFF doesn't understand non-integers.
+	  This is done because FINDOFF doesn't understand non-integers.
 
 2005-02-25  Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 	* Catalog.pm (filter_by_id): Use quotemeta function to make sure
-	that things like + and () are escaped before being passed to the
-	regex engine.
+	  that things like + and () are escaped before being passed to the
+	  regex engine.
 
 2005-02-15  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/Astrom.pm: Add epoch of observation support.
 
 	* Catalog.pm: Allow newer versions of Astro::Coords to be used
-	without screwing up output from the ra and dec methods.
+	  without breaking up output from the ra and dec methods.
 
 	* Star/Star.pm: Add wcs method allowing for a world coordinate
-	system to be associated with a star. Allow for calculation of x/y
-	position from ra/dec if possible. Allow newer versions of
-	Astro::Coords to be used without screwing up output from the ra
-	and dec methods.
+	  system to be associated with a star. Allow for calculation of x/y
+	  position from ra/dec if possible. Allow newer versions of
+	  Astro::Coords to be used without screwing up output from the ra
+	  and dec methods.
 
 2005-02-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* Query/Query/2MASS.pm: Tell TST which column the ID is in when
-	forming the new catalogue from the 2MASS output. This is done to
-	prevent a warning from appearing when TST tries to parse the
-	catalogue.
+	  forming the new catalogue from the 2MASS output. This is done to
+	  prevent a warning from appearing when TST tries to parse the
+	  catalogue.
 
 2005-02-02  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.9.0)
 
 	* Star/Star.pm: Fixed quality comparison in line 860 (now 865) so
-	it can handle undef values. Not sure this was the right thing to,
-	why was it getting undef values to start with? This could indicate
-	a bug in one of the IO plugin modules?
+	  it can handle undef values. Not sure this was the right thing to,
+	  why was it getting undef values to start with? This could indicate
+	  a bug in one of the IO plugin modules?
 
 2005-02-02  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* t/2_astrom.t: __DATA__ section needed updating to use
-	publically- available Astro::Coords.
+	  publically- available Astro::Coords.
 
 	* IO/Astrom.pm: Use Astro::Coords v0.05 methods instead of v0.06.
 
 	* t/helper.pl: Add compare_mpc_catalog and compare_mpc_star for
-	MPC checking.
+	  MPC checking.
 
 	* t/4_mpc.t: Use compare_mpc_catalog comparison method, update
-	asteroid positions.
+	  asteroid positions.
 
 2005-02-01  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/FINDOFF.pm: Fix regex bug, clarify documentation, only write
-	ID in comment column.
+	  ID in comment column.
 
 	* IO/SExtractor.pm: Declare filter variable to fix syntax error.
 

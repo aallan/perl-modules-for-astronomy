@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.51 2005/03/31 01:28:08 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.52 2005/06/08 01:03:18 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Star;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.51 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.52 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.51 2005/03/31 01:28:08 cavanagh Exp $
+$Id: Catalog.pm,v 1.52 2005/06/08 01:03:18 aa Exp $
 
 =head1 METHODS
 
@@ -1164,7 +1164,7 @@ sub sort_catalog {
 
     # Just sort it all
     @$stars = sort $mode, @$stars;
-
+    
   } else {
 
     # see if we have a reference object

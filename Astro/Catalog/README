@@ -19,6 +19,16 @@ readily noticable by the user as alot of work has gone into the infrastructure
 of the package. This means that adding additional I/O and Query support has 
 been made alot easier.
 
+Version 4.x.x
+-------------
+
+This release is the last of the V3 releases. The next release V4.0.0 will
+include new functionality, including time series support, and add "proper"
+support for fluxes, errors and quality flags. However it may not be backwards
+compatible with the existing code in all cases. This therefore is the last
+version of Astro::Catalog which promises backwards compatibility with 
+exisiting V3 code.
+
 Requirements
 ------------
 
