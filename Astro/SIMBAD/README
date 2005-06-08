@@ -8,13 +8,9 @@ The Astro::SIMBAD module is an objected orientated Perl interface to the
 SIMBAD astronomical database. SIMBAD provides basic data, cross-identifications
 and bibliography for astronomical objects outside the solar system.
 
-Currently the module is in the inital stages of development, and I'm following
-the release early, release often paradigm. SIMBAD can currently be queried by
-co-ordinates and by identifier, alrhough not yet by bibcode. Only minimal
-information is mined, although URLs pointing to further, and more detailed,
-information are stored along with this data.
-
-More functionality should arrive soon.
+I'd like to point anyone interested in the Astro::SIMBAD module towards the 
+Astro::Catalog module, which does most of what Astro::SIMBAD does, and a
+whole lot more. It may be more suitable for your needs.
 
 Why do it?
 ----------
@@ -67,6 +63,10 @@ Authors
 This module was written by Alasdair Allan <aa@astro.ex.ac.uk>, of the 
 University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/) 
 as part of his work for the eSTAR project.
+
+As of release V2..0 the module includes patches written by Mark Echeverri
+<echever@ipac.caltech.edu> to support object-type queries in addition
+to "list"-type queries.
 
 License
 -------

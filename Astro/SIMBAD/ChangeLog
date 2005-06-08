@@ -1,4 +1,9 @@
+2005-06-08 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Released as version 2.0.0
+
 2005-05-19  Mark Echeverri <mechever@ipac.caltech.edu>
+
 	* Query/Query.pm: Added object query; refactored the module
 
 	* Result/Object/Object.pm: Added new fields for object query
