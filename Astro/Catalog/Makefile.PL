@@ -17,7 +17,6 @@ WriteMakefile(
                                      'Astro::Telescope'    => 0.50,
                                      'Astro::SLA'          => 0.96,
                                      'Time::Piece'         => 1.08,
-                                     'Math::Libm'          => 1.00,
                                      'SOAP::Lite'          => 0.00,
                                      'Test'                => 1.24,
                                      'Carp'                => 1.01,

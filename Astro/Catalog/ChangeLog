@@ -1,6 +1,8 @@
 2005-06-04  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.9.9)
 
         * Updated documentation and released as version 3.9.9
+        
+        * Quary/Query/Sesame.pm: Removed reference from Math::Libm
 
 2005-06-04  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
         

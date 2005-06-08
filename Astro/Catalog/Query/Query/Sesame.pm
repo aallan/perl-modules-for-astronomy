@@ -24,18 +24,18 @@ use base qw/ Astro::Catalog::Transport::WebService /;
 use vars qw/ $VERSION /;
 
 use Carp;
-use Math::Libm ':all';
+use POSIX qw(ceil);
 
 # generic catalog objects
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Sesame.pm,v 1.5 2003/09/30 11:48:25 aa Exp $
+$Id: Sesame.pm,v 1.6 2005/06/08 01:08:49 aa Exp $
 
 =head1 METHODS
 
@@ -234,7 +234,7 @@ sub _parse_query {
   my $sec = substr $min, $secdot+1, length($min);
   $min = substr $min, 0, $secdot;
   $sec = "0." . $sec;
-  $sec = Math::Libm::ceil($sec * 60.0);  
+  $sec = POSIX::ceil($sec * 60.0);  
   
   if ( $sec == 60 ) {
      $sec = 0;
@@ -265,7 +265,7 @@ sub _parse_query {
   $sec = substr $min, $secdot+1, length($min);
   $min = substr $min, 0, $secdot;
   $sec = "0." . $sec;
-  $sec = Math::Libm::ceil($sec * 60.0);  
+  $sec = POSIX::ceil($sec * 60.0);  
   
   if ( $sec == 60 ) {
      $sec = 0;
