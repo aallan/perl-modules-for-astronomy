@@ -1,8 +1,10 @@
 package Astro::Catalog::Star::Morphology;
 
+use Astro::Catalog::Item::Morphology;
+
 use base qw / Astro::Catalog::Item::Morphology /;
 use vars qw/ $VERSION /;
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 NAME
 

@@ -60,8 +60,10 @@ The package provides the following user level classes
   Astro::Catalog
     A generic catalogue object, includes pluggable I/O support.
   
-  Astro::Catalog::Star
+  Astro::Catalog::Item
     A generic catalogue item.
+    
+NB: Astro::Catalog::Star is maintained for backwards compatibility.    
 
 The following classes can be used to query various online databases
 for astronomical objects. They all return an Astro::Catalog object
@@ -119,6 +121,7 @@ query plugins, these are
   Astro::Catalog::Transport::REST
   Astro::Catalog::Transport::WebService
   Astro::Catalog::Query
+  Astro::Catalog::Item::Morphology
 
 The user level query classes inherit from the Astro::Catalog::Transport::XXX
 classes, which in turn all inherit basic functionality from the Query base

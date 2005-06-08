@@ -9,6 +9,10 @@ Star/Star.pm
 Star/Makefile.PL
 Star/Morphology/Makefile.PL
 Star/Morphology/Morphology.pm
+Item/Item.pm
+Item/Makefile.PL
+Item/Morphology/Makefile.PL
+Item/Morphology/Morphology.pm
 IO/ASCII.pm
 IO/Astrom.pm
 IO/Binary.pm

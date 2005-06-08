@@ -1,8 +1,10 @@
 package Astro::Catalog::Star;
 
+use Astro::Catalog::Item;
+
 use base qw / Astro::Catalog::Item /;
 use vars qw/ $VERSION /;
-'$Revision: 1.23 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.24 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 NAME
 

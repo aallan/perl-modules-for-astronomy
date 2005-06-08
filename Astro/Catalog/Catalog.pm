@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.52 2005/06/08 01:03:18 aa Exp $
+#     $Id: Catalog.pm,v 1.53 2005/06/08 03:00:35 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -44,7 +44,7 @@ Astro::Catalog - A generic API for stellar catalogues
 
 Stores generic meta-data about an astronomical catalogue. Takes a hash
 with an array refernce as an argument. The array should contain a list
-of Astro::Catalog::Star objects. Alternatively it takes a catalog
+of Astro::Catalog::Item objects. Alternatively it takes a catalog
 format and either the name of a catalogue file or a reference to a
 scalar, glob or array.
 
@@ -68,11 +68,11 @@ use warnings::register;
 use vars qw/ $VERSION $DEBUG /;
 
 use Astro::Coords;
-use Astro::Catalog::Star;
+use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.52 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.53 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.52 2005/06/08 01:03:18 aa Exp $
+$Id: Catalog.pm,v 1.53 2005/06/08 03:00:35 aa Exp $
 
 =head1 METHODS
 
@@ -347,7 +347,7 @@ version is unchanged).
 
    $star = $catalog->popstar();
 
-the method deletes the star and returns the deleted C<Astro::Catalog::Star>
+the method deletes the star and returns the deleted C<Astro::Catalog::Item>
 object.
 
 =cut
@@ -361,17 +361,17 @@ sub popstar {
 
 =item B<popstarbyid>
 
-Return C<Astro::Catalog::Star> objects that have the given ID. This forces
+Return C<Astro::Catalog::Item> objects that have the given ID. This forces
 a copy of the array if one has not already been made (ie the original
 version is unchanged).
 
   @stars = $catalog->popstarbyid( $id );
 
-The method deletes the stars and returns the deleted C<Astro::Catalog::Star>
+The method deletes the stars and returns the deleted C<Astro::Catalog::Item>
 objects. If no star exists with the given ID, the method returns empty list.
 
 If called in scalar context this method returns an array reference, and if
-called in list context returns an array of C<Astro::Catalog::Star> objects.
+called in list context returns an array of C<Astro::Catalog::Item> objects.
 
 This is effectively an inverse filter (see C<search_by_id> for complementary
 method).
@@ -421,7 +421,7 @@ sub allstars {
 
 =item B<stars>
 
-Return a list of all the C<Astro::Catalog::Star> objects that are currently
+Return a list of all the C<Astro::Catalog::Item> objects that are currently
 valid and in the current order. This method may well return different
 stars to the C<allstars> method depending on the current sort in scope.
 
@@ -461,7 +461,7 @@ sub stars {
 
 =item B<starbyindex>
 
-Return the C<Astro::Catalog::Star> object at index $index
+Return the C<Astro::Catalog::Item> object at index $index
 
    $star = $catalog->starbyindex( $index );
 
@@ -789,7 +789,7 @@ are:
           reference to array of lines or reference to glob (file handle).
           This key is used in preference to 'File' if both are present
 
-  Stars => Array of Astro::Catalog::Star objects. Supercedes all other options.
+  Stars => Array of Astro::Catalog::Item objects. Supercedes all other options.
   ReadOpt => Reference to hash of options to be forwarded onto the
              format specific catalogue reader. See the IO documentation
              for details.

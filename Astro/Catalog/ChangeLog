@@ -1,3 +1,9 @@
+2005-06-04  Alasdair Allan <aa@astro.ex.ac.uk> (Version 4.0.0)
+
+        * Removed Astro::Catalog::Star and Astro::Catalog::Star::Morphology
+	  and replaces with corresponding Item classes. The Star classes are
+	  retained as empty-subclasses for backwards compatibility.
+
 2005-06-04  Alasdair Allan <aa@astro.ex.ac.uk> (Version 3.9.9)
 
         * Updated documentation and released as version 3.9.9
