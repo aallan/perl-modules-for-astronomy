@@ -14,6 +14,11 @@ use Data::Dumper;
 require_ok("Astro::Catalog");
 require_ok("Astro::Catalog::Star");
 
+if( $@ ) {
+  exit "Fatal Error: $@\n";
+}  
+
+
 # Do a private require so that we can skip the tests if VOTable is missing
 eval {
   require Astro::VO::VOTable;
