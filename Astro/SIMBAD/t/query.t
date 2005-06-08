@@ -48,7 +48,7 @@ my $multi_result = $multi_query->querydb();
 print "# Continuing Tests\n"; 
 
 my @multi_list = $multi_result->listofobjects();
-ok( "@multi_list", "3C 273C [CME2001] 3C 273 1 [VV96] J122906.7+020308");
+ok( "@multi_list", "3C 273C 4C 02.32 NVSS J122906+020305 [CME2001] 3C 273 1 [SHS2001] QSO J1229+0203 abs 0.00338 [SHS2001] QSO J1229+0203 abs 0.00530 [SHS2001] QSO J1229+0203 abs 0.02947 [SHS2001] QSO J1229+0203 abs 0.04898 [SHS2001] QSO J1229+0203 abs 0.06655 [SHS2001] QSO J1229+0203 abs 0.09012 [SHS2001] QSO J1229+0203 abs 0.12007 [SHS2001] QSO J1229+0203 abs 0.14660" );
                                              
 # Time at the bar...
 
