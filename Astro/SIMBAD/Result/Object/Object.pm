@@ -19,7 +19,7 @@ package Astro::SIMBAD::Result::Object;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Object.pm,v 1.2 2001/11/28 01:06:10 aa Exp $
+#     $Id: Object.pm,v 1.3 2005/06/08 01:38:17 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -55,13 +55,13 @@ Astro::SIMBAD::Result object returned by an Astro::SIMBAD::Query object.
 use strict;
 use vars qw/ $VERSION /;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Object.pm,v 1.2 2001/11/28 01:06:10 aa Exp $
+$Id: Object.pm,v 1.3 2005/06/08 01:38:17 aa Exp $
 
 =head1 METHODS
 
@@ -85,13 +85,22 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { NAME    => undef,
+		      TARGET  => undef,
                       TYPE    => undef,
                       LONG    => undef,
                       FRAME   => [],
                       RA      => undef,
                       DEC     => undef,
                       SPEC    => undef,
-                      URL     => undef }, $class;
+                      URL     => undef,
+		      BMAG    => undef,
+		      VMAG    => undef,
+		      IDENT   => [],
+		      PM      => [],
+		      PLX     => undef,
+		      RADIAL  => undef,
+		      REDSHIFT=> undef,
+		  }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -115,6 +124,8 @@ Return (or set) the name of the object
    $name = $object->name();
    $object->name( $name );
 
+Query types:  list, object
+
 =cut
 
 sub name {
@@ -125,12 +136,37 @@ sub name {
   return $self->{NAME};
 }
 
+=item B<target>
+
+Return (or set) the target name of the object. Available whenever a target is
+specified in the query. The returned value is identical to the query parameter,
+except that it is normalized (spaces replaced with '+' characters).
+This is useful because name() may return a different designation than the
+target that is supplied as a query parameter.
+
+   $target = $object->target();
+   $object->target( $target );
+
+Query types:  list, object
+
+=cut
+
+sub target {
+  my $self = shift;
+  if (@_) {
+    $self->{TARGET} = shift;
+  }
+  return $self->{TARGET};
+}
+
 =item B<type>
 
 Return (or set) the (short) type of the object
 
    $type = $object->type();
    $object->type( $type );
+
+Query types:  list
 
 =cut
 
@@ -149,6 +185,8 @@ Return (or set) the (long) type of the object
    $long_type = $object->long();
    $object->long( $long_type );
 
+Query types:  list, object
+
 =cut
 
 sub long {
@@ -164,11 +202,13 @@ sub long {
 Return (or set) the system the R.A. and DEC stored in the object are
 defined in, e.g. Co-ordinate Frame FK5, Epoch 1950 and Equinox 2000
 
-   @system = $object->system();
-   $object->system( \@system );
+   @system = $object->frame();
+   $object->frame( \@system );
 
 where @system would be [ "FK5", 1950.0, 2000.0 ]. If called in a scalar
 context will return a string of the form "FK5 1950/2000" to
+
+Query types:  list, object
 
 =cut
 
@@ -194,6 +234,8 @@ Return (or set) the R.A. of the object
    $ra = $object->ra();
    $object->ra( $ra );
 
+Query types:  list, object
+
 =cut
 
 sub ra {
@@ -211,6 +253,8 @@ Return (or set) the Declination of the object
    $dec = $object->dec();
    $object->dec( $dec );
 
+Query types:  list, object
+
 =cut
 
 sub dec {
@@ -227,6 +271,8 @@ Return (or set) the Spectral Type of the object
 
    $spec_type = $object->spec();
    $object->spec( $spec_type );
+
+Query types:  list, object
 
 =cut
 
@@ -254,6 +300,140 @@ sub url {
     $self->{URL} = shift;
   }
   return $self->{URL};
+}
+
+=item B<bmag>
+
+Return (or set) the B-magnitude of the object
+
+   $bmag = $object->bmag();
+   $object->bmag( $bmag );
+
+Query types:  list, object
+
+=cut
+
+sub bmag {
+  my $self = shift;
+  if (@_) {
+    $self->{BMAG} = shift;
+  }
+  return $self->{BMAG};
+}
+
+=item B<vmag>
+
+Return (or set) the V-magnitude of the object
+
+   $vmag = $object->vmag();
+   $object->vmag( $vmag );
+
+Query types:  list, object
+
+=cut
+
+sub vmag {
+  my $self = shift;
+  if (@_) {
+    $self->{VMAG} = shift;
+  }
+  return $self->{VMAG};
+}
+
+=item B<ident>
+
+Return (or append) the array of object identifiers
+
+   @ident = $object->ident();
+   $object->ident( @ident );
+
+Query types:  object
+
+=cut
+
+sub ident {
+  my $self = shift;
+  if (@_) {
+    my $idarray = shift;
+    @{$self->{IDENT}} = @{$idarray};
+  }
+  return $self->{IDENT};
+}
+
+=item B<pm>
+
+Return (or set) the proper motion of the object in mas/year
+
+   @pm = $object->pm();
+   $object->pm( @pm );
+
+Query types:  object
+
+=cut
+
+sub pm {
+  my $self = shift;
+  if (@_) {
+    push @{$self->{PM}}, @_[0..1];
+  }
+  return $self->{PM};
+}
+
+=item B<plx>
+
+Return (or set) the parallax of the object
+
+   $plx = $object->plx();
+   $object->plx( $plx );
+
+Query types:  object
+
+=cut
+
+sub plx {
+  my $self = shift;
+  if (@_) {
+    $self->{PLX} = shift;
+  }
+  return $self->{PLX};
+}
+
+=item B<radial>
+
+Return (or set) the radial velocity (km/s) of the object
+
+   $radial = $object->radial();
+   $object->radial( $radial );
+
+Query types:  object
+
+=cut
+
+sub radial {
+  my $self = shift;
+  if (@_) {
+    $self->{RADIAL} = shift;
+  }
+  return $self->{RADIAL};
+}
+
+=item B<redshift>
+
+Return (or set) the redshift of the object
+
+   $redshift = $object->redshift();
+   $object->redshift( $redshift );
+
+Query types:  object
+
+=cut
+
+sub redshift {
+  my $self = shift;
+  if (@_) {
+    $self->{REDSHIFT} = shift;
+  }
+  return $self->{REDSHIFT};
 }
 
 # C O N F I G U R E -------------------------------------------------------

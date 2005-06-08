@@ -19,7 +19,7 @@ package Astro::SIMBAD::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.13 2002/05/30 16:53:10 aa Exp $
+#     $Id: Query.pm,v 1.14 2005/06/08 01:38:17 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -55,7 +55,13 @@ Astro::SIMBAD::Query - Object definining an prospective SIMBAD query.
 Stores information about an prospective SIMBAD query and allows the query to
 be made, returning an Astro::SIMBAD::Result object. Minimum information needed
 for a sucessful query is an R.A. and Dec. or an object Target speccification,
-other variables will be defaulted. 
+other variables will be defaulted.
+
+The Query object supports two types of queries:  "list" (summary)
+and "object" (detailed).  The list query usually returns multiple results;
+the object query is expected to obtain only one result, but returns extra
+data about that target.  An object query is performed if the target name
+is specified and the Error radius is 0; otherwise, a list query is done.
 
 The object will by default pick up the proxy information from the HTTP_PROXY 
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
@@ -71,17 +77,25 @@ use vars qw/ $VERSION /;
 use LWP::UserAgent;
 use Net::Domain qw(hostname hostdomain);
 use Carp;
+use HTML::TreeBuilder;
+use HTML::Entities;
 
 use Astro::SIMBAD::Result;
 use Astro::SIMBAD::Result::Object;
 
-'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+
+sub trim {
+  my $s = shift;
+  $s =~ s/(^\s+)|(\s+$)//g;
+  return $s;
+}
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Query.pm,v 1.13 2002/05/30 16:53:10 aa Exp $
+$Id: Query.pm,v 1.14 2005/06/08 01:38:17 aa Exp $
 
 =head1 METHODS
 
@@ -361,6 +375,9 @@ sub target {
     # mutilate it and stuff it into ${$self->{OPTIONS}}{"Ident"} 
     $ident =~ s/\s/\+/g;
     ${$self->{OPTIONS}}{"Ident"} = $ident;
+
+    # refigure object/list search type
+    $self->_update_nbident();
   }
   
   return ${$self->{OPTIONS}}{"Ident"};
@@ -382,7 +399,12 @@ sub error {
   my $self = shift;
 
   if (@_) { 
+    # If searching with a nonzero radius, do a list query.
+    # If radius is zero, get a detailed object query.
     ${$self->{OPTIONS}}{"Radius"} = shift;
+
+    # refigure object/list search type
+    $self->_update_nbident();
   }
   
   return ${$self->{OPTIONS}}{"Radius"};
@@ -414,6 +436,23 @@ sub units {
   
   return ${$self->{OPTIONS}}{"Radius.unit"};
 
+}
+
+=item B<use_list_query>
+
+When searching by coordinates, or if the radius is nonzero, we perform a
+"list query" that is expected to return multiple results.  However, if
+searching for a target by name, and the error radius is zero, it is pretty
+clear that we want a specific target.  In that case, we use a more detailed
+"object query."
+
+This method returns true if the criteria are such that we will use a list
+query and false if it is an object query.
+
+=cut
+sub use_list_query {
+  my $self = shift;
+  return ((${$self->{OPTIONS}}{"Ident"} =~ m/^(\d{1,3}\+){2}/) || (${$self->{OPTIONS}}{"Radius"} > 0));
 }
 
 =item B<Frame>
@@ -484,6 +523,30 @@ sub equinox {
   
   return ${$self->{OPTIONS}}{"CooEqui"};
 
+}
+
+=item B<Queryurl>
+
+Returns the URL used to query the Simbad database
+
+=cut
+
+sub queryurl {
+   my $self = shift;
+
+   # grab the base URL
+   my $URL = $self->{QUERY};
+   my $options = "";
+
+   # loop round all the options keys and build the query
+   foreach my $key ( keys %{$self->{OPTIONS}} ) {
+      $options = $options . "&$key=${$self->{OPTIONS}}{$key}";
+   }
+
+   # build final query URL
+   $URL = $URL . $options;
+   
+   return $URL;
 }
 
 # C O N F I G U R E -------------------------------------------------------
@@ -703,7 +766,7 @@ sub configure {
   ${$self->{LOOKUP}}{"OVV"}  =     "Optically Violently Variable object";
   ${$self->{LOOKUP}}{"QSO"}  =     "Quasar";
 
-  # CONFIGURE FROM ARGUEMENTS
+  # CONFIGURE FROM ARGUMENTS
   # -------------------------
 
   # return unless we have arguments
@@ -753,16 +816,7 @@ sub _make_query {
    $self->{BUFFER} = "";
 
    # grab the base URL
-   my $URL = $self->{QUERY};
-   my $options = "";
-
-   # loop round all the options keys and build the query
-   foreach my $key ( keys %{$self->{OPTIONS}} ) {
-      $options = $options . "&$key=${$self->{OPTIONS}}{$key}";
-   }
-
-   # build final query URL
-   $URL = $URL . $options;
+   my $URL = $self->queryurl();
    
    # build request
    my $request = new HTTP::Request('GET', $URL);
@@ -789,109 +843,276 @@ parse the results.
 
 sub _parse_query {
   my $self = shift;
+  my $tree = HTML::TreeBuilder->new_from_content($self->{BUFFER});
+  $tree->elementify();
+  my $result;
+  if ($self->use_list_query()) {
+      $result = $self->_parse_list_query($tree);
+  } else {
+      $result = $self->_parse_object_query($tree);
+  }
+  $tree->delete(); # yes, this is necessary
+  return $result;
+}
 
-  my $number = 0;   # number of objects found in error circle
-  my @target;       # raw HTML lines, one per object
-  
-  # get a local copy of the current BUFFER
-  my @buffer = split( /\n/,$self->{BUFFER});
-  chomp @buffer;
+=item B<_parse_list_query>
+
+Private method to parse the results of a list query.  Should not be called
+directly. Instead use the querydb() assessor method to make and parse the
+results.
+
+=cut
+
+sub _parse_list_query {
+  my $self = shift;
+  my $tree = shift;
+
+  my $pretag = $tree->find_by_tag_name('pre'); # find the <pre> element
+  my $idtext = decode_entities($pretag->as_HTML());
+  chomp($idtext);
+
+  my @buffer = split( /\n/, $idtext);
 
   # create an Astro::SIMBAD::Result object to hold the search results
   my $result = new Astro::SIMBAD::Result();
 
-  # loop round the returned buffer 
-  my ( $line );
-  foreach $line ( 0 ... $#buffer ) {
+  # loop round the returned buffer
+  foreach my $linepos (2 .. $#buffer-1) {
+      my $starline = $buffer[$linepos];
 
-     # NUMBER OF OBJECTS FOUND IN ERROR CIRCLE
-     if( lc($buffer[$line]) =~ "objects: </b><pre>" ) {
-        $_ = lc($buffer[$line]);
-        ( $number ) = /^<b>(\d*)\s+/;
-    
-        # GRAB EACH OBJECT
-        foreach my $i ( $line+2 ... $line+$number+1 ) {
-           push ( @target, $buffer[$i] );
-        }
-        
-        # DROP OUT OF FIRST LOOP
-        $line = $#buffer;
-     }  
-  }
-   
-  # ...and stuff the contents into Object objects
-  my ( $star );
-  foreach $star ( 0 ... $#target ) {
+      # create a temporary place holder object
+      my $object = new Astro::SIMBAD::Result::Object();  
      
-     # create a temporary place holder object
-     my $object = new Astro::SIMBAD::Result::Object();  
+      # split each line using the "pipe" symbol separating the table columns
+      my @separated = split( /\|/, $starline );
      
-     # split each line using the "pipe" symbol sepearating the table columns
-     my @separated = split( /\|/, $target[$star] );
+
+      $self->_insert_query_params($object);
      
-     # FRAME
-     # -----
-     
-     # grab the current co-ordinate frame from the query object itself
-     my @coord_frame = ( ${$self->{OPTIONS}}{"CooFrame"},
-                         ${$self->{OPTIONS}}{"CooEpoch"},
-                         ${$self->{OPTIONS}}{"CooEqui"} );
-     # push it into the object
-     $object->frame( \@coord_frame );
-     
-     # URL
-     # ---
+      # URL
+      # ---
  
-     # grab the url based on quotes around the string
-     my $start_index = index( $separated[0], q/"/ );
-     my $last_index = rindex( $separated[0], q/"/ );
-     my $url = substr( $separated[0], $start_index+1, 
-                       $last_index-$start_index-1);
+      # grab the url based on quotes around the string
+      my $start_index = index( $separated[0], q/"/ );
+      my $last_index = rindex( $separated[0], q/"/ );
+      my $url = substr( $separated[0], $start_index+1, 
+			$last_index-$start_index-1);
 
-     # push it into the object
-     $object->url( $url );
+      # push it into the object
+      $object->url( $url );
      
-     # NAME
-     # ----
+      # NAME
+      # ----
      
-     # get the object name from the same section
-     my $final_index = rindex( $separated[0], "A" );
-     my $name = substr($separated[0],$last_index+2,$final_index-$last_index-4);
+      # get the object name from the same section
+      my $final_index = rindex( $separated[0], "<" ) - 1;
+      my $name = substr($separated[0],$last_index+2,$final_index-$last_index-1);
      
-     # push it into the object
-     $object->name( $name );
+      # push it into the object
+      $object->name( $name );
     
-     # TYPE
-     # ----
-     my $type = $separated[1];
+      # TYPE
+      # ----
+      my $type = trim($separated[1]);
+      
+      # push it into the object
+      $object->type( $type );
+      
+      # LONG TYPE
+      # ---------
      
-     # dump leading spaces
-     $type =~ s/^\s+//g;
-     
-     # push it into the object
-     $object->type( $type );
-     
-     # LONG TYPE
-     # ---------
-     
-     # do the lookup
-     for my $key (keys %{$self->{LOOKUP}}) {
+      # do the lookup
+      for my $key (keys %{$self->{LOOKUP}}) {
         
-        if( $object->type() eq $key ) {
+	  if( $object->type() eq $key ) {
         
-           # push it into the object
-           my $long = ${$self->{LOOKUP}}{$key};
-           $object->long( $long );
-           last;
-        }
-     }     
+	      # push it into the object
+	      my $long = ${$self->{LOOKUP}}{$key};
+	      $object->long( $long );
+	      last;
+	  }
+      }     
      
+      # RA and DEC
+      my ($ra, $dec) = $self->_coordinates($separated[2]);
+      $object->ra($ra);
+      $object->dec($dec);
+      
+      # B, V magnitudes; field may contain none, one or both
+      my ($bmag, $vmag) = split /\s+/, trim($separated[3]);
+      if ($bmag && $bmag ne ":") {
+	  $object->bmag($bmag);
+      }
+      $object->vmag($vmag);
+    
+      # SPECTRAL TYPE
+      # -------------
+      my $spectral = trim($separated[4]);
+      
+      # push it into the object
+      $object->spec($spectral);
+      
+      # Add the target object to the Astro::SIMBAD::Result object
+      # ---------------------------------------------------------
+      $result->addobject( $object );
+  }
+  
+  # return an Astro::SIMBAD::Result object, or undef if no abstracts returned
+  return $result;
+}
+
+=item B<_parse_object_query>
+
+Private method to parse the results of an object query.  Should not be called
+directly. Instead use the querydb() assessor method to make and parse the
+results.
+
+=cut
+
+sub _parse_object_query {
+  my $self = shift;
+  my $tree = shift;
+
+  my $result = new Astro::SIMBAD::Result();
+  my $object = new Astro::SIMBAD::Result::Object();
+
+  # The object's detail URL is the query URL
+  $object->url($self->queryurl());
+
+  # Find the <a> tag named lab_basic1
+  my $basic_anchor = $tree->look_down("_tag", "a", sub { $_[0]->attr("name") eq "lab_basic1"} );
+
+  # Under lab_basic1, find the table cell containing name and long description
+  my $objtitle = $basic_anchor->look_down("_tag", "td", sub { $_[0]->as_text() =~ /^Basic data :/ })->as_text();
+  my ($label, $name, $long) = split /:|--/, $objtitle;
+  $object->name($name);
+  $object->long($long);
+
+  # "Basic data" table
+  my $bdtable = $basic_anchor->look_down("_tag", "table", sub { $_[0]->attr("cols") eq "3" });
+
+  # Grab the left-hand column of table cells
+  my @bdlabels = $bdtable->look_down("_tag", "td", sub { $_[0]->right() });
+
+  my %basic_data = {};
+  foreach my $bdlabel (@bdlabels) {
+      my $key = trim($bdlabel->as_text());
+      my $value = trim($bdlabel->right()->as_text());
+      $basic_data{$key} = $value;
+  }
+
+  $self->_insert_query_params($object);
+
+  # Set RA and DEC
+  my @coord_types = ( ["ICRS", 2000, 2000, "ICRS 2000.0 coordinates"],
+		      ["FK5", 2000, 2000, "FK5 2000.0/2000.0 coordinates"],
+		      ["FK4", 1950, 1950, "FK4 1950.0/1950.0 coordinates"],
+		      );
+  foreach my $row (@coord_types) {
+      if (join('*', @{$row}[0..2]) eq join('*', $object->frame())) {
+	  $label = @{$row}[3];
+	  my $coord_string = $basic_data{$label};
+	  my ($ra, $dec) = $self->_coordinates($coord_string);
+	  $object->ra($ra);
+	  $object->dec($dec);
+	  last;
+      }
+  }
+
+  # Spectral type
+  $object->spec($basic_data{"Spectral type"});
+
+  # B, V magnitudes
+  my ($bmag, $vmag) = split ',', $basic_data{"B magn, V magn, Peculiarities"};
+  $object->bmag($bmag);
+  $object->vmag($vmag);
+
+  # Proper motion
+  if ((my $pm = $basic_data{"Proper motion (mas/yr) [error ellipse]"})) {
+    $object->pm(split /\s+/, $pm);
+  }
+
+  # Parallax
+  if ((my $plx = $basic_data{"Parallaxes (mas)"})) {
+    $object->plx(split /\s+/, $plx);
+  }
+
+  # Radial velocity/redshift
+  if ((my $rvterm = $basic_data{"Radial velocity (v:Km/s) or Redshift (z)"})) {
+    my ($type, $mag) = split /\s+/, $rvterm;
+    if ($type eq "v") {
+      $object->radial($mag);
+    } elsif ($type eq "z") {
+      $object->redshift($mag);
+    }
+  }
+
+  # Build an array of designations for this object
+  my @idents;
+  # Find the <pre> block under the 'lab_ident1' anchor
+  my $iptag = $tree->look_down("_tag", "a", sub { $_[0]->attr("name") eq "lab_ident1"} )->find('pre');
+  foreach my $idref ($iptag->find("a")) {
+    push @idents, trim($idref->as_text());
+    $idref = $idref->right();
+  }
+  $object->ident(\@idents);
+
+  $result->addobject( $object );
+  return $result;
+}
+
+=item B<_insert_query_params>
+
+Copies frame, epoch and equinox and target from the query params into
+the result object.
+
+=cut
+sub _insert_query_params {
+  my $self = shift;
+  my $object = shift;
+
+  # FRAME
+  # -----
+     
+  # grab the current co-ordinate frame from the query object itself
+  my @coord_frame = ( ${$self->{OPTIONS}}{"CooFrame"},
+		      ${$self->{OPTIONS}}{"CooEpoch"},
+		      ${$self->{OPTIONS}}{"CooEqui"} );
+  # push it into the object
+  $object->frame( \@coord_frame );
+
+  # TARGET
+  $object->target($self->target());
+}
+
+=item B<_update_nbident>
+
+If the search is for a specific object and the radius is 0, do a detailed
+(i.e., object) query, rather than a more general list (summary) query
+that is expected to return multiple results.
+
+=cut
+sub _update_nbident {
+  my $self = shift;
+  if ($self->use_list_query()) {
+    ${$self->{OPTIONS}}{"NbIdent"} = "around";
+  } else {
+    ${$self->{OPTIONS}}{"NbIdent"} = "1";
+  }
+}
+
+=item B<_coordinates>
+
+Private function used to split a coordinate line into RA and DEC values
+
+=cut
+sub _coordinates {
+     my $self = shift;
+
      # RA
      # --
      
-     # remove leading spaces
-     my $coords = $separated[2];
-     $coords =~ s/^\s+//g;
+     my $coords = trim(shift);
      
      # split the RA and Dec line into an array elements
      my @radec = split( /\s+/, $coords );
@@ -904,8 +1125,6 @@ sub _parse_query {
        $ra = "$radec[0] $radec[1] 00.0";
      }
       
-     # push it into the object
-     $object->ra($ra);
      
      # DEC
      # ---
@@ -917,29 +1136,8 @@ sub _parse_query {
      } else {
        $dec = "$radec[2] $radec[3] 00.0";
      }
-       
-     # push it into the object
-     $object->dec($dec);
-    
-     # SPECTRAL TYPE
-     # -------------
-     my $spectral = $separated[4];
-     
-     # remove leading and trailing spaces
-     $spectral =~ s/^\s+//g;
-     $spectral =~ s/\s+$//g;
-      
-     # push it into the object
-     $object->spec($spectral);
-     
-     # Add the target object to the Astro::SIMBAD::Result object
-     # ---------------------------------------------------------
-     $result->addobject( $object );
-  }
-  
-  # return an Astro::SIMBAD::Result object, or undef if no abstracts returned
-  return $result;
 
+     return ($ra, $dec);
 }
 
 =item B<_dump_raw>
