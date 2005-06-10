@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+GPL
+ChangeLog
+Quality.pm
+t/1_compile.pm
+t/2_quality.pm
