@@ -1,4 +1,4 @@
-package Astro::Quality;
+package Misc::Quality;
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ use warnings;
 use warnings::register;
 use Carp;
 
-# CVS version $Id: Quality.pm,v 1.1 2005/06/10 00:49:07 aa Exp $
+# CVS version $Id: Quality.pm,v 1.2 2005/06/10 00:50:04 aa Exp $
 our $VERSION = '0.01';
 
 sub new {
