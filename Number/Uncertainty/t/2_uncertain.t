@@ -1,7 +1,7 @@
 #!perl
 
 # Number::Uncertainty test harness
-use Test::More tests => 92;
+use Test::More tests => 94;
 
 use strict;
 use warnings;
@@ -162,6 +162,11 @@ is( $obj7->max(),5, "Maximum value of \$obj7" );
 				 			 
 is( $obj7 == $obj1,1, "\$obj7 equal to \$obj1" );
 
+
+# multiply
+my $mult;
+ok( $mult = $obj1*$obj2 );
+isa_ok( $mult, "Number::Uncertainty" );
 
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 

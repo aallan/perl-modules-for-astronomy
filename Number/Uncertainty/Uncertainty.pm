@@ -43,16 +43,17 @@ use overload '""' => 'stringify',
              '==' => 'equal',
              'eq' => 'equal',
              '!=' => 'notequal',
-             'ne' => 'notequal';
+             'ne' => 'notequal',
+	     '*'  => 'multiply';
 
 use vars qw/ $VERSION /;
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Uncertainty.pm,v 1.1 2005/06/13 20:20:52 aa Exp $
+$Id: Uncertainty.pm,v 1.2 2005/06/14 04:14:27 aa Exp $
 
 =head1 METHODS
 
@@ -503,6 +504,29 @@ sub notequal {
 
 }
 
+
+=item B<*>
+
+When the object is multiplied.
+
+=cut
+
+sub multiply {
+  my $self = shift;
+  my $other = shift;
+  
+  my $value = $self->value() * $other->value();
+  if( defined $self->bound() || defined $other->bound() ) {
+    return new Number::Uncertainty( Value => $value );
+  }
+  
+  if( defined $self->error() && defined $other->error() ) {
+    my $error = sqrt ( $self->error()*$self->error() +
+                       $other->error()*$other->error() );  
+    return new Number::Uncertainty( Value => $value, Error => $error );
+  }
+
+}
 
 =back 
 

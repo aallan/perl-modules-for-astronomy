@@ -1,4 +1,7 @@
+2005-06-13  Alasdair Allan <aa@astro.ex.ac.uk>
 
+        * Added muliplication overloading
+	
 2005-06-10  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Original version.
