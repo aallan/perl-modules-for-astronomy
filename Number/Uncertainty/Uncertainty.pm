@@ -47,13 +47,13 @@ use overload '""' => 'stringify',
 	     '*'  => 'multiply';
 
 use vars qw/ $VERSION /;
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Uncertainty.pm,v 1.2 2005/06/14 04:14:27 aa Exp $
+$Id: Uncertainty.pm,v 1.3 2005/06/14 04:18:58 aa Exp $
 
 =head1 METHODS
 
@@ -515,6 +515,17 @@ sub multiply {
   my $self = shift;
   my $other = shift;
   
+  if ( !UNIVERSAL::isa( $other, "Number::Uncertainty" ) ) {
+     if( defined $self->error()  ) {
+        my $value = $self->value()*$other;
+        my $error = $self->error();
+        return  new Number::Uncertainty( Value => $value, Error => $error );
+     } else {
+        my $value = $self->value()*$other;
+        return  new Number::Uncertainty( Value => $value );
+     }
+  }
+     
   my $value = $self->value() * $other->value();
   if( defined $self->bound() || defined $other->bound() ) {
     return new Number::Uncertainty( Value => $value );
