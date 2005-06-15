@@ -1,4 +1,17 @@
-2005-06-04  Alasdair Allan <aa@astro.ex.ac.uk> (Version 4.0.0)
+2005-06-15 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Basic fixes to Catalog.pm and IO/Cluster.pm to support the new
+	  changes. Hopefully this will provide a springboard so I can fix
+	  the rest of the IO and Query modules. This is a big job...
+
+2005-06-12 Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * Series of changes breaking backwards compatibility in Item.pm to
+	  support the new Astro::Fluxes objects and Number::Uncertainty for
+	  magnitude and colour support. These changes break all other classes
+	  in the package.
+
+2005-06-04  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Removed Astro::Catalog::Star and Astro::Catalog::Star::Morphology
 	  and replaces with corresponding Item classes. The Star classes are

@@ -32,18 +32,24 @@ use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
 
+use Astro::FluxColor;
+use Astro::Flux;
+use Astro::Fluxes;
+
+use Number::Uncertainty;
+
 use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.13 2005/03/31 01:24:53 cavanagh Exp $
+$Id: Cluster.pm,v 1.14 2005/06/15 03:24:49 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -89,7 +95,7 @@ sub _read_catalog {
       #}
 
       # temporary star object
-      my $star = new Astro::Catalog::Star();
+      my $star = new Astro::Catalog::Item();
 
       # field
       $star->field( $separated[0] );
@@ -122,31 +128,37 @@ sub _read_catalog {
       my @colours = split( /\s+/, $lines[1] );
 
       my @quality;
+      my ( @colors, @fluxes );
       foreach my $j ( 0 .. $#colours ) {
 
          # colours have minus signs
          if( lc($colours[$j]) =~ "-" ) {
 
-            # colours
-            my %colours = ( $colours[$j] => $separated[3*$j+10] );
-            $star->colours( \%colours );
-
-            # errors
-            my %col_errors = ( $colours[$j] => $separated[3*$j+11] );
-            $star->colerr( \%col_errors );
+            # build a colour object and push it into the @colors array
+	    my @filters = split "-", $colours[$j];
+            my $color = new Astro::FluxColor( 
+              upper => new Astro::WaveBand( Filter => $filters[0] ),
+              lower => new Astro::WaveBand( Filter => $filters[1] ),
+	      quantity => new Number::Uncertainty( 
+	                   Value => $separated[3*$j+10],
+			   Error => $separated[3*$j+11] ) );
+	    push @colors, $color;
 
             # quality flags
             $quality[$j] = $separated[3*$j+12];
+	    
 
          } else {
 
-            # mags
-            my %magnitudes = ( $colours[$j] => $separated[3*$j+10] );
-            $star->magnitudes( \%magnitudes );
 
-            # errors
-            my %mag_errors = ( $colours[$j] => $separated[3*$j+11] );
-            $star->magerr( \%mag_errors );
+            
+	    my $mag = new Astro::Flux( 
+	                   new Number::Uncertainty( 
+	                   Value => $separated[3*$j+10],
+			   Error => $separated[3*$j+11] ),
+			   'mag', $colours[$j] );
+	    push @fluxes, $mag;
+
 
             # quality flags
             $quality[$j] = $separated[3*$j+12];
@@ -157,6 +169,8 @@ sub _read_catalog {
          }
 
       }
+      
+      $star->fluxes( new Astro::Fluxes( @fluxes, @colors ) );
 
       # set default "good" quality
       $star->quality( 0 );

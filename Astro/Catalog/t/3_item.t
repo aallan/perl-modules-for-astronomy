@@ -15,19 +15,28 @@ use Data::Dumper;
 # T E S T   H A R N E S S --------------------------------------------------
 
 # magnitude and colour hashes
-my %mags = ( R => '16.1', B => '16.4', V => '16.3' );
-my %mag_error = ( R => '0.1', B => '0.4', V => '0.3' );
-my %colours = ( 'B-V' => '0.1', 'B-R' => '0.3' );
-my %col_error = ( 'B-V' => '0.02', 'B-R' => '0.05' );
-
+my $flux1 = new Astro::Flux( new Number::Uncertainty ( Value => 16.1,
+                                                       Error => 0.1 ),  
+			     'mag', 'R' );
+my $flux2 = new Astro::Flux( new Number::Uncertainty ( Value => 16.4,
+                                                       Error => 0.4 ),  
+			     'mag', 'B' );
+my $flux3 = new Astro::Flux( new Number::Uncertainty ( Value => 16.3,
+                                                       Error => 0.3 ),  
+			     'mag', 'V' );
+my $col1 = new Astro::FluxColor( upper => 'B', lower => 'V',
+                     quantity => new Number::Uncertainty ( Value => 0.1,
+                                                           Error => 0.02 ) );  			     
+my $col2 = new Astro::FluxColor( upper => 'B', lower => 'R',
+                     quantity => new Number::Uncertainty ( Value => 0.3,
+                                                           Error => 0.05 ) );
+my $fluxes = new Astro::Fluxes( $flux1, $flux2, $flux3, $col1, $col2 );	
+						    
 # create a star
 my $star = new Astro::Catalog::Item( ID         => 'U1500_01194794',
                                      RA         => '17.55398',
                                      Dec        => '60.07673',
-                                     Magnitudes => \%mags,
-                                     MagErr     => \%mag_error,
-                                     Colours    => \%colours,
-                                     ColErr     => \%col_error,
+                                     Fluxes     => $fluxes,
                                      Quality    => '0',
                                      GSC        => 'FALSE',
                                      Distance   => '0.09',
@@ -36,14 +45,11 @@ my $star = new Astro::Catalog::Item( ID         => 'U1500_01194794',
 
 isa_ok($star,"Astro::Catalog::Item");
 
-# FILTERS AND MAGNITUDES
-# ----------------------
+# FILTERS
+# -------
 
 # grab input filters
-my @input;
-for my $key ( sort keys %mags ) {
-   push ( @input, $key );
-}
+my @input = ( 'R', 'B', 'V' );
 
 # grab used filters
 my @filters = $star->what_filters();
@@ -55,33 +61,34 @@ print "# output = @filters\n";
 # compare input and returned filters
 for my $i (0 .. $#filters) {
  is( $filters[$i], $input[$i], "compare filter name" );
- is( $star->get_magnitude($filters[$i]), $mags{$filters[$i]},
-   "compare filter mag");
- is( $star->get_errors($filters[$i]), $mag_error{$filters[$i]},
-   "compare filter magerror");
 }
+is( $star->get_magnitude( 'B' ), 16.4, 'B magnitude' );
+is( $star->get_magnitude( 'R' ), 16.1, 'R magnitude' );
+is( $star->get_magnitude( 'V' ), 16.3, 'V magnitude' );
+is( $star->get_errors( 'B' ), 0.4, 'B error' );
+is( $star->get_errors( 'R' ), 0.1, 'R error' );
+is( $star->get_errors( 'V' ), 0.3, 'V error' );
 
-# grab input colours
-my @cols;
-for my $key ( sort keys %colours ) {
-   push ( @cols, $key );
-}
+# COLOURS
+# -------
 
-# grab used filters
-my @cols2 = $star->what_colours();
+@input = ( "B-V", "B-R" );
+
+my @colours = $star->what_colours();
 
 # report to user
-print "# input  = @cols\n";
-print "# output = @cols2\n";
+print "# input  = @input\n";
+print "# output = @colours\n";
 
 # compare input and returned filters
-for my $i (0 .. $#cols2) {
- is( $cols[$i], $cols2[$i], "compare colours names" );
- is( $star->get_colour($cols2[$i]), $colours{$cols2[$i]}, 
-     "compare colour values" );
- is( $star->get_colourerr($cols2[$i]), $col_error{$cols2[$i]},
-     "compare colour error");
+for my $i (0 .. $#colours) {
+ is( $colours[$i], $input[$i], "compare colour names" );
 }
+is( $star->get_colour('B-V'), 0.1 , "compare B-V colour values" );
+is( $star->get_colour('B-R'), 0.3 , "compare B-V colour values" );
+is( $star->get_colourerr('B-V'), 0.02, "compare B-V colour error values" );
+is( $star->get_colourerr('B-R'), 0.05, "compare B-V colour error values" );
+
 
 # T I M E   A T   T H E   B A R ---------------------------------------------
 exit;                                     

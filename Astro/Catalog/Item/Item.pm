@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.1 2005/06/08 03:01:59 aa Exp $
+#     $Id: Item.pm,v 1.2 2005/06/15 03:24:49 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -34,27 +34,25 @@ Astro::Catalog::Item - A generic star object in a stellar catalogue.
 
 =head1 SYNOPSIS
 
-  $star = new Astro::Catalog::Item( ID           => $id, 
-                                    Coords       => new Astro::Coords(),
-                                    Magnitudes   => \%magnitudes,
-                                    MagErr       => \%mag_errors,
-                                    Colours      => \%colours,
-                                    ColErr       => \%colour_errors,
-                                    Morphology   => new Astro::Catalog::Item::Morphology(),
-                                    Quality      => $quality_flag,
-                                    Field        => $field,
-                                    GSC          => $in_gsc,
-                                    Distance     => $distance_to_centre,
-                                    PosAngle     => $position_angle,
-                                    X            => $x_pixel_coord,
-                                    Y            => $y_pixel_coord,
-                                    WCS          => new Starlink::AST(),
-                                    Comment      => $comment_string
-				    SpecType     => $spectral_type,
-				    StarType     => $star_type,
-				    LongStarType => $long_star_type,
-				    MoreInfo     => $url,
-                                    InsertDate   => new Time::Piece(),
+  $star = new Astro::Catalog::Item( 
+               ID	    => $id, 
+               Coords	    => new Astro::Coords(),
+               Morphology   => new Astro::Catalog::Item::Morphology(),
+               Fluxes	    => new Astro::Fluxes(),
+	       Quality      => $quality_flag,
+               Field	    => $field,
+               GSC	    => $in_gsc,
+               Distance     => $distance_to_centre,
+               PosAngle     => $position_angle,
+               X	    => $x_pixel_coord,
+               Y	    => $y_pixel_coord,
+               WCS	    => new Starlink::AST(),
+               Comment      => $comment_string
+	       SpecType     => $spectral_type,
+	       StarType     => $star_type,
+	       LongStarType => $long_star_type,
+	       MoreInfo     => $url,
+               InsertDate   => new Time::Piece(),
 				  );
 
 =head1 DESCRIPTION
@@ -78,6 +76,9 @@ use vars qw/ $VERSION /;
 use Carp;
 use Astro::Coords;
 use Astro::Catalog::Item::Morphology;
+use Astro::Fluxes;
+use Astro::Flux;
+use Astro::FluxColor;
 
 # Register an Astro::Catalog::Item warning category
 use warnings::register;
@@ -88,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -236,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.1 2005/06/08 03:01:59 aa Exp $
+$Id: Item.pm,v 1.2 2005/06/15 03:24:49 aa Exp $
 
 =head1 METHODS
 
@@ -249,26 +250,24 @@ $Id: Item.pm,v 1.1 2005/06/08 03:01:59 aa Exp $
 Create a new instance from a hash of options
 
 
-  $star = new Astro::Catalog::Item( ID           => $id, 
-                                    Coords       => new Astro::Coords(),
-                                    Magnitudes   => \%magnitudes,
-                                    MagErr       => \%mag_errors,
-                                    Colours      => \%colours,
-                                    ColErr       => \%colour_errors,
-                                    Morphology   => new Astro::Catalog::Item::Morphology(),
-                                    Quality      => $quality_flag,
-                                    Field        => $field,
-                                    GSC          => $in_gsc,
-                                    Distance     => $distance_to_centre,
-                                    PosAngle     => $position_angle,
-                                    X            => $x_pixel_coord,
-                                    Y            => $y_pixel_coord,
-                                    Comment      => $comment_string
-				    SpecType     => $spectral_type,
-				    StarType     => $star_type,
-				    LongStarType => $long_star_type,
-				    MoreInfo     => $url,
-                                    InsertDate   => new Time::Piece(),
+  $star = new Astro::Catalog::Item( 
+               ID           => $id, 
+               Coords	    => new Astro::Coords(),
+               Morphology   => new Astro::Catalog::Item::Morphology(),
+               Fluxes	    => new Astro::Fluxes(),
+               Quality      => $quality_flag,
+               Field	    => $field,
+               GSC	    => $in_gsc,
+               Distance     => $distance_to_centre,
+               PosAngle     => $position_angle,
+               X	    => $x_pixel_coord,
+               Y	    => $y_pixel_coord,
+               Comment      => $comment_string
+	       SpecType     => $spectral_type,
+	       StarType     => $star_type,
+	       LongStarType => $long_star_type,
+	       MoreInfo     => $url,
+               InsertDate   => new Time::Piece(),
 				  );
 
 returns a reference to an Astro::Catalog::Item object.
@@ -284,10 +283,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { ID         => undef,
-                      MAGNITUDES => {},
-                      MAGERR     => {},
-                      COLOURS    => {},
-                      COLERR     => {},
+                      FLUXES     => undef,
                       MORPHOLOGY => undef,
                       QUALITY    => undef,
                       FIELD      => undef,
@@ -564,114 +560,69 @@ sub dec {
   }
 }
 
-=item B<magnitudes>
+=item B<fluxes>
 
-Set the UBVRIHK magnitudes of the object, takes a reference to a hash of 
-magnitude values
+Return or set the flux measurements of the star as an C<Astro::Fluxes>
+object.
 
-    my %mags = ( B => '16.5', V => '15.4', R => '14.3' );
-    $star->magnitudes( \%mags );
+  $f = $star->fluxes();
+  $star->fluxes( $f );    
+  
+  $star->fluxes( $f, 1 );  # will replace instead of appending
 
-additional calls to magnitudes() will append, not replace, additional 
-magnitude values, magnitudes for filters already existing will be over-written.
 
-=cut
+The object returned by this method is the actual object stored
+inside this Item object and not a clone. If the flux values
+are changed through this object the flu values of the star is
+also changed.
 
-sub magnitudes {
-  my $self = shift;
-  if (@_) {
-    my $mags = shift;
-    %{$self->{MAGNITUDES}} = ( %{$self->{MAGNITUDES}}, %{$mags} );
-  }
-}
+If an optional flag is passed as set to the routine it will replace
+instead of appending (default action) to an existing fluxes object
+in the catalogue.
 
-=item B<magerr>
-
-Set the error in UBVRIHK magnitudes of the object, takes a reference to a
-hash of error values
-
-    my %mag_errors = ( B => '0.3', V => '0.1', R => '0.4' );
-    $star->magerr( \%mag_errors );
-
-additional calls to magerr() will append, not replace, additional error values,
-errors for filters already existing will be over-written.
+Returns undef if the fluxes have never been specified.
 
 =cut
 
-sub magerr {
+sub fluxes {
   my $self = shift;
   if (@_) {
-    my $magerr = shift;
-    %{$self->{MAGERR}} = ( %{$self->{MAGERR}}, %{$magerr} );
+    my $flux = shift;
+    my $flag = shift;
+    croak "Flux must be an Astro::Fluxes object"
+      unless UNIVERSAL::isa($flux, "Astro::Fluxes");
+
+    if ( defined $self->{FLUXES} ) {
+       if ( defined $flag ) {
+          $self->{FLUXES} = $flux;
+       } else {         
+          ${$self->{FLUXES}}->merge( $flux );
+       }	  
+    } else {
+       $self->{FLUXES} = $flux;
+    }
   }
+  return $self->{FLUXES};
 }
-
-=item B<Colours>
-
-Set the colour values for the object, takes a reference to a hash of colours
-
-    my %cols = ( 'B-V' => '0.5', 'B-R' => '0.4' );
-    $star->colours( \%cols );
-
-additional calls to colours() will append, not replace, colour values,
-altough for colours which already have defined values, these values will
-be over-written.
-
-=cut
-
-sub colours {
-  my $self = shift;
-  if (@_) {
-    my $cols = shift;
-    %{$self->{COLOURS}} = ( %{$self->{COLOURS}}, %{$cols} );
-  }
-}
-
-=item B<ColErr>
-
-Set the colour error values for the object, takes a reference to a hash of
-colour errors
-
-    my %col_errors = ( 'B-V' => '0.02', 'B-R' => '0.05' );
-    $star->colerr( \%col_errors );
-
-additional calls to colerr() will append, not replace, colour error values,
-altough for errors which already have defined values, these values will
-be over-written.
-
-=cut
-
-sub colerr {
-  my $self = shift;
-  if (@_) {
-    my $col_err = shift;
-    %{$self->{COLERR}} = ( %{$self->{COLERR}}, %{$col_err} );
-  }
-}
-
 
 =item B<what_filters>
 
-Returns a list of the filters for which the object has defined values.
+Returns a list of the wavebands for which the object has defined values.
 
    @filters = $star->what_filters();
    $num = $star->what_filters();
 
 if called in a scalar context it will return the number of filters which
-have defined magnitudes in the object.
+have defined magnitudes in the object. It will included 'derived' values,
+see C<Astro::Flux> for details.
 
 =cut
 
 sub what_filters {
   my $self = shift;
 
-  # define output array
-  my @mags;
-
-  foreach my $key (sort keys %{$self->{MAGNITUDES}}) {
-      # push the filters onto the output array
-      push ( @mags, $key );
-  }
+  my $fluxes = $self->{FLUXES};
+  my @mags = $fluxes->original_filters();
 
   # return array of filters or number if called in scalar context
   return wantarray ? @mags : scalar( @mags );
@@ -692,17 +643,13 @@ have defined values in the object.
 sub what_colours {
   my $self = shift;
 
-  # define output array
-  my @cols;
-
-  foreach my $key (sort keys %{$self->{COLOURS}}) {
-      # push the colours onto the output array
-      push ( @cols, $key );
-  }
+  my $fluxes = $self->{FLUXES};
+  my @cols = $fluxes->original_colors();
 
   # return array of colours or number if called in scalar context
   return wantarray ? @cols : scalar( @cols );
 }
+
 
 =item B<get_magnitude>
 
@@ -714,21 +661,18 @@ Returns the magnitude for the supplied filter if available
 
 sub get_magnitude {
   my $self = shift;
-
+  warnings::warn("Astro::Item::get_magnitude is deprecated") 
+					  if warnings::enabled();
+					   
   my $magnitude;
   if (@_) {
 
      # grab passed filter
      my $filter = shift;
-     foreach my $key (sort keys %{$self->{MAGNITUDES}}) {
-
-         # grab magnitude for filter
-         if( $key eq $filter ) {
-            $magnitude = ${$self->{MAGNITUDES}}{$key};
-         }
-     }
+     my $fluxes = $self->{FLUXES};
+     $magnitude = $fluxes->flux( waveband => $filter );
   }
-  return $magnitude;
+  return $magnitude->quantity('mag');
 }
 
 =item B<get_errors>
@@ -741,19 +685,17 @@ Returns the error in the magnitude value for the supplied filter if available
 
 sub get_errors {
   my $self = shift;
-
+  warnings::warn("Astro::Item::get_errors is deprecated") 
+					  if warnings::enabled();
   my $mag_error;
   if (@_) {
 
      # grab passed filter
      my $filter = shift;
-     foreach my $key (sort keys %{$self->{MAGERR}}) {
-
-         # grab magnitude for filter
-         if( $key eq $filter ) {
-            $mag_error = ${$self->{MAGERR}}{$key};
-         }
-     }
+     my $fluxes = $self->{FLUXES};
+     my $magnitude = $fluxes->flux( waveband => $filter );
+     $mag_error = $magnitude->error( 'mag' );
+     
   }
   return $mag_error;
 }
@@ -768,19 +710,19 @@ Returns the value of the supplied colour if available
 
 sub get_colour {
   my $self = shift;
-
+  warnings::warn("Astro::Item::get_colour is deprecated") 
+					  if warnings::enabled();
   my $value;
   if (@_) {
 
      # grab passed colour
      my $colour = shift;
-     foreach my $key (sort keys %{$self->{COLOURS}}) {
-
-         # grab magnitude for colour
-         if( $key eq $colour ) {
-            $value = ${$self->{COLOURS}}{$key};
-         }
-     }
+     my @filters = split "-", $colour;
+     my $fluxes = $self->{FLUXES};
+     my $color = $fluxes->color( 
+        upper => new Astro::WaveBand( Filter => $filters[0] ),
+        lower => new Astro::WaveBand( Filter => $filters[1] ) );
+     $value = $color->quantity('mag');	
   }
   return $value;
 }
@@ -795,19 +737,23 @@ Returns the error in the colour value for the supplied colour if available
 
 sub get_colourerr {
   my $self = shift;
-
+  warnings::warn("Astro::Item::get_colourerr is deprecated") 
+					  if warnings::enabled();
   my $col_error;
   if (@_) {
 
      # grab passed colour
      my $colour = shift;
-     foreach my $key (sort keys %{$self->{COLERR}}) {
-
-         # grab values for the colour
-         if( $key eq $colour ) {
-            $col_error = ${$self->{COLERR}}{$key};
-         }
-     }
+     my @filters = split "-", $colour;
+     my $fluxes = $self->{FLUXES};
+     my $color = $fluxes->color( 
+        upper => new Astro::WaveBand( Filter => $filters[0] ),
+        lower => new Astro::WaveBand( Filter => $filters[1] ) );
+	
+     #use Data::Dumper; print Dumper( $color );
+     $col_error = $color->error('mag');	
+     
+    
   }
   return $col_error;
 }
@@ -839,6 +785,7 @@ sub morphology {
   }
   return $self->{MORPHOLOGY};
 }
+
 
 =item B<quality>
 
@@ -1221,9 +1168,47 @@ sub insertdate {
   return $self->{INSERTDATE};
 }
 
+=back
+
+=head2 Obsolete Methods
+
+Several methods were made obsolete with the introduction of V4 of the
+Astro::Catalog class. These were magnitudes(), magerr(), colours() and
+colerr(). The functionality these supported is now part of the addfluxes()
+method.
+
+=cut
+
+sub magnitudes {
+  my $self = shift;
+  croak "Astro::Catalog::Item::magnitudes()\n" .
+        "This method is no longer supported, use addfluxes() instead.\n";
+}
+
+sub magerr {
+  my $self = shift;
+  croak "Astro::Catalog::Item::magerr()\n" .
+        "This method is no longer supported, use addfluxes() instead.\n";
+}
+
+
+sub colours {
+  my $self = shift;
+  croak "Astro::Catalog::Item::colours()\n" .
+        "This method is no longer supported, use addfluxes() instead.\n";
+
+}
+
+sub colerr {
+  my $self = shift;
+  croak "Astro::Catalog::Item::colerr()\n" .
+   "This method is no longer supported, use addfluxes() instead.\n";
+
+}
+
+
 # C O N F I G U R E -------------------------------------------------------
 
-=back
 
 =head2 General Methods
 
