@@ -137,7 +137,6 @@ sub compare_star {
     is($cmpstar->field, $refstar->field, "Compare field");
   }
 
-
   # Filter comparisons
   my @cmp_filters = $cmpstar->what_filters();
   my @ref_filters = $refstar->what_filters();
@@ -158,6 +157,11 @@ sub compare_star {
 
   my @cmp_cols = $cmpstar->what_colours();
   my @ref_cols = $refstar->what_colours();
+  
+  #use Data::Dumper;
+  #print Dumper( @cmp_cols );
+  #print Dumper( @ref_cols );
+  
   is(scalar(@cmp_cols), scalar(@ref_cols), "compare number of colors");
 
   foreach my $col ( 0 ... $#ref_cols ) {

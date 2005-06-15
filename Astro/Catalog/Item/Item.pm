@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.2 2005/06/15 03:24:49 aa Exp $
+#     $Id: Item.pm,v 1.3 2005/06/15 19:03:42 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.2 2005/06/15 03:24:49 aa Exp $
+$Id: Item.pm,v 1.3 2005/06/15 19:03:42 aa Exp $
 
 =head1 METHODS
 
@@ -622,8 +622,10 @@ sub what_filters {
   my $self = shift;
 
   my $fluxes = $self->{FLUXES};
+  
+  #use Data::Dumper; print Dumper( $self->{FLUXES} );
   my @mags = $fluxes->original_filters();
-
+  
   # return array of filters or number if called in scalar context
   return wantarray ? @mags : scalar( @mags );
 }
@@ -645,7 +647,7 @@ sub what_colours {
 
   my $fluxes = $self->{FLUXES};
   my @cols = $fluxes->original_colors();
-
+    
   # return array of colours or number if called in scalar context
   return wantarray ? @cols : scalar( @cols );
 }
@@ -661,8 +663,8 @@ Returns the magnitude for the supplied filter if available
 
 sub get_magnitude {
   my $self = shift;
-  warnings::warn("Astro::Item::get_magnitude is deprecated") 
-					  if warnings::enabled();
+  #warnings::warn("Astro::Item::get_magnitude is deprecated") 
+  #					  if warnings::enabled();
 					   
   my $magnitude;
   if (@_) {
@@ -685,8 +687,9 @@ Returns the error in the magnitude value for the supplied filter if available
 
 sub get_errors {
   my $self = shift;
-  warnings::warn("Astro::Item::get_errors is deprecated") 
-					  if warnings::enabled();
+  #warnings::warn("Astro::Item::get_errors is deprecated") 
+  #					  if warnings::enabled();
+
   my $mag_error;
   if (@_) {
 
@@ -710,8 +713,9 @@ Returns the value of the supplied colour if available
 
 sub get_colour {
   my $self = shift;
-  warnings::warn("Astro::Item::get_colour is deprecated") 
-					  if warnings::enabled();
+  #warnings::warn("Astro::Item::get_colour is deprecated") 
+  #					  if warnings::enabled();
+  
   my $value;
   if (@_) {
 
@@ -737,8 +741,9 @@ Returns the error in the colour value for the supplied colour if available
 
 sub get_colourerr {
   my $self = shift;
-  warnings::warn("Astro::Item::get_colourerr is deprecated") 
-					  if warnings::enabled();
+  #warnings::warn("Astro::Item::get_colourerr is deprecated") 
+  #					  if warnings::enabled();
+
   my $col_error;
   if (@_) {
 

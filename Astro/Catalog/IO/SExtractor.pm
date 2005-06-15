@@ -31,6 +31,11 @@ use Astro::Catalog::Star::Morphology;
 use Astro::Coords;
 use Astro::SLA;
 
+use Number::Uncertainty;
+use Astro::Flux;
+use Astro::FluxColor;
+use Astro::Fluxes;
+
 use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/ $VERSION $DEBUG /;
@@ -254,12 +259,18 @@ sub _read_catalog {
     # Set the magnitude and the magnitude error. Set the filter
     # to 'unknown' because SExtractor doesn't know about such things.
     if( $mag_column != -1 ) {
-      my %mags = ( $filter => $fields[$mag_column] );
-      $star->magnitudes( \%mags );
-    }
-    if( $magerr_column != -1 ) {
-      my %magerrs = ( $filter => $fields[$magerr_column] );
-      $star->magerr( \%magerrs );
+      my $num;
+      if( $magerr_column != -1 ) {
+         $num = new Number::Uncertainty( Value => $fields[$mag_column],
+	                                 Error => $fields[$magerr_column] );
+      } else {
+         $num = new Number::Uncertainty( Value => $fields[$mag_column] );
+      }
+      
+      my $mag = new Astro::Flux( $num,'mag', $filter );
+      $star->fluxes( new Astro::Fluxes($mag) );
+      
+      
     }
 
     # Set the x and y coordinates.
@@ -307,7 +318,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.8 2005/06/08 03:29:25 aa Exp $
+  $Id: SExtractor.pm,v 1.9 2005/06/15 19:03:42 aa Exp $
 
 =head1 FORMAT
 

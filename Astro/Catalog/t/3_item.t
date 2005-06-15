@@ -85,9 +85,9 @@ for my $i (0 .. $#colours) {
  is( $colours[$i], $input[$i], "compare colour names" );
 }
 is( $star->get_colour('B-V'), 0.1 , "compare B-V colour values" );
-is( $star->get_colour('B-R'), 0.3 , "compare B-V colour values" );
+is( $star->get_colour('B-R'), 0.3 , "compare B-R colour values" );
 is( $star->get_colourerr('B-V'), 0.02, "compare B-V colour error values" );
-is( $star->get_colourerr('B-R'), 0.05, "compare B-V colour error values" );
+is( $star->get_colourerr('B-R'), 0.05, "compare B-R colour error values" );
 
 
 # T I M E   A T   T H E   B A R ---------------------------------------------

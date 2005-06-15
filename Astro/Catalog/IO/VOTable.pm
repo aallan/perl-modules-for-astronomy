@@ -29,6 +29,9 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
+use Astro::Flux;
+use Astro::FluxColor;
+use Astro::Fluxes;
 
 use Astro::VO::VOTable::Document;
 
@@ -36,14 +39,14 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOTable.pm,v 1.9 2005/03/31 01:24:53 cavanagh Exp $
+$Id: VOTable.pm,v 1.10 2005/06/15 19:03:42 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -156,7 +159,7 @@ sub _read_catalog {
       #print Dumper( @row ) . "\n";
       
       # loop around the contents and grab the magnitudes and colours
-      my ( %mags, %colours );
+      my ( @fluxes, @colours );
       foreach my $key ( keys %contents ) {
            
          # drop through unless we have a magntiude
@@ -175,15 +178,27 @@ sub _read_catalog {
       
             # we might have a colour, who knows?
             #print "COLOUR IN COLUMN $contents{$key}\n";
-            $colours{$identifier} = $row[$contents{$key}];
+            #$colours{$identifier} = $row[$contents{$key}];
+            	    
+            my $color = new Astro::FluxColor( 
+                   upper => new Astro::WaveBand( Filter => $1 ),
+                   lower => new Astro::WaveBand( Filter => $2 ),
+		   quantity => $row[$contents{$key}] );
+            unshift @colours, $color;	# I don't understand why I have
+	                                # to unshift here rather than
+					# push, this is oddly disturbing	   
          } else {
             
             # we might have a magnitude, who knows?
             #print "MAGNITUDE IN COLUMN $contents{$key}\n";
-            $mags{$identifier} = $row[$contents{$key}];   
+            #$mags{$identifier} = $row[$contents{$key}]; 
+	    my $flux = new Astro::Flux( $row[$contents{$key}],
+	                                'mag', $identifier );
+	    push @fluxes, $flux;				
          }
          
       }
+      my $fluxes = new Astro::Fluxes( @fluxes, @colours );
       
       # Set defaults for the proper motions and parallax.
       my $pm_dec = ( exists( $contents{"pm_dec"} ) && defined( $contents{"pm_dec"} ) ? $row[$contents{"pm_dec"}] : undef );
@@ -210,8 +225,9 @@ sub _read_catalog {
       my $star = new Astro::Catalog::Star( 
                            id  => $row[$contents{"id"}],
                            coords => $coords,
-                           magnitudes => \%mags,
-                           colours => \%colours,
+                           #magnitudes => \%mags,
+                           #colours => \%colours,
+			   fluxes => $fluxes,
                            quality => $row[$contents{"quality"}] );
       
       # push the star onto the catalog

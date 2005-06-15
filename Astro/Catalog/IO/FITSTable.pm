@@ -23,6 +23,10 @@ use Astro::Coords;
 use Astro::FITS::CFITSIO qw/ :longnames :constants /;
 use File::Temp qw/ tempfile /;
 
+use Astro::Flux;
+use Astro::FluxColor;
+use Astro::Fluxes;
+
 use base qw/ Astro::Catalog::IO::Binary /;
 
 use vars qw/ $VERSION $DEBUG /;
@@ -365,9 +369,10 @@ sub _read_catalog {
         }
 
         # Calculate the magnitude.
-        my %mag;
+        my $flux;
         if( defined( $flux_value ) ) {
-          $mag{'unknown'} = -2.5 * log( $flux_value ) / log( 10 );
+          my $mag = -2.5 * log( $flux_value ) / log( 10 );
+	  $flux = new Astro::Flux( $mag, 'mag', 'unknown' );
         }
 
         # And set up the Astro::Catalog::Star::Morphology object.
@@ -377,7 +382,7 @@ sub _read_catalog {
 
         # And create the Astro::Catalog::Star object from this conglomoration of data.
         my $star = new Astro::Catalog::Star( ID => $id_value,
-                                             Magnitudes => \%mag,
+                                             Fluxes => new Astro::Fluxes( $flux ),
                                              Coords => $coords,
                                              X => $x_pos_value,
                                              Y => $y_pos_value,
@@ -427,7 +432,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: FITSTable.pm,v 1.3 2005/06/08 03:29:25 aa Exp $
+  $Id: FITSTable.pm,v 1.4 2005/06/15 19:03:42 aa Exp $
 
 =head1 SEE ALSO
 

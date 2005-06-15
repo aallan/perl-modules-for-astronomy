@@ -36,7 +36,6 @@ ok( $cat->write_catalog( Format => 'Simple', File => $tempfile ),
 
 # Read it back in
 my $newcat = new Astro::Catalog( Format => 'Simple', File => $tempfile );
-unlink($tempfile);
 
 isa_ok( $newcat, "Astro::Catalog" );
 
@@ -47,7 +46,7 @@ is( $newcat->sizeof, 5, "Confirm star count");
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
 END {
-  unlink "$tempfile";
+  #unlink "$tempfile";
 }
 
 

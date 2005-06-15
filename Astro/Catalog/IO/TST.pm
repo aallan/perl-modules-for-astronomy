@@ -440,14 +440,57 @@ sub _read_catalog {
 
     }
 
+    my ( @fluxes, @colors );
+    foreach my $fkey ( keys %{$construct{magnitudes}} ) {
+    
+      my $num;
+      if ( defined $construct{magerr}->{$fkey} ) {
+	 $num = new Number::Uncertainty( 
+			   Value => $construct{magnitudes}->{$fkey},
+			   Error => $construct{magerr}->{$fkey} );
+      } else {
+          $num = new Number::Uncertainty( 
+                           Value => $construct{magnitudes}->{$fkey}  );     
+      }		   
+      my $mag = new Astro::Flux( $num, 'mag', "$fkey" );
+      push @fluxes, $mag;
+    }
+    delete $construct{magnitudes};
+    delete $construct{magerr} if defined $construct{magerr};
+    
     # Colors: Look for B-V
     $construct{colours} = {};
     for my $key (keys %$star) {
+
       next unless $key =~ /^(\w)-(\w)$/; # non-greedy
       $construct{colours}->{uc($key)} = $star->{$key};
       print "Found colour ".uc($key)." ... \n" if $DEBUG;
     }
+    foreach my $ckey ( keys %{$construct{colours}} ) {
+        my @filters = split "-", $ckey;
+        my $color = new Astro::FluxColor( 
+          upper => new Astro::WaveBand( Filter => $filters[0] ),
+          lower => new Astro::WaveBand( Filter => $filters[1] ),
+          quantity => new Number::Uncertainty( 
+        	       Value => $construct{colours}->{$ckey} ) );
+        push @colors, $color;
 
+    }
+    delete $construct{colours};
+
+    # build the fluxes object from the available data  
+    if ( defined $fluxes[0]  && defined $colors[0] ) {
+       $construct{fluxes} = new Astro::Fluxes( @fluxes, @colors );
+    } elsif ( defined $colors[0] ) {
+       $construct{fluxes} = new Astro::Fluxes( @colors );
+    } elsif ( defined $fluxes[0] ) {
+       $construct{fluxes} = new Astro::Fluxes( @fluxes );
+    } else {
+       delete $construct{fluxes} if defined $construct{fluxes};
+    }
+    
+    print Dumper( %construct ) . "\n" if $DEBUG;
+    
     # Modify the array in place
     $star = new Astro::Catalog::Star( id => $star->{id}, %construct );
 
@@ -512,7 +555,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.12 2005/03/31 01:24:53 cavanagh Exp $
+ $Id: TST.pm,v 1.13 2005/06/15 19:03:42 aa Exp $
 
 =head1 FORMAT
 

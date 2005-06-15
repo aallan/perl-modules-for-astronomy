@@ -5,7 +5,7 @@
 use strict;
 
 #load test
-use Test::More tests => 15;
+use Test::More tests => 17;
 
 
 # load modules
@@ -45,11 +45,11 @@ my $star = new Astro::Catalog::Star( ID         => 'U1500_01194794',
 
 isa_ok($star,"Astro::Catalog::Star");
 
-# FILTERS AND MAGNITUDES
-# ----------------------
+# FILTERS
+# -------
 
 # grab input filters
-my @input = ( 'B', 'R', 'V' );
+my @input = ( 'R', 'B', 'V' );
 
 # grab used filters
 my @filters = $star->what_filters();
@@ -68,10 +68,25 @@ is( $star->get_magnitude( 'V' ), 16.3, 'V magnitude' );
 is( $star->get_errors( 'B' ), 0.4, 'B error' );
 is( $star->get_errors( 'R' ), 0.1, 'R error' );
 is( $star->get_errors( 'V' ), 0.3, 'V error' );
-is( $star->get_colour('B-V'), 0.1 , "compare B-V colour values" );
-is( $star->get_colour('B-R'), 0.3 , "compare B-V colour values" );
-is( $star->get_colourerr('B-V'), 0.02, "compare B-V colour error values" );
-is( $star->get_colourerr('B-R'), 0.05, "compare B-V colour error values" );
 
+# COLOURS
+# -------
+
+@input = ( "B-V", "B-R" );
+
+my @colours = $star->what_colours();
+
+# report to user
+print "# input  = @input\n";
+print "# output = @colours\n";
+
+# compare input and returned filters
+for my $i (0 .. $#colours) {
+ is( $colours[$i], $input[$i], "compare colour names" );
+}
+is( $star->get_colour('B-V'), 0.1 , "compare B-V colour values" );
+is( $star->get_colour('B-R'), 0.3 , "compare B-R colour values" );
+is( $star->get_colourerr('B-V'), 0.02, "compare B-V colour error values" );
+is( $star->get_colourerr('B-R'), 0.05, "compare B-R colour error values" );
 # T I M E   A T   T H E   B A R ---------------------------------------------
 exit;                                     

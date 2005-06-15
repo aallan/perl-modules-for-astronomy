@@ -3,6 +3,8 @@
         * Basic fixes to Catalog.pm and IO/Cluster.pm to support the new
 	  changes. Hopefully this will provide a springboard so I can fix
 	  the rest of the IO and Query modules. This is a big job...
+	  
+	* IO/*.pm: All IO classes working, I think?  
 
 2005-06-12 Alasdair Allan <aa@astro.ex.ac.uk>
 

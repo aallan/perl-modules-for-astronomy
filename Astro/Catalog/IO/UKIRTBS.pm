@@ -81,7 +81,8 @@ sub _read_catalog {
     my $s = new Astro::Catalog::Star( coords => $c,
 				      id =>  $bs,
 				      spectype => $type,
-				      magnitudes => { V => $mag },
+				      fluxes => new Astro::Fluxes(
+				        new Astro::Flux( $mag, 'mag', 'V') ),
 				    );
     push(@stars, $s);
   }
