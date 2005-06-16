@@ -5,7 +5,7 @@
 use strict;
 
 #load test
-use Test::More tests => 4066;
+use Test::More tests => 646;
 use File::Spec;
 use Data::Dumper;
 
@@ -42,17 +42,19 @@ $catalog_data->origin( $catalog_read->origin() );
 $catalog_data->set_coords( $catalog_read->get_coords() ) 
                           if defined $catalog_read->get_coords(); 
 
-my ( @oldstars, @newstars ); 
-@oldstars = $catalog_read->allstars(); 
-my ( @mags, @cols );
-foreach my $i ( 0 ... $#oldstars ) {
-  my ($cval, $err, $mag, $col );
+  my @stars = $catalog_read->allstars(); 
+  
+  my ( @mags, @cols );
+  foreach my $i ( 0 ... $#stars ) {
+    my ($cval, $err, $mag, $col );
+    my @mags = undef;
+    my @cols = undef;
+    
+    my $star = $stars[$i];  
+    #print Dumper( $star );
 
-  my $star = $oldstars[$i];  
-  #print Dumper( $star );
-
-  # if we have a non-zero quality, set the quality to 1 (this sucks!)
-  $star->quality(1) if( $star->quality() != 0 ); 
+    # if we have a non-zero quality, set the quality to 1 (this sucks!)
+    $star->quality(1) if( $star->quality() != 0 ); 
     
     # calulate the errors
     
@@ -71,7 +73,7 @@ foreach my $i ( 0 ... $#oldstars ) {
           Value => $star->get_magnitude("BJ"), Error => $err ), 'mag', 'BJ' );
     push @mags, $mag;	  
 
-    $err = 0.06;      
+    $err = 0.06;	      
     if ( $star->get_magnitude( "R1" ) != 99.999 ) {
        $err = 0.06 if $star->get_magnitude( "R1" ) > 11.0;
        $err = 0.03 if $star->get_magnitude( "R1" ) > 12.0;
@@ -168,15 +170,17 @@ foreach my $i ( 0 ... $#oldstars ) {
     
     my $fluxes = new Astro::Fluxes( @mags, @cols );
     $star->fluxes( $fluxes, 1 );  # the 1 means overwrite the previous values
-     
-  
-  # push it onto the stack
-  $newstars[$i] = $star if defined $star;
-  
-  
-}
-$catalog_data->pushstar( @newstars );  
 
+ 
+    
+    # push it onto the stack
+    $stars[$i] = $star if defined $star;
+    
+    
+  }
+  
+  $catalog_data->allstars( @stars );
+  
 # field centre
 $catalog_data->fieldcentre( RA => '12 52 24.40', 
                             Dec => '-29 14 56.70', 

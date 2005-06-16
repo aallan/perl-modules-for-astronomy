@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.53 2005/06/08 03:00:35 aa Exp $
+#     $Id: Catalog.pm,v 1.54 2005/06/16 03:11:11 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.53 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.54 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.53 2005/06/08 03:00:35 aa Exp $
+$Id: Catalog.pm,v 1.54 2005/06/16 03:11:11 aa Exp $
 
 =head1 METHODS
 
@@ -412,10 +412,21 @@ In list context returns all the stars, in scalar context returns a reference
 to the internal array. This allows the primary array to be modified in place
 so use this with care.
 
+Addendum: This is pretty much for internal use only, but if you do this
+
+  $catalog->allstars( @stars );
+  
+you repalce the stars array with the array passed. Don't do this, it's bad!
+
 =cut
 
 sub allstars {
   my $self = shift;
+  
+  if (@_) {
+    @{$self->{ALLSTARS}} = @_;
+  }  
+  
   return (wantarray ? @{ $self->{ALLSTARS} } : $self->{ALLSTARS} );
 }
 

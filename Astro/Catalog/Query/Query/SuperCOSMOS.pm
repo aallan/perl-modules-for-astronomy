@@ -68,7 +68,7 @@ use Astro::Fluxes;
 use Number::Uncertainty;
 
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 $VERSION = '0.01';
 $DEBUG = 0;
@@ -89,7 +89,7 @@ my %CONFIG;
 
 =head1 REVISION
 
-$Id: SuperCOSMOS.pm,v 1.10 2005/06/16 01:57:35 aa Exp $
+$Id: SuperCOSMOS.pm,v 1.11 2005/06/16 03:11:11 aa Exp $
 
 =head1 METHODS
 
@@ -297,14 +297,15 @@ sub _parse_query {
   $catalog->origin( $query->origin() );
   $catalog->set_coords( $query->get_coords() ) if defined $query->get_coords(); 
   
-  my ( @oldstars, @newstars ); 
-  @oldstars = $query->allstars(); 
+  my @stars = $query->allstars(); 
   
   my ( @mags, @cols );
-  foreach my $i ( 0 ... $#oldstars ) {
+  foreach my $i ( 0 ... $#stars ) {
     my ($cval, $err, $mag, $col );
-    
-    my $star = $oldstars[$i];  
+    my @mags = undef;
+    my @cols = undef;
+        
+    my $star = $stars[$i];  
     #print Dumper( $star );
 
     # if we have a non-zero quality, set the quality to 1 (this sucks!)
@@ -424,13 +425,16 @@ sub _parse_query {
     
     my $fluxes = new Astro::Fluxes( @mags, @cols );
     $star->fluxes( $fluxes, 1 );  # the 1 means overwrite the previous values
+
+ 
     
     # push it onto the stack
-    $newstars[$i] = $star if defined $star;
+    $stars[$i] = $star if defined $star;
     
     
   }
-  $catalog->pushstar( @newstars );  
+  
+  $catalog->allstars( @stars );
 
   # set the field centre
   my %allow = $self->_get_allowed_options();
