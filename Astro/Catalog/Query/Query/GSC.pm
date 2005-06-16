@@ -46,12 +46,15 @@ use Carp;
 # generic catalog objects
 use Astro::Catalog;
 use Astro::Catalog::Star;
+use Astro::Flux;
+use Astro::Fluxes;
+use Number::Uncertainty;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: GSC.pm,v 1.4 2003/09/12 22:38:59 aa Exp $
+$Id: GSC.pm,v 1.5 2005/06/16 01:57:35 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -231,12 +234,17 @@ sub _parse_query {
 			     );
 
               # B Magnitude
-              my %b_mag = ( B => $separated[10] );
-              $star->magnitudes( \%b_mag );
+              #my %b_mag = ( B => $separated[10] );
+              #$star->magnitudes( \%b_mag );
+	      
+	      $star->fluxes( new Astro::Fluxes( new Astro::Flux(
+	               new Number::Uncertainty( Value => $separated[10],
+		                                Error => $separated[11] ),
+			'mag', "B" )));
 
               # B mag error
-              my %mag_errors = ( B => $separated[11] );
-              $star->magerr( \%mag_errors );
+              #my %mag_errors = ( B => $separated[11] );
+              #$star->magerr( \%mag_errors );
 
               # Quality
               my $quality = $separated[13];

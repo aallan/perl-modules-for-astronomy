@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.3 2005/06/15 19:03:42 aa Exp $
+#     $Id: Item.pm,v 1.4 2005/06/16 01:57:35 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.3 2005/06/15 19:03:42 aa Exp $
+$Id: Item.pm,v 1.4 2005/06/16 01:57:35 aa Exp $
 
 =head1 METHODS
 
@@ -624,7 +624,7 @@ sub what_filters {
   my $fluxes = $self->{FLUXES};
   
   #use Data::Dumper; print Dumper( $self->{FLUXES} );
-  my @mags = $fluxes->original_filters();
+  my @mags = $fluxes->original_filters() if defined $fluxes;
   
   # return array of filters or number if called in scalar context
   return wantarray ? @mags : scalar( @mags );
@@ -646,7 +646,7 @@ sub what_colours {
   my $self = shift;
 
   my $fluxes = $self->{FLUXES};
-  my @cols = $fluxes->original_colors();
+  my @cols = $fluxes->original_colors() if defined $fluxes;
     
   # return array of colours or number if called in scalar context
   return wantarray ? @cols : scalar( @cols );

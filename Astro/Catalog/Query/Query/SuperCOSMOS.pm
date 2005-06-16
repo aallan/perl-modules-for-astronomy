@@ -62,11 +62,16 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
+use Astro::Flux;
+use Astro::FluxColor;
+use Astro::Fluxes;
+use Number::Uncertainty;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 $VERSION = '0.01';
-$DEBUG = 1;
+$DEBUG = 0;
 
 # Controls whether we follow 'directory' config entries and recursively
 # expand those. Default to false at the moment.
@@ -84,7 +89,7 @@ my %CONFIG;
 
 =head1 REVISION
 
-$Id: SuperCOSMOS.pm,v 1.8 2003/09/25 23:31:25 aa Exp $
+$Id: SuperCOSMOS.pm,v 1.10 2005/06/16 01:57:35 aa Exp $
 
 =head1 METHODS
 
@@ -294,7 +299,10 @@ sub _parse_query {
   
   my ( @oldstars, @newstars ); 
   @oldstars = $query->allstars(); 
+  
+  my ( @mags, @cols );
   foreach my $i ( 0 ... $#oldstars ) {
+    my ($cval, $err, $mag, $col );
     
     my $star = $oldstars[$i];  
     #print Dumper( $star );
@@ -303,102 +311,119 @@ sub _parse_query {
     $star->quality(1) if( $star->quality() != 0 ); 
     
     # calulate the errors
+    
+    $err = 0.04;
     if ( $star->get_magnitude( "BJ" ) != 99.999 ) {
-       $star->magerr( {BJ => 0.04} );
-       $star->magerr( {BJ => 0.04} ) if( $star->get_magnitude( "BJ" ) > 15.0 );
-       $star->magerr( {BJ => 0.05} ) if( $star->get_magnitude( "BJ" ) > 17.0 );
-       $star->magerr( {BJ => 0.06} ) if( $star->get_magnitude( "BJ" ) > 19.0 );
-       $star->magerr( {BJ => 0.07} ) if( $star->get_magnitude( "BJ" ) > 20.0 );
-       $star->magerr( {BJ => 0.12} ) if( $star->get_magnitude( "BJ" ) > 21.0 );
-       $star->magerr( {BJ => 0.08} ) if( $star->get_magnitude( "BJ" ) > 22.0 );
+       $err = 0.04 if $star->get_magnitude( "BJ" ) > 15.0;
+       $err = 0.05 if $star->get_magnitude( "BJ" ) > 17.0;
+       $err = 0.06 if $star->get_magnitude( "BJ" ) > 19.0;
+       $err = 0.07 if $star->get_magnitude( "BJ" ) > 20.0;
+       $err = 0.12 if $star->get_magnitude( "BJ" ) > 21.0;
+       $err = 0.08 if $star->get_magnitude( "BJ" ) > 22.0;  
     } else {
-       $star->magerr( {BJ => 99.999} );
+       $err = 99.999;
     }
-    
-    if ( $star->get_magnitude( "R1" ) != 99.999 ) {
-       $star->magerr( {R1 => 0.06} );
-       $star->magerr( {R1 => 0.06} ) if( $star->get_magnitude( "R1" ) > 11.0 );
-       $star->magerr( {R1 => 0.03} ) if( $star->get_magnitude( "R1" ) > 12.0 );
-       $star->magerr( {R1 => 0.09} ) if( $star->get_magnitude( "R1" ) > 13.0 );
-       $star->magerr( {R1 => 0.10} ) if( $star->get_magnitude( "R1" ) > 14.0 );
-       $star->magerr( {R1 => 0.12} ) if( $star->get_magnitude( "R1" ) > 18.0 );
-       $star->magerr( {R1 => 0.18} ) if( $star->get_magnitude( "R1" ) > 19.0 );
-    } else {
-       $star->magerr( {R1 => 99.999} );
-    }
+    $mag = new Astro::Flux( new Number::Uncertainty( 
+          Value => $star->get_magnitude("BJ"), Error => $err ), 'mag', 'BJ' );
+    push @mags, $mag;	  
 
+    $err = 0.06;	      
+    if ( $star->get_magnitude( "R1" ) != 99.999 ) {
+       $err = 0.06 if $star->get_magnitude( "R1" ) > 11.0;
+       $err = 0.03 if $star->get_magnitude( "R1" ) > 12.0;
+       $err = 0.09 if $star->get_magnitude( "R1" ) > 13.0;
+       $err = 0.10 if $star->get_magnitude( "R1" ) > 14.0;
+       $err = 0.12 if $star->get_magnitude( "R1" ) > 18.0;
+       $err = 0.18 if $star->get_magnitude( "R1" ) > 19.0;
+    } else {
+       $err = 99.999;
+    }
+    $mag = new Astro::Flux( new Number::Uncertainty( 
+          Value => $star->get_magnitude("R1"), Error => $err ), 'mag', 'R1' );
+    push @mags, $mag;	
+    
+    $err = 0.02;
     if ( $star->get_magnitude( "R2" ) != 99.999 ) {
-       $star->magerr( {R2 => 0.02} );
-       $star->magerr( {R2 => 0.02} ) if( $star->get_magnitude( "R2" ) > 12.0 );
-       $star->magerr( {R2 => 0.03} ) if( $star->get_magnitude( "R2" ) > 13.0 );
-       $star->magerr( {R2 => 0.04} ) if( $star->get_magnitude( "R2" ) > 15.0 );
-       $star->magerr( {R2 => 0.05} ) if( $star->get_magnitude( "R2" ) > 17.0 );
-       $star->magerr( {R2 => 0.06} ) if( $star->get_magnitude( "R2" ) > 18.0 );
-       $star->magerr( {R2 => 0.11} ) if( $star->get_magnitude( "R2" ) > 19.0 );
-       $star->magerr( {R2 => 0.16} ) if( $star->get_magnitude( "R2" ) > 20.0 );
+       $err = 0.02 if $star->get_magnitude( "R2" ) > 12.0;
+       $err = 0.03 if $star->get_magnitude( "R2" ) > 13.0;
+       $err = 0.04 if $star->get_magnitude( "R2" ) > 15.0;
+       $err = 0.05 if $star->get_magnitude( "R2" ) > 17.0;
+       $err = 0.06 if $star->get_magnitude( "R2" ) > 18.0;
+       $err = 0.11 if $star->get_magnitude( "R2" ) > 19.0;
+       $err = 0.16 if $star->get_magnitude( "R2" ) > 20.0;
     } else {
-       $star->magerr( {R2 => 99.999} );
+       $err = 99.999;
     }
-    
+    $mag = new Astro::Flux( new Number::Uncertainty( 
+          Value => $star->get_magnitude("R2"), Error => $err ), 'mag', 'R2' );
+    push @mags, $mag;
+     
+    $err = 0.05;   
     if ( $star->get_magnitude( "I" ) != 99.999 ) {
-       $star->magerr( {I => 0.05} );
-       $star->magerr( {I => 0.05} ) if( $star->get_magnitude( "I" ) > 15.0 );
-       $star->magerr( {I => 0.06} ) if( $star->get_magnitude( "I" ) > 16.0 );
-       $star->magerr( {I => 0.09} ) if( $star->get_magnitude( "I" ) > 17.0 );
-       $star->magerr( {I => 0.16} ) if( $star->get_magnitude( "I" ) > 18.0 );
+       $err = 0.05 if $star->get_magnitude( "I" ) > 15.0;
+       $err = 0.06 if $star->get_magnitude( "I" ) > 16.0;
+       $err = 0.09 if $star->get_magnitude( "I" ) > 17.0;
+       $err = 0.16 if $star->get_magnitude( "I" ) > 18.0;
     } else {
-       $star->magerr( {I => 99.999} );
+       $err = 99.999;
     }
-    
+    $mag = new Astro::Flux( new Number::Uncertainty( 
+          Value => $star->get_magnitude("I"), Error => $err ), 'mag', 'I' );
+    push @mags, $mag;
+        
     # calculate colours UKST Bj - UKST R, UKST Bj - UKST I
+    
     if ( $star->get_magnitude( "BJ" ) != 99.999 &&
          $star->get_magnitude( "R2" ) != 99.999  ) {
     
        my $bj_minus_r2 = $star->get_magnitude( "BJ" ) -
                          $star->get_magnitude( "R2" );
        $bj_minus_r2 =  sprintf("%.4f", $bj_minus_r2 );
-       $star->colours( {"BJ-R2" => (  $bj_minus_r2  )} );
+       
+       my $delta_bjmr = ( ( $star->get_errors( "BJ" ) )**2.0 +
+                          ( $star->get_errors( "R2" ) )**2.0     )** (1/2);
+       $delta_bjmr = sprintf("%.4f", $delta_bjmr ); 
+       
+       $cval = $bj_minus_r2;
+       $err = $delta_bjmr;                 
        
     } else {
-       $star->colours( {"BJ-R2" => 99.999 } );
+       $cval = 99.999;
+       $err = 99.999;
     }                              
-
+    $col = new Astro::FluxColor( upper => 'BJ', lower => "R2",
+       quantity => new Number::Uncertainty( Value => $cval, Error => $err ) );
+    push @cols, $col;
+    
     if ( $star->get_magnitude( "BJ" ) != 99.999 &&
          $star->get_magnitude( "I" ) != 99.999  ) {
           
        my $bj_minus_i = $star->get_magnitude( "BJ" ) - 
                         $star->get_magnitude( "I" );   
        $bj_minus_i =  sprintf("%.4f", $bj_minus_i );
-       $star->colours( {"BJ-I" => (  $bj_minus_i  )} );
        
-    } else {
-       $star->colours( {"BJ-I" => 99.999 } );
-    }                                  
-
-    # calculate colour errors
-    if ( $star->get_magnitude( "BJ" ) != 99.999 &&
-         $star->get_magnitude( "R2" ) != 99.999  ) {
-    
-       my $delta_bjmr = ( ( $star->get_errors( "BJ" ) )**2.0 +
-                          ( $star->get_errors( "R2" ) )**2.0     )** (1/2);
-       $delta_bjmr = sprintf("%.4f", $delta_bjmr );                  
-       $star->colerr( {"BJ-R2" => $delta_bjmr} );
-       
-    } else {
-       $star->colerr( {"BJ-R2" => 99.999 } );
-    }                                  
-  
-    if ( $star->get_magnitude( "BJ" ) != 99.999 &&
-         $star->get_magnitude( "I" ) != 99.999 ) {
-    
        my $delta_bjmi = ( ( $star->get_errors( "BJ" ) )**2.0 +
                           ( $star->get_errors( "I" ) )**2.0     )** (1/2);
        $delta_bjmi = sprintf("%.4f", $delta_bjmi );                  
-       $star->colerr( {"BJ-I"  => $delta_bjmi} );
-       
+
+       $cval = $bj_minus_i;
+       $err = $delta_bjmi; 
+              
     } else {
-       $star->colerr( {"BJ-I" => 99.999 } );
-    } 
+       $cval = 99.999;
+       $err = 99.999;
+    }                                  
+    $col = new Astro::FluxColor( upper => 'BJ', lower => "I",
+       quantity => new Number::Uncertainty( Value => $cval, Error => $err ) );
+    push @cols, $col;
+        
+    # Push the data back into the star object, overwriting ther previous
+    # values we got from the initial Skycat query. This isn't a great 
+    # solution, but it wasn't easy in version 3 syntax either, so I guess
+    # your milage may vary.
+    
+    my $fluxes = new Astro::Fluxes( @mags, @cols );
+    $star->fluxes( $fluxes, 1 );  # the 1 means overwrite the previous values
     
     # push it onto the stack
     $newstars[$i] = $star if defined $star;

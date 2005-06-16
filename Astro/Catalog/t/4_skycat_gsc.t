@@ -16,6 +16,10 @@ BEGIN {
   use_ok("Astro::Catalog::Query::SkyCat");
 }
 
+use Astro::Fluxes;
+use Astro::Flux;
+use Number::Uncertainty;
+
 # Load the generic test code
 my $p = ( -d "t" ?  "t/" : "");
 do $p."helper.pl" or die "Error reading test functions: $!";
@@ -68,13 +72,16 @@ foreach my $line ( 0 .. $#buffer ) {
 				       ));
 
        # B Magnitude
-       my %b_mag = ( R => $separated[10] );
-       $star->magnitudes( \%b_mag );
+       #my %b_mag = ( R => $separated[10] );
+       #$star->magnitudes( \%b_mag );
               
        # B mag error
-       my %mag_errors = ( R => undef );
-       $star->magerr( \%mag_errors );
-              
+       #my %mag_errors = ( R => undef );
+       #$star->magerr( \%mag_errors );
+
+       $star->fluxes( new Astro::Fluxes( new Astro::Flux(
+	               new Number::Uncertainty( Value => $separated[10] ),
+			'mag', "R" )));              
        # Quality
        my $quality = $separated[13];
        $star->quality( undef );

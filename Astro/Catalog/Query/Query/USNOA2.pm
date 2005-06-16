@@ -46,11 +46,16 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+use Astro::Flux;
+use Astro::Fluxes;
+use Astro::FluxColor;
+use Number::Uncertainty;
+
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: USNOA2.pm,v 1.7 2003/09/12 22:38:59 aa Exp $
+$Id: USNOA2.pm,v 1.8 2005/06/16 01:57:35 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -231,12 +236,12 @@ sub _parse_query {
               }
               
               # R Magnitude
-              my %r_mag = ( R => $separated[8] );
-              $star->magnitudes( \%r_mag );
+              #my %r_mag = ( R => $separated[8] );
+              #$star->magnitudes( \%r_mag );
 
               # B Magnitude
-              my %b_mag = ( B => $separated[9] );
-              $star->magnitudes( \%b_mag );
+              #my %b_mag = ( B => $separated[9] );
+              #$star->magnitudes( \%b_mag );
 
               # Quality
               my $quality = $separated[10];
@@ -264,16 +269,7 @@ sub _parse_query {
 
            }
 
-           # Push the star into the catalog
-           # ------------------------------
-           
-           # only push the star if the Astro::Coords object is 
-           # correctly defined. The Dec might be bogus since the
-           # USNO-A2 catalogue has its seconds field out of 
-           # normal range (0-59.9) in some cases.
-           if( $star->coords() ) {
-              $catalog->pushstar( $star );
-           }
+
            
            # Calculate error
            # ---------------
@@ -287,17 +283,17 @@ sub _parse_query {
            my ( $power, $delta_r, $delta_b );
 
            # delta.R
-           $power = 0.8*( $star->get_magnitude( 'R' ) - 19.0 );
+           $power = 0.8*( $separated[8] - 19.0 );
            $delta_r = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
 
            # delta.B
-           $power = 0.8*( $star->get_magnitude( 'B' ) - 19.0 );
+           $power = 0.8*( $separated[9] - 19.0 );
            $delta_b = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
 
            # mag errors
-           my %mag_errors = ( B => $delta_b,  R => $delta_r );
-           $star->magerr( \%mag_errors );
-
+           #my %mag_errors = ( B => $delta_b,  R => $delta_r );
+           #$star->magerr( \%mag_errors );
+			 
            # calcuate B-R colour and error
            # -----------------------------
 
@@ -306,19 +302,42 @@ sub _parse_query {
            #   Delta.(B-R) = sqrt( Delta.R**2 + Delta.B**2 )
            #
 
-           my $b_minus_r = $star->get_magnitude( 'B' ) -
-                           $star->get_magnitude( 'R' );
+           my $b_minus_r = $separated[9] - $separated[8];
 
-           my %colours = ( 'B-R' => $b_minus_r );
-           $star->colours( \%colours );
+           #my %colours = ( 'B-R' => $b_minus_r );
+           #$star->colours( \%colours );
 
            # delta.(B-R)
            my $delta_bmr = ( ( $delta_r ** 2.0 ) + ( $delta_b ** 2.0 ) ) ** (1.0/2.0);
 
            # col errors
-           my %col_errors = ( 'B-R' => $delta_bmr );
-           $star->colerr( \%col_errors );
+           #my %col_errors = ( 'B-R' => $delta_bmr );
+           #$star->colerr( \%col_errors );
 
+          $star->fluxes( new Astro::Fluxes( 
+            new Astro::Flux( 
+	       new Number::Uncertainty( Value => $separated[8],
+	                                Error => $delta_r ),'mag', "R" ),
+            new Astro::Flux( 
+	       new Number::Uncertainty( Value => $separated[9],
+	                                Error => $delta_b),'mag', "B" ),
+            new Astro::FluxColor( lower => "R", upper => "B", 
+	                          quantity => new Number::Uncertainty( 
+	                                Value => $b_minus_r,
+	                                Error => $delta_bmr) ),								
+			));
+			
+           # Push the star into the catalog
+           # ------------------------------
+           
+           # only push the star if the Astro::Coords object is 
+           # correctly defined. The Dec might be bogus since the
+           # USNO-A2 catalogue has its seconds field out of 
+           # normal range (0-59.9) in some cases.
+           if( $star->coords() ) {
+              $catalog->pushstar( $star );
+           }
+	   
            # increment counter
            # -----------------
            $counter = $counter + 1;

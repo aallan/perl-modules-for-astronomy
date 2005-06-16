@@ -14,7 +14,9 @@ BEGIN {
   use_ok( "Astro::Catalog");
   use_ok( "Astro::Catalog::Query::GSC");
 }
-
+use Astro::Flux;
+use Astro::Fluxes;
+use Number::Uncertainty;
 
 # Load the generic test code
 my $p = ( -d "t" ?  "t/" : "");
@@ -69,13 +71,18 @@ foreach my $line ( 0 .. $#buffer ) {
 				       ));
 
        # B Magnitude
-       my %b_mag = ( B => $separated[10] );
-       $star->magnitudes( \%b_mag );
+       #my %b_mag = ( B => $separated[10] );
+       #$star->magnitudes( \%b_mag );
               
        # B mag error
-       my %mag_errors = ( B => $separated[11] );
-       $star->magerr( \%mag_errors );
-              
+       #my %mag_errors = ( B => $separated[11] );
+       #$star->magerr( \%mag_errors );
+       
+       $star->fluxes( new Astro::Fluxes( new Astro::Flux(
+        	new Number::Uncertainty( Value => $separated[10],
+	 				 Error => $separated[11] ),
+	 	 'mag', "B" )));
+		 	      
        # Quality
        my $quality = $separated[13];
        $star->quality( $quality );

@@ -8,6 +8,10 @@ use strict;
 use Test::More tests => 202;
 use Data::Dumper;
 
+use Astro::Flux;
+use Astro::Fluxes;
+use Number::Uncertainty;
+
 # Catalog modules need to be loaded first
 BEGIN {
   use_ok( "Astro::Catalog::Star");
@@ -50,8 +54,12 @@ foreach my $line ( 0 .. $#buffer ) {
     $star->id( $name );
 
     $vmag =~ s/^\s+//;
-    my %vmag = ( V => $vmag );
-    $star->magnitudes( \%vmag );
+    #my %vmag = ( V => $vmag );
+    #$star->magnitudes( \%vmag );
+  
+    $star->fluxes( new Astro::Fluxes( new Astro::Flux(
+	               new Number::Uncertainty( Value => $vmag ),
+			'mag', "V" )));
 
     $comment =~ s/^\s+//;
     $star->comment( $comment );

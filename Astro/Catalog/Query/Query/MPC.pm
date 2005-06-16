@@ -48,11 +48,15 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+use Astro::Flux;
+use Astro::Fluxes;
+use Number::Uncertainty;
+
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: MPC.pm,v 1.1 2004/03/03 00:38:42 cavanagh Exp $
+$Id: MPC.pm,v 1.2 2005/06/16 01:57:35 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -215,8 +219,12 @@ sub _parse_query {
           $star->id( $name );
 
           $vmag =~ s/^\s+//;
-          my %vmag = ( V => $vmag );
-          $star->magnitudes( \%vmag );
+          #my %vmag = ( V => $vmag );
+          #$star->magnitudes( \%vmag );
+	    
+	  $star->fluxes( new Astro::Fluxes( new Astro::Flux(
+	                 new Number::Uncertainty( Value => $vmag ),
+			 'mag', "V" )));
 
           $comment =~ s/^\s+//;
           $star->comment( $comment );

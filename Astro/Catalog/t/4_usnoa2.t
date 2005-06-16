@@ -8,6 +8,11 @@ use strict;
 use Test::More tests => 351;
 use Data::Dumper;
 
+use Astro::Flux;
+use Astro::Fluxes;
+use Astro::FluxColor;
+use Number::Uncertainty;
+
 BEGIN {
   # load modules
   use_ok("Astro::Catalog::Star");
@@ -64,13 +69,13 @@ foreach my $line ( 0 .. $#buffer ) {
 				       ));
 
        # R Magnitude
-       my %r_mag = ( R => $separated[9] );
-       $star->magnitudes( \%r_mag );
+       #my %r_mag = ( R => $separated[9] );
+       #$star->magnitudes( \%r_mag );
 
        # B Magnitude
-       my %b_mag = ( B => $separated[10] );
-       $star->magnitudes( \%b_mag );
-
+       #my %b_mag = ( B => $separated[10] );
+       #$star->magnitudes( \%b_mag );
+    
        # Quality
        my $quality = $separated[11];
        $star->quality( $quality );
@@ -97,9 +102,6 @@ foreach my $line ( 0 .. $#buffer ) {
 
     }
 
-    # Push the star into the catalog
-    # ------------------------------
-    $catalog_data->pushstar( $star );
 
     # Calculate error
     # ---------------
@@ -107,32 +109,52 @@ foreach my $line ( 0 .. $#buffer ) {
     my ( $power, $delta_r, $delta_b );
 
     # delta.R
-    $power = 0.8*( $star->get_magnitude( 'R' ) - 19.0 );
+    $power = 0.8*( $separated[9] - 19.0 );
     $delta_r = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
 
     # delta.B
-    $power = 0.8*( $star->get_magnitude( 'B' ) - 19.0 );
+    $power = 0.8*( $separated[10] - 19.0 );
     $delta_b = 0.15* (( 1.0 + ( 10.0 ** $power ) ) ** (1.0/2.0));
 
     # mag errors
-    my %mag_errors = ( B => $delta_b,  R => $delta_r );
-    $star->magerr( \%mag_errors );
+    #my %mag_errors = ( B => $delta_b,  R => $delta_r );
+    #$star->magerr( \%mag_errors );
 
     # calcuate B-R colour and error
     # -----------------------------
 
-    my $b_minus_r = $star->get_magnitude( 'B' ) - 
-                    $star->get_magnitude( 'R' );
+    my $b_minus_r = $separated[10] - $separated[9];
 
-    my %colours = ( 'B-R' => $b_minus_r );
-    $star->colours( \%colours );
+
+    #my %colours = ( 'B-R' => $b_minus_r );
+    #$star->colours( \%colours );
 
     # delta.(B-R)
     my $delta_bmr = ( ( $delta_r ** 2.0 ) + ( $delta_b ** 2.0 ) ) ** (1.0/2.0);
 
     # col errors
-    my %col_errors = ( 'B-R' => $delta_bmr );
-    $star->colerr( \%col_errors );
+    #my %col_errors = ( 'B-R' => $delta_bmr );
+    #$star->colerr( \%col_errors );
+
+    # Build the fluxes object
+    # ------------------------------
+        
+    $star->fluxes( new Astro::Fluxes( 
+            new Astro::Flux( 
+	       new Number::Uncertainty( Value => $separated[9],
+	                                Error => $delta_r ),'mag', "R" ),
+            new Astro::Flux( 
+	       new Number::Uncertainty( Value => $separated[10],
+	                                Error => $delta_b),'mag', "B" ),
+            new Astro::FluxColor( lower => "R", upper => "B" ,
+	                          quantity => new Number::Uncertainty( 
+	                                Value => $b_minus_r,
+	                                Error => $delta_bmr) ),								
+			));
+			
+    # Push the star into the catalog
+    # ------------------------------
+    $catalog_data->pushstar( $star );			
 
 }
 

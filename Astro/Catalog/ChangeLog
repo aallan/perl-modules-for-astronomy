@@ -1,3 +1,11 @@
+2005-06-16 Alasdair Allan <aa@astro.ex.ac.uk>  (Version 4.0)
+
+        * Query/Query/*.pm: All query classes updated. The package passes
+	  all test, however many parts of the test suite do not have anything
+	  like full coverage. I think we have to expect some bugs at this
+	  stage.Theoretically fully working Astro::Catalog distribution
+	  however, so lets badge this as V4.
+
 2005-06-15 Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Basic fixes to Catalog.pm and IO/Cluster.pm to support the new
