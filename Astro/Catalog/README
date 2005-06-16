@@ -6,28 +6,18 @@ What is it?
 
 The module is a generic object orientated astronomical catalogue object.
 
-Version 3.x.x
--------------
-
-Verison 3.x.x of the Astro::Catalog breaks the existing v1.x and v2.x API. 
-There are many good reasons for this, chiefly the introduction of new features
-that would have been hard to implement and maintain backwards compatibility.
-
-New features for v3.x.x include pluggable I/O support, filtering and inline
-sorting of retrieved catalogues. However alot of the improvements are not 
-readily noticable by the user as alot of work has gone into the infrastructure
-of the package. This means that adding additional I/O and Query support has 
-been made alot easier.
-
 Version 4.x.x
 -------------
 
-This release is the last of the V3 releases. The next release V4.0.0 will
-include new functionality, including time series support, and add "proper"
-support for fluxes, errors and quality flags. However it may not be backwards
-compatible with the existing code in all cases. This therefore is the last
-version of Astro::Catalog which promises backwards compatibility with 
-exisiting V3 code.
+This release is the first V4 releae and breaks the existing V3.* API in 
+a similiar manner than the V3 release broke the exisint V2.* and V1.* API.
+The new V4 code also now depends on the Astro::Flux, Number::Uncertainty 
+and Misc::Quality packages which can be downloaded from CPAN.
+
+However to make up for these inconveniences V4 has a host of new features,
+including better support for error handling using Number::Uncertainty,
+auto-generation of colours from existing magnitude data, better quality
+flags and time series support. 
 
 Requirements
 ------------
@@ -48,9 +38,12 @@ The madatory requirement of the Astro::Catalog package are,
   Data::Dumper
   Carp
   Astro::VO::VOTable
+  Astro::Flux
+  Number::Uncertainty
+  Misc::Quality
 
 See http://heasarc.gsfc.nasa.gov/classx/votable/index.html to obtain the GSFC
-VOTable package. You need V0.9 or later of this module.
+Astro::VO::VOTable package. You need V0.9 or later of this module.
 
 Provides
 --------
@@ -155,10 +148,10 @@ The module was originally written by Alasdair Allan <aa@astro.ex.ac.uk>,
 of the University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/)  
 as part of his work for the eSTAR project.
 
-The internal architecture of the module has been extensively rewritten 
-for v3.0 by Tim Jenness <t.jenness@jach.hawaii.edu> of the Joint Astronomy
-Centre in Hawaii and Alasdair Allan <aa@astro.ex.ac.uk>, of the University 
-of Exeter Astrophysics Group
+The internal architecture of the module was extensively rewritten for v3.0 
+by Tim Jenness <t.jenness@jach.hawaii.edu> of the Joint Astronomy Centre 
+in Hawaii and Alasdair Allan <aa@astro.ex.ac.uk>, of the University of 
+Exeter Astrophysics Group. Then rewritten again by Alasdair Allan <aa@astro.ex.ac.uk> for the v4.0 release.
 
 This version also includes patches supplied by Stephen Quinney
 <S.J.Quinney@durham.ac.uk> of Durham University, and Brad Cavanagh

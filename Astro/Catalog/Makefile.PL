@@ -26,6 +26,9 @@ WriteMakefile(
                                      'Astro::FITS::CFITSIO'=> 1.03,
                                      'File::Temp'          => 0.14,
                                      'Class::Struct'       => 0.63,
+				     'Number::Uncertainty' => 0.01,
+				     'Misc::Quality'       => 0.01,
+				     'Astro::Flux'         => 0.01
 	                           },
 	       'dist'           => { COMPRESS => "gzip -9f"},
 	       ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
