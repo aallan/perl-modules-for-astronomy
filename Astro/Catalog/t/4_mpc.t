@@ -134,6 +134,6 @@ __DATA__
 (30505) 2000 RW82        07 06 00.9 -10 20 39  18.6 111.8W 221.3N     4-    14+    7o  None needed at this time.
  (6911) Nancygreen       07 32 08.0 -14 26 28  15.5 268.2E  24.5S     0-    43+    9o  None needed at this time.
         2003 BY18        07 22 16.1 -09 53 13  18.2 124.7E 248.8N     6-    13+    4o  Very desirable between 2005 June 4-July 4.  (120.0,-25.0,19.1)
-        2000 RS48        07 07 08.9 -09 38 15  19.5  95.3W 263.8N     4+    32+    3o  Desirable between 2005 June 17-July 17.  (117.8,+18.0,18.9)
+        2000 RS48        07 07 08.9 -09 38 15  19.4  95.3W 263.8N     4+    32+    3o  Desirable between 2005 June 17-July 17.  (117.8,+18.0,18.9)
         1999 TM234       07 23 10.0 -09 57 32  18.9 137.8E 244.5N     7-    20+    2o  Desirable between 2005 June 4-July 4.  (125.3,-18.7,18.9)
 (54857) 2001 OY22        07 33 00.4 -15 42 45  19.2 281.0E 100.8S    13-    24+    7o  None needed at this time.
