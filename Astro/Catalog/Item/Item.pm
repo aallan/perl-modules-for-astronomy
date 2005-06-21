@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.4 2005/06/16 01:57:35 aa Exp $
+#     $Id: Item.pm,v 1.5 2005/06/21 02:36:50 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.4 2005/06/16 01:57:35 aa Exp $
+$Id: Item.pm,v 1.5 2005/06/21 02:36:50 aa Exp $
 
 =head1 METHODS
 
@@ -1173,6 +1173,84 @@ sub insertdate {
   return $self->{INSERTDATE};
 }
 
+
+=item B<fluxdatestamp>
+
+Apply a datestamp to all the C<Astro::Flux> objects inside the
+C<Astro::Fluxes> object contained within this object
+
+  $star->fluxdatestamp( new DateTime() )
+
+this is different from the time for which the inormation about the
+star was gathered, see the insertdate() method call, and is the
+time of observation of the object.
+
+=cut
+
+sub fluxdatestamp {
+  my $self = shift;
+  if( @_ ) {
+    my $datetime = shift; 
+    croak "Astro::Catalog::Item::fluxdatestamp()\n".
+          "Error: Not a DateTime object\n"
+                      unless UNIVERSAL::isa( $datetime, "DateTime" );   
+    $self->{FLUXES}->datestamp( $datetime );
+  }
+  return $self->{FLUXES};
+}
+
+
+=item B<distancetostar>
+
+The distance from another Item,
+
+  my $distance1 = $star->distancetostar( $star2 )
+
+returns a separation value in arcsec.
+
+=cut
+
+sub distancetostar {
+  my $self = shift;
+  my $other = shift;
+  
+  croak "Astro::Catalog::Item::distancetostar()\n".
+        "Error: Not an Astro::Catalog::Item object\n"
+        unless UNIVERSAL::isa( $other, "Astro::Catalog::Item" );    
+  
+  my $radsep = $self->coords->distance( $other->coords );
+  my $assep = $radsep * Astro::Catalog::Item::DR2AS;
+  
+  my $distance = $assep;
+  return $distance;
+}
+
+
+=item B<within>
+
+Check if the passed star is within $distance_in_arcsec of the object.
+
+  my $status = $star->within( $star2, $distance_in_arcsec )
+
+returns true if this is the case.
+
+=cut
+
+sub within {
+  my $self = shift;
+  my $other = shift;
+  my $max = shift;
+ 
+  croak "Astro::Catalog::Item::within()\n".
+        "Error: Not an Astro::Catalog::Item object\n"
+        unless UNIVERSAL::isa( $other, "Astro::Catalog::Item" );    
+	  
+  my $distance = $self->distancetostar( $other );
+  return 1 if $distance < $max;
+  return 0;  
+}
+
+
 =back
 
 =head2 Obsolete Methods
@@ -1187,27 +1265,27 @@ method.
 sub magnitudes {
   my $self = shift;
   croak "Astro::Catalog::Item::magnitudes()\n" .
-        "This method is no longer supported, use addfluxes() instead.\n";
+        "This method is no longer supported, use fluxes() instead.\n";
 }
 
 sub magerr {
   my $self = shift;
   croak "Astro::Catalog::Item::magerr()\n" .
-        "This method is no longer supported, use addfluxes() instead.\n";
+        "This method is no longer supported, use fluxes() instead.\n";
 }
 
 
 sub colours {
   my $self = shift;
   croak "Astro::Catalog::Item::colours()\n" .
-        "This method is no longer supported, use addfluxes() instead.\n";
+        "This method is no longer supported, use fluxes() instead.\n";
 
 }
 
 sub colerr {
   my $self = shift;
   croak "Astro::Catalog::Item::colerr()\n" .
-   "This method is no longer supported, use addfluxes() instead.\n";
+   "This method is no longer supported, use fluxes() instead.\n";
 
 }
 

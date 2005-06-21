@@ -5,12 +5,13 @@
 use strict;
 
 #load test
-use Test::More tests => 17;
+use Test::More tests => 27;
 
 
 # load modules
 BEGIN { use_ok("Astro::Catalog::Item") };
 use Data::Dumper;
+use DateTime;
 
 # T E S T   H A R N E S S --------------------------------------------------
 
@@ -89,6 +90,63 @@ is( $star->get_colour('B-R'), 0.3 , "compare B-R colour values" );
 is( $star->get_colourerr('B-V'), 0.02, "compare B-V colour error values" );
 is( $star->get_colourerr('B-R'), 0.05, "compare B-R colour error values" );
 
+
+# Date Stamp the fluxes
+# ---------------------
+
+print "1\n";
+my $time = DateTime->now();
+print "2\n";
+$star->fluxdatestamp( $time );
+print "3\n";
+my $f = $star->fluxes();
+print "4\n";
+is($f->flux( waveband => new Astro::WaveBand( Filter => 'B' ) )->datetime(), $time, 'Retrieval of pushed DateTime object from Astro::Fluxes object');
+is($f->flux( waveband => new Astro::WaveBand( Filter => 'V' ) )->datetime(), $time, 'Retrieval of pushed DateTime object from Astro::Fluxes object');
+is($f->flux( waveband => new Astro::WaveBand( Filter => 'R' ) )->datetime(), $time, 'Retrieval of pushed DateTime object from Astro::Fluxes object');
+
+
+# Distance 
+# --------
+
+my $star1 = new Astro::Catalog::Item( ID         => '1',
+                                     RA         => '17.55398',
+                                     Dec        => '60.07673',
+                                     Fluxes     => $fluxes,
+                                     Quality    => '0',
+                                     GSC        => 'FALSE',
+                                     Distance   => '0.09',
+                                     PosAngle   => '50.69',
+                                     Field      => '00080' );
+isa_ok($star1,"Astro::Catalog::Item");
+				     
+my $star2 = new Astro::Catalog::Item( ID         => '2',
+                                     RA         => '18.55398',
+                                     Dec        => '60.07673',
+                                     Fluxes     => $fluxes,
+                                     Quality    => '0',
+                                     GSC        => 'FALSE',
+                                     Distance   => '0.09',
+                                     PosAngle   => '50.69',
+                                     Field      => '00080' );
+isa_ok($star2,"Astro::Catalog::Item");
+
+my $star3 = new Astro::Catalog::Item( ID         => '2',
+                                     RA         => '17.554',
+                                     Dec        => '60.07673',
+                                     Fluxes     => $fluxes,
+                                     Quality    => '0',
+                                     GSC        => 'FALSE',
+                                     Distance   => '0.09',
+                                     PosAngle   => '50.69',
+                                     Field      => '00080' );
+isa_ok($star3,"Astro::Catalog::Item");
+
+is( sprintf ("%.4f", $star1->distancetostar($star2)), 1795.7688, "Distance from 1 to 2");
+is( sprintf ("%.4f", $star1->distancetostar($star3)), 0.0359, "Distance from 1 to 3");
+
+is( $star1->within($star2, 1), 0, "Star 2 within 1 arcsec of star 1");
+is( $star1->within($star3, 1), 1, "Star 2 within 1 arcsec of star 1");
 
 # T I M E   A T   T H E   B A R ---------------------------------------------
 exit;                                     

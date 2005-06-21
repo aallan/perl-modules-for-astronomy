@@ -1,3 +1,12 @@
+2005-06-20 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+        * Item.pm: Added fluxdatestamp() function which allows you to append
+	  a time stamp to all the Astro::Flux objects held in the Item. Also
+	  addeddistancetostar() and within() methods to allow us to easily
+	  figure out if one star is close to another.
+	  
+	* t/4_mpc.t: Updated tests again. Must be better way to do this?   
+	
 2005-06-16 Alasdair Allan <aa@astro.ex.ac.uk>  (Version 4.0)
 
         * Query/Query/*.pm: All query classes updated. The package passes
