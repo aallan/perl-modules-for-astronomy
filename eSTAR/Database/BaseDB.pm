@@ -201,7 +201,7 @@ sub _dbhandle {
     } elsif (!defined $db) {
       $self->{DB} = undef;
     } else {
-      croak "Attempt to set database handle in eSTAR::Database::BaseDB using incorrect class");
+      croak "Attempt to set database handle in eSTAR::Database::BaseDB using incorrect class";
     }
   }
   my $db = $self->{DB};

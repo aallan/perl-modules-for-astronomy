@@ -27,7 +27,8 @@ use Carp;
 # External modules
 use XML::LibXML; # Our standard parser
 
-use Time::Piece ':override'; # for gmtime
+use DateTime;
+#use Time::Piece ':override'; # for gmtime
 use Time::Seconds;
 
 # Package globals

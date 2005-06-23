@@ -42,7 +42,7 @@ BEGIN { $ENV{SYBASE} = "/local/progs/sybase" unless exists $ENV{SYBASE} }
 
 #use OMP::Error;
 #use OMP::General;
-use eSTAR::Config;
+#use eSTAR::Config;
 use DBI;
 
 our $VERSION = '0.01';
@@ -83,14 +83,19 @@ file rather than hard-wiring the values in the module.
 sub loginhash {
   my $class = shift;
 
-  my $config = new eSTAR::Config();
+#  my $config = new eSTAR::Config();
 
   my %details = (
-		 driver   => $config->get_option("database.driver"),
-		 server   => $config->get_option("database.server"),
-		 database => $config->get_option("database.database"),
-		 user     => $config->get_option("database.user"),
-		 password => $config->get_option("database.password"),
+#		 driver   => $config->get_option("database.driver"),
+#		 server   => $config->get_option("database.server"),
+#		 database => $config->get_option("database.database"),
+#		 user     => $config->get_option("database.user"),
+#		 password => $config->get_option("database.password"),
+                 driver => 'Sybase',
+                 server => 'SYB_OMP1',
+                 database => 'estar',
+                 user => 'estar',
+                 password => 'estar_db',
 		);
 
   # possible override for sybase users
