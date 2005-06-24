@@ -13,7 +13,7 @@ eval { require Astro::FITS::CFITSIO; };
 if( $@ ) {
   plan skip_all => "Tests require Astro::FITS::CFITSIO";
 } else {
-  plan tests => 7;
+  plan tests => 16;
 }
 
 require_ok( "Astro::Catalog" );
@@ -35,7 +35,15 @@ is( $id, 672, "Last object's ID" );
 
 is( $star->dec, "-02 03 51.95", "Last object's Dec" );
 
-my $mag = $star->get_magnitude( 'unknown' );
-is( $mag, -7.66992554016591, "Last object's magnitude" );
+my $fluxes = $star->fluxes;
+isa_ok( $fluxes, "Astro::Fluxes" );
 
-
+my @allfluxes = $fluxes->allfluxes;
+foreach my $flux ( @allfluxes ) {
+  isa_ok( $flux, "Astro::Flux" );
+  if( lc($flux->type) eq 'isophotal_flux' ) {
+    is( sprintf( "%.3f", $flux->quantity('isophotal_flux') ),
+        1169.419,
+        "Last object's isophotal flux" );
+  }
+}
