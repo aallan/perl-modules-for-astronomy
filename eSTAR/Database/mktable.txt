@@ -1,0 +1,16 @@
+use estar;
+
+CREATE TABLE tblObject ( pklngID NUMERIC(18,0) NOT NULL PRIMARY KEY, right_ascension FLOAT NOT NULL, declination FLOAT NOT NULL, HTMid NUMERIC(20,0) NOT NULL, ellipticity FLOAT NULL, ellipticity_error FLOAT NULL, position_angle FLOAT NULL, position_angle_error FLOAT NULL, fwhm FLOAT NULL, fwhm_error FLOAT NULL, flag VARCHAR(4) NULL );
+
+CREATE INDEX idxHTMid ON tblObject ( HTMid );
+CREATE INDEX idxflag ON tblObject ( flag );
+
+CREATE TABLE tblMeasurement ( pklngID NUMERIC(18,0) NOT NULL PRIMARY KEY, fklngObject NUMERIC(18,0) NOT NULL, core_flux_1 FLOAT NULL, core_flux_1_error FLOAT NULL, core_flux_2 FLOAT NULL, core_flux_2_error FLOAT NULL, core_flux_3 FLOAT NULL, core_flux_3_error FLOAT NULL, core_flux_4 FLOAT NULL, core_flux_4_error FLOAT NULL, core_flux_5 FLOAT NULL, core_flux_5_error FLOAT NULL, isophotal_flux FLOAT NULL, isophotal_flux_error FLOAT NULL, total_flux FLOAT NULL, total_flux_error FLOAT NULL, peak_height FLOAT NULL, peak_height_error FLOAT NULL, sky_level FLOAT NULL, sky_level_error FLOAT NULL, extraction_flags BINARY(32) NULL , datetime DATETIME NOT NULL, FOREIGN KEY (fklngObject) REFERENCES tblObject(pklngID) );
+
+CREATE INDEX idxdatetime ON tblMeasurement ( datetime );
+
+CREATE TABLE tblObservation ( pklngID NUMERIC(18,0) NOT NULL PRIMARY KEY, observation_id VARCHAR(32) );
+
+CREATE INDEX idxobservation_id ON tblObservation ( observation_id );
+
+CREATE TABLE tblMeasObs ( pklngID NUMERIC(18,0) IDENTITY NOT NULL PRIMARY KEY, fklngMeasurement NUMERIC(18,0) NOT NULL, fklngObservation NUMERIC(18,0) NOT NULL, FOREIGN KEY ( fklngMeasurement ) REFERENCES tblMeasurement( pklngID ), FOREIGN KEY ( fklngObservation ) REFERENCES tblObservation( pklngID ) );
