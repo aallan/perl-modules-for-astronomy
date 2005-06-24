@@ -86,7 +86,9 @@ C<Astro::Catalog::Star> properties are:
 
 =item RA & DEC - Coords
 
-=item Isophotal_flux - Magnitudes
+=item Isophotal_flux, Total_flux, Core_flux, Core1_flux, Core2_flux,
+ Core3_flux, Core4_flux, Core5_flux - C<Astro::Flux> objects pushed into
+ the C<Astro::Catalog::Item> fluxes accessor.
 
 =item Ellipticity & Position_angle - Morphology
 
@@ -115,7 +117,14 @@ sub _read_catalog {
                       'Y' => 'Y_coordinate',
                       'RA' => 'RA',
                       'Dec' => 'DEC',
-                      'flux' => 'Isophotal_flux',
+                      'isophotal_flux' => 'Isophotal_flux',
+                      'total_flux' => 'Total_flux',
+                      'core_flux' => 'Core_flux',
+                      'core1_flux' => 'Core1_flux',
+                      'core2_flux' => 'Core2_flux',
+                      'core3_flux' => 'Core3_flux',
+                      'core4_flux' => 'Core4_flux',
+                      'core5_flux' => 'Core5_flux',
                       'ellipticity' => 'Ellipticity',
                       'position_angle' => 'Position_angle',
                     );
@@ -179,7 +188,7 @@ sub _read_catalog {
       $fptr->get_colnum( CASEINSEN, $column_name{'RA'}, my $ra_column, $status );
       if( $status == COL_NOT_FOUND ) {
         $status = 0;
-        $id_column = -1;
+        $ra_column = -1;
       } elsif( $status != 0 ) {
         Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
         croak "Error in finding RA column: $status $text";
@@ -190,7 +199,7 @@ sub _read_catalog {
       $fptr->get_colnum( CASEINSEN, $column_name{'Dec'}, my $dec_column, $status );
       if( $status == COL_NOT_FOUND ) {
         $status = 0;
-        $id_column = -1;
+        $dec_column = -1;
       } elsif( $status != 0 ) {
         Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
         croak "Error in finding Dec column: $status $text";
@@ -198,16 +207,93 @@ sub _read_catalog {
       if( $dec_column == 0 ) { $dec_column = -1; }
       print "Dec column: $dec_column\n" if $DEBUG;
 
-      $fptr->get_colnum( CASEINSEN, $column_name{'flux'}, my $flux_column, $status );
+      $fptr->get_colnum( CASEINSEN, $column_name{'isophotal_flux'}, my $iso_flux_column, $status );
       if( $status == COL_NOT_FOUND ) {
         $status = 0;
-        $id_column = -1;
+        $iso_flux_column = -1;
       } elsif( $status != 0 ) {
         Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
-        croak "Error in finding flux column: $status $text";
+        croak "Error in finding isophotal flux column: $status $text";
       }
-      if( $flux_column == 0 ) { $flux_column = -1; }
-      print "Flux column: $flux_column\n" if $DEBUG;
+      if( $iso_flux_column == 0 ) { $iso_flux_column = -1; }
+      print "Isophotal flux column: $iso_flux_column\n" if $DEBUG;
+
+      $fptr->get_colnum( CASEINSEN, $column_name{'total_flux'}, my $total_flux_column, $status );
+      if( $status == COL_NOT_FOUND ) {
+        $status = 0;
+        $total_flux_column = -1;
+      } elsif( $status != 0 ) {
+        Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+        croak "Error in finding total flux column: $status $text";
+      }
+      if( $total_flux_column == 0 ) { $total_flux_column = -1; }
+      print "Total flux column: $total_flux_column\n" if $DEBUG;
+
+      $fptr->get_colnum( CASEINSEN, $column_name{'core_flux'}, my $core_flux_column, $status );
+      if( $status == COL_NOT_FOUND ) {
+        $status = 0;
+        $core_flux_column = -1;
+      } elsif( $status != 0 ) {
+        Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+        croak "Error in finding core flux column: $status $text";
+      }
+      if( $core_flux_column == 0 ) { $core_flux_column = -1; }
+      print "Core flux column: $core_flux_column\n" if $DEBUG;
+
+      $fptr->get_colnum( CASEINSEN, $column_name{'core1_flux'}, my $core1_flux_column, $status );
+      if( $status == COL_NOT_FOUND ) {
+        $status = 0;
+        $core1_flux_column = -1;
+      } elsif( $status != 0 ) {
+        Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+        croak "Error in finding core1 flux column: $status $text";
+      }
+      if( $core1_flux_column == 0 ) { $core1_flux_column = -1; }
+      print "Core1 flux column: $core1_flux_column\n" if $DEBUG;
+
+      $fptr->get_colnum( CASEINSEN, $column_name{'core2_flux'}, my $core2_flux_column, $status );
+      if( $status == COL_NOT_FOUND ) {
+        $status = 0;
+        $core2_flux_column = -1;
+      } elsif( $status != 0 ) {
+        Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+        croak "Error in finding core2 flux column: $status $text";
+      }
+      if( $core2_flux_column == 0 ) { $core2_flux_column = -1; }
+      print "Core2 flux column: $core2_flux_column\n" if $DEBUG;
+
+      $fptr->get_colnum( CASEINSEN, $column_name{'core3_flux'}, my $core3_flux_column, $status );
+      if( $status == COL_NOT_FOUND ) {
+        $status = 0;
+        $core3_flux_column = -1;
+      } elsif( $status != 0 ) {
+        Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+        croak "Error in finding core3 flux column: $status $text";
+      }
+      if( $core3_flux_column == 0 ) { $core3_flux_column = -1; }
+      print "Core3 flux column: $core3_flux_column\n" if $DEBUG;
+
+      $fptr->get_colnum( CASEINSEN, $column_name{'core4_flux'}, my $core4_flux_column, $status );
+      if( $status == COL_NOT_FOUND ) {
+        $status = 0;
+        $core4_flux_column = -1;
+      } elsif( $status != 0 ) {
+        Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+        croak "Error in finding core4 flux column: $status $text";
+      }
+      if( $core4_flux_column == 0 ) { $core4_flux_column = -1; }
+      print "Core4 flux column: $core4_flux_column\n" if $DEBUG;
+
+      $fptr->get_colnum( CASEINSEN, $column_name{'core5_flux'}, my $core5_flux_column, $status );
+      if( $status == COL_NOT_FOUND ) {
+        $status = 0;
+        $core5_flux_column = -1;
+      } elsif( $status != 0 ) {
+        Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+        croak "Error in finding core5 flux column: $status $text";
+      }
+      if( $core5_flux_column == 0 ) { $core5_flux_column = -1; }
+      print "Core5 flux column: $core5_flux_column\n" if $DEBUG;
 
       $fptr->get_colnum( CASEINSEN, $column_name{'ellipticity'}, my $ell_column, $status );
       if( $status == COL_NOT_FOUND ) {
@@ -259,7 +345,8 @@ sub _read_catalog {
       my $id;
       my $ra;
       my $dec;
-      my $flux;
+      my ( $iso_flux, $total_flux, $core_flux, $core1_flux, $core2_flux, $core3_flux );
+      my ( $core4_flux, $core5_flux );
       my $ell;
       my $posang;
       my $x_pos;
@@ -285,11 +372,60 @@ sub _read_catalog {
           croak "Error in retrieving data for Dec column: $status $text";
         }
       }
-      if( $flux_column != -1 ) {
-        $fptr->read_col( TFLOAT, $flux_column, 1, 1, $nrows, undef, $flux, undef, $status );
+      if( $iso_flux_column != -1 ) {
+        $fptr->read_col( TFLOAT, $iso_flux_column, 1, 1, $nrows, undef, $iso_flux, undef, $status );
         if( $status != 0 ) {
           Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
-          croak "Error in retrieving data for flux column: $status $text";
+          croak "Error in retrieving data for isophotal flux column: $status $text";
+        }
+      }
+      if( $total_flux_column != -1 ) {
+        $fptr->read_col( TFLOAT, $total_flux_column, 1, 1, $nrows, undef, $total_flux, undef, $status );
+        if( $status != 0 ) {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error in retrieving data for tottal flux column: $status $text";
+        }
+      }
+      if( $core_flux_column != -1 ) {
+        $fptr->read_col( TFLOAT, $core_flux_column, 1, 1, $nrows, undef, $core_flux, undef, $status );
+        if( $status != 0 ) {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error in retrieving data for core flux column: $status $text";
+        }
+      }
+      if( $core1_flux_column != -1 ) {
+        $fptr->read_col( TFLOAT, $core1_flux_column, 1, 1, $nrows, undef, $core1_flux, undef, $status );
+        if( $status != 0 ) {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error in retrieving data for core1 flux column: $status $text";
+        }
+      }
+      if( $core2_flux_column != -1 ) {
+        $fptr->read_col( TFLOAT, $core2_flux_column, 1, 1, $nrows, undef, $core2_flux, undef, $status );
+        if( $status != 0 ) {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error in retrieving data for core2 flux column: $status $text";
+        }
+      }
+      if( $core3_flux_column != -1 ) {
+        $fptr->read_col( TFLOAT, $core3_flux_column, 1, 1, $nrows, undef, $core3_flux, undef, $status );
+        if( $status != 0 ) {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error in retrieving data for core3 flux column: $status $text";
+        }
+      }
+      if( $core4_flux_column != -1 ) {
+        $fptr->read_col( TFLOAT, $core4_flux_column, 1, 1, $nrows, undef, $core4_flux, undef, $status );
+        if( $status != 0 ) {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error in retrieving data for core4 flux column: $status $text";
+        }
+      }
+      if( $core5_flux_column != -1 ) {
+        $fptr->read_col( TFLOAT, $core5_flux_column, 1, 1, $nrows, undef, $core5_flux, undef, $status );
+        if( $status != 0 ) {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error in retrieving data for core5 flux column: $status $text";
         }
       }
       if( $ell_column != -1 ) {
@@ -336,9 +472,37 @@ sub _read_catalog {
         if( defined( $dec ) ) {
           $dec_value = $dec->[$i];
         }
-        my $flux_value;
-        if( defined( $flux ) ) {
-          $flux_value = $flux->[$i];
+        my $iso_flux_value;
+        if( defined( $iso_flux ) ) {
+          $iso_flux_value = $iso_flux->[$i];
+        }
+        my $total_flux_value;
+        if( defined( $total_flux ) ) {
+          $total_flux_value = $total_flux->[$i];
+        }
+        my $core_flux_value;
+        if( defined( $core_flux ) ) {
+          $core_flux_value = $core_flux->[$i];
+        }
+        my $core1_flux_value;
+        if( defined( $core1_flux ) ) {
+          $core1_flux_value = $core1_flux->[$i];
+        }
+        my $core2_flux_value;
+        if( defined( $core2_flux ) ) {
+          $core2_flux_value = $core2_flux->[$i];
+        }
+        my $core3_flux_value;
+        if( defined( $core3_flux ) ) {
+          $core3_flux_value = $core3_flux->[$i];
+        }
+        my $core4_flux_value;
+        if( defined( $core4_flux ) ) {
+          $core4_flux_value = $core4_flux->[$i];
+        }
+        my $core5_flux_value;
+        if( defined( $core5_flux ) ) {
+          $core5_flux_value = $core5_flux->[$i];
         }
         my $ell_value;
         if( defined( $ell ) ) {
@@ -368,12 +532,15 @@ sub _read_catalog {
                                      );
         }
 
-        # Calculate the magnitude.
-        my $flux;
-        if( defined( $flux_value ) ) {
-          my $mag = -2.5 * log( $flux_value ) / log( 10 );
-	  $flux = new Astro::Flux( $mag, 'mag', 'unknown' );
-        }
+        # Set up the Astro::Flux objects.
+        my $iso_flux_obj = new Astro::Flux( $iso_flux_value, 'isophotal_flux', 'unknown' );
+        my $total_flux_obj = new Astro::Flux( $total_flux_value, 'total_flux', 'unknown' );
+        my $core_flux_obj = new Astro::Flux( $core_flux_value, 'core_flux', 'unknown' );
+        my $core1_flux_obj = new Astro::Flux( $core1_flux_value, 'core1_flux', 'unknown' );
+        my $core2_flux_obj = new Astro::Flux( $core2_flux_value, 'core2_flux', 'unknown' );
+        my $core3_flux_obj = new Astro::Flux( $core3_flux_value, 'core3_flux', 'unknown' );
+        my $core4_flux_obj = new Astro::Flux( $core4_flux_value, 'core4_flux', 'unknown' );
+        my $core5_flux_obj = new Astro::Flux( $core5_flux_value, 'core5_flux', 'unknown' );
 
         # And set up the Astro::Catalog::Star::Morphology object.
         my $morphology = new Astro::Catalog::Star::Morphology( ellipticity => $ell_value,
@@ -382,7 +549,14 @@ sub _read_catalog {
 
         # And create the Astro::Catalog::Star object from this conglomoration of data.
         my $star = new Astro::Catalog::Star( ID => $id_value,
-                                             Fluxes => new Astro::Fluxes( $flux ),
+                                             Fluxes => new Astro::Fluxes( $iso_flux_obj,
+                                                                          $total_flux_obj,
+                                                                          $core_flux_obj,
+                                                                          $core1_flux_obj,
+                                                                          $core2_flux_obj,
+                                                                          $core3_flux_obj,
+                                                                          $core4_flux_obj,
+                                                                          $core5_flux_obj ),
                                              Coords => $coords,
                                              X => $x_pos_value,
                                              Y => $y_pos_value,
@@ -432,7 +606,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: FITSTable.pm,v 1.4 2005/06/15 19:03:42 aa Exp $
+  $Id: FITSTable.pm,v 1.5 2005/06/24 20:47:48 cavanagh Exp $
 
 =head1 SEE ALSO
 
