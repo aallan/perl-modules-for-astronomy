@@ -4,7 +4,7 @@
 
 # Astro::Catalog test harness
 use Test::More;
-
+use Data::Dumper;
 use File::Spec;
 
 use strict;

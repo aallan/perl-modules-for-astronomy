@@ -31,11 +31,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Sesame.pm,v 1.6 2005/06/08 01:08:49 aa Exp $
+$Id: Sesame.pm,v 1.7 2005/06/24 02:59:23 aa Exp $
 
 =head1 METHODS
 
@@ -82,7 +82,7 @@ sub querydb {
   eval { $buffer = $service->Sesame( $ident ); };
   if ( $@ ) {
      my $status = $service->transport()->status();
-     croak("Error: $status");
+     croak("Error ($status): $@");
      return;
   }
  
