@@ -27,6 +27,9 @@ use Astro::Flux;
 use Astro::FluxColor;
 use Astro::Fluxes;
 
+use DateTime;
+use DateTime::Format::ISO8601;
+
 use base qw/ Astro::Catalog::IO::Binary /;
 
 use vars qw/ $VERSION $DEBUG /;
@@ -100,6 +103,10 @@ and is converted into a magnitude through the formula -2.5 * log10( flux ).
 The position angle is assumed to be the angle measured counter-
 clockwise from the positive x axis, in degrees.
 
+An attempt to read in the DATE-OBS header is made so that flux measurements
+can be timestamped. If the DATE-OBS header does not exist, then the current
+date and time will be used for the flux timestamps.
+
 =cut
 
 sub _read_catalog {
@@ -163,6 +170,30 @@ sub _read_catalog {
     }
 
     if( $hdutype == BINARY_TBL ) {
+
+      # Try to retrieve the DATE-OBS header. This will be used
+      # to give each flux measurement a datetime stamp. If DATE-OBS
+      # cannot be determined, then set the datetime to the current
+      # time.
+      my $datetime;
+      $fptr->read_keyword( 'DATE-OBS', my $dateobs, my $comment, $status );
+      if( $status != 0 ) {
+        if( $status == KEY_NO_EXIST ) {
+          # We can deal with this, just take the current time and set
+          # the status back to 0 (good).
+          $datetime = DateTime->now;
+          $status = 0;
+        } else {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error retrieving DATE-OBS header from FITS file: $status $text";
+        }
+      } else {
+        # Strip out any characters that aren't meant to be there.
+        # read_keyword() puts single quotes around strings, so we need
+        # to get rid of those, along with any trailing Zs.
+        $dateobs =~ s/['Z]//g;
+        $datetime = DateTime::Format::ISO8601->parse_datetime( $dateobs );
+      }
 
       # Get the number of rows in this table.
       $fptr->get_num_rows( my $nrows, $status );
@@ -533,14 +564,22 @@ sub _read_catalog {
         }
 
         # Set up the Astro::Flux objects.
-        my $iso_flux_obj = new Astro::Flux( $iso_flux_value, 'isophotal_flux', 'unknown' );
-        my $total_flux_obj = new Astro::Flux( $total_flux_value, 'total_flux', 'unknown' );
-        my $core_flux_obj = new Astro::Flux( $core_flux_value, 'core_flux', 'unknown' );
-        my $core1_flux_obj = new Astro::Flux( $core1_flux_value, 'core1_flux', 'unknown' );
-        my $core2_flux_obj = new Astro::Flux( $core2_flux_value, 'core2_flux', 'unknown' );
-        my $core3_flux_obj = new Astro::Flux( $core3_flux_value, 'core3_flux', 'unknown' );
-        my $core4_flux_obj = new Astro::Flux( $core4_flux_value, 'core4_flux', 'unknown' );
-        my $core5_flux_obj = new Astro::Flux( $core5_flux_value, 'core5_flux', 'unknown' );
+        my $iso_flux_obj = new Astro::Flux( $iso_flux_value, 'isophotal_flux', 'unknown',
+                                            datetime => $datetime );
+        my $total_flux_obj = new Astro::Flux( $total_flux_value, 'total_flux', 'unknown',
+                                              datetime => $datetime );
+        my $core_flux_obj = new Astro::Flux( $core_flux_value, 'core_flux', 'unknown',
+                                             datetime => $datetime );
+        my $core1_flux_obj = new Astro::Flux( $core1_flux_value, 'core1_flux', 'unknown',
+                                              datetime => $datetime );
+        my $core2_flux_obj = new Astro::Flux( $core2_flux_value, 'core2_flux', 'unknown',
+                                              datetime => $datetime );
+        my $core3_flux_obj = new Astro::Flux( $core3_flux_value, 'core3_flux', 'unknown',
+                                              datetime => $datetime );
+        my $core4_flux_obj = new Astro::Flux( $core4_flux_value, 'core4_flux', 'unknown',
+                                              datetime => $datetime );
+        my $core5_flux_obj = new Astro::Flux( $core5_flux_value, 'core5_flux', 'unknown',
+                                              datetime => $datetime );
 
         # And set up the Astro::Catalog::Star::Morphology object.
         my $morphology = new Astro::Catalog::Star::Morphology( ellipticity => $ell_value,
@@ -606,7 +645,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: FITSTable.pm,v 1.5 2005/06/24 20:47:48 cavanagh Exp $
+  $Id: FITSTable.pm,v 1.6 2005/06/24 22:00:07 cavanagh Exp $
 
 =head1 SEE ALSO
 
