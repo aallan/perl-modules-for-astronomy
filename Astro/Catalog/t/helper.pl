@@ -207,8 +207,8 @@ sub compare_mpc_star {
 
   is( $cmpstar->id(), $refstar->id(), "compare star ID" );
 
-  # Distance is okay if we are within 60 arcsec
-  my $maxsec = 60;
+  # Distance is okay if we are within 120 arcsec
+  my $maxsec = 120;
   my $radsep = $refstar->coords->distance( $cmpstar->coords );
 
   if (!defined $radsep) {
