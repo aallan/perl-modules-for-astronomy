@@ -1,9 +1,13 @@
+2005-06-26 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+        * Query/Query/Sesame.pm: Fixed problems with Sesame endpoint.
+	
 2005-06-24 Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/FITSTable.pm: Modified to use flux measurements directly
-	instead of importing a specific one into a magnitude. Added
-	support for reading DATE-OBS header to apply timestamp for
-	flux measurements.
+	  instead of importing a specific one into a magnitude. Added
+	  support for reading DATE-OBS header to apply timestamp for
+	  flux measurements.
 
 2005-06-23 Alasdair Allan <aa@astro.ex.ac.uk> 
 

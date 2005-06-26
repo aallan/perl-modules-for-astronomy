@@ -31,11 +31,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Sesame.pm,v 1.7 2005/06/24 02:59:23 aa Exp $
+$Id: Sesame.pm,v 1.8 2005/06/26 01:59:09 aa Exp $
 
 =head1 METHODS
 
@@ -73,13 +73,14 @@ sub querydb {
   return undef unless $self->query_options("object");
 
   # make sesame query
+  #print "Endpoint: $endpoint\n";
   my $service = SOAP::Lite->service( $self->endpoint() );   
   
   my $ident = $self->query_options("object");
   $ident =~ s/\+/ /g;
   
   my $buffer; 
-  eval { $buffer = $service->Sesame( $ident ); };
+  eval { $buffer = $service->sesame( $ident, "u" ); };
   if ( $@ ) {
      my $status = $service->transport()->status();
      croak("Error ($status): $@");
@@ -105,7 +106,7 @@ These methods are for internal use only.
 =cut
 
 sub _default_endpoint {
-  return "http://cdsws.u-strasbg.fr/axis/Sesame.jws?wsdl";
+  return "http://cdsws.u-strasbg.fr/axis/services/Sesame?wsdl";
 }
 
 =item B<_default_urn>

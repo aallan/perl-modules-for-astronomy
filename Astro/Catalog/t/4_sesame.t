@@ -36,7 +36,7 @@ my $star = new Astro::Catalog::Star( id => 'EX Hya',
 				       ra =>'12 52 25', dec =>'-29 14 57',
 					type=> 'j2000' ) );
 
-print Dumper ( $star );
+#print Dumper ( $star );
 
 compare_star( $catalog->starbyindex(0), $star);
 
