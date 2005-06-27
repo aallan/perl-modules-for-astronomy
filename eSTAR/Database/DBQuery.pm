@@ -28,8 +28,11 @@ use Carp;
 use XML::LibXML; # Our standard parser
 
 use DateTime;
-#use Time::Piece ':override'; # for gmtime
 use Time::Seconds;
+use Number::Interval;
+use HTML::Entities qw(decode_entities);
+
+use Data::Dumper;
 
 # Package globals
 
@@ -289,9 +292,9 @@ where C<$column> is the database column name and
 C<$entry> can be
 
   - An array of values that will be ORed
-  - An OMP::Range object
+  - An Number::Interval object
   - A hash containing items to be ORed
-    using the rules for OMP::Range and array refs
+    using the rules for Number::Interval and array refs
     [hence recursion]. If a _TYPE field is present in this
     hash that can be used in the join rather than OR. ie
     _TYPE => 'AND' will allow the hash values to be ANDed
@@ -316,38 +319,50 @@ sub _create_sql_recurse {
 
   my $sql;
   if (ref($entry) eq 'ARRAY') {
-
-    # default to actual column name and simple equality
-    my $colname = $column;
-    my $cmp = "equal";
-    if ($colname =~ /^TEXTFIELD__/) {
-      $colname =~ s/^TEXTFIELD__//;
-      $cmp = "like";
-    }
-
-    # Link all of the search queries together with an OR [must be inside
-    # parentheses] but AND them if we have spaces in the string and
-    # are a TEXT query
-    if ($column =~ /^TEXTFIELD__/) {
-      $sql = "(".join( " OR ",
-		       # Join all of the search strings with an AND
-		       # [ex: "John Doe", "Jane" becomes John Doe AND Jane]
-		       map { join( " AND ",
-				   map {
-				     $self->_querify($colname, $_, $cmp);
-				   } OMP::General->split_string($_) )
-			   } @{ $entry } ) . ")";
+    # Check the first value in the array ref. If it's a Number::Interval
+    # object, expand each range out and join them together with ORs.
+    if( UNIVERSAL::isa( $entry->[0], 'Number::Interval' ) ) {
+      my @bits;
+      foreach my $range ( @$entry ) {
+        my %range = $range->minmax_hash;
+        my $bit = "(" . join( " AND ",
+                              map { $self->_querify( $column, $range{$_}, $_ ); }
+                              keys %range ) . ")";
+        push @bits, $bit;
+      }
+      $sql = "(" . join( " OR ", @bits ) . ")";
     } else {
-      # Just OR the individual entries
-      # No special handling of spaces in strings
-      $sql = "(".join( " OR ",
-		       map { $self->_querify($colname, $_, $cmp); }
-		       @{ $entry }
-		       ) . ")";
+
+      # default to actual column name and simple equality
+      my $colname = $column;
+      my $cmp = "equal";
+      if ($colname =~ /^TEXTFIELD__/) {
+        $colname =~ s/^TEXTFIELD__//;
+        $cmp = "like";
+      }
+
+      # Link all of the search queries together with an OR [must be inside
+      # parentheses] but AND them if we have spaces in the string and
+      # are a TEXT query
+      if ($column =~ /^TEXTFIELD__/) {
+        $sql = "(".join( " OR ",
+                         # Join all of the search strings with an AND
+                         # [ex: "John Doe", "Jane" becomes John Doe AND Jane]
+                         map { join( " AND ",
+                                     map {
+                                       $self->_querify($colname, $_, $cmp);
+                                     } OMP::General->split_string($_) )
+                             } @{ $entry } ) . ")";
+      } else {
+        # Just OR the individual entries
+        # No special handling of spaces in strings
+        $sql = "(".join( " OR ",
+                         map { $self->_querify($colname, $_, $cmp); }
+                         @{ $entry }
+                       ) . ")";
+      }
     }
-
-
-  } elsif (UNIVERSAL::isa( $entry, "OMP::Range")) {
+  } elsif (UNIVERSAL::isa( $entry, "Number::Interval")) {
     # A Range object
     my %range = $entry->minmax_hash;
 
@@ -370,7 +385,7 @@ sub _create_sql_recurse {
 
   } else {
 
-    croak("Query hash contained a non-ARRAY non-OMP::Range non-HASH for $column: $entry\n");
+    croak("Query hash contained a non-ARRAY non-Number::Interval non-HASH for $column: $entry\n");
   }
 
   return $sql;
@@ -417,36 +432,33 @@ sub _convert_to_perl {
 
       if ($grand->isa("XML::LibXML::Text")) {
 
-	# This is just PCDATA
+        # This is just PCDATA
 
-	# Make sure this is not simply white space
-	my $string = $grand->toString;
-	next unless $string =~ /\w/;
+        # Make sure this is not simply white space
+        my $string = $grand->toString;
+        next unless $string =~ /\w/;
 
-	$self->_add_text_to_hash( \%query, $name, $string, \%attr );
+        $self->_add_text_to_hash( \%query, $name, $string, \%attr );
 
       } else {
 
-	# We have an element. Get its name and add the contents
-	# to the hash (we assume only one text node)
-	my $childname = $grand->getName;
+        # We have an element. Get its name and add the contents
+        # to the hash (we assume only one text node)
+        my $childname = $grand->getName;
 
-	# it is possible for the xml to be <max/> (sent by the QT
-	# so we must trap that
-	my $firstchild = $grand->firstChild;
-	if ($firstchild) {
-	  $self->_add_text_to_hash(\%query, 
-				   $name, $firstchild->toString,
-				   $childname, \%attr );
-	}
+        # it is possible for the xml to be <max/> (sent by the QT
+        # so we must trap that
+        my $firstchild = $grand->firstChild;
+        if ($firstchild) {
+          $self->_add_text_to_hash(\%query, 
+                                   $name, $firstchild->toString,
+                                   $childname, \%attr );
+        }
       }
-
     }
-
-
   }
 
-  # Do some post processing to convert to OMP::Ranges and
+  # Do some post processing to convert to Number::Intervals and
   # to fix up some standard keys
   $self->_post_process_hash( \%query );
 
@@ -528,8 +540,17 @@ sub _add_text_to_hash {
   if (exists $hash->{$key}) {
 
     if ($special) {
-      # Add it into the hash ref
-      $hash->{$key}->{$secondkey} = $value;
+
+
+      # Okay, we've already got this key set up. 
+
+      if( exists( $hash->{$key}->[scalar( @{$hash->{$key}} )-1] ) &&
+          exists( $hash->{$key}->[scalar( @{$hash->{$key}} )-1]->{$secondkey} ) ) {
+
+        push( @{$hash->{$key}}, { $secondkey => $value } );
+      } else {
+        $hash->{$key}->[scalar( @{$hash->{$key}} )-1]->{$secondkey} = $value;
+      }
 
     } else {
       # Append it to the array
@@ -538,7 +559,8 @@ sub _add_text_to_hash {
 
   } else {
     if ($special) {
-      $hash->{$key} = { $secondkey => $value };
+      my $href = { $secondkey => $value };
+      $hash->{$key} = [ $href ];
     } else {
       $hash->{$key} = [ $value ];
     }
@@ -558,7 +580,7 @@ Fix up the query hash according to generic rules. These are:
 
 =item *
 
-Convert hashes with min/max to C<OMP::Range> objects.
+Convert hashes with min/max to C<Number::Interval> objects.
 
 =item *
 
@@ -650,7 +672,7 @@ sub _post_process_hash {
               $max = 'Min';
             }
 
-            $href->{$key} = new OMP::Range( $min => $date,
+            $href->{$key} = new Number::Interval( $min => $date,
                                             $max => $enddate);
           }
         }
@@ -662,12 +684,16 @@ sub _post_process_hash {
   for my $key (keys %$href ) {
     # Skip private keys
     next if $key =~ /^_/;
-
     if (ref($href->{$key}) eq "HASH") {
-      # Convert to OMP::Range object
-      $href->{$key} = new OMP::Range( Min => $href->{$key}->{min},
-                                      Max => $href->{$key}->{max},
-                                    );
+      # Convert to Number::Interval object
+      $href->{$key} = new Number::Interval( Min => $href->{$key}->{min},
+                                            Max => $href->{$key}->{max},
+                                          );
+    } elsif( ( ref( $href->{$key} ) eq 'ARRAY' ) &&
+             ( ref( $href->{$key}->[0] ) eq 'HASH' ) ) {
+      my @newarray = map { new Number::Interval( Min => $_->{'min'},
+                                                 Max => $_->{'max'} ); } @{$href->{$key}};
+      $href->{$key} = \@newarray;
     }
   }
 
@@ -777,7 +803,7 @@ second argument is a callback (CODEREF) to be executed for each
 array element or hash member and the last argument is an array
 of keys in the query hash to process.
 
-As well as hashes and arrays it recognizes C<OMP::Range> objects.
+As well as hashes and arrays it recognizes C<Number::Interval> objects.
 
 This method allows you to process all elements in a simple way without
 caring about the specific organization in the query hash.
