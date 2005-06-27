@@ -475,7 +475,11 @@ sub _db_insert_data {
     $placeholder .= "," if $placeholder;
 
     # Plain text
-    if (not ref($column)) {
+    if( ! defined( $column ) ) {
+      push( @toinsert, 'null' );
+      $placeholder .= "?";
+
+    } elsif (not ref($column)) {
 
       # the data we will insert immediately
       push(@toinsert, $column);
