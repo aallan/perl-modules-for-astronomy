@@ -10,6 +10,32 @@ use base qw/ eSTAR::Database::DBQuery /;
 
 our $VERSION = '0.01';
 
+our $OBJECTTABLE = 'tblObject OBJ';
+our $MEASUREMENTTABLE = 'tblMeasurement MEA';
+our $OBSERVATIONTABLE = 'tblObservation OBS';
+our $MEASOBSJOINTABLE = 'tblMeasObs MEAOBS';
+my $RAD_TO_DEG = 180 / ( atan2( 1, 1 ) * 4 );
+
+our %primary_keys = ( $OBJECTTABLE => 'pklngObjectID',
+                      $MEASUREMENTTABLE => 'pklngMeasurementID',
+                      $OBSERVATIONTABLE => 'pklngObservationID',
+                      $MEASOBSJOINTABLE => 'pklngMeasObsID',
+                    );
+our %jointable = ( $OBJECTTABLE => { $MEASUREMENTTABLE => 'OBJ.pklngObjectID = MEA.fklngObjectID' },
+                   $MEASUREMENTTABLE => { $MEASOBSJOINTABLE => 'MEA.pklngMeasurementID = MEAOBS.fklngMeasurementID'},
+                   $OBSERVATIONTABLE => { $MEASOBSJOINTABLE => 'OBS.pklngObservationID = MEAOBS.fklngObservationID'},
+                 );
+
+our %tables = ( all => [ $OBJECTTABLE, $MEASUREMENTTABLE, $OBSERVATIONTABLE, $MEASOBSJOINTABLE ] );
+
+our $DATETIMECOLUMN = 'MEA.datetime';
+
+my %lut = (
+           # XML tag -> column name
+           HTMid => 'OBJ.HTMid',
+           date => 'MEA.datetime',
+          );
+
 =head1 METHODS
 
 =head2 General Methods
@@ -31,20 +57,27 @@ sub sql {
   my $self = shift;
 
   croak "sql method invoked with incorrect number of arguments"
-    unless scalar( @_ ) == 1;
+    unless scalar( @_ ) == 0;
 
-  my $eSTARtable = shift;
+  my $subsql = $self->_qhash_tosql();
 
-  # Generate the WHERE clause from the query hash.
-  my $subsql = $self->_qhash_to_sql();
-
-  # If the resulting query contained anything we should prepend
-  # an AND so that it fits in with the rest of the SQL. This allows
-  # an empty query to work without having a naked "WHERE".
+  # Replace column names in the subsql with the proper table names.
+  foreach my $column ( keys %lut ) {
+    $subsql =~ s/$column/$lut{$column}/g if $subsql;
+  }
   $subsql = " WHERE " . $subsql if $subsql;
 
-  # Now need to put this SQL into the template query
-  my $sql = " SELECT * FROM $eSTARtable E $subsql";
+  # Need to append the join criteria.
+  $subsql .= " AND " . $jointable{$OBJECTTABLE}{$MEASUREMENTTABLE};
+  $subsql .= " AND " . $jointable{$MEASUREMENTTABLE}{$MEASOBSJOINTABLE};
+  $subsql .= " AND " . $jointable{$OBSERVATIONTABLE}{$MEASOBSJOINTABLE};
+
+  # Now generate the SQL.
+  my $sql = "SELECT *, CONVERT(CHAR, $DATETIMECOLUMN, 109) AS 'longmeasurementdate' FROM $OBJECTTABLE, $MEASUREMENTTABLE, $OBSERVATIONTABLE, $MEASOBSJOINTABLE $subsql";
+
+  # Sort this, first by the object ID and second by the flux measurement
+  # timestamp.
+  $sql .= " ORDER BY OBJ.pklngObjectID, MEA.datetime";
 
   return "$sql\n";
 }
