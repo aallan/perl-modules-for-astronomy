@@ -102,13 +102,17 @@ sub add_catalog {
 
 Retrieve all objects within a given radius of a given RA and Dec.
 
-  $catalog = $db->cone_search( $coords, $radius[, $date_range] );
+  $catalog = $db->cone_search( $coords, $radius,
+                               date_range => $date_range,
+                               waveband => $waveband );
 
 This method takes two mandatory parameters. The first must be an
 C<Astro::Coords> object denoting the centre of the cone search, and
-the second must be the search radius in arcseconds. The third
-optional parameter is a date range that, if defined, must be
-a C<DateTime::Span> object.
+the second must be the search radius in arcseconds.
+
+The first optional named parameter is a date range that, if defined,
+must be a C<DateTime::Span> object. The second optional named parameter
+is a waveband that, if defined, must be a C<Astro::WaveBand> object.
 
 This method returns an C<Astro::Catalog> object.
 
@@ -129,13 +133,19 @@ sub cone_search {
     croak "radius parameter to eSTAR::Database::Manip->cone_search must be defined in arcseconds";
   }
 
-  my $date_range = shift;
-  if( defined( $date_range ) &&
+  # Deal with the rest of the arguments.
+  my %args = @_;
+  if( defined( $args{'date_range'} ) &&
       ! UNIVERSAL::isa( $date_range, "DateTime::Span" ) ) {
     croak "date_range parameter to eSTAR::Database::Manip->cone_search must be a DateTime::Span object";
   }
 
-  my $catalog = $self->_retrieve_catalog( $coords, $radius, $date_range );
+  if( defined( $args{'waveband'} ) &&
+      ! UNIVERSAL::isa( $waveband, "Astro::WaveBand" ) ) {
+    croak "waveband parameter to eSTAR::Database::Manip->cone_search must be a WaveBand object";
+  }
+
+  my $catalog = $self->_retrieve_catalog( $coords, $radius, date_range => $date_range, waveband => $waveband );
 
   return $catalog;
 }
@@ -366,13 +376,18 @@ sub _get_HTM_ranges {
 
 =item B<_insert_flux>
 
-Insert an C<Astro::Flux> object into the database.
+Insert flux measurements for a given object and epoch into the database.
 
-  $db->_insert_flux( $flux, $flux_key, $item_key );
+  $db->_insert_flux( $fluxes, $flux_key, $item_key );
 
-This method takes three mandatory arguments: the C<Astro::Flux>
-object, the primary key for that object, and the primary key
-of the related C<Astro::Catalog::Item> object.
+This method takes three mandatory arguments: The first is a reference to a
+hash whose keys are 'isophotal_flux', 'core1_flux', 'core2_flux', 'core3_flux',
+'core4_flux', and 'core5_flux' and whose values are C<Astro::Flux> objects,
+the primary key for the list of flux measurements, and the primary key of
+the related C<Astro::Catalog::Item> object.
+
+The epoch of observation is taken from the C<Astro::Flux> object pointed to
+by the 'isophotal_flux' key, as is the waveband.
 
 =cut
 
@@ -394,7 +409,7 @@ sub _insert_flux {
     croak "Must supply item primary key to eSTAR::Database::Manip->_insert_flux()";
   }
 
-  my $date = $fluxes->{'iso_flux'}->datetime;
+  my $date = $fluxes->{'isophotal_flux'}->datetime;
   my $fluxdate;
   if( defined( $date ) ) {
     $fluxdate = $date->strftime("%Y%m%d %T");
@@ -403,9 +418,17 @@ sub _insert_flux {
     $fluxdate = $current->strftime("%Y%m%d %T");
   }
 
+  my $waveband;
+  if( ! defined( $fluxes->{'isophotal_flux'} ) ) {
+    $waveband = 'unknown';
+  } else {
+    $waveband = $fluxes->{'isophotal_flux'}->waveband->natural;
+  }
+
   # Insert the data into the table. The columns are:
   # - primary key (integer)
   # - item foreign key (integer)
+  # - waveband (varchar(32))
   # - core_flux_1 (float)
   # - core_flux_1_error (float)
   # - core_flux_2 (float)
@@ -429,6 +452,7 @@ sub _insert_flux {
   $self->_db_insert_data( $MEASUREMENTTABLE,
                           $flux_key,
                           $item_key,
+                          $waveband,
                           ( defined( $fluxes->{'core1_flux'} ) ? $fluxes->{'core1_flux'}->quantity('core1_flux') : undef ),
                           undef,
                           ( defined( $fluxes->{'core2_flux'} ) ? $fluxes->{'core2_flux'}->quantity('core2_flux') : undef ),
@@ -469,12 +493,12 @@ sub _insert_measobs {
 
   my $meas_key = shift;
   if( ! defined( $meas_key ) ) {
-    croak "Must supply measurement primary key to eSTAR::Database::Manip->_insert_fluxobs()";
+    croak "Must supply measurement primary key to eSTAR::Database::Manip->_insert_measobs()";
   }
 
   my $obsid_key = shift;
   if( ! defined( $obsid_key ) ) {
-    croak "Must supply obsid primary key to eSTAR::Database::Manip->_insert_fluxobs()";
+    croak "Must supply obsid primary key to eSTAR::Database::Manip->_insert_measobs()";
   }
 
   $self->_db_insert_data( $MEASOBSJOINTABLE,
@@ -563,14 +587,18 @@ sub _insert_obsid {
 
 Retrieve an C<Astro::Catalog> object from the database.
 
-  my $catalog = $db->_retrieve_catalog( $coords, $radius, $date_range );
+  my $catalog = $db->_retrieve_catalog( $coords, $radius,
+                                        date_range => $date_range,
+                                        waveband => $waveband );
 
 This method takes two mandatory arguments. The first must be an
 C<Astro::Coords> object denoting the centre of the search, and the
 second is a radius in arcseconds.
 
-This method takes one optional argument. If defined it must be a
-C<DateTime::Span> object.
+This method takes two optional named arguments. If the date_range
+argument is defined, it must be a C<DateTime::Span> object. If the
+waveband argument is defined, it must be an C<Astro::WaveBand>
+object.
 
 This method returns an C<Astro::Catalog> object.
 
@@ -590,11 +618,20 @@ sub _retrieve_catalog {
     croak "Radius parameter to eSTAR::Database::Manip->_retrieve_catalog must be defined in arcseconds";
   }
 
-  my $date_range = shift;
-  if( defined( $date_range ) &&
-      ! UNIVERSAL::isa( $date_range, "DateTime::Span" ) ) {
+  # Deal with optional arguments.
+  my %args = @_;
+
+  if( defined( $args{'date_range'} ) &&
+      ! UNIVERSAL::isa( $args{'date_range'}, "DateTime::Span" ) ) {
     croak "Date range parameter to eSTAR::Database::Manip->_retrieve_catalog must be a DateTime::Span object";
   }
+  my $date_range = $args{'date_range'};
+
+  if( defined( $args{'waveband'} ) &&
+      ! UNIVERSAL::isa( $args{'waveband'}, "Astro::WaveBand" ) ) {
+    croak "waveband parameter to eSTAR::Database::Manip->_retrieve_catalog must be an Astro::WaveBand object";
+  }
+  my $waveband = $args{'waveband'};
 
   my $radius_deg = $radius / 3600;
 
@@ -609,6 +646,9 @@ sub _retrieve_catalog {
   $xml .= ( join "\n", map { "<HTMid><min>" . $_->min . "</min><max>" . $_->max . "</max></HTMid>"; } @ranges );
   if( defined( $date_range ) ) {
     $xml .= "<date><min>" . $date_range->min . "</min><max>" . $date_range->max . "</max></date>";
+  }
+  if( defined( $waveband ) ) {
+    $xml .= "<waveband>" . $waveband->natural . "</waveband>";
   }
   $xml .= "\n</Query>\n";
 
@@ -633,11 +673,18 @@ sub _retrieve_catalog {
 
 Retrieve an C<Astro::Catalog::Item> object from the database.
 
-  $item = $db->_retrieve_item( $coords, $radius );
+  $item = $db->_retrieve_item( $coords, $radius,
+                               date_range => $date_range,
+                               waveband => $waveband );
 
 This method takes two mandatory arguments. The first must be an
 C<Astro::Coords> object denoting the centre of the search, and the
 second is a radius in arcseconds.
+
+This method takes two optional named parameters. If the date_range
+argument is defined, it must be a C<DateTime::Span> object. If the
+waveband argument is defined, it must be an C<Astro::WaveBand>
+object.
 
 This method returns one C<Astro::Catalog::Item> object, and will
 be the one closest to the centre of the search if multiple items
@@ -659,13 +706,25 @@ sub _retrieve_item {
     croak "Radius parameter to eSTAR::Database::Manip->_retrieve_item must be defined in arcseconds";
   }
 
-  my $date_range = shift;
-  if( defined( $date_range ) &&
+  # Deal with the rest of the arguments.
+  my %args = @_;
+  if( defined( $args{'date_range'} ) &&
       ! UNIVERSAL::isa( $date_range, "DateTime::Span" ) ) {
-    croak "Date range parameter to eSTAR::Database::Manip->_retrieve_item must be a DateTime::Span object";
+    croak "date_range parameter to eSTAR::Database::Manip->cone_search must be a
+ DateTime::Span object";
   }
+  my $date_range = $args{'date_range'};
 
-  my $catalog = $self->_retrieve_catalog( $coords, $radius, $date_range );
+  if( defined( $args{'waveband'} ) &&
+      ! UNIVERSAL::isa( $waveband, "Astro::WaveBand" ) ) {
+    croak "waveband parameter to eSTAR::Database::Manip->cone_search must be a W
+aveBand object";
+  }
+  my $waveband = $args{'waveband'};
+
+  my $catalog = $self->_retrieve_catalog( $coords, $radius,
+                                          date_range => $date_range,
+                                          waveband => $waveband );
 
   # If the DB doesn't return anything, return undef.
   if( ! defined( $catalog ) ) {
@@ -829,7 +888,7 @@ sub _reorganize_results {
           $type = $flux_map{$fluxtype};
         }
         my $flux = new Astro::Flux( $newrow->{$type}, $type,
-                                    new Astro::WaveBand( Filter => 'unknown' ) );
+                                    new Astro::WaveBand( Filter => $newrow->{WAVEBAND} ) );
         $fluxes->pushfluxes( $flux );
       }
 
