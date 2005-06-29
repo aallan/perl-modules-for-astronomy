@@ -181,13 +181,17 @@ sub queryDB {
 
 =item B<_add_item>
 
-Add an C<Astro::Catalog::Item> object to the database. This
-only adds the information to the tblObject table.
+Add an C<Astro::Catalog::Item> object to the database.
 
   $db->_add_item( $item );
 
 The sole argument is mandatory and must be an
 C<Astro::Catalog::Item> object.
+
+If this item exists in the database (meaning there is another object
+within one arcsecond of this item's position), then the flux measurements
+will be added to this item's light curve. Otherwise, a new object
+is added to the database.
 
 =cut
 
@@ -200,6 +204,8 @@ sub _add_item {
     croak "Item parameter to eSTAR::Database::Manip->_add_item must be defined as an Astro::Catalog::Item object, not " . ref( $item ) . "\n";
   }
 
+  # Find an item that's within one arcsecond of the item we're
+  # looking for.
   my $radius = 1;
 
   my $ret_item = $self->_retrieve_item( $item->coords, $radius );
@@ -931,5 +937,37 @@ sub _store_catalog {
 
   }
 }
+
+=back
+
+=head1 SEE ALSO
+
+C<eSTAR::Database::Query>
+
+=head1 AUTHORS
+
+Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the
+Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA  02111-1307  USA
+
+=cut
 
 1;
