@@ -17,8 +17,8 @@ use Carp;
 use strict;
 
 use Astro::Catalog;
-use Astro::Catalog::Star;
-use Astro::Catalog::Star::Morphology;
+use Astro::Catalog::Item;
+use Astro::Catalog::Item::Morphology;
 use Astro::Coords;
 use Astro::FITS::CFITSIO qw/ :longnames :constants /;
 use File::Temp qw/ tempfile /;
@@ -77,7 +77,7 @@ containing the catalogue entries.
   $cat = Astro::Catalog::IO::FITSTable->_read_catalog( $whatever );
 
 The current translations from FITS table column names to
-C<Astro::Catalog::Star> properties are:
+C<Astro::Catalog::Item> properties are:
 
 =over 4
 
@@ -391,7 +391,7 @@ sub _read_catalog {
 
       # Now that we've got all the columns defined, we need to grab each column
       # in one big array, then take those arrays and stuff the information into
-      # Astro::Catalog::Star objects
+      # Astro::Catalog::Item objects
       my $id;
       my $ra;
       my $dec;
@@ -508,7 +508,7 @@ sub _read_catalog {
       }
 
       # Go through each array, grabbing the information and creating a
-      # new Astro::Catalog::Star object each time through.
+      # new Astro::Catalog::Item object each time through.
       for( my $i = 0; $i < $nrows; $i++ ) {
         my $id_value;
         if( defined( $id ) ) {
@@ -600,13 +600,13 @@ sub _read_catalog {
         my $core5_flux_obj = new Astro::Flux( $core5_flux_value, 'core5_flux', $waveband,
                                               datetime => $datetime );
 
-        # And set up the Astro::Catalog::Star::Morphology object.
-        my $morphology = new Astro::Catalog::Star::Morphology( ellipticity => $ell_value,
+        # And set up the Astro::Catalog::Item::Morphology object.
+        my $morphology = new Astro::Catalog::Item::Morphology( ellipticity => $ell_value,
                                                                position_angle_pixel => $posang_value,
                                                              );
 
-        # And create the Astro::Catalog::Star object from this conglomoration of data.
-        my $star = new Astro::Catalog::Star( ID => $id_value,
+        # And create the Astro::Catalog::Item object from this conglomoration of data.
+        my $star = new Astro::Catalog::Item( ID => $id_value,
                                              Fluxes => new Astro::Fluxes( $iso_flux_obj,
                                                                           $total_flux_obj,
                                                                           $core_flux_obj,
@@ -664,7 +664,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: FITSTable.pm,v 1.7 2005/06/30 23:43:26 cavanagh Exp $
+  $Id: FITSTable.pm,v 1.8 2005/06/30 23:51:31 cavanagh Exp $
 
 =head1 SEE ALSO
 
