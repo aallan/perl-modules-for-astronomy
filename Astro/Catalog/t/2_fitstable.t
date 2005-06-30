@@ -13,7 +13,7 @@ eval { require Astro::FITS::CFITSIO; };
 if( $@ ) {
   plan skip_all => "Tests require Astro::FITS::CFITSIO";
 } else {
-  plan tests => 17;
+  plan tests => 18;
 }
 
 require_ok( "Astro::Catalog" );
@@ -46,5 +46,6 @@ foreach my $flux ( @allfluxes ) {
         1169.419,
         "Last object's isophotal flux" );
     is( $flux->datetime->datetime, "2004-11-27T05:49:14", "DateTime of flux measurement" );
+    is( $flux->waveband->natural, "Z", "Filter of flux measurement" );
   }
 }
