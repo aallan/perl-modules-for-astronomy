@@ -1,6 +1,6 @@
 use estar;
 
-CREATE TABLE tblObject ( pklngObjectID NUMERIC(18,0) NOT NULL PRIMARY KEY, right_ascension FLOAT NOT NULL, declination FLOAT NOT NULL, HTMid NUMERIC(32,0) NOT NULL, ellipticity FLOAT NULL, ellipticity_error FLOAT NULL, position_angle FLOAT NULL, position_angle_error FLOAT NULL, fwhm FLOAT NULL, fwhm_error FLOAT NULL, flag VARCHAR(4) NULL );
+CREATE TABLE tblObject ( pklngObjectID NUMERIC(18,0) NOT NULL PRIMARY KEY, right_ascension FLOAT NOT NULL, declination FLOAT NOT NULL, HTMid NUMERIC(32,0) NOT NULL, ellipticity FLOAT NULL, ellipticity_error FLOAT NULL, position_angle FLOAT NULL, position_angle_error FLOAT NULL, fwhm FLOAT NULL, fwhm_error FLOAT NULL, flag VARCHAR(16) NULL );
 
 CREATE INDEX idxHTMid ON tblObject ( HTMid );
 CREATE INDEX idxflag ON tblObject ( flag );
