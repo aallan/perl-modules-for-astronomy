@@ -56,6 +56,11 @@ our %flux_map = ( CORE1_FLUX => 'CORE_FLUX_1',
                   CORE5_FLUX => 'CORE_FLUX_5',
                 );
 
+our %flag_lookup = ( 'estar_variable' => 'a',
+                     'estar_new' => 'b',
+                     'simbad_variable' => 'c',
+                   );
+
 =head1 METHODS
 
 =head2 Public Methods
@@ -136,14 +141,16 @@ sub cone_search {
   # Deal with the rest of the arguments.
   my %args = @_;
   if( defined( $args{'date_range'} ) &&
-      ! UNIVERSAL::isa( $date_range, "DateTime::Span" ) ) {
+      ! UNIVERSAL::isa( $args{'date_range'}, "DateTime::Span" ) ) {
     croak "date_range parameter to eSTAR::Database::Manip->cone_search must be a DateTime::Span object";
   }
+  my $date_range = $args{'date_range'};
 
   if( defined( $args{'waveband'} ) &&
-      ! UNIVERSAL::isa( $waveband, "Astro::WaveBand" ) ) {
+      ! UNIVERSAL::isa( $args{'waveband'}, "Astro::WaveBand" ) ) {
     croak "waveband parameter to eSTAR::Database::Manip->cone_search must be a WaveBand object";
   }
+  my $waveband = $args{'waveband'};
 
   my $catalog = $self->_retrieve_catalog( $coords, $radius, date_range => $date_range, waveband => $waveband );
 
@@ -177,6 +184,53 @@ sub queryDB {
 
   # And return the catalog.
   return $catalog;
+}
+
+=item B<update_flags>
+
+Update a C<Astro::Catalog::Item>'s flags in the database.
+
+  $db->update_flags( $item, \@flags );
+
+This method takes two mandatory arguments, the first being the
+C<Astro::Catalog::Item> object to be updated, and the second being
+an array reference to a list of strings.
+
+If the given item does not exist in the database, nothing will
+happen.
+
+=cut
+
+sub update_flags {
+  my $self = shift;
+
+  # Handle arguments.
+  my $item = shift;
+  if( ! defined( $item ) ||
+      ! UNIVERSAL::isa( $item, "Astro::Catalog::Item" ) ) {
+    croak "item parameter to eSTAR::Database::Manip->update_flags must be an Astro::Catalog::Item object";
+  }
+
+  my $flag_ref = shift;
+  if( ! defined( $flag_ref ) ||
+      ref( $flag_ref ) ne 'ARRAY' ) {
+    croak "flags parameter to eSTAR::Database::Manip->update_flags must be an array reference";
+  }
+
+  # Retrieve the item's ID.
+  my $db_item = $self->_retrieve_item( $item->coords, 0.5 );
+
+  if( ! defined( $db_item ) ) {
+    return;
+  }
+
+  my $id = $db_item->id;
+  my $clause = $primary_keys{$OBJECTTABLE} . "=$id";
+  my $value = join '', map { $flag_lookup{lc($_)}; } @$flag_ref;
+  my $hash_ref = {};
+  $hash_ref->{'flag'} = $value;
+
+  $self->_db_update_data( $OBJECTTABLE, $hash_ref, $clause );
 }
 
 =item B<_add_item>
@@ -258,7 +312,7 @@ sub _add_item {
       # does, then keep its key around for future use. If it doesn't,
       # generate its key and insert it in the database.
       my $obsid_key = $self->_retrieve_obsid_key( $obsid );
-      if( defined( $obsid_key ) ) {
+      if( $obsid_key != 0 ) {
         $obsid_hash{$obsid_key}++;
       } else {
         $obsid_key = $self->_retrieve_next_key( $OBSERVATIONTABLE,
@@ -415,7 +469,11 @@ sub _insert_flux {
     croak "Must supply item primary key to eSTAR::Database::Manip->_insert_flux()";
   }
 
-  my $date = $fluxes->{'isophotal_flux'}->datetime;
+#  use Data::Dumper;
+#print Dumper $fluxes;
+#exit;
+
+  my $date = $fluxes->{'iso_flux'}->datetime;
   my $fluxdate;
   if( defined( $date ) ) {
     $fluxdate = $date->strftime("%Y%m%d %T");
@@ -425,10 +483,10 @@ sub _insert_flux {
   }
 
   my $waveband;
-  if( ! defined( $fluxes->{'isophotal_flux'} ) ) {
+  if( ! defined( $fluxes->{'iso_flux'} ) ) {
     $waveband = 'unknown';
   } else {
-    $waveband = $fluxes->{'isophotal_flux'}->waveband->natural;
+    $waveband = $fluxes->{'iso_flux'}->waveband->natural;
   }
 
   # Insert the data into the table. The columns are:
@@ -469,7 +527,7 @@ sub _insert_flux {
                           undef,
                           ( defined( $fluxes->{'core5_flux'} ) ? $fluxes->{'core5_flux'}->quantity('core5_flux') : undef ),
                           undef,
-                          ( defined( $fluxes->{'isophotal_flux'} ) ? $fluxes->{'isophotal_flux'}->quantity('isophotal_flux') : undef ),
+                          ( defined( $fluxes->{'iso_flux'} ) ? $fluxes->{'iso_flux'}->quantity('isophotal_flux') : undef ),
                           undef,
                           ( defined( $fluxes->{'total_flux'} ) ? $fluxes->{'total_flux'}->quantity('total_flux') : undef ),
                           undef,
@@ -715,16 +773,14 @@ sub _retrieve_item {
   # Deal with the rest of the arguments.
   my %args = @_;
   if( defined( $args{'date_range'} ) &&
-      ! UNIVERSAL::isa( $date_range, "DateTime::Span" ) ) {
-    croak "date_range parameter to eSTAR::Database::Manip->cone_search must be a
- DateTime::Span object";
+      ! UNIVERSAL::isa( $args{'date_range'}, "DateTime::Span" ) ) {
+    croak "date_range parameter to eSTAR::Database::Manip->cone_search must be a DateTime::Span object";
   }
   my $date_range = $args{'date_range'};
 
   if( defined( $args{'waveband'} ) &&
-      ! UNIVERSAL::isa( $waveband, "Astro::WaveBand" ) ) {
-    croak "waveband parameter to eSTAR::Database::Manip->cone_search must be a W
-aveBand object";
+      ! UNIVERSAL::isa( $args{'waveband'}, "Astro::WaveBand" ) ) {
+    croak "waveband parameter to eSTAR::Database::Manip->cone_search must be a WaveBand object";
   }
   my $waveband = $args{'waveband'};
 
