@@ -195,6 +195,25 @@ sub _read_catalog {
         $datetime = DateTime::Format::ISO8601->parse_datetime( $dateobs );
       }
 
+      my $waveband;
+      $fptr->read_keyword( 'FILTER', my $filter, my $filtercomment, $status );
+      if( $status != 0 ) {
+        if( $status == KEY_NO_EXIST ) {
+          # We can deal with this, just set the filter to be 'unknown'.
+          $filter = 'unknown';
+          $status = 0;
+        } else {
+          Astro::FITS::CFITSIO::fits_get_errstatus( $status, my $text );
+          croak "Error retrieving FILTER header from FITS file: $status $text";
+        }
+      } else {
+        # Strip out any characters that aren't meant to be there.
+        $filter =~ s/'//g;
+        $filter =~ s/^\s+//;
+        $filter =~ s/\s+$//;
+      }
+      $waveband = new Astro::WaveBand( Filter => $filter );
+
       # Get the number of rows in this table.
       $fptr->get_num_rows( my $nrows, $status );
       if( $status != 0 ) {
@@ -564,21 +583,21 @@ sub _read_catalog {
         }
 
         # Set up the Astro::Flux objects.
-        my $iso_flux_obj = new Astro::Flux( $iso_flux_value, 'isophotal_flux', 'unknown',
+        my $iso_flux_obj = new Astro::Flux( $iso_flux_value, 'isophotal_flux', $waveband,
                                             datetime => $datetime );
-        my $total_flux_obj = new Astro::Flux( $total_flux_value, 'total_flux', 'unknown',
+        my $total_flux_obj = new Astro::Flux( $total_flux_value, 'total_flux', $waveband,
                                               datetime => $datetime );
-        my $core_flux_obj = new Astro::Flux( $core_flux_value, 'core_flux', 'unknown',
+        my $core_flux_obj = new Astro::Flux( $core_flux_value, 'core_flux', $waveband,
                                              datetime => $datetime );
-        my $core1_flux_obj = new Astro::Flux( $core1_flux_value, 'core1_flux', 'unknown',
+        my $core1_flux_obj = new Astro::Flux( $core1_flux_value, 'core1_flux', $waveband,
                                               datetime => $datetime );
-        my $core2_flux_obj = new Astro::Flux( $core2_flux_value, 'core2_flux', 'unknown',
+        my $core2_flux_obj = new Astro::Flux( $core2_flux_value, 'core2_flux', $waveband,
                                               datetime => $datetime );
-        my $core3_flux_obj = new Astro::Flux( $core3_flux_value, 'core3_flux', 'unknown',
+        my $core3_flux_obj = new Astro::Flux( $core3_flux_value, 'core3_flux', $waveband,
                                               datetime => $datetime );
-        my $core4_flux_obj = new Astro::Flux( $core4_flux_value, 'core4_flux', 'unknown',
+        my $core4_flux_obj = new Astro::Flux( $core4_flux_value, 'core4_flux', $waveband,
                                               datetime => $datetime );
-        my $core5_flux_obj = new Astro::Flux( $core5_flux_value, 'core5_flux', 'unknown',
+        my $core5_flux_obj = new Astro::Flux( $core5_flux_value, 'core5_flux', $waveband,
                                               datetime => $datetime );
 
         # And set up the Astro::Catalog::Star::Morphology object.
@@ -645,7 +664,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: FITSTable.pm,v 1.6 2005/06/24 22:00:07 cavanagh Exp $
+  $Id: FITSTable.pm,v 1.7 2005/06/30 23:43:26 cavanagh Exp $
 
 =head1 SEE ALSO
 
