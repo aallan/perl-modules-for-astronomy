@@ -729,9 +729,6 @@ sub _db_delete_project_data {
 
 }
 
-
-=back
-
 =item B<DESTROY>
 
 When this object is destroyed we need to roll back the transactions
