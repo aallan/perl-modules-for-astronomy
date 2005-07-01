@@ -118,7 +118,7 @@ isa_ok($catalog, "Astro::Catalog");
 my $tempfile; # for cleanup
 SKIP: {
 
-  skip "VOTable module not found", 125 unless $hasvo;
+  skip "VOTable module not found", 128 unless $hasvo;
 
 # WRITE IT OUT TO DISK USING THE VOTABLE WRITER
 # =============================================
