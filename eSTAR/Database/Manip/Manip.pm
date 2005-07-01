@@ -30,6 +30,7 @@ use Carp;
 use eSTAR::Database::Query;
 
 use Astro::Catalog;
+use Astro::Catalog::Item::Morphology;
 use Astro::HTM::Functions;
 use DateTime::Format::Strptime;
 use Data::Dumper;
@@ -59,6 +60,7 @@ our %flux_map = ( CORE1_FLUX => 'CORE_FLUX_1',
 our %flag_lookup = ( 'estar_variable' => 'a',
                      'estar_new' => 'b',
                      'simbad_variable' => 'c',
+                     'simbad_ident' => 'd',
                    );
 
 =head1 METHODS
@@ -219,7 +221,6 @@ sub update_flags {
 
   # Retrieve the item's ID.
   my $db_item = $self->_retrieve_item( $item->coords, 0.5 );
-
   if( ! defined( $db_item ) ) {
     return;
   }
@@ -230,7 +231,17 @@ sub update_flags {
   my $hash_ref = {};
   $hash_ref->{'flag'} = $value;
 
+  # Lock the database (since we are writing)
+  $self->_db_begin_trans;
+  $self->_dblock;
+
+  # Do the update.
   $self->_db_update_data( $OBJECTTABLE, $hash_ref, $clause );
+
+  # End the transaction.
+  $self->_dbunlock;
+  $self->_db_commit_trans;
+
 }
 
 =item B<_add_item>
@@ -254,7 +265,7 @@ sub _add_item {
 
   my $item = shift;
   if( ! defined( $item ) ||
-      ! UNIVERSAL::isa( $item, "Astro::Catalog::Star" ) ) {
+      ! UNIVERSAL::isa( $item, "Astro::Catalog::Item" ) ) {
     croak "Item parameter to eSTAR::Database::Manip->_add_item must be defined as an Astro::Catalog::Item object, not " . ref( $item ) . "\n";
   }
 
@@ -469,10 +480,6 @@ sub _insert_flux {
     croak "Must supply item primary key to eSTAR::Database::Manip->_insert_flux()";
   }
 
-#  use Data::Dumper;
-#print Dumper $fluxes;
-#exit;
-
   my $date = $fluxes->{'iso_flux'}->datetime;
   my $fluxdate;
   if( defined( $date ) ) {
@@ -601,15 +608,16 @@ sub _insert_item {
   my $htmid = Astro::HTM::Functions->lookup_radec( $ra_deg, $dec_deg, 20 );
   $htmid =~ s/N//;
   $htmid =~ s/S/-/;
+  my $morphology = $item->morphology;
 
   $self->_db_insert_data( $OBJECTTABLE,
                           $item_key,
                           $ra->radians,
                           $dec->radians,
                           $htmid,
-                          $item->morphology->ellipticity,
+                          $morphology->ellipticity,
                           undef,
-                          $item->morphology->position_angle_world,
+                          $morphology->position_angle_world,
                           undef,
                           undef,
                           undef,
