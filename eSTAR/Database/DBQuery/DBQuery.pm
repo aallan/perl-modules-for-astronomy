@@ -422,7 +422,6 @@ sub _convert_to_perl {
   # Loop over children
   for my $child ($msbquery->childNodes) {
     my $name = $child->getName;
-    #print "Name: $name\n";
 
     # Get the attributes
     my %attr = map {  $_->getName, $_->getValue} $child->getAttributes;
@@ -464,9 +463,6 @@ sub _convert_to_perl {
 
   # Store the hash
   $self->query_hash(\%query);
-
-#  use Data::Dumper;
-#  print Dumper(\%query);
 
 }
 
