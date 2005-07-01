@@ -194,6 +194,7 @@ is thrown.
 
 sub _dbhandle {
   my $self = shift;
+
   if (@_) { 
     my $db = shift;
     if (UNIVERSAL::isa($db, "eSTAR::Database::DBbackend")) {
@@ -476,7 +477,7 @@ sub _db_insert_data {
 
     # Plain text
     if( ! defined( $column ) ) {
-      push( @toinsert, 'null' );
+      push( @toinsert, 'NULL' );
       $placeholder .= "?";
 
     } elsif (not ref($column)) {
