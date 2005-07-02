@@ -94,13 +94,13 @@ is( $star->get_colourerr('B-R'), 0.05, "compare B-R colour error values" );
 # Date Stamp the fluxes
 # ---------------------
 
-print "1\n";
+print "# 1\n";
 my $time = DateTime->now();
-print "2\n";
+print "# 2\n";
 $star->fluxdatestamp( $time );
-print "3\n";
+print "# 3\n";
 my $f = $star->fluxes();
-print "4\n";
+print "# 4\n";
 is($f->flux( waveband => new Astro::WaveBand( Filter => 'B' ) )->datetime(), $time, 'Retrieval of pushed DateTime object from Astro::Fluxes object');
 is($f->flux( waveband => new Astro::WaveBand( Filter => 'V' ) )->datetime(), $time, 'Retrieval of pushed DateTime object from Astro::Fluxes object');
 is($f->flux( waveband => new Astro::WaveBand( Filter => 'R' ) )->datetime(), $time, 'Retrieval of pushed DateTime object from Astro::Fluxes object');
@@ -142,7 +142,7 @@ my $star3 = new Astro::Catalog::Item( ID         => '2',
                                      Field      => '00080' );
 isa_ok($star3,"Astro::Catalog::Item");
 
-is( sprintf ("%.2f", $star1->distancetostar($star2)), 1795.76, "Distance from 1 to 2");
+is( sprintf ("%.1f", $star1->distancetostar($star2)), 1795.8, "Distance from 1 to 2");
 is( sprintf ("%.4f", $star1->distancetostar($star3)), 0.0359, "Distance from 1 to 3");
 
 is( $star1->within($star2, 1), 0, "Star 2 within 1 arcsec of star 1");
