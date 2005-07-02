@@ -111,7 +111,7 @@ for my $id (keys %hash1) {
 }
 
 # and remove it
-#unlink $outcat;
+unlink $outcat;
 
 # Test object constructor fails (should be in Astro::Catalog tests)
 eval { my $cat2 = new Astro::Catalog( Format => 'JCMT', Data => { } ); };
