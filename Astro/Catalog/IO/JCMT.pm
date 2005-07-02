@@ -34,7 +34,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/$VERSION $DEBUG /;
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 $DEBUG   = 0;
 
 # Name must be limited to 15 characters on write
@@ -234,6 +234,11 @@ sub _write_catalog {
     # Store a comment
     $srcdata{comment} = $star->comment;
 
+    # prepopulate the default velocity settings
+    $srcdata{rv}    = 'n/a';
+    $srcdata{vdefn}  = 'RADIO';
+    $srcdata{vframe} = 'LSR';
+
     # Get the type of source
     my $type = $src->type;
     if ($type eq 'RADEC') {
@@ -243,6 +248,17 @@ sub _write_catalog {
       $srcdata{long} = $src->ra(format => 'array');
       $srcdata{lat} = $src->dec(format => 'array');
 
+      # Get the velocity information
+      my $rv = $src->rv;
+      if ($rv) {
+	$srcdata{rv}    = $rv;
+	$srcdata{vdefn}  = $src->vdefn;
+	$srcdata{vframe} = $src->vframe;
+
+	# JCMT compatibility
+	$srcdata{vframe} = "LSR" if $srcdata{vframe} eq 'LSRK';
+
+      }
 
     } elsif ($type eq 'PLANET') {
       # Planets are not supported in catalog form. Skip them
@@ -277,13 +293,18 @@ sub _write_catalog {
     # new CRL618 with different coords then we trigger 3 warning
     # messages rather than 1 because we do not check that CRL618_2 is
     # the same as CRL618_1
+
+    # Note that velocity specification is included in this comparison
+
     if (exists $targets{$srcdata{name}}) {
       my $previous = $targets{$srcdata{name}};
 
       # Create stringified form of previous coordinate with same name
       # and current coordinate
-      my $prevcoords = join(" ",@{$previous->{long}},@{$previous->{lat}});
-      my $curcoords = join(" ",@{$srcdata{long}},@{$srcdata{lat}});
+      my $prevcoords = join(" ",@{$previous->{long}},@{$previous->{lat}},
+			    $previous->{rv}, $previous->{vdefn}, $previous->{vframe});
+      my $curcoords = join(" ",@{$srcdata{long}},@{$srcdata{lat}},
+			    $srcdata{rv}, $srcdata{vdefn}, $srcdata{vframe});
 
       if ($prevcoords eq $curcoords) {
 	# This is the same target so we can ignore it
@@ -378,7 +399,23 @@ sub _write_catalog {
     my $lat     = $src->{lat};
     my $system  = $src->{system};
     my $comment = $src->{comment};
+    my $rv      = $src->{rv};
+    my $vdefn   = $src->{vdefn};
+    my $vframe  = $src->{vframe};
+
     $comment = '' unless defined $comment;
+
+    # Velocity can not easily be done with a sprintf since it can be either
+    # a string or a 2 column number
+    if (lc($rv) eq 'n/a') {
+      $rv = '  n/a  ';
+    } else {
+      my $sign = ( $rv >= 0 ? '+' : '-' );
+      my $val  = $rv;
+      $val =~ s/^\s*[+-]\s*//;
+      $val =~ s/\s*$//;
+      $rv = $sign . ' '. sprintf('%6.1f',$val);
+    }
 
     # Name must be limited to MAX_SRC_LENGTH characters
     # [this should be taken care of by clean_target_name but
@@ -387,8 +424,8 @@ sub _write_catalog {
 
     push @lines, 
       sprintf("%-". MAX_SRC_LENGTH.
-      "s    %02d %02d %06.3f %1s %02d %02d %04.1f  %2s    n/a     n/a   n/a   LSR  RADIO %s\n",
-      $name, @$long, @$lat, $system, $comment);
+      "s    %02d %02d %06.3f %1s %02d %02d %04.1f  %2s  %s  n/a   n/a   %-4s %s %s\n",
+      $name, @$long, @$lat, $system, $rv, $vframe, $vdefn, $comment);
 
   }
 
@@ -509,6 +546,16 @@ sub _parse_line {
 
   # Replace multiple spaces in comment with single space
   $comment =~ s/\s+/ /g;
+
+  # velocity
+  $coords{vdefn} = "RADIO";
+  $coords{vframe} = "LSR";
+  if ($match[8] !~ /n/) {
+    $match[8] =~ s/\s//g; # remove spaces
+    $coords{rv} = $match[8];
+    $coords{vdefn} = $match[12];
+    $coords{vframe} = $match[11];
+  }
 
   # create the source object
   my $source = new Astro::Coords( %coords );

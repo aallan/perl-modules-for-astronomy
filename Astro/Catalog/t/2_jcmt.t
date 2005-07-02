@@ -4,11 +4,11 @@
 # it is the pointing catalogue.
 
 # Author: Tim Jenness (tjenness@cpan.org)
-# Copyright (C) 2003 Particle Physics and Astronomy Research Council
+# Copyright (C) 2003-2005 Particle Physics and Astronomy Research Council
 
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 1339;
 use Astro::SLA;
 
 require_ok( 'Astro::SLA' );
@@ -20,7 +20,8 @@ my $cat = new Astro::Catalog(Format => 'JCMT', Data => \*DATA );
 
 isa_ok( $cat, "Astro::Catalog");
 
-is( $cat->sizeof, 352, "count number of sources [inc planets]");
+my $total = 352;
+is( $cat->sizeof, $total, "count number of sources [inc planets]");
 
 # check that we are using Astro::Coords and Astro::Catalog::Star
 
@@ -50,6 +51,11 @@ is( scalar(@results), 4, "search by radius");
 @results = $cat->filter_by_id( qr/^N7538IRS1$/i );
 is( scalar(@results), 3, "search by full name");
 
+# Check a specific velocity
+$cat->reset_list;
+my ($gl) = $cat->popstarbyid( "GL490" );
+is( $gl->coords->rv(), -12.5,"GL490 velocity");
+
 # search for coords
 $cat->reset_list;
 @results = $cat->filter_by_cb( sub { substr($_[0]->ra,0,8) eq "02 22 39" });
@@ -59,15 +65,81 @@ is( scalar(@results), 1, "search by exact ra match");
 #print Dumper(@results);
 
 # Write catalog
+my $outcat = "catalog$$.dat";
 $cat->reset_list;
 $cat->write_catalog( Format => 'JCMT', File => "catalog$$.dat" );
-ok( -e "catalog$$.dat", "Check catalog file was created");
+ok( -e $outcat, "Check catalog file was created");
+
+# re-read it for comparison
+my $cat3 = new Astro::Catalog( Format => 'JCMT', File => $outcat);
+
+# Because of duplicates, we first go through and create a hash indexed by ID
+my %hash1 = form_hash( $cat );
+my %hash2 = form_hash( $cat3 );
+is( scalar keys %hash2, scalar keys %hash1, "Compare count");
+
+for my $id (keys %hash1) {
+  my $s1 = $hash1{$id};
+  my $s2 = $hash2{$id};
+
+  if (defined $s1 && defined $s2) {
+    my $d = $s1->coords->distance( $s2->coords);
+    ok( $d->arcsec < 0.1, "Check coordinates $id");
+  SKIP: {
+      skip "Only Equatorial coordinates have velocity", 3
+        unless $s1->coords->type eq 'RADEC';
+      is( sprintf("%.1f",$s2->coords->rv), sprintf("%.1f",$s1->coords->rv), "Compare velocity");
+      is( $s2->coords->vdefn, $s1->coords->vdefn, "Compare vel definition");
+      is( $s2->coords->vframe, $s1->coords->vframe, "Compare vel frame");
+    }
+  } else {
+    # one of them is not defined
+    if (!defined $s1 && !defined $s2) {
+      ok( 0, "ID $id exists in neither catalog");
+    } elsif (!defined $s1) {
+      ok( 0, "ID $id does not exist in original catalog");
+    } else {
+      ok( 0, "ID $id does not exist in new catalog");
+    }
+
+  SKIP: {
+      skip "One of the coordinates is not defined", 3;
+    }
+
+  }
+
+}
+
 # and remove it
-unlink "catalog$$.dat";
+#unlink $outcat;
 
 # Test object constructor fails (should be in Astro::Catalog tests)
 eval { my $cat2 = new Astro::Catalog( Format => 'JCMT', Data => { } ); };
 ok( $@, "Explicit object constructor failure - hash ref");
+
+exit;
+
+# my %hash = form_hash( $cat );
+sub form_hash {
+  my $cat = shift;
+
+  my %hash;
+  for my $s ($cat->allstars) {
+    my $id = $s->id;
+    if (exists $hash{$id}) {
+      my $c1 = $s->coords;
+      my $c2 = $hash{$id}->coords;
+      if ($c1->distance( $c2 ) == 0) {
+	# fine. The same coordinate
+      } else {
+	warn "ID matches $id but coords differ\n";
+      }
+    } else {
+      $hash{$id} = $s;
+    }
+  }
+  return %hash;
+}
 
 __DATA__
 *                              JCMT_CATALOG
@@ -395,7 +467,7 @@ W3(OH)          02 27 03.831 + 61 52 24.77 RJ  -   45.0 35.0   n/a   LSR  RADIO 
 GL490           03 27 38.842 + 58 47 00.51 RJ  -   12.5  5.0   n/a   LSR  RADIO  c 
 TTau            04 21 59.43  + 19 32 06.4  RJ  +    7.5  1.3   n/a   LSR  RADIO  s T Tauri star            
 DGTau           04 27 04.7   + 26 06 17.   RJ  +    5.0  0.9   n/a   LSR  RADIO  s T Tauri star; use 120" chop            
-L1551-IRS5      04 31 34.140 + 18 08 05.13 RJ  +    7.0  6.0   n/a   LSR  RADIO  c 
+L1551-IRS5      04 31 34.140 + 18 08 05.13 RJ  +    6.0  6.0   n/a   LSR  RADIO  c 
 HLTau           04 31 38.4   + 18 13 59.   RJ  +    6.4  2.3   n/a   LSR  RADIO  s TTAu* - 2nd-ary flux calibrator
 CRL618          04 42 53.597 + 36 06 53.65 RJ  -   21.7  4.5   90.0  LSR  RADIO  c Secondary flux calibrator
 OMC1            05 35 14.373 - 05 22 32.35 RJ  +   10.0 99.9   n/a   LSR  RADIO  c use 150" chop for pointi
@@ -407,7 +479,7 @@ IRC+10216       09 47 57.382 + 13 16 43.66 RJ  -   25.6  6.1   35.0  LSR  RADIO 
 TWHya           11 01 51.91  - 34 42 17.0  RJ  +    0.0  0.8   n/a   LSR  RADIO  s T Tauri star             
 16293-2422      16 32 22.909 - 24 28 35.60 RJ  +    4.0 16.3   n/a   LSR  RADIO  c Secondary flux calibrator
 G343.0          16 58 17.136 - 42 52 06.61 RJ  -   31.0 35.0   n/a   LSR  RADIO  c 
-NGC6334I        17 20 53.445 - 35 47 01.67 RJ  +    7.0 60.0   n/a   LSR  RADIO  c 
+NGC6334I        17 20 53.445 - 35 47 01.67 RJ  -    6.9 60.0   n/a   LSR  RADIO  c 
 G5.89           18 00 30.376 - 24 04 00.48 RJ  +   10.0 48.0   n/a   LSR  RADIO  c 
 M8E             18 04 52.957 - 24 26 39.36 RJ  +   11.0  2.8   n/a   LSR  RADIO  c       
 G10.62          18 10 28.661 - 19 55 49.76 RJ  -    3.5 50.0   n/a   LSR  RADIO  c 
@@ -497,7 +569,7 @@ UUAur           06 36 32.84  + 38 26 44.4  RJ  +    7.0  0.6   25.0  LSR  RADIO 
 VYCMa           07 22 58.33  - 25 46 03.2  RJ  +   19.0  1.0   92.0  LSR  RADIO 2-1 50.1                 
 M1-16           07 37 18.89  - 09 38 48.5  RJ  +   49.0  0.85  50.0  LSR  RADIO 2-1 48.9 : SEST 2-1 26.0 
 M1-17           07 40 22.16  - 11 32 30.1  RJ  +   28.0  1.80  78.0  LSR  RADIO 2-1 31.7 : IRAM 2-1 66.2 
-OH231.8         07 42 16.93  - 14 42 50.2  RJ  +   40.0  1.3  160.0  LSR  RADIO 2-1 71.8 : IRAM 1-0 92.5 
+OH231.8         07 42 16.93  - 14 42 50.2  RJ  +   30.0  1.3  160.0  LSR  RADIO 2-1 71.8 : IRAM 1-0 92.5 
 RLMi            09 45 34.29  + 34 30 42.8  RJ  +    2.0  0.4   18.0  LSR  RADIO 2-1 5.8  : IRAM 2-1 15.0 
 RLeo            09 47 33.49  + 11 25 44.1  RJ  -    0.4  1.0   22.0  LSR  RADIO 2-1 13.0 : CSO 3-2 37 4-3
 IRC+10216       09 47 57.382 + 13 16 43.66 RJ  -   25.6 32.    35.0  LSR  RADIO 2-1 427. (564) 3-2 687 (600) 4-3 720

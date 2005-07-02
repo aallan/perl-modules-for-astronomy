@@ -1,3 +1,7 @@
+2005-07-01  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* IO/JCMT.pm: Now read/write Velocity information 
+
 2005-06-26 Alasdair Allan <aa@astro.ex.ac.uk> 
 
         * Query/Query/Sesame.pm: Fixed problems with Sesame endpoint.
