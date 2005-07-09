@@ -47,9 +47,12 @@ my %lut = (
 Returns an SQL representation of the XML Query using the specified
 database table.
 
-  $sql = $query->sql( $eSTARtable );
+  $sql = $query->sql( $with_flux );
 
-Returns undef if the query could not be formed.
+Returns undef if the query could not be formed. The only argument
+is optional and, if set to false, returns SQL that will only query
+the tblObject table. Defaults to true, so that the SQL will query
+all tables.
 
 =cut
 
@@ -57,9 +60,19 @@ sub sql {
   my $self = shift;
 
   croak "sql method invoked with incorrect number of arguments"
-    unless scalar( @_ ) == 0;
+    unless scalar( @_ ) <= 1;
 
-  my $subsql = $self->_qhash_tosql();
+  my $with_flux = shift;
+  if( ! defined( $with_flux ) ) {
+    $with_flux = 1;
+  }
+
+  my $subsql;
+  if( $with_flux ) {
+    $subsql = $self->_qhash_tosql( );
+  } else {
+    $subsql = $self->_qhash_tosql( [ qw/ date waveband / ] );
+  }
 
   # Replace column names in the subsql with the proper table names.
   foreach my $column ( keys %lut ) {
@@ -67,17 +80,23 @@ sub sql {
   }
   $subsql = " WHERE " . $subsql if $subsql;
 
-  # Need to append the join criteria.
-  $subsql .= " AND " . $jointable{$OBJECTTABLE}{$MEASUREMENTTABLE};
-  $subsql .= " AND " . $jointable{$MEASUREMENTTABLE}{$MEASOBSJOINTABLE};
-  $subsql .= " AND " . $jointable{$OBSERVATIONTABLE}{$MEASOBSJOINTABLE};
+  my $sql;
+  if( $with_flux ) {
 
-  # Now generate the SQL.
-  my $sql = "SELECT *, CONVERT(CHAR, $DATETIMECOLUMN, 109) AS 'longmeasurementdate' FROM $OBJECTTABLE, $MEASUREMENTTABLE, $OBSERVATIONTABLE, $MEASOBSJOINTABLE $subsql";
+    # Need to append the join criteria.
+    $subsql .= " AND " . $jointable{$OBJECTTABLE}{$MEASUREMENTTABLE};
+    $subsql .= " AND " . $jointable{$MEASUREMENTTABLE}{$MEASOBSJOINTABLE};
+    $subsql .= " AND " . $jointable{$OBSERVATIONTABLE}{$MEASOBSJOINTABLE};
 
-  # Sort this, first by the object ID and second by the flux measurement
-  # timestamp.
-  $sql .= " ORDER BY OBJ.pklngObjectID, MEA.datetime";
+    # Now generate the SQL.
+    $sql = "SELECT *, CONVERT(CHAR, $DATETIMECOLUMN, 109) AS 'longmeasurementdate' FROM $OBJECTTABLE, $MEASUREMENTTABLE, $OBSERVATIONTABLE, $MEASOBSJOINTABLE $subsql";
+
+    # Sort this, first by the object ID and second by the flux measurement
+    # timestamp.
+    $sql .= " ORDER BY OBJ.pklngObjectID, MEA.datetime";
+  } else {
+    $sql = "SELECT * FROM $OBJECTTABLE $subsql ORDER BY OBJ.pklngObjectID";
+  }
 
   return "$sql\n";
 }
