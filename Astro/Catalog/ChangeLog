@@ -1,3 +1,10 @@
+2005-07-08  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* Catalog.pm: Rework sorting so that only specific values
+	are calculated depending on if that type of sort is being
+	done (i.e. if sorting by 'ra', only the RA is calculated
+	and not azimuth, elevation, etc).
+
 2005-07-01  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* IO/JCMT.pm: Now read/write Velocity information 
