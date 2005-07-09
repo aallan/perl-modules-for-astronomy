@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.54 2005/06/16 03:11:11 aa Exp $
+#     $Id: Catalog.pm,v 1.55 2005/07/09 02:17:47 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.54 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.55 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.54 2005/06/16 03:11:11 aa Exp $
+$Id: Catalog.pm,v 1.55 2005/07/09 02:17:47 cavanagh Exp $
 
 =head1 METHODS
 
@@ -1181,6 +1181,9 @@ sub sort_catalog {
     # see if we have a reference object
     my $ref = $self->reference;
 
+    # down case
+    my $sort = lc($mode);
+
     # to try to speed up all the queries, rather than
     # calculating the dynamic values during the sort we should
     # do it outside the sort. Create an array of hashes for the
@@ -1189,22 +1192,20 @@ sub sort_catalog {
       my $c = $_->coords;
       return () unless defined $c;
       my %calc = (
-		  object => $_,
-		  ra => $c->ra_app,
-		  dec => $c->dec_app,
-		  az => $c->az,
-		  el => $c->el,
-		  id => $_->id,
-		 );
-      if ($ref) {
-	$calc{distance} = $ref->distance( $c );
-	$calc{distance} = "Inf" unless defined $calc{distance};
+                  object => $_,
+                 );
+		  $calc{ra} = $c->ra_app if $sort eq 'ra';
+		  $calc{dec} = $c->dec_app if $sort eq 'dec';
+		  $calc{az} = $c->az if $sort eq 'az';
+		  $calc{el} = $c->el if $sort eq 'el';
+		  $calc{id} = $_->id if ( $sort eq 'id' || $sort eq 'name' );
+
+      if ($ref && $sort eq 'distance') {
+        $calc{distance} = $ref->distance( $c );
+        $calc{distance} = "Inf" unless defined $calc{distance};
       }
       \%calc;
     } @$stars;
-
-    # down case
-    my $sort = lc($mode);
 
     # Array to hold the sorted hashes
     my @rSources;
