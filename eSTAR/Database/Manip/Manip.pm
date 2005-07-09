@@ -166,23 +166,32 @@ Query the database using the supplied query (supplied as a
 C<eSTAR::Database::Query> object). Results are returned as
 an C<Astro::Catalog> object.
 
-  $catalog = $db->queryDB( $query );
+  $catalog = $db->queryDB( $query, $with_flux );
+
+The second optional argument tells the method whether or
+not to return flux measurements along with the objects.
+Defaults to true (i.e. flux measurements are returned).
 
 =cut
 
 sub queryDB {
   my $self = shift;
   my $query = shift;
+  my $with_flux = shift;
+
+  if( ! defined( $with_flux ) ) {
+    $with_flux = 1;
+  }
 
   # Get the SQL.
-  my $sql = $query->sql();
+  my $sql = $query->sql( $with_flux );
 
   # Use this SQL to query the database, returning the results
   # in an array reference.
   my $ref = $self->_db_retrieve_data_ashash( $sql );
 
   # Convert the data to an Astro::Catalog object.
-  my $catalog = $self->_reorganize_results( $ref );
+  my $catalog = $self->_reorganize_results( $ref, $with_flux );
 
   # And return the catalog.
   return $catalog;
@@ -220,7 +229,7 @@ sub update_flags {
   }
 
   # Retrieve the item's ID.
-  my $db_item = $self->_retrieve_item( $item->coords, 0.5 );
+  my $db_item = $self->_retrieve_item( $item->coords, 5 );
   if( ! defined( $db_item ) ) {
     return;
   }
@@ -386,7 +395,7 @@ sub _get_HTM_ranges {
   # This will be done by retrieving the HTM ID for twelve points
   # along the circle centred by the central coordinates.
   my %htmids;
-  my $steps = 12;
+  my $steps = 6;
   my $level;
   my $length = 2.5 * $radius;
   if( $length > 178 ) {
@@ -412,8 +421,9 @@ sub _get_HTM_ranges {
   } else {
     $level = 20;
   }
-  my $ra = $coords->ra( format => 'deg' );
-  my $dec = $coords->dec( format => 'deg' );
+  my ( $ra, $dec ) = $coords->radec();
+  $ra = $ra->degrees;
+  $dec = $dec->degrees;
 
   # First, get the central.
   my $htmid = Astro::HTM::Functions->lookup_radec( $ra, $dec, $level );
@@ -603,8 +613,8 @@ sub _insert_item {
   }
 
   my ( $ra, $dec ) = $item->coords->radec();
-  my $ra_deg = $ra->radians * $RAD_TO_DEG;
-  my $dec_deg = $dec->radians * $RAD_TO_DEG;
+  my $ra_deg = $ra->degrees;
+  my $dec_deg = $dec->degrees;
   my $htmid = Astro::HTM::Functions->lookup_radec( $ra_deg, $dec_deg, 20 );
   $htmid =~ s/N//;
   $htmid =~ s/S/-/;
@@ -705,6 +715,13 @@ sub _retrieve_catalog {
   }
   my $waveband = $args{'waveband'};
 
+  my $with_flux;
+  if( defined( $args{'with_flux'} ) ) {
+    $with_flux = $args{'with_flux'};
+  } else {
+    $with_flux = 1;
+  }
+
   my $radius_deg = $radius / 3600;
 
   # First, get a list of all of the HTM IDs we need to search for.
@@ -728,7 +745,7 @@ sub _retrieve_catalog {
   my $query = new eSTAR::Database::Query( XML => $xml );
 
   # Fire it off to queryDB.
-  my $catalog = $self->queryDB( $query );
+  my $catalog = $self->queryDB( $query, $with_flux );
 
   # Slam the central coordinates into the catalog object.
   $catalog->set_coords( $coords );
@@ -745,18 +762,11 @@ sub _retrieve_catalog {
 
 Retrieve an C<Astro::Catalog::Item> object from the database.
 
-  $item = $db->_retrieve_item( $coords, $radius,
-                               date_range => $date_range,
-                               waveband => $waveband );
+  $item = $db->_retrieve_item( $coords, $radius );
 
 This method takes two mandatory arguments. The first must be an
 C<Astro::Coords> object denoting the centre of the search, and the
 second is a radius in arcseconds.
-
-This method takes two optional named parameters. If the date_range
-argument is defined, it must be a C<DateTime::Span> object. If the
-waveband argument is defined, it must be an C<Astro::WaveBand>
-object.
 
 This method returns one C<Astro::Catalog::Item> object, and will
 be the one closest to the centre of the search if multiple items
@@ -778,30 +788,16 @@ sub _retrieve_item {
     croak "Radius parameter to eSTAR::Database::Manip->_retrieve_item must be defined in arcseconds";
   }
 
-  # Deal with the rest of the arguments.
-  my %args = @_;
-  if( defined( $args{'date_range'} ) &&
-      ! UNIVERSAL::isa( $args{'date_range'}, "DateTime::Span" ) ) {
-    croak "date_range parameter to eSTAR::Database::Manip->cone_search must be a DateTime::Span object";
-  }
-  my $date_range = $args{'date_range'};
-
-  if( defined( $args{'waveband'} ) &&
-      ! UNIVERSAL::isa( $args{'waveband'}, "Astro::WaveBand" ) ) {
-    croak "waveband parameter to eSTAR::Database::Manip->cone_search must be a WaveBand object";
-  }
-  my $waveband = $args{'waveband'};
-
+  # Get a catalog.
   my $catalog = $self->_retrieve_catalog( $coords, $radius,
-                                          date_range => $date_range,
-                                          waveband => $waveband );
+                                          with_flux => 0 );
 
   # If the DB doesn't return anything, return undef.
   if( ! defined( $catalog ) ) {
     return undef;
   }
 
-  # Sort the catalog by distance from the central coordinates.
+  # Sort the catalog.
   $catalog->sort_catalog( "distance" );
 
   # Pop off the first Astro::Catalog::Item object.
@@ -820,7 +816,7 @@ sub _retrieve_item {
     }
   }
 
-  # And return that object.
+  # And return that object (even though we can't actually get here...)
   return $item;
 }
 
@@ -886,17 +882,26 @@ Given the results from a database query (returned as a row
 per flux measurement per object), convert this output to an
 C<Astro::Catalog> object.
 
-  $catalog = $db->_reorganize_results( $query_output );
+  $catalog = $db->_reorganize_results( $query_output, $with_flux );
+
+The optional second argument tells the routine to keep the Flux
+measurements or not. Not keeping them speeds things up. Keeping
+the flux measurements is the default.
 
 =cut
 
 sub _reorganize_results {
   my $self = shift;
   my $rows = shift;
+  my $with_flux = shift;
 
   # Return if we don't have anything to reorganize.
   if( ! defined( $rows ) ) {
     return undef;
+  }
+
+  if( ! defined( $with_flux ) ) {
+    $with_flux = 1;
   }
 
   my $catalog = new Astro::Catalog;
@@ -948,7 +953,7 @@ sub _reorganize_results {
       # Push this item onto the catalog.
       $catalog->pushstar( $item );
     }
-    if( ! $seen_flux_ids{$newrow->{uc($primary_keys{$MEASUREMENTTABLE})}} ) {
+    if( $with_flux && ! $seen_flux_ids{$newrow->{uc($primary_keys{$MEASUREMENTTABLE})}} ) {
       # New flux measurement, process it.
       my $fluxes = new Astro::Fluxes;
       foreach my $fluxtype ( qw/ ISOPHOTAL_FLUX TOTAL_FLUX CORE1_FLUX CORE2_FLUX
