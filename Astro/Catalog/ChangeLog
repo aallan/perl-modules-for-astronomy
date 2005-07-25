@@ -1,3 +1,7 @@
+2005-07-25 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+        * Query/Query/Sesame.pm: Added more error handling!
+
 2005-07-08  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
 
 	* Catalog.pm: Rework sorting so that only specific values

@@ -31,11 +31,11 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 REVISION
 
-$Id: Sesame.pm,v 1.8 2005/06/26 01:59:09 aa Exp $
+$Id: Sesame.pm,v 1.9 2005/07/25 07:45:49 aa Exp $
 
 =head1 METHODS
 
@@ -195,7 +195,7 @@ sub _parse_query {
   my @result = $self->_dump_raw();
   chomp @result;
   
-  #use Data::Dumper; print Dumper( @result );
+  use Data::Dumper; print Dumper( @result );
   
   # Grab Coordinates
   # ----------------
@@ -211,6 +211,8 @@ sub _parse_query {
      }  
   }
   
+  croak "Can not understand response, no co-ordinate line found "
+      unless defined $coord_line;
   my $line = $result[$coord_line];
   
   # split it on \s+

@@ -33,10 +33,12 @@ isa_ok( $catalog, "Astro::Catalog" );
 # reference star
 my $star = new Astro::Catalog::Star( id => 'EX Hya',
 				     coords => new Astro::Coords(
-				       ra =>'12 52 25', dec =>'-29 14 57',
+				       ra =>'12 52 25', dec =>'-29 14 58',
 					type=> 'j2000' ) );
 
 #print Dumper ( $star );
 
 compare_star( $catalog->starbyindex(0), $star);
 
+my $sesame2 = new Astro::Catalog::Query::Sesame( Target => 'HT Cas' );
+my $catalog2 = $sesame2->querydb();
