@@ -36,13 +36,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOEvent.pm,v 1.3 2005/04/22 13:25:01 aa Exp $
+$Id: VOEvent.pm,v 1.4 2005/07/27 11:44:40 aa Exp $
 
 =head1 METHODS
 
@@ -107,7 +107,7 @@ or
                                               .
                                           { ID   => $string,
                                             Cite => $string }],
-                         Curation    => { Publisher => $url,
+                         Who        => { Publisher => $url,
                                           Contact => { Name      => $string,
                                                        Institution => $string,
                                                        Address   => $string,
@@ -202,7 +202,7 @@ sub build {
   my %args = @_;
 
   # mandatory tags
-  unless ( exists $args{Type} && exists $args{Role} && exists $args{ID} && 
+  unless ( exists $args{Role} && exists $args{ID} && 
            ( exists $args{Reference} || $args{WhereWhen} ) ) {
      return undef;
   }         
@@ -211,17 +211,26 @@ sub build {
   $self->{WRITER}->xmlDecl( 'UTF-8' );
    
   # BEGIN DOCUMENT ------------------------------------------------------- 
-  $self->{WRITER}->startTag( 'VOEvent', 
-          'type' => $args{Type},
+  if ( exists $args{UseSTC} ) {
+     $self->{WRITER}->startTag( 'VOEvent', 
+          #'type' => $args{Type},
           'role' => $args{Role},
           'id'   => $args{ID},
+	  'version' => '0.1',
           'xmlns:stc' => 'http://www.ivoa.net/xml/STC/stc-v1.20.xsd',
           'xmlns:crd' => 'http://www.ivoa.net/xml/STC/STCCoords/v1.20',
           'xmlns:xi'  => 'http://www.w3c.org/2001/XInclude',
           'xmlns:xsi'  => 'http://www.w3c.org/2001/XMLSchema-instance',
           'xsi:schemaLocation' => 'http://www.ivoa.net/xml/STC/stc-v1.20'
-          );   
-                             
+	  );   
+  } else {
+     $self->{WRITER}->startTag( 'VOEvent', 
+          #'type' => $args{Type},
+          'role' => $args{Role},
+          'id'   => $args{ID},
+	  'version' => 'HTN/0.1' );  
+  }
+                            
   # REFERENCE ONLY -------------------------------------------------------
                              
   if ( exists $args{Reference} ) {
@@ -231,7 +240,7 @@ sub build {
         $self->{WRITER}->endTag( 'Description' );
      }
      
-     $self->{WRITER}->emptyTag( 'Ref',
+     $self->{WRITER}->emptyTag( 'Reference',
                                 'uri' => ${$args{Reference}}{URL},
                                 'type' => ${$args{Reference}}{Type} );
   
@@ -251,56 +260,56 @@ sub build {
      $self->{WRITER}->endTag( 'Description' );
   }   
  
-  # CURATION
-  if ( exists $args{Curation} ) {
-     $self->{WRITER}->startTag( 'Curation' );
+  # WHO
+  if ( exists $args{Who} ) {
+     $self->{WRITER}->startTag( 'Who' );
   
-     if ( exists ${$args{Curation}}{Publisher} ) {
+     if ( exists ${$args{Who}}{Publisher} ) {
        $self->{WRITER}->startTag( 'Publisher' );
-       $self->{WRITER}->characters( ${$args{Curation}}{Publisher} );
+       $self->{WRITER}->characters( ${$args{Who}}{Publisher} );
        $self->{WRITER}->endTag( 'Publisher' );
      }
-     if ( exists ${$args{Curation}}{Contact} ) {
+     if ( exists ${$args{Who}}{Contact} ) {
        $self->{WRITER}->startTag( 'Contact' );
-       if ( exists ${${$args{Curation}}{Contact}}{Name} ) {
+       if ( exists ${${$args{Who}}{Contact}}{Name} ) {
           $self->{WRITER}->startTag( 'Name' );
           $self->{WRITER}->characters( 
-                             ${${$args{Curation}}{Contact}}{Name} );
+                             ${${$args{Who}}{Contact}}{Name} );
           $self->{WRITER}->endTag( 'Name' );          
        }           
-       if ( exists ${${$args{Curation}}{Contact}}{Institution} ) {
+       if ( exists ${${$args{Who}}{Contact}}{Institution} ) {
           $self->{WRITER}->startTag( 'Institution' );
           $self->{WRITER}->characters( 
-                             ${${$args{Curation}}{Contact}}{Institution} );
+                             ${${$args{Who}}{Contact}}{Institution} );
           $self->{WRITER}->endTag( 'Institution' );          
        }
-       if ( exists ${${$args{Curation}}{Contact}}{Address} ) {
+       if ( exists ${${$args{Who}}{Contact}}{Address} ) {
           $self->{WRITER}->startTag( 'Address' );
           $self->{WRITER}->characters( 
-                             ${${$args{Curation}}{Contact}}{Address} );
+                             ${${$args{Who}}{Contact}}{Address} );
           $self->{WRITER}->endTag( 'Address' );          
        }   
-       if ( exists ${${$args{Curation}}{Contact}}{Telephone} ) {
+       if ( exists ${${$args{Who}}{Contact}}{Telephone} ) {
           $self->{WRITER}->startTag( 'Telephone' );
           $self->{WRITER}->characters( 
-                             ${${$args{Curation}}{Contact}}{Telephone} );
+                             ${${$args{Who}}{Contact}}{Telephone} );
           $self->{WRITER}->endTag( 'Telephone' );          
        }   
-       if ( exists ${${$args{Curation}}{Contact}}{Email} ) {
+       if ( exists ${${$args{Who}}{Contact}}{Email} ) {
           $self->{WRITER}->startTag( 'Email' );
           $self->{WRITER}->characters( 
-                             ${${$args{Curation}}{Contact}}{Email} );
+                             ${${$args{Who}}{Contact}}{Email} );
           $self->{WRITER}->endTag( 'Email' );          
        }    
        $self->{WRITER}->endTag( 'Contact' );
      }
-     if ( exists ${$args{Curation}}{Date} ) {
+     if ( exists ${$args{Who}}{Date} ) {
        $self->{WRITER}->startTag( 'Date' );
-       $self->{WRITER}->characters( ${$args{Curation}}{Date} );
+       $self->{WRITER}->characters( ${$args{Who}}{Date} );
        $self->{WRITER}->endTag( 'Date' );
      }   
      
-     $self->{WRITER}->endTag( 'Curation' );
+     $self->{WRITER}->endTag( 'Who' );
   }
  
   # CITATIONS
@@ -309,19 +318,19 @@ sub build {
      
      my @array = @{$args{Citations}};
      foreach my $i ( 0 ... $#array ) {
-        $self->{WRITER}->emptyTag( 'Ref',
-                                   'id'   => ${$array[$i]}{ID},
-                                   'cite' => ${$array[$i]}{Cite} );
+        $self->{WRITER}->startTag( 'EventID','cite' => ${$array[$i]}{Cite} );
+	$self->{WRITER}->characters( ${$array[$i]}{ID} );
+	$self->{WRITER}->endTag( 'EventID' );
      }
      $self->{WRITER}->endTag( 'Citations' );
   }
    
   # WHERE & WHEN  
   $self->{WRITER}->startTag( 'WhereWhen' );
-  
+  if ( exists $args{UseSTC} ) {
       $self->{WRITER}->startTag( 'stc:ObservationLocation' );
       $self->{WRITER}->startTag( 'crd:AstroCoords',
-                                  'coord_system_id' => 'FK5-UTC' );
+        		      'coord_system_id' => 'FK5-UTC' );
       $self->{WRITER}->startTag( 'crd:Time', 'unit' => 's' );
       $self->{WRITER}->startTag( 'crd:TimeInstant' );
       $self->{WRITER}->startTag( 'crd:TimeScale' );
@@ -345,7 +354,38 @@ sub build {
       $self->{WRITER}->endTag( 'crd:Position2D' );
       $self->{WRITER}->endTag( 'crd:AstroCoords' );
       $self->{WRITER}->endTag( 'stc:ObservationLocation' );
-   
+  } else {
+      $self->{WRITER}->startTag( 'RA', units => 'deg' );
+      $self->{WRITER}->startTag( 'Coord' );
+      $self->{WRITER}->characters( ${$args{WhereWhen}}{RA} );
+      $self->{WRITER}->endTag( 'Coord' );
+      $self->{WRITER}->emptyTag( 'Error', 
+                            value => ${$args{WhereWhen}}{Error},
+			    units => "arcmin" );
+      $self->{WRITER}->endTag( 'RA' );
+      $self->{WRITER}->startTag( 'Dec', units => 'deg' );
+      $self->{WRITER}->startTag( 'Coord' );
+      $self->{WRITER}->characters( ${$args{WhereWhen}}{Dec} );
+      $self->{WRITER}->endTag( 'Coord' );
+      $self->{WRITER}->emptyTag( 'Error', 
+                            value => ${$args{WhereWhen}}{Error},
+			    units => "arcmin" );
+      $self->{WRITER}->endTag( 'Dec' );  
+      $self->{WRITER}->emptyTag( 'Epoch', value => "J2000.0" );      
+      $self->{WRITER}->emptyTag( 'Equinox', value => "2000.0" ); 
+
+      $self->{WRITER}->startTag( 'Time' );
+      $self->{WRITER}->startTag( 'Value' );
+      $self->{WRITER}->characters( ${$args{WhereWhen}}{Time} );
+      $self->{WRITER}->endTag( 'Value' );
+      if ( exists ${$args{WhereWhen}}{TimeError} ) {
+         $self->{WRITER}->emptyTag( 'Error', 
+                            value => ${$args{WhereWhen}}{TimeError},
+			    units => "s" );
+      }		    
+      $self->{WRITER}->endTag( 'Time' );  
+       
+  } 
   $self->{WRITER}->endTag( 'WhereWhen' );
    
   # HOW
@@ -365,7 +405,7 @@ sub build {
        $self->{WRITER}->endTag( 'Location' );
      }     
      if ( exists ${$args{How}}{RTML} ) {
-       $self->{WRITER}->emptyTag( 'Ref' , 
+       $self->{WRITER}->emptyTag( 'Reference' , 
                                    uri => ${$args{How}}{RTML}, 
                                    type => 'rtml' );
      }         
@@ -427,38 +467,38 @@ sub build {
      $self->{WRITER}->endTag( 'What' );
   }
   
-  # HPOTHESIS
-  if ( exists $args{Hypothesis} ) {
-     $self->{WRITER}->startTag( 'Hypothesis' );
+  # WHY
+  if ( exists $args{Why} ) {
+     $self->{WRITER}->startTag( 'Why' );
            
-     if ( exists ${$args{Hypothesis}}{Classification} ) {
-        if ( exists ${${$args{Hypothesis}}{Classification}}{Probability} ) {
+     if ( exists ${$args{Why}}{Classification} ) {
+        if ( exists ${${$args{Why}}{Classification}}{Probability} ) {
           $self->{WRITER}->startTag( 'Classification', 
-          'probability' => ${${$args{Hypothesis}}{Classification}}{Probability},
+          'probability' => ${${$args{Why}}{Classification}}{Probability},
           'units'       => 'percent',
-          'type'        => ${${$args{Hypothesis}}{Classification}}{Type});
+          'type'        => ${${$args{Why}}{Classification}}{Type});
           $self->{WRITER}->characters( 
-                        ${${$args{Hypothesis}}{Classification}}{Description} );
+                        ${${$args{Why}}{Classification}}{Description} );
           $self->{WRITER}->endTag( 'Classification' );
         } else {
           $self->{WRITER}->startTag( 'Classification', 
-                   'type' => ${${$args{Hypothesis}}{Classification}}{Type});
+                   'type' => ${${$args{Why}}{Classification}}{Type});
           $self->{WRITER}->characters( 
-                        ${${$args{Hypothesis}}{Classification}}{Description} );
+                        ${${$args{Why}}{Classification}}{Description} );
           $self->{WRITER}->endTag( 'Classification' );
         }         
      }    
       
-     if ( exists ${$args{Hypothesis}}{Identification} ) {
+     if ( exists ${$args{Why}}{Identification} ) {
        $self->{WRITER}->startTag( 'Identification', 
-             'type'   => ${${$args{Hypothesis}}{Identification}}{Type});
+             'type'   => ${${$args{Why}}{Identification}}{Type});
        $self->{WRITER}->characters( 
-                        ${${$args{Hypothesis}}{Identification}}{Description} );
+                        ${${$args{Why}}{Identification}}{Description} );
        $self->{WRITER}->endTag( 'Identification' );
      }         
      
      
-     $self->{WRITER}->endTag( 'Hypothesis' );
+     $self->{WRITER}->endTag( 'Why' );
   }  
   
   # END DOCUMENT --------------------------------------------------------- 

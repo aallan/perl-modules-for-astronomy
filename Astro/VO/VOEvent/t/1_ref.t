@@ -26,7 +26,7 @@ chomp @buffer;
 my $object = new Astro::VO::VOEvent();
 
 my $document = $object->build( 
-                Type => 'update', Role => 'test',
+                Role => 'test',
                 ID   => 'ivo://raptor.lanl/23456789/',
                 Description => 'This is a bit of human readable text',
                 Reference  => { 
@@ -48,7 +48,7 @@ exit;
 __DATA__
 <?xml version="1.0" encoding="UTF-8"?>
 
-<VOEvent type="update" role="test" id="ivo://raptor.lanl/23456789/" xmlns:stc="http://www.ivoa.net/xml/STC/stc-v1.20.xsd" xmlns:crd="http://www.ivoa.net/xml/STC/STCCoords/v1.20" xmlns:xi="http://www.w3c.org/2001/XInclude" xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/STC/stc-v1.20">
+<VOEvent role="test" id="ivo://raptor.lanl/23456789/" version="HTN/0.1">
     <Description>This is a bit of human readable text</Description>
-    <Ref uri="http://www.raptor.lanl.gov/documents/event233.xml" type="voevent" />
+    <Reference uri="http://www.raptor.lanl.gov/documents/event233.xml" type="voevent" />
 </VOEvent>

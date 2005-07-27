@@ -1,3 +1,8 @@
+2005-07-27  Alasdair Allan <aa@astro.ex.ac.uk>
+
+        * VOEvent.pm: Support for "simple" positions, synced with RAPTOR
+	  parser for interoperability between the networks.
+
 2005-04-22  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Original version.

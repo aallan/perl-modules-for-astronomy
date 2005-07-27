@@ -4,7 +4,7 @@
 use strict;
 
 #load test
-use Test::More tests => 66;
+use Test::More tests => 64;
 
 # load modules
 BEGIN {
@@ -30,11 +30,10 @@ my $address = "Los Alamos National Laboratory,\n" .
               "Los Alamos, NM 87545";
               
 my $document = $object->build( 
-     Type => 'update', 
      Role => 'test',
      ID   => 'ivo://raptor.lanl/23456789/',
      Description => 'This is some human readable text.',
-     Curation => { Publisher => 'ivo://raptor.lanl',
+     Who => { Publisher => 'ivo://raptor.lanl',
                    Date => '2005-04-15T14:34:16',
                    Contact => { Name => 'Robert White',
                                 Institution => 'LANL',
@@ -45,22 +44,26 @@ my $document = $object->build(
                       Cite => 'supercedes' },
                     { ID => 'ivo://estar.org/1234567/aa/', 
                       Cite => 'associated' } ],
-     WhereWhen => { RA => '148.888', Dec => '69.065', Error => '0.01',
-                    Time => '2005-04-15T23:59:59' },  
+     WhereWhen => { RA => '148.888', Dec => '69.065', Error => '4',
+                    Time => '2005-04-15T23:59:59', TimeError => '30' },  
      How => { Name => 'Raptor AB', Location => 'Los Alamos',
-              RTML => 'http://www.raptor.lanl.gov.documents/phase_zero.html' },
+              RTML => 'http://www.raptor.lanl.gov/documents/phase_zero.html' },
      What => [ { Group => [ { Name  => 'magnitude',
                               UCD   => 'phot.mag:em.opt.R',
-                              Value => '13.2' },
+                              Value => '13.2',
+			      Units => 'mag' },
                             { Name  => 'error',
                               UCD   => 'phot.mag:stat.error',
-                              Value => '0.1' } ] },
+                              Value => '0.1',
+			      Units => 'mag' } ] },
                { Group => [ { Name  => 'magnitude',
                               UCD   => 'phot.mag:em.opt.V',
-                              Value => '12.5' },
+                              Value => '12.5',
+			      Units => 'mag' },
                             { Name  => 'error',
                               UCD   => 'phot.mag:stat.error',
-                              Value => '0.1' } ] },
+                              Value => '0.1',
+			      Units => 'mag' } ] },
                { Name  => 'seeing',
                   UCD   => 'instr.obsty.site.seeing',
                   Value => '2',
@@ -68,7 +71,7 @@ my $document = $object->build(
                { Name  => 'misc',
                  UCD   => 'misc.junk',
                  Value => 'unknown' } ],
-       Hypothesis  => { Classification => { 
+       Why  => { Classification => { 
                            Probability  => '30', Type  => 'ot',
                            Description => 'Fast Orphan Optical Transient' },
                         Identification => { 
@@ -92,9 +95,9 @@ exit;
 __DATA__
 <?xml version="1.0" encoding="UTF-8"?>
 
-<VOEvent type="update" role="test" id="ivo://raptor.lanl/23456789/" xmlns:stc="http://www.ivoa.net/xml/STC/stc-v1.20.xsd" xmlns:crd="http://www.ivoa.net/xml/STC/STCCoords/v1.20" xmlns:xi="http://www.w3c.org/2001/XInclude" xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/STC/stc-v1.20">
+<VOEvent role="test" id="ivo://raptor.lanl/23456789/" version="HTN/0.1">
     <Description>This is some human readable text.</Description>
-    <Curation>
+    <Who>
         <Publisher>ivo://raptor.lanl</Publisher>
         <Contact>
             <Name>Robert White</Name>
@@ -107,50 +110,48 @@ Los Alamos, NM 87545</Address>
             <Email>rwhite@lanl.gov</Email>
         </Contact>
         <Date>2005-04-15T14:34:16</Date>
-    </Curation>
+    </Who>
     <Citations>
-        <Ref id="ivo://raptor.lanl/98765432/" cite="supercedes" />
-        <Ref id="ivo://estar.org/1234567/aa/" cite="associated" />
+        <EventID cite="supercedes">ivo://raptor.lanl/98765432/</EventID>
+        <EventID cite="associated">ivo://estar.org/1234567/aa/</EventID>
     </Citations>
     <WhereWhen>
-        <stc:ObservationLocation>
-            <crd:AstroCoords coord_system_id="FK5-UTC">
-                <crd:Time unit="s">
-                    <crd:TimeInstant>
-                        <crd:TimeScale>UTC</crd:TimeScale>
-                        <crd:ISOTime>2005-04-15T23:59:59</crd:ISOTime>
-                    </crd:TimeInstant>
-                </crd:Time>
-                <crd:Position2D unit="deg">
-                    <crd:Value2>148.888 69.065</crd:Value2>
-                    <crd:Error1Circle>
-                        <crd:Size>0.01</crd:Size>
-                    </crd:Error1Circle>
-                </crd:Position2D>
-            </crd:AstroCoords>
-        </stc:ObservationLocation>
+        <RA units="deg">
+            <Coord>148.888</Coord>
+            <Error value="4" units="arcmin" />
+        </RA>
+        <Dec units="deg">
+            <Coord>69.065</Coord>
+            <Error value="4" units="arcmin" />
+        </Dec>
+        <Epoch value="J2000.0" />
+        <Equinox value="2000.0" />
+        <Time>
+            <Value>2005-04-15T23:59:59</Value>
+            <Error value="30" units="s" />
+        </Time>
     </WhereWhen>
     <How>
         <Instrument>
             <Name>Raptor AB</Name>
             <Location>Los Alamos</Location>
-            <Ref uri="http://www.raptor.lanl.gov.documents/phase_zero.html" type="rtml" />
+            <Reference uri="http://www.raptor.lanl.gov/documents/phase_zero.html" type="rtml" />
         </Instrument>
     </How>
     <What>
         <Group>
-            <Param name="magnitude" ucd="phot.mag:em.opt.R" value="13.2" units="" />
-            <Param name="error" ucd="phot.mag:stat.error" value="0.1" units="" />
+            <Param name="magnitude" ucd="phot.mag:em.opt.R" value="13.2" units="mag" />
+            <Param name="error" ucd="phot.mag:stat.error" value="0.1" units="mag" />
         </Group>
         <Group>
-            <Param name="magnitude" ucd="phot.mag:em.opt.V" value="12.5" units="" />
-            <Param name="error" ucd="phot.mag:stat.error" value="0.1" units="" />
+            <Param name="magnitude" ucd="phot.mag:em.opt.V" value="12.5" units="mag" />
+            <Param name="error" ucd="phot.mag:stat.error" value="0.1" units="mag" />
         </Group>
         <Param name="seeing" ucd="instr.obsty.site.seeing" value="2" units="arcsec" />
         <Param name="misc" ucd="misc.junk" value="unknown" />
     </What>
-    <Hypothesis>
+    <Why>
         <Classification probability="30" units="percent" type="ot">Fast Orphan Optical Transient</Classification>
         <Identification type="associated">NGC1234</Identification>
-    </Hypothesis>
+    </Why>
 </VOEvent>

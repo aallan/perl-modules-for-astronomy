@@ -22,27 +22,27 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/Config.pm)
+# These definitions are from config.sh (via /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/Config.pm)
 
 # They may have been overridden via Makefile.PL or on the command line
 AR = ar
-CC = cc
-CCCDLFLAGS = -fpic
-CCDLFLAGS = -Wl,-E
-DLEXT = so
-DLSRC = dl_dlopen.xs
-LD = cc
-LDDLFLAGS = -shared -L/usr/local/lib
+CC = gcc
+CCCDLFLAGS =  
+CCDLFLAGS =  
+DLEXT = bundle
+DLSRC = dl_dyld.xs
+LD = env MACOSX_DEPLOYMENT_TARGET=10.3 cc
+LDDLFLAGS =  -bundle -undefined dynamic_lookup -L/usr/local/lib
 LDFLAGS =  -L/usr/local/lib
-LIBC = /lib/libc-2.3.2.so
+LIBC = /usr/lib/libc.dylib
 LIB_EXT = .a
 OBJ_EXT = .o
-OSNAME = linux
-OSVERS = 2.4.21-20.elsmp
-RANLIB = :
-SITELIBEXP = /software/perl-5.8.6/lib/site_perl/5.8.6
-SITEARCHEXP = /software/perl-5.8.6/lib/site_perl/5.8.6/i686-linux-thread-multi
-SO = so
+OSNAME = darwin
+OSVERS = 7.9.0
+RANLIB = /usr/bin/ar ts
+SITELIBEXP = /Users/estar/Perl/lib/perl5/site_perl/5.8.6
+SITEARCHEXP = /Users/estar/Perl/lib/perl5/site_perl/5.8.6/darwin-thread-multi-2level
+SO = dylib
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
 VENDORARCHEXP = 
@@ -72,18 +72,18 @@ MAN3EXT = 3
 INSTALLDIRS = site
 DESTDIR = 
 PREFIX = 
-PERLPREFIX = /software/perl-5.8.6
-SITEPREFIX = /software/perl-5.8.6
+PERLPREFIX = /Users/estar/Perl
+SITEPREFIX = /Users/estar/Perl
 VENDORPREFIX = 
-INSTALLPRIVLIB = $(PERLPREFIX)/lib/5.8.6
+INSTALLPRIVLIB = $(PERLPREFIX)/lib/perl5/5.8.6
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = $(SITEPREFIX)/lib/site_perl/5.8.6
+INSTALLSITELIB = $(SITEPREFIX)/lib/perl5/site_perl/5.8.6
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
 INSTALLVENDORLIB = 
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = $(PERLPREFIX)/lib/5.8.6/i686-linux-thread-multi
+INSTALLARCHLIB = $(PERLPREFIX)/lib/perl5/5.8.6/darwin-thread-multi-2level
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = $(SITEPREFIX)/lib/site_perl/5.8.6/i686-linux-thread-multi
+INSTALLSITEARCH = $(SITEPREFIX)/lib/perl5/site_perl/5.8.6/darwin-thread-multi-2level
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
 INSTALLVENDORARCH = 
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
@@ -107,16 +107,16 @@ INSTALLSITEMAN3DIR = $(SITEPREFIX)/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = 
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
-PERL_LIB = /software/perl-5.8.6/lib/5.8.6
-PERL_ARCHLIB = /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi
+PERL_LIB = /Users/estar/Perl/lib/perl5/5.8.6
+PERL_ARCHLIB = /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = $(FIRST_MAKEFILE).old
 MAKE_APERL_FILE = $(FIRST_MAKEFILE).aperl
 PERLMAINCC = $(CC)
-PERL_INC = /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE
-PERL = /software/perl-5.8.6/bin/perl
-FULLPERL = /software/perl-5.8.6/bin/perl
+PERL_INC = /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE
+PERL = /home/estar/Perl/bin/perl
+FULLPERL = /home/estar/Perl/bin/perl
 ABSPERL = $(PERL)
 PERLRUN = $(PERL)
 FULLPERLRUN = $(FULLPERL)
@@ -128,7 +128,7 @@ PERL_CORE = 0
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /software/perl-5.8.6/lib/5.8.6/ExtUtils/MakeMaker.pm
+MAKEMAKER   = /Users/estar/Perl/lib/perl5/5.8.6/ExtUtils/MakeMaker.pm
 MM_VERSION  = 6.17
 MM_REVISION = 1.133
 
@@ -307,21 +307,21 @@ config :: $(INST_ARCHAUTODIR)$(DIRFILESEP).exists
 config :: $(INST_AUTODIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 
-$(INST_AUTODIR)/.exists :: /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE/perl.h
+$(INST_AUTODIR)/.exists :: /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE/perl.h
 	$(NOECHO) $(MKPATH) $(INST_AUTODIR)
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE/perl.h $(INST_AUTODIR)/.exists
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE/perl.h $(INST_AUTODIR)/.exists
 
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_AUTODIR)
 
-$(INST_LIBDIR)/.exists :: /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE/perl.h
+$(INST_LIBDIR)/.exists :: /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE/perl.h
 	$(NOECHO) $(MKPATH) $(INST_LIBDIR)
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE/perl.h $(INST_LIBDIR)/.exists
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE/perl.h $(INST_LIBDIR)/.exists
 
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_LIBDIR)
 
-$(INST_ARCHAUTODIR)/.exists :: /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE/perl.h
+$(INST_ARCHAUTODIR)/.exists :: /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE/perl.h
 	$(NOECHO) $(MKPATH) $(INST_ARCHAUTODIR)
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE/perl.h $(INST_ARCHAUTODIR)/.exists
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE/perl.h $(INST_ARCHAUTODIR)/.exists
 
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_ARCHAUTODIR)
 
@@ -329,9 +329,9 @@ config :: $(INST_MAN3DIR)$(DIRFILESEP).exists
 	$(NOECHO) $(NOOP)
 
 
-$(INST_MAN3DIR)/.exists :: /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE/perl.h
+$(INST_MAN3DIR)/.exists :: /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE/perl.h
 	$(NOECHO) $(MKPATH) $(INST_MAN3DIR)
-	$(NOECHO) $(EQUALIZE_TIMESTAMP) /software/perl-5.8.6/lib/5.8.6/i686-linux-thread-multi/CORE/perl.h $(INST_MAN3DIR)/.exists
+	$(NOECHO) $(EQUALIZE_TIMESTAMP) /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE/perl.h $(INST_MAN3DIR)/.exists
 
 	-$(NOECHO) $(CHMOD) $(PERM_RWX) $(INST_MAN3DIR)
 
@@ -660,7 +660,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
-FULLPERL      = /software/perl-5.8.6/bin/perl
+FULLPERL      = /home/estar/Perl/bin/perl
 
 $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 	$(MAKE) -f $(MAKE_APERL_FILE) $@
@@ -706,7 +706,7 @@ ppd:
 	$(NOECHO) $(ECHO) '    <AUTHOR>Alasdair Allan &lt;aa@astro.ex.ac.uk&gt;</AUTHOR>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <OS NAME="$(OSNAME)" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="i686-linux-thread-multi" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="darwin-thread-multi-2level" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> $(DISTNAME).ppd
