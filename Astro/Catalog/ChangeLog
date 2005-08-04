@@ -1,6 +1,11 @@
+2005-08-04  Tim Jenness  <tjenness@cpan.org>
+
+	* IO/JCMT.pm: Add support for ASTRO_CATALOG_JCMT environment
+	variable for default catalogue location.
+
 2005-07-25 Alasdair Allan <aa@astro.ex.ac.uk> 
 
-        * Query/Query/Sesame.pm: Added more error handling!
+	* Query/Query/Sesame.pm: Added more error handling!
 
 2005-07-08  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
 

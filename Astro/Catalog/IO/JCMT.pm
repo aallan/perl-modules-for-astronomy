@@ -34,7 +34,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/$VERSION $DEBUG /;
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 $DEBUG   = 0;
 
 # Name must be limited to 15 characters on write
@@ -101,10 +101,15 @@ to know explicitly where it is.
 
 Returns empty list/undef if the file is not available.
 
+If the environment variable ASTRO_CATALOG_JCMT is defined (and exists)
+this will be used as the default.
+
 =cut
 
 sub _default_file {
   my $class = shift;
+  return $ENV{ASTRO_CATALOG_JCMT}
+    if (exists $ENV{ASTRO_CATALOG_JCMT} && -e $ENV{ASTRO_CATALOG_JCMT});
   return (-e $defaultCatalog ? $defaultCatalog : () );
 }
 
