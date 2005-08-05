@@ -1,5 +1,7 @@
 2005-08-04  Tim Jenness  <tjenness@cpan.org>
 
+	* IO/ASCII.pm: Reinstate 'default' logic
+
 	* IO/JCMT.pm: Add support for ASTRO_CATALOG_JCMT environment
 	variable for default catalogue location.
 

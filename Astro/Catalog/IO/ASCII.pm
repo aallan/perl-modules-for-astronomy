@@ -24,7 +24,7 @@ use strict;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 $DEBUG = 0;
 
 =head1 METHODS
@@ -43,7 +43,11 @@ are:
   Data => Contents of catalogue, either as a scalar variable,
           reference to array of lines or reference to glob (file handle).
           This key is used in preference to 'File' if both are present.
+
   File => File name for catalog on disk. Not used if 'Data' supplied.
+          If a file is specified but is called 'default', the default file 
+          for the class is used.
+
   ReadOpt => Reference to hash of options to be forwarded onto the
              format specific catalogue reader. See the IO documentation
              for details.
@@ -87,7 +91,7 @@ sub read_catalog {
   } else {
     # Look for a filename or the default file
     my $file;
-    if ( defined $args{file} ) {
+    if ( defined $args{file} && $args{file} ne 'default') {
       $file = $args{file};
     } else {
       # Need to ask for the default file
@@ -122,7 +126,7 @@ sub read_catalog {
 
 =head1 REVISION
 
-  $Id: ASCII.pm,v 1.1 2005/03/31 01:25:37 cavanagh Exp $
+  $Id: ASCII.pm,v 1.2 2005/08/05 03:36:17 timj Exp $
 
 =head1 SEE ALSO
 
