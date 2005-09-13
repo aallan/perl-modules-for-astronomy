@@ -42,14 +42,14 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.14 2005/06/15 03:24:49 aa Exp $
+$Id: Cluster.pm,v 1.15 2005/09/13 21:30:12 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -211,7 +211,7 @@ currently C<Colours> and C<Mags>, e.g.
 
    \@lines = Astro::Catalog::IO::Cluster->_write_catalog( 
                        $catalog, Magnitudes => \@mags, Colours => \@colours );
-                                                           
+
 where magnitudes and colours passed in the array will be used in the catalog
 despite the presence of other
 
@@ -229,46 +229,35 @@ sub _write_catalog {
   my $class = shift;
   my $catalog = shift;
 
-  # debugging, drop the catalogue to disk as it flys right by...
-  #use Data::Dumper;
-  #print "Dumping Catalogue to disk 'catalog_dump.cat'\n";
-  #my $status = open my $fh, ">catalog_dump.cat";
-  #if (!$status) {
-  #    print "Error: cannot open dump file catalog_dump.cat\n";
-  #    return;
-  #}
-  #print $fh Dumper($catalog);
-  #close( $fh );
-
   # real list of filters and colours in the catalogue
   my @filters = $catalog->starbyindex(0)->what_filters();
   my @colours = $catalog->starbyindex(0)->what_colours();
-  
+
   # number of stars in catalogue
   my $number = $catalog->sizeof();
-  
+
   # number of filters & colours
   my $num_mags = $catalog->starbyindex(0)->what_filters();
   my $num_cols = $catalog->starbyindex(0)->what_colours();
 
   # reference to the $self->{STARS} array in Astro::Catalog
   my $stars = $catalog->stars();
-  
+
   # figure out what magnitudes and colours we're going to output
   my ( $mags, $cols );
   if ( @_ ) {
     my %args = @_;
-  
+
     if( defined $args{colours} ) {
       $cols = $args{colours};
     }
     if( defined $args{magnitudes} ) {
       $mags = $args{magnitudes};
     }
-      
+
   } else {
-    $mags = \@filters;    
-    $cols = \@colours;  
+    $mags = \@filters;
+    $cols = \@colours;
   }
 
   # define varaibles for output filters and colours
@@ -277,24 +266,24 @@ sub _write_catalog {
   # if we want fewer magnitudes than we have in the object
   # to be written to the cluster file
   foreach my $m ( 0 .. $#{$mags} ) {
-     foreach my $n ( 0 .. $num_mags-1 ) {
-        #print "${$mags}[$m] == $filters[$n]\n";
-        if ( ${$mags}[$m] eq $filters[$n] ) {
-           push( @out_mags, ${$mags}[$m] );
-        }   
-     }
+    foreach my $n ( 0 .. $num_mags-1 ) {
+      if ( ${$mags}[$m] eq $filters[$n] ) {
+        push( @out_mags, ${$mags}[$m] );
+        last;
+      }
+    }
   }
 
   # same for colours
   foreach my $k ( 0 .. $#{$cols} ) {
-     foreach my $l ( 0 .. $num_cols-1 ) {
-        #print "${$cols}[$k] == $colours[$l]\n";
-        if ( ${$cols}[$k] eq $colours[$l] ) {
-           push( @out_cols, ${$cols}[$k] );
-        }   
-     }
-  } 
-   
+    foreach my $l ( 0 .. $num_cols-1 ) {
+      if ( ${$cols}[$k] eq $colours[$l] ) {
+        push( @out_cols, ${$cols}[$k] );
+        last;
+      }
+    }
+  }
+
   # write header
   # ------------
   my @output;
@@ -338,13 +327,13 @@ sub _write_catalog {
         $output_line = "0 ";
      }
      
-     #if ( defined ${$stars}[$star]->id() && 
-     #     Scalar::Util::looks_like_number( ${$stars}[$star]->id() ) ) {
-     #   $output_line = $output_line . ${$stars}[$star]->id() . "  ";
-     #} else {
+     if ( defined ${$stars}[$star]->id() && 
+          Scalar::Util::looks_like_number( ${$stars}[$star]->id() ) ) {
+        $output_line = $output_line . ${$stars}[$star]->id() . "  ";
+     } else {
         $output_line = $output_line . $star . " ";
-     #} 
-     
+     }
+
      # fiddle with the dec, olv versions of the Fortran Cluster
      # parser don't like + signs for northern hemisphere dec's
      my $dec = ${$stars}[$star]->dec();
@@ -361,71 +350,55 @@ sub _write_catalog {
      }   
 
      # magnitudes
-     foreach my $i ( 0 .. $#$mags ) {
+     foreach my $out_mag ( @out_mags ) {
 
-        my $doit = 0;
+       # Grab each magnitude listed in the @out_mags array and append
+       # it to the output line.
+       if( defined( $ {$stars}[$star]->get_magnitude( $out_mag ) ) ) {
+         $output_line .= ${$stars}[$star]->get_magnitude( $out_mag ) . " ";
+       } else {
+         $output_line .= "0.000 ";
+       }
 
-        # if we want fewer magnitudes than we have in the object
-        # to be written to the cluster file
-        if ( defined $out_mags[0] ) {
+       # And get the error, if it exists.
+       if( defined( $ {$stars}[$star]->get_errors( $out_mag ) ) ) {
+         $output_line .= ${$stars}[$star]->get_errors( $out_mag ) . " ";
+       } else {
+         $output_line .= "0.000 ";
+       }
 
-           $doit = -1;
-           # check to see if we have a valid filter
-           foreach my $m ( 0 .. $#out_mags ) {           
-              $doit = 1 if ( $out_mags[$m] eq ${$mags}[$i] );
-           }
-        }
-
-        # so long as $doit isn't -1 then we have a valid filter
-        if( $doit != -1 ) {
-        
-          if ( defined ${$stars}[$star]->get_magnitude(${$mags}[$i]) ) {
-             $output_line = $output_line . 
-                         ${$stars}[$star]->get_magnitude(${$mags}[$i]) . "  ";
-          } else {
-             $output_line = $output_line . "0.000 ";
-          } 
-          if ( defined ${$stars}[$star]->get_errors(${$mags}[$i]) ) {
-             $output_line = $output_line . 
-                         ${$stars}[$star]->get_errors(${$mags}[$i]) . "  ";
-          } else {
-             $output_line = $output_line . "0.000 ";
-          }
-          if ( defined ${$stars}[$star]->quality() ) {
-             $output_line = $output_line . 
-                         ${$stars}[$star]->quality() . "  ";
-          } else {
-             $output_line = $output_line . "0 ";
-          }                
-        }
+       # And the quality.
+       if ( defined ${$stars}[$star]->quality() ) {
+         $output_line .= ${$stars}[$star]->quality() . "  ";
+       } else {
+         $output_line .= "0 ";
+       }
      }
 
+     # Now for the colours.
+     foreach my $out_col ( @out_cols ) {
 
-     # magnitudes
-     foreach my $i ( 0 .. $#$cols ) {
+       # Grab each colour listed in the @out_cols array and append it
+       # to the output line.
+       if( defined( $ {$stars}[$star]->get_colour( $out_col ) ) ) {
+         $output_line .= ${$stars}[$star]->get_colour( $out_col ) . " ";
+       } else {
+         $output_line .= "0.000 ";
+       }
 
-        my $doit = 0;
+       # And get the error, if it exists.
+       if( defined( $ {$stars}[$star]->get_colourerr( $out_col ) ) ) {
+         $output_line .= ${$stars}[$star]->get_colourerr( $out_col ) . " ";
+       } else {
+         $output_line .= "0.000 ";
+       }
 
-        # if we want fewer magnitudes than we have in the object
-        # to be written to the cluster file
-        if ( defined $out_cols[0] ) {
-
-           $doit = -1;
-           # check to see if we have a valid filter
-           foreach my $m ( 0 .. $#out_cols ) {
-              $doit = 1 if ( $out_cols[$m] eq ${$cols}[$i] );
-           }
-        }
-
-        # so long as $doit isn't -1 then we have a valid filter
-        if( $doit != -1 ) {
-          $output_line = $output_line . 
-                         ${$stars}[$star]->get_colour(${$cols}[$i]) . "  ";
-          $output_line = $output_line . 
-                         ${$stars}[$star]->get_colourerr(${$cols}[$i]) . "  ";
-          $output_line = $output_line . 
-                         ${$stars}[$star]->quality() . "  ";
-        }
+       # And the quality.
+       if ( defined ${$stars}[$star]->quality() ) {
+         $output_line .= ${$stars}[$star]->quality() . "  ";
+       } else {
+         $output_line .= "0 ";
+       }
      }
 
      # next star
@@ -459,17 +432,18 @@ sub _default_file {
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2003 University of Exeter. All Rights Reserved.
-Some modificiations Copyright (C) 2003 Particle Physics and Astronomy
-Research Council. All Rights Reserved.
+Some modificiations Copyright (C) 2003-2005 Particle Physics and
+Astronomy Research Council. All Rights Reserved.
 
 This module was written as part of the eSTAR project in collaboration
-with the Joint Astronomy Centre (JAC) in Hawaii and is free software; 
-you can redistribute it and/or modify it under the terms of the GNU 
+with the Joint Astronomy Centre (JAC) in Hawaii and is free software;
+you can redistribute it and/or modify it under the terms of the GNU
 Public License.
 
 =head1 AUTHORS
 
 Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>
+Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
 
 =cut
 
