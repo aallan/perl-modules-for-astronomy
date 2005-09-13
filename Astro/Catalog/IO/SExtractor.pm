@@ -11,10 +11,10 @@ $cat = Astro::Catalog::IO::SExtractor->_read_catalog( \@lines );
 
 =head1 DESCRIPTION
 
-This class provides a read method for catalogues written by SExtractor,
-as long as they were written in ASCII_HEAD format. The method is not
-public and should, in general, only be called from the C<Astro::Catalog>
-C<write_catalog> method.
+This class provides read and write methods for catalogues written by
+SExtractor, as long as they were written in ASCII_HEAD format. The
+methods are not public and should, in general, only be called from the
+C<Astro::Catalog> C<read_catalog> and C<write_catalog> methods.
 
 =cut
 
@@ -266,11 +266,23 @@ sub _read_catalog {
       } else {
          $num = new Number::Uncertainty( Value => $fields[$mag_column] );
       }
-      
+
       my $mag = new Astro::Flux( $num,'mag', $filter );
       $star->fluxes( new Astro::Fluxes($mag) );
-      
-      
+    }
+
+    # Set the flux count and flux count error.
+    if( $flux_column != -1 ) {
+      my $num;
+      if( $fluxerr_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$flux_column],
+                                        Error => $fields[$fluxerr_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$flux_column], );
+      }
+
+      my $flux = new Astro::Flux( $num, 'counts', $filter );
+      $star->fluxes( new Astro::Fluxes( $flux ) );
     }
 
     # Set the x and y coordinates.
@@ -318,7 +330,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.9 2005/06/15 19:03:42 aa Exp $
+  $Id: SExtractor.pm,v 1.10 2005/09/13 02:10:28 cavanagh Exp $
 
 =head1 FORMAT
 
