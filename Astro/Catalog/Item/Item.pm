@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.6 2005/06/24 02:59:23 aa Exp $
+#     $Id: Item.pm,v 1.7 2005/09/13 02:13:43 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.6 2005/06/24 02:59:23 aa Exp $
+$Id: Item.pm,v 1.7 2005/09/13 02:13:43 cavanagh Exp $
 
 =head1 METHODS
 
@@ -593,13 +593,13 @@ sub fluxes {
       unless UNIVERSAL::isa($flux, "Astro::Fluxes");
 
     if ( defined $self->{FLUXES} ) {
-       if ( defined $flag ) {
-          $self->{FLUXES} = $flux;
-       } else {         
-          ${$self->{FLUXES}}->merge( $flux );
-       }	  
+      if ( defined $flag ) {
+        $self->{FLUXES} = $flux;
+      } else {
+        $self->{FLUXES}->merge( $flux );
+      }
     } else {
-       $self->{FLUXES} = $flux;
+      $self->{FLUXES} = $flux;
     }
   }
   return $self->{FLUXES};
