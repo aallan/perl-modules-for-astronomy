@@ -1,3 +1,17 @@
+2005-09-13  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+  * IO/Cluster.pm: Fix bug when more than one measurement for a given
+    waveband is present in a catalogue.
+
+  * t/2_cluster.t: Add tests.
+
+  * t/3_item.t: Modify distance check to use two decimal places
+    instead of one. This is done to avoid differences in rounding x.5
+    between different platforms.
+
+  * t/helper.pl: Check to make sure item is an Astro::Catalog::Item
+    object instead of an Astro::Catalog::Star object.
+
 2005-09-12  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
   * Item/Item.pm: Fix bug when adding more than one flux measurement.
