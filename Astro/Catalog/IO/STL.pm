@@ -10,8 +10,8 @@ $cat = Astro::Catalog::IO::STL->_read_catalog( \@lines );
 
 =head1 DESCRIPTION
 
-This class provides a read method for catalogues in the CURSA small
-text list (STL) catalogue format. The method is not public and
+This class provides read and write methods for catalogues in the CURSA
+small text list (STL) catalogue format. The methods are not public and
 should, in general, only be called from the C<Astro::Catalog>
 C<write_catalog> method.
 
@@ -219,23 +219,65 @@ sub _read_catalog {
 Create an output catalogue in the STL format and return the lines
 in an array.
 
-  $ref = Astro::Catalog::IO::TST->_write_catalog( $catalog );
+  $ref = Astro::Catalog::IO::STL->_write_catalog( $catalog );
 
 Argument is an C<Astro::Catalog> object.
-
-This method is not yet implemented.
 
 =cut
 
 sub _write_catalog {
-  croak "Not yet implemented.";
+  my $class = shift;
+  my $catalog = shift;
+
+  # An array to hold the output.
+  my @return;
+
+  # First, the preamble.
+  push( @return, "!+" );
+  push( @return, "!  This catalogue is formatted as a CURSA small text list (STL)." );
+  push( @return, "!  For a description of this format see Starlink User Note 190." );
+  push( @return, "!-" );
+  push( @return, "" );
+
+  # Now the header describing the output columns.
+  push( @return, "C  PIDENT   INTEGER   1     EXFMT=I6" );
+  push( @return, ":    COMMENTS='Position identifier'" );
+  push( @return, "C  RA       DOUBLE    2     EXFMT=D19.10" );
+  push( @return, ":    UNITS='RADIANS{hms.1}'" );
+  push( @return, ":    COMMENTS='Right ascension'" );
+  push( @return, "C  Dec      DOUBLE    3     EXFMT=D19.10" );
+  push( @return, ":    UNITS='RADIANS{dms}'" );
+  push( @return, ":    COMMENTS='Declination'" );
+  push( @return, "" );
+
+  # Begin the table.
+  push( @return, "BEGINTABLE" );
+
+  # And now the actual data. Loop through the stars in the catalogue.
+  my $stars = $catalog->stars();
+
+  foreach my $star ( @$stars ) {
+    my $output_string;
+
+    my $id_string = sprintf( "%6d", $star->id );
+    my $ra_string = sprintf( "%19.10e", $star->coords->ra->radians );
+    $ra_string =~ s/e/E/;
+    my $dec_string = sprintf( "%19.10e", $star->coords->dec->radians );
+    $dec_string =~ s/e/E/;
+
+    $output_string = $id_string . $ra_string . $dec_string;
+    push( @return, $output_string );
+  }
+
+  # And return.
+  return \@return;
 }
 
 =back
 
 =head1 REVISION
 
- $Id: STL.pm,v 1.2 2005/03/31 01:24:53 cavanagh Exp $
+ $Id: STL.pm,v 1.3 2005/09/13 02:12:50 cavanagh Exp $
 
 =head1 FORMAT
 
@@ -250,7 +292,7 @@ L<Astro::Catalog>, L<Astro::Catalog::IO::Simple>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004 Particle Physics and Astronomy Research Council.
+Copyright (C) 2004-2005 Particle Physics and Astronomy Research Council.
 All Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it
