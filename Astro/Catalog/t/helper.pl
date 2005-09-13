@@ -104,8 +104,8 @@ reference star.
 sub compare_star {
   my ($cmpstar, $refstar) = @_;
 
-  isa_ok( $refstar, "Astro::Catalog::Star", "Check ref star type");
-  isa_ok( $cmpstar, "Astro::Catalog::Star", "Check cmp star type");
+  isa_ok( $refstar, "Astro::Catalog::Item", "Check ref star type");
+  isa_ok( $cmpstar, "Astro::Catalog::Item", "Check cmp star type");
 
   is( $cmpstar->id(), $refstar->id(), "compare star ID" );
 
