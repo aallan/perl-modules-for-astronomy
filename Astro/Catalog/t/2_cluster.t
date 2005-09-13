@@ -1,77 +1,62 @@
 # Astro::Catalog test harness
 
-# strict
+use Test::More tests => 84;
 use strict;
 
-#load test
-use Test;
-use File::Spec;
-use Data::Dumper;
-BEGIN { plan tests => 1 };
+BEGIN {
+  use_ok( "Astro::Catalog" );
+}
 
-# load modules
-use Astro::Catalog;
+# Load the generic test code
+my $p = ( -d "t" ?  "t/" : "");
+do $p."helper.pl" or die "Error reading test functions: $!";
 
-# T E S T   H A R N E S S --------------------------------------------------
+# Read in the catalogue from the DATA block
+my $cat = new Astro::Catalog( Format => 'Cluster', Data => \*DATA );
 
-# test the test system
-ok(1);
+# Is it an Astro::Catalog object?
+isa_ok( $cat, "Astro::Catalog" );
 
+# Write the catalogue out to disk.
+my $tempfile = File::Spec->catfile( File::Spec->tmpdir, "catalog.test" );
+ok( $cat->write_catalog( Format => 'Cluster',
+                         File   => $tempfile,
+                       ),
+    "Writing catalogue to disk" );
 
-# Write Catalog to Cluster File
-# -----------------------------
+# Read it back in...
+my $newcat = new Astro::Catalog( Format => 'Cluster',
+                                 File   => $tempfile,
+                               );
 
-my $in_name = File::Spec->catfile( File::Spec->tmpdir(), "input.cat" );
-my $out_name = File::Spec->catfile( File::Spec->tmpdir(), "output.cat" );
+# ...check to make sure it's an Astro::Catalog object...
+isa_ok( $newcat, "Astro::Catalog" );
 
-# read from data block
-my @buffer = <DATA>;
-chomp @buffer;
+# ...and that it's the same as the old catalogue.
+compare_catalog( $cat, $newcat );
 
-# write to temporary file
-unless ( open( FILE, ">$in_name" ) ) {
-  print "Could not open $in_name\n";
-  exit;
-}  
+# Pop off the first item.
+my $item = $cat->popstar;
 
-foreach my $i ( 0 ... $#buffer ) {
-   print FILE $buffer[$i] . "\n";
-}   
-close(FILE);
+# Is it an Astro::Catalog::Item object?
+isa_ok( $item, "Astro::Catalog::Item" );
 
-# Create Catalog Object
-# ---------------------
+# Check its attributes.
+is( $item->id, "2", "Cluster Star ID" );
+is( $item->field, "00081", "Cluster Star field" );
+is( $item->ra, "10 44 57.00", "Cluster Star RA" );
+is( $item->dec, "+12 34 53.50", "Cluster Star Dec" );
+is( $item->get_magnitude( 'B' ), 9.3, "Cluster Star B magnitude" );
+is( $item->get_errors( 'B' ), 0.2, "Cluster Star B magnitude error" );
 
-my $catalog = new Astro::Catalog( Format => 'Cluster', File => $in_name );
-
-#$catalog->write_catalog( Format => 'Cluster', File => $out_name );
-
-my @mags = ( 'B', 'V' );
-my @cols = ( 'B-R', 'B-V' );
-$catalog->write_catalog(  Format => 'Cluster', File => $out_name, 
-                          Magnitudes => \@mags, Colours => \@cols );
-
-
-# L A S T   O R D E R S   A T   T H E   B A R --------------------------------
-
-END {
-  # clean up after ourselves
-  #print "# Cleaning up temporary files\n";
-  #my @list = ( $in_name, $out_name );
-  #print "# Deleting:@list\n";
-  #unlink(@list); 
-}        
-
-
-# T I M E   A T   T H E   B A R ---------------------------------------------
-
-exit;  
+# All done.
+exit;
 
 # D A T A   B L O C K --------------------------------------------------------
 
 __DATA__
-5 colours were created
-B R V B-R B-V
+7 colours were created
+B B B R V B-R B-V
 A sub-set of USNO-A2: Field centre at RA 01 10 12.90, Dec +60 04 35.90, Search Radius 1 arcminutes 
-00080  A  09 55 39.00  +60 07 23.60  0.000  0.000  16.4  0.4  0  16.1  0.1  0  16.3  0.3  0  0.3  0.05  0  0.1  0.02  0  
-00081  B  10 44 57.00  +12 34 53.50  0.000  0.000  9.3  0.2  0  9.5  0.6  0  9.1  0.1  0  0.2  0.07  0  -0.2  0.05  0  
+00080  1  09 55 39.00  +60 07 23.60  0.000  0.000  16.4  0.4  0  16.4  0.4  0  16.4  0.4  0  16.1  0.1  0  16.3  0.3  0  0.3  0.05  0  0.1  0.02  0
+00081  2  10 44 57.00  +12 34 53.50  0.000  0.000  9.3  0.2  0  9.3  0.2  0  9.3  0.2  0  9.5  0.6  0  9.1  0.1  0  0.2  0.07  0  -0.2  0.05  0
