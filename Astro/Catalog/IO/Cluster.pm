@@ -42,14 +42,14 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.15 2005/09/13 21:30:12 cavanagh Exp $
+$Id: Cluster.pm,v 1.16 2005/09/13 21:34:28 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -355,14 +355,14 @@ sub _write_catalog {
        # Grab each magnitude listed in the @out_mags array and append
        # it to the output line.
        if( defined( $ {$stars}[$star]->get_magnitude( $out_mag ) ) ) {
-         $output_line .= ${$stars}[$star]->get_magnitude( $out_mag ) . " ";
+         $output_line .= ${$stars}[$star]->get_magnitude( $out_mag ) . "  ";
        } else {
          $output_line .= "0.000 ";
        }
 
        # And get the error, if it exists.
        if( defined( $ {$stars}[$star]->get_errors( $out_mag ) ) ) {
-         $output_line .= ${$stars}[$star]->get_errors( $out_mag ) . " ";
+         $output_line .= ${$stars}[$star]->get_errors( $out_mag ) . "  ";
        } else {
          $output_line .= "0.000 ";
        }
@@ -381,14 +381,14 @@ sub _write_catalog {
        # Grab each colour listed in the @out_cols array and append it
        # to the output line.
        if( defined( $ {$stars}[$star]->get_colour( $out_col ) ) ) {
-         $output_line .= ${$stars}[$star]->get_colour( $out_col ) . " ";
+         $output_line .= ${$stars}[$star]->get_colour( $out_col ) . "  ";
        } else {
          $output_line .= "0.000 ";
        }
 
        # And get the error, if it exists.
        if( defined( $ {$stars}[$star]->get_colourerr( $out_col ) ) ) {
-         $output_line .= ${$stars}[$star]->get_colourerr( $out_col ) . " ";
+         $output_line .= ${$stars}[$star]->get_colourerr( $out_col ) . "  ";
        } else {
          $output_line .= "0.000 ";
        }
