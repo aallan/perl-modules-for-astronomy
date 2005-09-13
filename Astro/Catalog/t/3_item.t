@@ -142,7 +142,7 @@ my $star3 = new Astro::Catalog::Item( ID         => '2',
                                      Field      => '00080' );
 isa_ok($star3,"Astro::Catalog::Item");
 
-is( sprintf ("%.1f", $star1->distancetostar($star2)), 1795.8, "Distance from 1 to 2");
+is( sprintf ("%.2f", $star1->distancetostar($star2)), 1795.85, "Distance from 1 to 2");
 is( sprintf ("%.4f", $star1->distancetostar($star3)), 0.0359, "Distance from 1 to 3");
 
 is( $star1->within($star2, 1), 0, "Star 2 within 1 arcsec of star 1");
