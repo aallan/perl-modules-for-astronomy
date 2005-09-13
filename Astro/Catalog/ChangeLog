@@ -1,3 +1,13 @@
+2005-09-12  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+  * Item/Item.pm: Fix bug when adding more than one flux measurement.
+
+  * IO/STL.pm: Add _write_catalog method.
+
+  * IO/SExtractor.pm: Read in flux counts if available in catalogue.
+
+  * IO/Astrom.pm: Do not write ~ at beginning of ASTR line.
+
 2005-08-04  Tim Jenness  <tjenness@cpan.org>
 
 	* IO/ASCII.pm: Reinstate 'default' logic
