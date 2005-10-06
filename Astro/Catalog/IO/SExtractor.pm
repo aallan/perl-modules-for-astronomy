@@ -156,6 +156,7 @@ sub _read_catalog {
   my $minor_world_column = -1;
   my $major_world_column = -1;
   my $area_column = -1;
+  my $flag_column = -1;
 
   # Loop through the lines.
   for ( @lines ) {
@@ -194,10 +195,10 @@ sub _read_catalog {
       } elsif( $column[2] =~ /^DELTA_J2000/ ) {
         $dec_column = $column[1] - 1;
         print "DEC column is $dec_column\n" if $DEBUG;
-      } elsif( $column[2] =~ /^MAG_ISOCOR/ ) {
+      } elsif( $column[2] =~ /^MAG_ISO/ ) {
         $mag_column = $column[1] - 1;
         print "MAG column is $mag_column\n" if $DEBUG;
-      } elsif( $column[2] =~ /^MAGERR_ISOCOR/ ) {
+      } elsif( $column[2] =~ /^MAGERR_ISO/ ) {
         $magerr_column = $column[1] - 1;
         print "MAG ERROR column is $magerr_column\n" if $DEBUG;
       } elsif( $column[2] =~ /^FLUX_ISO/ ) {
@@ -230,6 +231,9 @@ sub _read_catalog {
       } elsif( $column[2] =~ /^ISOAREA_IMAGE/ ) {
         $area_column = $column[1] - 1;
         print "AREA column is $area_column\n" if $DEBUG;
+      } elsif( $column[2] =~ /^FLAGS/ ) {
+        $flag_column = $column[1] - 1;
+        print "FLAG column is $flag_column\n" if $DEBUG;
       }
       next;
     }
@@ -254,7 +258,12 @@ sub _read_catalog {
                                   );
 
     $star->coords( $coords );
-    $star->quality( 0 );
+    if( $flag_column != -1 ) {
+      $star->quality( $fields[$flag_column] );
+#      print "setting quality to $fields[$flag_column]\n";
+    } else {
+      $star->quality( 0 );
+    }
 
     # Set the magnitude and the magnitude error. Set the filter
     # to 'unknown' because SExtractor doesn't know about such things.
@@ -330,7 +339,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.10 2005/09/13 02:10:28 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.11 2005/10/06 00:34:46 cavanagh Exp $
 
 =head1 FORMAT
 
