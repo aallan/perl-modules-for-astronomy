@@ -1,3 +1,8 @@
+2005-10-21  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+  * Item/Morphology/Morphology.pm: Use Number::Uncertainty for all
+    values.
+
 2005-09-13  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
   * IO/Cluster.pm: Fix bug when more than one measurement for a given
