@@ -19,11 +19,12 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 use Carp;
-use Class::Struct;
+
+use Number::Uncertainty;
 
 use warnings::register;
 
-'$Revision: 1.1 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 METHODS
 
@@ -42,17 +43,22 @@ object.
 
 =cut
 
-struct ( 'Astro::Catalog::Item::Morphology',
-         { ellipticity => '$',
-           position_angle_pixel => '$',
-           position_angle_world => '$',
-           major_axis_pixel => '$',
-           minor_axis_pixel => '$',
-           major_axis_world => '$',
-           minor_axis_world => '$',
-           area => '$',
-         }
-       );
+sub new {
+  my $proto = shift;
+  my $class = ref( $proto ) || $proto;
+
+  # Retrieve the arguments.
+  my %args = @_;
+
+  # Create the object.
+  my $obj = bless {}, $class;
+
+  # Configure the object.
+  $obj->_configure( %args );
+
+  # And return it.
+  return $obj;
+}
 
 =back
 
@@ -64,42 +70,176 @@ struct ( 'Astro::Catalog::Item::Morphology',
 
 The ellipticity of the object.
 
+=cut
+
+sub ellipticity {
+  my $self = shift;
+  if( @_ ) {
+    my $ell = shift;
+    if( ! UNIVERSAL::isa( $ell, "Number::Uncertainty" ) ) {
+      $ell = new Number::Uncertainty( Value => $ell );
+    }
+    $self->{ELLIPTICITY} = $ell;
+  }
+  return $self->{ELLIPTICITY};
+}
+
 =item B<position_angle_pixel>
 
 Position angle using the pixel frame as a reference. Measured counter-
 clockwise from the positive x axis.
+
+=cut
+
+sub position_angle_pixel {
+  my $self = shift;
+  if( @_ ) {
+    my $ang = shift;
+    if( ! UNIVERSAL::isa( $ang, "Number::Uncertainty" ) ) {
+      $ang = new Number::Uncertainty( Value => $ang );
+    }
+    $self->{POSITION_ANGLE_PIXEL} = $ang;
+  }
+  return $self->{POSITION_ANGLE_PIXEL};
+}
 
 =item B<position_angle_world>
 
 Position angle using the world coordinate system as a reference. Measured
 east of north.
 
+=cut
+
+sub position_angle_world {
+  my $self = shift;
+  if( @_ ) {
+    my $ang = shift;
+    if( ! UNIVERSAL::isa( $ang, "Number::Uncertainty" ) ) {
+      $ang = new Number::Uncertainty( Value => $ang );
+    }
+    $self->{POSITION_ANGLE_WORLD} = $ang;
+  }
+  return $self->{POSITION_ANGLE_WORLD};
+}
+
 =item B<major_axis_pixel>
 
 Length of the semi-major axis in units of pixels.
+
+=cut
+
+sub major_axis_pixel {
+  my $self = shift;
+  if( @_ ) {
+    my $axis = shift;
+    if( ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
+      $axis = new Number::Uncertainty( Value => $axis );
+    }
+    $self->{MAJOR_AXIS_PIXEL} = $axis;
+  }
+  return $self->{MAJOR_AXIS_PIXEL};
+}
 
 =item B<minor_axis_pixel>
 
 Length of the semi-minor axis in units of pixels.
 
+=cut
+
+sub minor_axis_pixel {
+  my $self = shift;
+  if( @_ ) {
+    my $axis = shift;
+    if( ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
+      $axis = new Number::Uncertainty( Value => $axis );
+    }
+    $self->{MINOR_AXIS_PIXEL} = $axis;
+  }
+  return $self->{MINOR_AXIS_PIXEL};
+}
+
 =item B<major_axis_world>
 
 Length of the semi-major axis in units of degrees.
 
+=cut
+
+sub major_axis_world {
+  my $self = shift;
+  if( @_ ) {
+    my $axis = shift;
+    if( ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
+      $axis = new Number::Uncertainty( Value => $axis );
+    }
+    $self->{MAJOR_AXIS_WORLD} = $axis;
+  }
+  return $self->{MAJOR_AXIS_WORLD};
+}
+
 =item B<minor_axis_world>
 
 Length of the semi-minor axis in units of degrees.
+
+=cut
+
+sub minor_axis_world {
+  my $self = shift;
+  if( @_ ) {
+    my $axis = shift;
+    if( ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
+      $axis = new Number::Uncertainty( Value => $axis );
+    }
+    $self->{MINOR_AXIS_WORLD} = $axis;
+  }
+  return $self->{MINOR_AXIS_WORLD};
+}
 
 =item B<area>
 
 Area of the object, usually by using isophotal techniques, in square
 pixels.
 
+=cut
+
+sub area {
+  my $self = shift;
+  if( @_ ) {
+    my $area = shift;
+    if( ! UNIVERSAL::isa( $area, "Number::Uncertainty" ) ) {
+      $area = new Number::Uncertainty( Value => $area );
+    }
+    $self->{AREA} = $area;
+  }
+  return $self->{AREA};
+}
+
 =back
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item B<_configure>
+
+Configure the object.
+
+=cut
+
+sub _configure {
+  my $self = shift;
+
+  my %args = @_;
+  foreach my $key ( keys %args ) {
+    if( $self->can( lc( $key ) ) ) {
+      my $method = lc $key;
+      $self->$method( $args{$key} );
+    }
+  }
+}
 
 =head1 REVISION
 
- $Id: Morphology.pm,v 1.1 2005/06/08 03:01:59 aa Exp $
+ $Id: Morphology.pm,v 1.2 2005/10/24 21:21:52 cavanagh Exp $
 
 =head1 COPYRIGHT
 
