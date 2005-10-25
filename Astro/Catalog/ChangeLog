@@ -1,3 +1,8 @@
+2005-10-24  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Item/Morphology/Morphology.pm: Fix bug when setting values with
+	'undef'.
+
 2005-10-21  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
   * Item/Morphology/Morphology.pm: Use Number::Uncertainty for all
