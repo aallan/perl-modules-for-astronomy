@@ -292,13 +292,13 @@ sub _read_catalog {
         $posangerr_pixel_column = $column[1] - 1;
         print "ERRTHETA_IMAGE column is $posangerr_pixel_column\n" if $DEBUG;
 
-      } elsif( $column[2] =~ /^THETA_WORLD/ ) {
+      } elsif( $column[2] =~ /^THETA_SKY/ ) {
         $posang_world_column = $column[1] - 1;
-        print "THETA_WORLD column is $posang_world_column\n" if $DEBUG;
+        print "THETA_SKY column is $posang_world_column\n" if $DEBUG;
 
-      } elsif( $column[2] =~ /^ERRTHETA_WORLD/ ) {
+      } elsif( $column[2] =~ /^ERRTHETA_SKY/ ) {
         $posangerr_world_column = $column[1] - 1;
-        print "ERRTHETA_WORLD column is $posangerr_world_column\n" if $DEBUG;
+        print "ERRTHETA_SKY column is $posangerr_world_column\n" if $DEBUG;
 
       } elsif( $column[2] =~ /^B_IMAGE/ ) {
         $minor_pixel_column = $column[1] - 1;
@@ -602,7 +602,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.12 2005/10/25 01:56:33 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.13 2005/10/25 02:23:37 cavanagh Exp $
 
 =head1 FORMAT
 
