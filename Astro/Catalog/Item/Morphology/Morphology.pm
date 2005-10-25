@@ -24,7 +24,7 @@ use Number::Uncertainty;
 
 use warnings::register;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 METHODS
 
@@ -76,7 +76,8 @@ sub ellipticity {
   my $self = shift;
   if( @_ ) {
     my $ell = shift;
-    if( ! UNIVERSAL::isa( $ell, "Number::Uncertainty" ) ) {
+    if( defined( $ell ) &&
+        ! UNIVERSAL::isa( $ell, "Number::Uncertainty" ) ) {
       $ell = new Number::Uncertainty( Value => $ell );
     }
     $self->{ELLIPTICITY} = $ell;
@@ -95,7 +96,8 @@ sub position_angle_pixel {
   my $self = shift;
   if( @_ ) {
     my $ang = shift;
-    if( ! UNIVERSAL::isa( $ang, "Number::Uncertainty" ) ) {
+    if( defined( $ang ) &&
+        ! UNIVERSAL::isa( $ang, "Number::Uncertainty" ) ) {
       $ang = new Number::Uncertainty( Value => $ang );
     }
     $self->{POSITION_ANGLE_PIXEL} = $ang;
@@ -114,7 +116,8 @@ sub position_angle_world {
   my $self = shift;
   if( @_ ) {
     my $ang = shift;
-    if( ! UNIVERSAL::isa( $ang, "Number::Uncertainty" ) ) {
+    if( defined( $ang ) &&
+        ! UNIVERSAL::isa( $ang, "Number::Uncertainty" ) ) {
       $ang = new Number::Uncertainty( Value => $ang );
     }
     $self->{POSITION_ANGLE_WORLD} = $ang;
@@ -132,7 +135,8 @@ sub major_axis_pixel {
   my $self = shift;
   if( @_ ) {
     my $axis = shift;
-    if( ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
+    if( defined( $axis ) &&
+        ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
       $axis = new Number::Uncertainty( Value => $axis );
     }
     $self->{MAJOR_AXIS_PIXEL} = $axis;
@@ -150,7 +154,8 @@ sub minor_axis_pixel {
   my $self = shift;
   if( @_ ) {
     my $axis = shift;
-    if( ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
+    if( defined( $axis ) &&
+        ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
       $axis = new Number::Uncertainty( Value => $axis );
     }
     $self->{MINOR_AXIS_PIXEL} = $axis;
@@ -168,7 +173,8 @@ sub major_axis_world {
   my $self = shift;
   if( @_ ) {
     my $axis = shift;
-    if( ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
+    if( defined( $axis ) &&
+        ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
       $axis = new Number::Uncertainty( Value => $axis );
     }
     $self->{MAJOR_AXIS_WORLD} = $axis;
@@ -186,7 +192,8 @@ sub minor_axis_world {
   my $self = shift;
   if( @_ ) {
     my $axis = shift;
-    if( ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
+    if( defined( $axis ) &&
+        ! UNIVERSAL::isa( $axis, "Number::Uncertainty" ) ) {
       $axis = new Number::Uncertainty( Value => $axis );
     }
     $self->{MINOR_AXIS_WORLD} = $axis;
@@ -205,7 +212,8 @@ sub area {
   my $self = shift;
   if( @_ ) {
     my $area = shift;
-    if( ! UNIVERSAL::isa( $area, "Number::Uncertainty" ) ) {
+    if( defined( $area ) &&
+        ! UNIVERSAL::isa( $area, "Number::Uncertainty" ) ) {
       $area = new Number::Uncertainty( Value => $area );
     }
     $self->{AREA} = $area;
@@ -239,7 +247,7 @@ sub _configure {
 
 =head1 REVISION
 
- $Id: Morphology.pm,v 1.2 2005/10/24 21:21:52 cavanagh Exp $
+ $Id: Morphology.pm,v 1.3 2005/10/25 01:22:29 cavanagh Exp $
 
 =head1 COPYRIGHT
 
