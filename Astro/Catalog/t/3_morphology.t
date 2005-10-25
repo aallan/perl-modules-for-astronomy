@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 BEGIN {
   use_ok( "Astro::Catalog::Item::Morphology" );
@@ -40,3 +40,8 @@ isa_ok( $morph3, "Astro::Catalog::Item::Morphology" );
 isa_ok( $morph3->area, "Number::Uncertainty" );
 is( $morph3->area->value, 10, "Object area" );
 is( $morph3->area->error, 0.1, "Object area error" );
+
+# Check setting of undefined values.
+my $morph4 = new Astro::Catalog::Item::Morphology( area => undef );
+isa_ok( $morph4, "Astro::Catalog::Item::Morphology" );
+is( $morph4->area, undef, "Object area is undefined" );
