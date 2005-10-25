@@ -41,7 +41,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 use vars qw/ $VERSION $DEBUG /;
 
 $VERSION = '0.01';
-$DEBUG = 0;
+$DEBUG = 1;
 
 =begin __PRIVATE_METHODS__
 
@@ -64,47 +64,7 @@ the 'ASCII_HEAD' catalogue type from SExtractor. This implementation
 currently only supports reading information from the following output
 parameters:
 
-=item NUMBER - Astro::Catalog::Star id
 
-=item X_IMAGE - Astro::Catalog::Star x
-
-=item Y_IMAGE - Astro::Catalog::Star y
-
-=item X2_IMAGE
-
-=item Y2_IMAGE
-
-=item ERRX2_IMAGE
-
-=item ERRY2_IMAGE
-
-=item ALPHA_J2000 - Astro::Catalog::Star coords
-
-=item DELTA_J2000 - Astro::Catalog::Star coords
-
-=item MAG_ISO - Astro::Catalog::Star magnitudes
-
-=item MAGERR_ISO - Astro::Catalog::Star magerr
-
-=item FLUX_ISO
-
-=item FLUXERR_ISO
-
-=item ELLIPTICITY - Astro::Catalog::Star morphology
-
-=item THETA_IMAGE - Astro::Catalog::Star morphology
-
-=item THETA_WORLD - Astro::Catalog::Star morphology
-
-=item A_IMAGE - Astro::Catalog::Star morphology
-
-=item B_IMAGE - Astro::Catalog::Star morphology
-
-=item A_WORLD - Astro::Catalog::Star morphology
-
-=item B_WORLD - Astro::Catalog::Star morphology
-
-=item ISOAREA_IMAGE - Astro::Catalog::Star morphology
 
 =cut
 
@@ -137,24 +97,52 @@ sub _read_catalog {
   # Set up columns.
   my $id_column = -1;
   my $x_column = -1;
-  my $xvar_column = -1;
+  my $xerr_column = -1;
+  my $xwin_column = -1;
+  my $xwinerr_column = -1;
   my $y_column = -1;
-  my $yvar_column = -1;
-  my $xvarerr_column = -1;
-  my $yvarerr_column = -1;
+  my $yerr_column = -1;
+  my $ywin_column = -1;
+  my $ywinerr_column = -1;
   my $ra_column = -1;
   my $dec_column = -1;
-  my $mag_column = -1;
-  my $magerr_column = -1;
-  my $flux_column = -1;
-  my $fluxerr_column = -1;
+  my $mag_iso_column = -1;
+  my $magerr_iso_column = -1;
+  my $flux_iso_column = -1;
+  my $fluxerr_iso_column = -1;
+  my $flux_isocor_column = -1;
+  my $fluxerr_isocor_column = -1;
+  my $mag_isocor_column = -1;
+  my $magerr_isocor_column = -1;
+  my $flux_aper1_column = -1;
+  my $fluxerr_aper1_column = -1;
+  my $mag_aper1_column = -1;
+  my $magerr_aper1_column = -1;
+  my $flux_aper2_column = -1;
+  my $fluxerr_aper2_column = -1;
+  my $mag_aper2_column = -1;
+  my $magerr_aper2_column = -1;
+  my $flux_auto_column = -1;
+  my $fluxerr_auto_column = -1;
+  my $mag_auto_column = -1;
+  my $magerr_auto_column = -1;
+  my $flux_best_column = -1;
+  my $fluxerr_best_column = -1;
+  my $mag_best_column = -1;
+  my $magerr_best_column = -1;
   my $ell_column = -1;
   my $posang_pixel_column = -1;
+  my $posangerr_pixel_column = -1;
   my $posang_world_column = -1;
+  my $posangerr_world_column = -1;
   my $minor_pixel_column = -1;
+  my $minorerr_pixel_column = -1;
   my $major_pixel_column = -1;
+  my $majorerr_pixel_column = -1;
   my $minor_world_column = -1;
+  my $minorerr_world_column = -1;
   my $major_world_column = -1;
+  my $majorerr_world_column = -1;
   my $area_column = -1;
   my $flag_column = -1;
 
@@ -171,69 +159,187 @@ sub _read_catalog {
       if( $column[2] =~ /^NUMBER/ ) {
         $id_column = $column[1] - 1;
         print "ID column is $id_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^X_IMAGE/ ) {
         $x_column = $column[1] - 1;
         print "X column is $x_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^Y_IMAGE/ ) {
         $y_column = $column[1] - 1;
         print "Y column is $y_column\n" if $DEBUG;
-      } elsif( $column[2] =~ /^X2_IMAGE/ ) {
-        $xvar_column = $column[1] - 1;
-        print "X VARIANCE column is $xvar_column\n" if $DEBUG;
-      } elsif( $column[2] =~ /^Y2_IMAGE/ ) {
-        $yvar_column = $column[1] - 1;
-        print "Y VARIANCE column is $yvar_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^ERRX2_IMAGE/ ) {
-        $xvarerr_column = $column[1] - 1;
-        print "X VARIANCE ERROR column is $xvarerr_column\n" if $DEBUG;
+        $xerr_column = $column[1] - 1;
+        print "X ERROR column is $xerr_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^ERRY2_IMAGE/ ) {
-        $yvarerr_column = $column[1] - 1;
-        print "Y VARIANCE ERROR column is $yvarerr_column\n" if $DEBUG;
+        $yerr_column = $column[1] - 1;
+        print "Y ERROR column is $yerr_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^XWIN_IMAGE/ ) {
+        $xwin_column = $column[1] - 1;
+        print "XWIN_IMAGE column is $xwin_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^ERRX2WIN_IMAGE/ ) {
+        $xwinerr_column = $column[1] - 1;
+        print "ERRX2WIN_IMAGE column is $xwinerr_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^YWIN_IMAGE/ ) {
+        $ywin_column = $column[1] - 1;
+        print "YWIN_IMAGE column is $ywin_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^ERRY2WIN_IMAGE/ ) {
+        $ywinerr_column = $column[1] - 1;
+        print "ERRY2WIN_IMAGE column is $ywinerr_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^ALPHA_J2000/ ) {
         $ra_column = $column[1] - 1;
         print "RA column is $ra_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^DELTA_J2000/ ) {
         $dec_column = $column[1] - 1;
         print "DEC column is $dec_column\n" if $DEBUG;
-      } elsif( $column[2] =~ /^MAG_ISO/ ) {
-        $mag_column = $column[1] - 1;
-        print "MAG column is $mag_column\n" if $DEBUG;
-      } elsif( $column[2] =~ /^MAGERR_ISO/ ) {
-        $magerr_column = $column[1] - 1;
-        print "MAG ERROR column is $magerr_column\n" if $DEBUG;
-      } elsif( $column[2] =~ /^FLUX_ISO/ ) {
-        $flux_column = $column[1] - 1;
-        print "FLUX_ISO column is $flux_column\n" if $DEBUG;
-      } elsif( $column[2] =~ /^FLUXERR_ISO/ ) {
-        $fluxerr_column = $column[1] - 1;
-        print "FLUXERR_ISO column is $fluxerr_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAG_ISO$/ ) {
+        $mag_iso_column = $column[1] - 1;
+        print "MAG_ISO column is $mag_iso_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAGERR_ISO$/ ) {
+        $magerr_iso_column = $column[1] - 1;
+        print "MAGERR_ISO column is $magerr_iso_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUX_ISO$/ ) {
+        $flux_iso_column = $column[1] - 1;
+        print "FLUX_ISO column is $flux_iso_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUXERR_ISO$/ ) {
+        $fluxerr_iso_column = $column[1] - 1;
+        print "FLUXERR_ISO column is $fluxerr_iso_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUX_ISOCOR/ ) {
+        $flux_isocor_column = $column[1] - 1;
+        print "FLUX_ISOCOR column is $flux_isocor_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUXERR_ISOCOR/ ) {
+        $fluxerr_isocor_column = $column[1] - 1;
+        print "FLUXERR_ISOCOR column is $fluxerr_isocor_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAG_ISOCOR/ ) {
+        $mag_isocor_column = $column[1] - 1;
+        print "MAG_ISOCOR column is $mag_isocor_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAGERR_ISOCOR/ ) {
+        $magerr_isocor_column = $column[1] - 1;
+        print "MAGERR_ISOCOR column is $magerr_isocor_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUX_APER/ ) {
+        $flux_aper1_column = $column[1] - 1;
+        print "FLUX_APER column is $flux_aper1_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUXERR_APER/ ) {
+        $fluxerr_aper1_column = $column[1] - 1;
+        print "FLUXERR_APER column is $fluxerr_aper1_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAG_APER/ ) {
+        $mag_aper1_column = $column[1] - 1;
+        print "MAG_APER column is $mag_aper1_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAGERR_APER/ ) {
+        $magerr_aper1_column = $column[1] - 1;
+        print "MAGERR_APER column is $magerr_aper1_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUX_AUTO/ ) {
+        $flux_auto_column = $column[1] - 1;
+        print "FLUX_AUTO column is $flux_auto_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUXERR_AUTO/ ) {
+        $fluxerr_auto_column = $column[1] - 1;
+        print "FLUXERR_AUTO column is $fluxerr_auto_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAG_AUTO/ ) {
+        $mag_auto_column = $column[1] - 1;
+        print "MAG_AUTO column is $mag_auto_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAGERR_AUTO/ ) {
+        $magerr_auto_column = $column[1] - 1;
+        print "MAGERR_AUTO column is $magerr_auto_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUX_BEST/ ) {
+        $flux_best_column = $column[1] - 1;
+        print "FLUX_BEST column is $flux_best_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FLUXERR_BEST/ ) {
+        $fluxerr_best_column = $column[1] - 1;
+        print "FLUXERR_BEST column is $fluxerr_best_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAG_BEST/ ) {
+        $mag_best_column = $column[1] - 1;
+        print "MAG_BEST column is $mag_best_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^MAGERR_BEST/ ) {
+        $magerr_best_column = $column[1] - 1;
+        print "MAGERR_BEST_COLUMN is $magerr_best_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^ELLIPTICITY/ ) {
         $ell_column = $column[1] - 1;
         print "ELLIPTICITY column is $ell_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^THETA_IMAGE/ ) {
         $posang_pixel_column = $column[1] - 1;
-        print "POSITION ANGLE (PIXELS) column is $posang_pixel_column\n" if $DEBUG;
+        print "THETA_IMAGE column is $posang_pixel_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^ERRTHETA_IMAGE/ ) {
+        $posangerr_pixel_column = $column[1] - 1;
+        print "ERRTHETA_IMAGE column is $posangerr_pixel_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^THETA_WORLD/ ) {
         $posang_world_column = $column[1] - 1;
-        print "POSITION ANGLE (WORLD) column is $posang_world_column\n" if $DEBUG;
+        print "THETA_WORLD column is $posang_world_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^ERRTHETA_WORLD/ ) {
+        $posangerr_world_column = $column[1] - 1;
+        print "ERRTHETA_WORLD column is $posangerr_world_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^B_IMAGE/ ) {
         $minor_pixel_column = $column[1] - 1;
-        print "MINOR AXIS (PIXELS) column is $minor_pixel_column\n" if $DEBUG;
+        print "B_IMAGE column is $minor_pixel_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^ERRB_IMAGE/ ) {
+        $minorerr_pixel_column = $column[1] - 1;
+        print "ERRB_IMAGE column is $minorerr_pixel_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^A_IMAGE/ ) {
         $major_pixel_column = $column[1] - 1;
-        print "MAJOR AXIS (PIXELS) column is $major_pixel_column\n" if $DEBUG;
+        print "A_IMAGE column is $major_pixel_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^ERRA_IMAGE/ ) {
+        $majorerr_pixel_column = $column[1] - 1;
+        print "ERRA_IMAGE column is $majorerr_pixel_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^B_WORLD/ ) {
         $minor_world_column = $column[1] - 1;
-        print "MINOR AXIS (WORLD) column is $minor_world_column\n" if $DEBUG;
+        print "B_WORLD column is $minor_world_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^ERRB_WORLD/ ) {
+        $minorerr_world_column = $column[1] - 1;
+        print "ERRB_WORLD column is $minorerr_world_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^A_WORLD/ ) {
         $major_world_column = $column[1] - 1;
-        print "MAJOR AXIS (WORLD) column is $major_world_column\n" if $DEBUG;
+        print "A_WORLD column is $major_world_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^ERRA_WORLD/ ) {
+        $majorerr_world_column = $column[1] - 1;
+        print "ERR_AWORLD column is $majorerr_world_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^ISOAREA_IMAGE/ ) {
         $area_column = $column[1] - 1;
         print "AREA column is $area_column\n" if $DEBUG;
+
       } elsif( $column[2] =~ /^FLAGS/ ) {
         $flag_column = $column[1] - 1;
-        print "FLAG column is $flag_column\n" if $DEBUG;
+        print "FLAGS column is $flag_column\n" if $DEBUG;
+
       }
       next;
     }
@@ -260,53 +366,210 @@ sub _read_catalog {
     $star->coords( $coords );
     if( $flag_column != -1 ) {
       $star->quality( $fields[$flag_column] );
-#      print "setting quality to $fields[$flag_column]\n";
     } else {
       $star->quality( 0 );
     }
 
-    # Set the magnitude and the magnitude error. Set the filter
-    # to 'unknown' because SExtractor doesn't know about such things.
-    if( $mag_column != -1 ) {
+    # Set up the various flux and magnitude measurements.
+    if( $mag_iso_column != -1 ) {
       my $num;
-      if( $magerr_column != -1 ) {
-         $num = new Number::Uncertainty( Value => $fields[$mag_column],
-	                                 Error => $fields[$magerr_column] );
+      if( $magerr_iso_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$mag_iso_column],
+                                        Error => $fields[$magerr_iso_column] );
       } else {
-         $num = new Number::Uncertainty( Value => $fields[$mag_column] );
+        $num = new Number::Uncertainty( Value => $fields[$mag_iso_column] );
       }
-
-      my $mag = new Astro::Flux( $num,'mag', $filter );
-      $star->fluxes( new Astro::Fluxes($mag) );
+      my $mag_iso = new Astro::Flux( $num, 'MAG_ISO', $filter );
+      $star->fluxes( new Astro::Fluxes( $mag_iso ) );
+    }
+    if( $flux_iso_column != -1 ) {
+      my $num;
+      if( $fluxerr_iso_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$flux_iso_column],
+                                        Error => $fields[$fluxerr_iso_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$flux_iso_column] );
+      }
+      my $flux_iso = new Astro::Flux( $num, 'FLUX_ISO', $filter );
+      $star->fluxes( new Astro::Fluxes( $flux_iso ) );
     }
 
-    # Set the flux count and flux count error.
-    if( $flux_column != -1 ) {
+    if( $mag_isocor_column != -1 ) {
       my $num;
-      if( $fluxerr_column != -1 ) {
-        $num = new Number::Uncertainty( Value => $fields[$flux_column],
-                                        Error => $fields[$fluxerr_column] );
+      if( $magerr_isocor_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$mag_isocor_column],
+                                        Error => $fields[$magerr_isocor_column] );
       } else {
-        $num = new Number::Uncertainty( Value => $fields[$flux_column], );
+        $num = new Number::Uncertainty( Value => $fields[$mag_isocor_column] );
       }
-
-      my $flux = new Astro::Flux( $num, 'counts', $filter );
-      $star->fluxes( new Astro::Fluxes( $flux ) );
+      my $mag_isocor = new Astro::Flux( $num, 'MAG_ISOCOR', $filter );
+      $star->fluxes( new Astro::Fluxes( $mag_isocor ) );
+    }
+    if( $flux_isocor_column != -1 ) {
+      my $num;
+      if( $fluxerr_isocor_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$flux_isocor_column],
+                                        Error => $fields[$fluxerr_isocor_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$flux_isocor_column] );
+      }
+      my $flux_isocor = new Astro::Flux( $num, 'FLUX_ISOCOR', $filter );
+      $star->fluxes( new Astro::Fluxes( $flux_isocor ) );
     }
 
-    # Set the x and y coordinates.
-    $star->x( ( $x_column != -1 ? $fields[$x_column] : undef ) );
-    $star->y( ( $y_column != -1 ? $fields[$y_column] : undef ) );
+    if( $mag_aper1_column != -1 ) {
+      my $num;
+      if( $magerr_aper1_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$mag_aper1_column],
+                                        Error => $fields[$magerr_aper1_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$mag_aper1_column] );
+      }
+      my $mag_aper1 = new Astro::Flux( $num, 'MAG_APER1', $filter );
+      $star->fluxes( new Astro::Fluxes( $mag_aper1 ) );
+    }
+    if( $flux_aper1_column != -1 ) {
+      my $num;
+      if( $fluxerr_aper1_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$flux_aper1_column],
+                                        Error => $fields[$fluxerr_aper1_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$flux_aper1_column] );
+      }
+      my $flux_aper1 = new Astro::Flux( $num, 'FLUX_APER1', $filter );
+      $star->fluxes( new Astro::Fluxes( $flux_aper1 ) );
+    }
+
+    if( $mag_auto_column != -1 ) {
+      my $num;
+      if( $magerr_auto_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$mag_auto_column],
+                                        Error => $fields[$magerr_auto_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$mag_auto_column] );
+      }
+      my $mag_auto = new Astro::Flux( $num, 'MAG_AUTO', $filter );
+      $star->fluxes( new Astro::Fluxes( $mag_auto ) );
+    }
+    if( $flux_auto_column != -1 ) {
+      my $num;
+      if( $fluxerr_auto_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$flux_auto_column],
+                                        Error => $fields[$fluxerr_auto_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$flux_auto_column] );
+      }
+      my $flux_auto = new Astro::Flux( $num, 'FLUX_AUTO', $filter );
+      $star->fluxes( new Astro::Fluxes( $flux_auto ) );
+    }
+
+    if( $mag_best_column != -1 ) {
+      my $num;
+      if( $magerr_best_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$mag_best_column],
+                                        Error => $fields[$magerr_best_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$mag_best_column] );
+      }
+      my $mag_best = new Astro::Flux( $num, 'MAG_BEST', $filter );
+      $star->fluxes( new Astro::Fluxes( $mag_best ) );
+    }
+    if( $flux_best_column != -1 ) {
+      my $num;
+      if( $fluxerr_best_column != -1 ) {
+        $num = new Number::Uncertainty( Value => $fields[$flux_best_column],
+                                        Error => $fields[$fluxerr_best_column] );
+      } else {
+        $num = new Number::Uncertainty( Value => $fields[$flux_best_column] );
+      }
+      my $flux_best = new Astro::Flux( $num, 'FLUX_BEST', $filter );
+      $star->fluxes( new Astro::Fluxes( $flux_best ) );
+    }
+
+    # Set the x and y coordinates. Use the windowed parameters, if
+    # those exist. Otherwise, use the standard ones.
+    if( $xwin_column != -1 ) {
+      $star->x( $fields[$xwin_column] );
+    } elsif( $x_column != -1 ) {
+      $star->x( $fields[$x_column] );
+    }
+    if( $ywin_column != -1 ) {
+      $star->y( $fields[$ywin_column] );
+    } elsif( $x_column != -1 ) {
+      $star->y( $fields[$y_column] );
+    }
 
     # Set up the star's morphology.
-    my $morphology = new Astro::Catalog::Star::Morphology( ellipticity => ( $ell_column != -1 ? $fields[$ell_column] : undef ),
-                                                           position_angle_pixel => ( $posang_pixel_column != -1 ? $fields[$posang_pixel_column] : undef ),
-                                                           position_angle_world => ( $posang_world_column != -1 ? $fields[$posang_world_column] : undef ),
-                                                           major_axis_pixel => ( $major_pixel_column != -1 ? $fields[$major_pixel_column] : undef ),
-                                                           minor_axis_pixel => ( $minor_pixel_column != -1 ? $fields[$minor_pixel_column] : undef ),
-                                                           major_axis_world => ( $major_world_column != -1 ? $fields[$major_world_column] : undef ),
-                                                           minor_axis_world => ( $minor_world_column != -1 ? $fields[$minor_world_column] : undef ),
-                                                           area => ( $area_column != -1 ? $fields[$area_column] : undef ),
+    my $ellipticity;
+    my $position_angle_pixel;
+    my $position_angle_world;
+    my $major_axis_pixel;
+    my $minor_axis_pixel;
+    my $major_axis_world;
+    my $minor_axis_world;
+    my $area;
+    if( $ell_column != -1 ) {
+      $ellipticity = new Number::Uncertainty( Value => $fields[$ell_column] );
+    }
+    if( $posang_pixel_column != -1 ) {
+      if( $posangerr_pixel_column != -1 ) {
+        $position_angle_pixel = new Number::Uncertainty( Value => $fields[$posang_pixel_column],
+                                                         Error => $fields[$posangerr_pixel_column] );
+      } else {
+        $position_angle_pixel = new Number::Uncertainty( Value => $fields[$posang_pixel_column] );
+      }
+    }
+    if( $posang_world_column != -1 ) {
+      if( $posangerr_world_column != -1 ) {
+        $position_angle_world = new Number::Uncertainty( Value => $fields[$posang_world_column],
+                                                         Error => $fields[$posangerr_world_column] );
+      } else {
+        $position_angle_world = new Number::Uncertainty( Value => $fields[$posang_world_column] );
+      }
+    }
+    if( $major_pixel_column != -1 ) {
+      if( $majorerr_pixel_column != -1 ) {
+        $major_axis_pixel = new Number::Uncertainty( Value => $fields[$major_pixel_column],
+                                                     Error => $fields[$majorerr_pixel_column] );
+      } else {
+        $major_axis_pixel = new Number::Uncertainty( Value => $fields[$major_pixel_column] );
+      }
+    }
+    if( $major_world_column != -1 ) {
+      if( $majorerr_world_column != -1 ) {
+        $major_axis_world = new Number::Uncertainty( Value => $fields[$major_world_column],
+                                                     Error => $fields[$majorerr_world_column] );
+      } else {
+        $major_axis_world = new Number::Uncertainty( Value => $fields[$major_world_column] );
+      }
+    }
+    if( $minor_pixel_column != -1 ) {
+      if( $minorerr_pixel_column != -1 ) {
+        $minor_axis_pixel = new Number::Uncertainty( Value => $fields[$minor_pixel_column],
+                                                     Error => $fields[$minorerr_pixel_column] );
+      } else {
+        $minor_axis_pixel = new Number::Uncertainty( Value => $fields[$minor_pixel_column] );
+      }
+    }
+    if( $minor_world_column != -1 ) {
+      if( $minorerr_world_column != -1 ) {
+        $minor_axis_world = new Number::Uncertainty( Value => $fields[$minor_world_column],
+                                                     Error => $fields[$minorerr_world_column] );
+      } else {
+        $minor_axis_world = new Number::Uncertainty( Value => $fields[$minor_world_column] );
+      }
+    }
+    if( $area_column != -1 ) {
+      $area = new Number::Uncertainty( Value => $fields[$area_column] );
+    }
+    my $morphology = new Astro::Catalog::Star::Morphology( ellipticity => $ellipticity,
+                                                           position_angle_pixel => $position_angle_pixel,
+                                                           position_angle_world => $position_angle_world,
+                                                           major_axis_pixel => $major_axis_pixel,
+                                                           minor_axis_pixel => $minor_axis_pixel,
+                                                           major_axis_world => $major_axis_world,
+                                                           minor_axis_world => $minor_axis_world,
+                                                           area => $area,
                                                          );
     $star->morphology( $morphology );
 
@@ -339,7 +602,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.11 2005/10/06 00:34:46 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.12 2005/10/25 01:56:33 cavanagh Exp $
 
 =head1 FORMAT
 
