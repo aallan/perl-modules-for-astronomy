@@ -3,11 +3,12 @@
 # Test SExtractor format read
 
 # Astro::Catalog test harness
-use Test::More tests => 5;
+use Test::More tests => 10;
 
 use strict;
 
 require_ok("Astro::Catalog");
+require_ok("Astro::Catalog::IO::SExtractor");
 
 my $cat = new Astro::Catalog( Format => 'SExtractor', Data => \*DATA );
 
@@ -25,6 +26,15 @@ is( $ra, "21 03 40.39", "SExtractor Star RA" );
 my $dec = $star->dec;
 
 is( $dec, "+30 17 30.02", "SExtractor Star Dec" );
+
+my $fluxes = $star->fluxes;
+isa_ok( $fluxes, "Astro::Fluxes" );
+my $mag_isocor = $fluxes->flux( waveband => 'unknown',
+                                type => 'mag_isocor' );
+isa_ok( $mag_isocor, "Astro::Flux" );
+my $mag_isocor_quantity = $mag_isocor->quantity('MAG_ISOCOR');
+is( $mag_isocor->quantity('MAG_ISOCOR'), -13.2317, "SExtractor Star magnitude" );
+is( $mag_isocor->error('MAG_ISOCOR'), 0.0073, "SExtractor Star magnitude error" );
 
 exit;
 
