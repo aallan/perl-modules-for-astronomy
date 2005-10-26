@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.7 2005/09/13 02:13:43 cavanagh Exp $
+#     $Id: Item.pm,v 1.8 2005/10/26 19:51:51 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.7 2005/09/13 02:13:43 cavanagh Exp $
+$Id: Item.pm,v 1.8 2005/10/26 19:51:51 cavanagh Exp $
 
 =head1 METHODS
 
@@ -677,6 +677,50 @@ sub get_magnitude {
   return $magnitude->quantity('mag');
 }
 
+=item B<get_flux_quantity>
+
+Returns the flux quantity for the given waveband and flux type.
+
+  my $flux = $star->get_flux_quantity( waveband => 'B',
+                                       type => 'mag' );
+
+The arguments are passed as a hash. The value for the waveband
+argument can be either a string describing a filter or an
+Astro::WaveBand object. The value for the flux type is
+case-insensitive.
+
+Returns a scalar.
+
+=cut
+
+sub get_flux_quantity {
+  my $self = shift;
+  my %args = @_;
+
+  if( ! defined( $args{'waveband'} ) ) {
+    croak "Must supply waveband to Astro::Catalog::Item->get_flux_quantity()";
+  }
+  if( ! defined( $args{'type'} ) ) {
+    croak "Must supply flux type to Astro::Catalog::Item->get_flux_quantity()";
+  }
+
+  my $waveband;
+  if( ! UNIVERSAL::isa( $args{'waveband'}, "Astro::WaveBand" ) ) {
+    $waveband = new Astro::WaveBand( Filter => $args{'waveband'} );
+  } else {
+    $waveband = $args{'waveband'};
+  }
+
+  my $fluxes = $self->fluxes;
+  if( defined( $fluxes ) ) {
+    my $flux = $fluxes->flux( waveband => $waveband, type => $args{'type'} );
+    if( defined( $flux ) ) {
+      return $flux->quantity( $args{'type'} );
+    }
+  }
+  return undef;
+}
+
 =item B<get_errors>
 
 Returns the error in the magnitude value for the supplied filter if available
@@ -701,6 +745,49 @@ sub get_errors {
      
   }
   return $mag_error;
+}
+
+=item B<get_flux_error>
+
+Returns the flux error for the given waveband and flux type.
+
+  my $flux = $star->get_flux_error( waveband => 'B',
+                                    type => 'mag' );
+
+The arguments are passed as a hash. The value for the waveband
+argument can be either a string describing a filter or an
+Astro::WaveBand object. The value for the flux type is
+case-insensitive.
+
+Returns a scalar.
+
+=cut
+
+sub get_flux_error {
+  my $self = shift;
+  my %args = @_;
+
+  if( ! defined( $args{'waveband'} ) ) {
+    croak "Must supply waveband to Astro::Catalog::Item->get_flux_error()";
+  }
+  if( ! defined( $args{'type'} ) ) {
+    croak "Must supply flux type to Astro::Catalog::Item->get_flux_error()";
+  }
+
+  my $waveband;
+  if( ! UNIVERSAL::isa( $args{'waveband'}, "Astro::WaveBand" ) ) {
+    $waveband = new Astro::WaveBand( Filter => $args{'waveband'} );
+  } else {
+    $waveband = $args{'waveband'};
+  }
+  my $fluxes = $self->fluxes;
+  if( defined( $fluxes ) ) {
+    my $flux = $fluxes->flux( waveband => $waveband, type => $args{'type'} );
+    if( defined( $flux ) ) {
+      return $flux->error( $args{'type'} );
+    }
+  }
+  return undef;
 }
 
 =item B<get_colour>
