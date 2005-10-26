@@ -1,3 +1,11 @@
+2005-10-26  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Item/Item.pm: Add get_flux_quantity() and get_flux_error()
+	wrapper functions.
+
+	* IO/SExtractor.pm: Turn off debugging, use Astro::Catalog::Item
+	instead of Astro::Catalog::Star.
+
 2005-10-24  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* Item/Morphology/Morphology.pm: Fix bug when setting values with
