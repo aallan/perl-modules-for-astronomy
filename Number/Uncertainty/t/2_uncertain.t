@@ -1,7 +1,7 @@
 #!perl
 
 # Number::Uncertainty test harness
-use Test::More tests => 94;
+use Test::More tests => 98;
 
 use strict;
 use warnings;
@@ -167,6 +167,18 @@ is( $obj7 == $obj1,1, "\$obj7 equal to \$obj1" );
 my $mult;
 ok( $mult = $obj1*$obj2 );
 isa_ok( $mult, "Number::Uncertainty" );
+
+
+# Greater than.
+my $obj10 = new Number::Uncertainty( Value => 4,
+                                     Error => 4 );
+my $obj11 = new Number::Uncertainty( Value => 5,
+                                     Error => 2 );
+ok( ( $obj10 > $obj11 ), "\$obj10 > \$obj11" );
+ok( ( $obj10->greater_than( $obj11 ) ), "\$obj10 greater_than \$obj11" );
+ok( ( $obj10 < $obj11 ), "\$obj10 < \$obj11" );
+ok( ( $obj10->less_than( $obj11 ) ), "\$obj10 less_than \$obj11" );
+
 
 # L A S T   O R D E R S   A T   T H E   B A R --------------------------------
 
