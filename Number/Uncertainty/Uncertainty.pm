@@ -44,16 +44,18 @@ use overload '""' => 'stringify',
              'eq' => 'equal',
              '!=' => 'notequal',
              'ne' => 'notequal',
-	     '*'  => 'multiply';
+             '>'  => 'greater_than',
+             '<'  => 'less_than',
+             '*'  => 'multiply';
 
 use vars qw/ $VERSION /;
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Uncertainty.pm,v 1.3 2005/06/14 04:18:58 aa Exp $
+$Id: Uncertainty.pm,v 1.4 2005/10/26 20:13:57 cavanagh Exp $
 
 =head1 METHODS
 
@@ -504,6 +506,67 @@ sub notequal {
 
 }
 
+=item B<greater_than>
+
+=cut
+
+sub greater_than {
+  my $self = shift;
+  my $other = shift;
+
+  if( ! UNIVERSAL::isa( $other, "Number::Uncertainty" ) ) {
+    if( defined( $self->error ) ) {
+      return ( ( $self->max ) > $other );
+    } else {
+      return ( $self->value > $other );
+    }
+  } else {
+    if( defined( $self->error ) ) {
+      if( defined( $other->error ) ) {
+        return ( $self->max > $other->min );
+      } else {
+        return ( $self->max > $other->value );
+      }
+    } else {
+      if( defined( $other->error ) ) {
+        return ( $self->value > $other->min );
+      } else {
+        return ( $self->value > $other->value );
+      }
+    }
+  }
+}
+
+=item B<less_than>
+
+=cut
+
+sub less_than {
+  my $self = shift;
+  my $other = shift;
+
+  if( ! UNIVERSAL::isa( $other, "Number::Uncertainty" ) ) {
+    if( defined( $self->error ) ) {
+      return ( ( $self->min ) < $other );
+    } else {
+      return ( $self->value < $other );
+    }
+  } else {
+    if( defined( $self->error ) ) {
+      if( defined( $other->error ) ) {
+        return ( $self->min < $other->max );
+      } else {
+        return ( $self->min < $other->value );
+      }
+    } else {
+      if( defined( $other->error ) ) {
+        return ( $self->value < $other->max );
+      } else {
+        return ( $self->value < $other->value );
+      }
+    }
+  }
+}
 
 =item B<*>
 
