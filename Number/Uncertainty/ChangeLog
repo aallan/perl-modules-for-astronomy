@@ -1,3 +1,7 @@
+2005-10-26  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Added greater than and less than operations.
+	
 2005-06-13  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * Added muliplication overloading
