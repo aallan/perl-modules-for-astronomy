@@ -26,8 +26,8 @@ use strict;
 
 # Bring in the Astro:: modules.
 use Astro::Catalog;
-use Astro::Catalog::Star;
-use Astro::Catalog::Star::Morphology;
+use Astro::Catalog::Item;
+use Astro::Catalog::Item::Morphology;
 use Astro::Coords;
 use Astro::SLA;
 
@@ -41,7 +41,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 use vars qw/ $VERSION $DEBUG /;
 
 $VERSION = '0.01';
-$DEBUG = 1;
+$DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
 
@@ -352,8 +352,8 @@ sub _read_catalog {
     # Form an array of the fields in the catalogue.
     my @fields = split( /\s+/, $line );
 
-    # Create a temporary Astro::Catalog::Star object.
-    my $star = new Astro::Catalog::Star();
+    # Create a temporary Astro::Catalog::Item object.
+    my $star = new Astro::Catalog::Item();
 
     # Grab the coordinates, forming an Astro::Coords object.
     my $coords = new Astro::Coords( type => 'J2000',
@@ -562,7 +562,7 @@ sub _read_catalog {
     if( $area_column != -1 ) {
       $area = new Number::Uncertainty( Value => $fields[$area_column] );
     }
-    my $morphology = new Astro::Catalog::Star::Morphology( ellipticity => $ellipticity,
+    my $morphology = new Astro::Catalog::Item::Morphology( ellipticity => $ellipticity,
                                                            position_angle_pixel => $position_angle_pixel,
                                                            position_angle_world => $position_angle_world,
                                                            major_axis_pixel => $major_axis_pixel,
@@ -602,7 +602,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.13 2005/10/25 02:23:37 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.14 2005/10/26 19:51:03 cavanagh Exp $
 
 =head1 FORMAT
 
