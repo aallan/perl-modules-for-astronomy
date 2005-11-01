@@ -14,7 +14,7 @@
 #     AUTHOR => q[Alasdair Allan <aa@astro.ex.ac.uk>]
 #     NAME => q[Astro::VO::VOEvent]
 #     PREREQ_PM => {  }
-#     VERSION => q[0.1]
+#     VERSION => q[0.2]
 #     dist => { COMPRESS=>q[gzip -9f] }
 
 # --- MakeMaker post_initialize section:
@@ -54,11 +54,11 @@ AR_STATIC_ARGS = cr
 DIRFILESEP = /
 NAME = Astro::VO::VOEvent
 NAME_SYM = Astro_VO_VOEvent
-VERSION = 0.1
+VERSION = 0.2
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_1
+VERSION_SYM = 0_2
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.1
+XS_VERSION = 0.2
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -115,8 +115,8 @@ MAKEFILE_OLD = $(FIRST_MAKEFILE).old
 MAKE_APERL_FILE = $(FIRST_MAKEFILE).aperl
 PERLMAINCC = $(CC)
 PERL_INC = /Users/estar/Perl/lib/perl5/5.8.6/darwin-thread-multi-2level/CORE
-PERL = /home/estar/Perl/bin/perl
-FULLPERL = /home/estar/Perl/bin/perl
+PERL = /Home/estar/Perl/bin/perl
+FULLPERL = /Home/estar/Perl/bin/perl
 ABSPERL = $(PERL)
 PERLRUN = $(PERL)
 FULLPERLRUN = $(FULLPERL)
@@ -239,7 +239,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Astro-VO-VOEvent
-DISTVNAME = Astro-VO-VOEvent-0.1
+DISTVNAME = Astro-VO-VOEvent-0.2
 
 
 # --- MakeMaker macro section:
@@ -432,7 +432,7 @@ metafile :
 	$(NOECHO) $(ECHO) '# http://module-build.sourceforge.net/META-spec.html' > META.yml
 	$(NOECHO) $(ECHO) '#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#' >> META.yml
 	$(NOECHO) $(ECHO) 'name:         Astro-VO-VOEvent' >> META.yml
-	$(NOECHO) $(ECHO) 'version:      0.1' >> META.yml
+	$(NOECHO) $(ECHO) 'version:      0.2' >> META.yml
 	$(NOECHO) $(ECHO) 'version_from: ' >> META.yml
 	$(NOECHO) $(ECHO) 'installdirs:  site' >> META.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META.yml
@@ -660,7 +660,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
-FULLPERL      = /home/estar/Perl/bin/perl
+FULLPERL      = /Home/estar/Perl/bin/perl
 
 $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 	$(MAKE) -f $(MAKE_APERL_FILE) $@
@@ -700,7 +700,7 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd:
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,1,0,0">' > $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0,2,0,0">' > $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <TITLE>$(DISTNAME)</TITLE>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Module designed to parse VOEvent messages</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Alasdair Allan &lt;aa@astro.ex.ac.uk&gt;</AUTHOR>' >> $(DISTNAME).ppd

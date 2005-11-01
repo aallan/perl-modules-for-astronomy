@@ -36,13 +36,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOEvent.pm,v 1.4 2005/07/27 11:44:40 aa Exp $
+$Id: VOEvent.pm,v 1.5 2005/11/01 23:19:00 aa Exp $
 
 =head1 METHODS
 
@@ -326,8 +326,9 @@ sub build {
   }
    
   # WHERE & WHEN  
-  $self->{WRITER}->startTag( 'WhereWhen' );
   if ( exists $args{UseSTC} ) {
+      $self->{WRITER}->startTag( 'WhereWhen', 
+                                 'type' => 'stc', );
       $self->{WRITER}->startTag( 'stc:ObservationLocation' );
       $self->{WRITER}->startTag( 'crd:AstroCoords',
         		      'coord_system_id' => 'FK5-UTC' );
@@ -355,6 +356,8 @@ sub build {
       $self->{WRITER}->endTag( 'crd:AstroCoords' );
       $self->{WRITER}->endTag( 'stc:ObservationLocation' );
   } else {
+      $self->{WRITER}->startTag( 'WhereWhen', 
+                                 'type' => 'simple', );
       $self->{WRITER}->startTag( 'RA', units => 'deg' );
       $self->{WRITER}->startTag( 'Coord' );
       $self->{WRITER}->characters( ${$args{WhereWhen}}{RA} );

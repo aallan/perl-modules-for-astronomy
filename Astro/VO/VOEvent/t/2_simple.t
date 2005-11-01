@@ -115,7 +115,7 @@ Los Alamos, NM 87545</Address>
         <EventID cite="supercedes">ivo://raptor.lanl/98765432/</EventID>
         <EventID cite="associated">ivo://estar.org/1234567/aa/</EventID>
     </Citations>
-    <WhereWhen>
+    <WhereWhen type="simple">
         <RA units="deg">
             <Coord>148.888</Coord>
             <Error value="4" units="arcmin" />
