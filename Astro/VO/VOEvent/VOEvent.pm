@@ -36,13 +36,13 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: VOEvent.pm,v 1.5 2005/11/01 23:19:00 aa Exp $
+$Id: VOEvent.pm,v 1.6 2005/11/02 01:17:49 aa Exp $
 
 =head1 METHODS
 
@@ -527,7 +527,7 @@ this parse a VOEvent document.
 sub parse {
   my $self = shift;
   my %args = @_;
-  
+    
   # Loop over the allowed keys
   for my $key (qw / File XML / ) {
      if ( lc($key) eq "file" && exists $args{$key} ) { 
@@ -538,15 +538,31 @@ sub parse {
         $self->{DOCUMENT} = $self->{PARSER}->parse( $args{$key} );
         return $self->{DOCUMENT};
         
-     } else {
-        return undef;
-        
-     }   
+     }  
   }
+  return undef;
   
  
 }
 
+=item B<determine_id>
+
+Return the id of the VOEvent document
+
+  $id = $object->determine_id( File => $file_name );
+  $id = $object->determine_id( XML => $scalar );
+
+this is the only information about the document available via this module.
+
+=cut
+
+sub determine_id {
+  my $self = shift;
+  my %args = @_;
+  
+  $self->parse( %args );
+  return ${${${$self->{DOCUMENT}}[1]}[0]}{'id'};
+}
 
 # C O N F I G U R E ---------------------------------------------------------
 
