@@ -97,10 +97,12 @@ sub _read_catalog {
   # Set up columns.
   my $id_column = -1;
   my $x_column = -1;
+  my $x_pixel_column = -1;
   my $xerr_column = -1;
   my $xwin_column = -1;
   my $xwinerr_column = -1;
   my $y_column = -1;
+  my $y_pixel_column = -1;
   my $yerr_column = -1;
   my $ywin_column = -1;
   my $ywinerr_column = -1;
@@ -162,11 +164,19 @@ sub _read_catalog {
 
       } elsif( $column[2] =~ /^X_IMAGE/ ) {
         $x_column = $column[1] - 1;
-        print "X column is $x_column\n" if $DEBUG;
+        print "X_IMAGE column is $x_column\n" if $DEBUG;
 
       } elsif( $column[2] =~ /^Y_IMAGE/ ) {
         $y_column = $column[1] - 1;
-        print "Y column is $y_column\n" if $DEBUG;
+        print "Y_IMAGE column is $y_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^X_PIXEL/ ) {
+        $x_pixel_column = $column[1] - 1;
+        print "X_PIXEL column is $x_pixel_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^Y_PIXEL/ ) {
+        $y_pixel_column = $column[1] - 1;
+        print "Y_PIXEL column is $y_pixel_column\n" if $DEBUG;
 
       } elsif( $column[2] =~ /^ERRX2_IMAGE/ ) {
         $xerr_column = $column[1] - 1;
@@ -355,19 +365,27 @@ sub _read_catalog {
     # Create a temporary Astro::Catalog::Item object.
     my $star = new Astro::Catalog::Item();
 
-    # Grab the coordinates, forming an Astro::Coords object.
-    my $coords = new Astro::Coords( type => 'J2000',
-                                    ra => ( $ra_column != -1 ? $fields[$ra_column] : undef ),
-                                    dec => ( $dec_column != -1 ? $fields[$dec_column] : undef ),
-                                    name => ( $id_column != -1 ? $fields[$id_column] : undef ),
-                                    units => 'degrees',
-                                  );
+    # Grab the coordinates, forming an Astro::Coords object., but only
+    # if the RA and Dec columns are defined.
+    if( $ra_column != -1 &&
+        $dec_column != -1 ) {
+      my $coords = new Astro::Coords( type => 'J2000',
+                                      ra => $fields[$ra_column],
+                                      dec => $fields[$dec_column],
+                                      name => ( $id_column != -1 ? $fields[$id_column] : undef ),
+                                      units => 'degrees',
+                                    );
+      $star->coords( $coords );
+    }
 
-    $star->coords( $coords );
     if( $flag_column != -1 ) {
       $star->quality( $fields[$flag_column] );
     } else {
       $star->quality( 0 );
+    }
+
+    if( $id_column != -1 ) {
+      $star->id( $fields[$id_column] );
     }
 
     # Set up the various flux and magnitude measurements.
@@ -486,14 +504,19 @@ sub _read_catalog {
       $star->fluxes( new Astro::Fluxes( $flux_best ) );
     }
 
-    # Set the x and y coordinates. Use the windowed parameters, if
-    # those exist. Otherwise, use the standard ones.
-    if( $xwin_column != -1 ) {
+    # Set the x and y coordinates. Preferentially use the NDF pixel
+    # coordinates, then the windowed coordinates, then the standard
+    # coordinates.
+    if( $x_pixel_column != -1 ) {
+      $star->x( $fields[$x_pixel_column] );
+    } elsif( $xwin_column != -1 ) {
       $star->x( $fields[$xwin_column] );
     } elsif( $x_column != -1 ) {
       $star->x( $fields[$x_column] );
     }
-    if( $ywin_column != -1 ) {
+    if( $y_pixel_column != -1 ) {
+      $star->y( $fields[$y_pixel_column] );
+    } elsif( $ywin_column != -1 ) {
       $star->y( $fields[$ywin_column] );
     } elsif( $x_column != -1 ) {
       $star->y( $fields[$y_column] );
@@ -602,7 +625,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.14 2005/10/26 19:51:03 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.15 2005/11/04 02:14:56 cavanagh Exp $
 
 =head1 FORMAT
 
