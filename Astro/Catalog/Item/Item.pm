@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.8 2005/10/26 19:51:51 cavanagh Exp $
+#     $Id: Item.pm,v 1.9 2005/11/04 02:16:33 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -34,8 +34,8 @@ Astro::Catalog::Item - A generic star object in a stellar catalogue.
 
 =head1 SYNOPSIS
 
-  $star = new Astro::Catalog::Item( 
-               ID	    => $id, 
+  $star = new Astro::Catalog::Item(
+               ID	    => $id,
                Coords	    => new Astro::Coords(),
                Morphology   => new Astro::Catalog::Item::Morphology(),
                Fluxes	    => new Astro::Fluxes(),
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.8 2005/10/26 19:51:51 cavanagh Exp $
+$Id: Item.pm,v 1.9 2005/11/04 02:16:33 cavanagh Exp $
 
 =head1 METHODS
 
@@ -300,6 +300,7 @@ sub new {
 		      LONGTYPE   => undef,
 		      MOREINFO   => undef,
                       INSERTDATE => undef,
+                      PREFERRED_MAG_TYPE => undef,
 		    }, $class;
 
   # If we have arguments configure the object
@@ -672,9 +673,11 @@ sub get_magnitude {
      # grab passed filter
      my $filter = shift;
      my $fluxes = $self->{FLUXES};
-     $magnitude = $fluxes->flux( waveband => $filter );
+     $magnitude = $fluxes->flux( waveband => $filter,
+                                 type => $self->preferred_magnitude_type );
   }
-  return $magnitude->quantity('mag');
+
+  return $magnitude->quantity( $self->preferred_magnitude_type );
 }
 
 =item B<get_flux_quantity>
@@ -740,8 +743,9 @@ sub get_errors {
      # grab passed filter
      my $filter = shift;
      my $fluxes = $self->{FLUXES};
-     my $magnitude = $fluxes->flux( waveband => $filter );
-     $mag_error = $magnitude->error( 'mag' );
+     my $magnitude = $fluxes->flux( waveband => $filter,
+                                    type => $self->preferred_magnitude_type );
+     $mag_error = $magnitude->error( $self->preferred_magnitude_type );
      
   }
   return $mag_error;
@@ -848,6 +852,31 @@ sub get_colourerr {
     
   }
   return $col_error;
+}
+
+=item B<preferred_magnitude_type>
+
+Get or set the preferred magnitude type to be returned from the get_magnitude method.
+
+  my $type = $item->preferred_magnitude_type;
+  $item->preferred_magnitude_type( 'MAG_ISO' );
+
+Defaults to 'MAG'.
+
+=cut
+
+sub preferred_magnitude_type {
+  my $self = shift;
+  if( @_ ) {
+    my $type = shift;
+    $self->{PREFERRED_MAG_TYPE} = $type;
+  }
+
+  if( ! defined( $self->{PREFERRED_MAG_TYPE} ) ) {
+    $self->{PREFERRED_MAG_TYPE} = 'MAG';
+  }
+
+  return $self->{PREFERRED_MAG_TYPE};
 }
 
 =item B<morphology>
