@@ -1,3 +1,12 @@
+2005-11-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/Cluster.pm: Filter filters and colours for uniqueness before
+	writing catalogue.
+
+	* Item/Item.pm: Add preferred_mag_type() method.
+
+	* IO/SExtractor.pm: Add support for Starlink X/Y_PIXEL parameters.
+
 2005-10-26  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* Item/Item.pm: Add get_flux_quantity() and get_flux_error()
