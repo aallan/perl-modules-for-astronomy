@@ -42,14 +42,14 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.16 2005/09/13 21:34:28 cavanagh Exp $
+$Id: Cluster.pm,v 1.17 2005/11/04 02:17:46 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -284,29 +284,42 @@ sub _write_catalog {
     }
   }
 
+  # Filter the output magnitudes and colours for uniqueness.
+  my %seen_mag;
+  foreach my $mag ( @out_mags ) {
+    $seen_mag{$mag}++;
+  }
+  @out_mags = keys %seen_mag;
+
+  my %seen_col;
+  foreach my $col ( @out_cols ) {
+    $seen_col{$col}++;
+  }
+  @out_cols = keys %seen_col;
+
   # write header
   # ------------
   my @output;
   my $output_line;
-  
+
   # check to see if we're outputing all the filters and colours
   my $total = scalar(@out_mags) + scalar(@out_cols);
 
   push( @output, "$total colours were created" );
   push( @output, "@out_mags @out_cols" );
-  
+
   # wierd and odd
-  $output_line = 
+  $output_line =
     "Origin: " . $catalog->origin() . " " if defined $catalog->origin();
-    
+
   if( defined $catalog->get_ra() && defined $catalog->get_dec() ) {
      $output_line = $output_line . 
-       "  Field Centre: RA " . $catalog->get_ra() . 
+       "  Field Centre: RA " . $catalog->get_ra() .
        ", Dec " . $catalog->get_dec() . " ";
   }
-       
+
   $output_line = $output_line . 
-      "  Catalogue Radius: " . $catalog->get_radius() . 
+      "  Catalogue Radius: " . $catalog->get_radius() .
       " arcmin" if defined $catalog->get_radius();
 
   $output_line = $output_line;
@@ -314,19 +327,19 @@ sub _write_catalog {
 
   # write body
   # ----------
-  
+
   # loop through all the stars in the catalogue
   foreach my $star ( 0 .. $#$stars ) {
 
      $output_line = undef;
-     
+
      # field, number, ra, dec and x&y position
      if ( defined ${$stars}[$star]->field() ) {
         $output_line = ${$stars}[$star]->field() . "  ";
      } else {
         $output_line = "0 ";
      }
-     
+
      if ( defined ${$stars}[$star]->id() && 
           Scalar::Util::looks_like_number( ${$stars}[$star]->id() ) ) {
         $output_line = $output_line . ${$stars}[$star]->id() . "  ";
@@ -338,16 +351,16 @@ sub _write_catalog {
      # parser don't like + signs for northern hemisphere dec's
      my $dec = ${$stars}[$star]->dec();
      $dec =~ s/\+//;
-     
+
      $output_line = $output_line . ${$stars}[$star]->ra() . "  ";
      $output_line = $output_line . $dec . "  ";
-     
+
      if ( defined ${$stars}[$star]->x() && defined ${$stars}[$star]->y() ) {
         $output_line = $output_line . 
                 ${$stars}[$star]->x() . " " . ${$stars}[$star]->y()  . " ";
      } else {
         $output_line = $output_line . "0.000  0.000  ";
-     }   
+     }
 
      # magnitudes
      foreach my $out_mag ( @out_mags ) {
