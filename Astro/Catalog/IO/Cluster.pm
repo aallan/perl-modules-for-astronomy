@@ -42,14 +42,14 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.17 2005/11/04 02:17:46 cavanagh Exp $
+$Id: Cluster.pm,v 1.18 2005/11/15 22:31:58 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -334,15 +334,17 @@ sub _write_catalog {
      $output_line = undef;
 
      # field, number, ra, dec and x&y position
-     if ( defined ${$stars}[$star]->field() ) {
-        $output_line = ${$stars}[$star]->field() . "  ";
+     my $field = ${$stars}[$star]->field;
+     if ( defined $field ) {
+        $output_line = $field . "  ";
      } else {
         $output_line = "0 ";
      }
 
-     if ( defined ${$stars}[$star]->id() && 
-          Scalar::Util::looks_like_number( ${$stars}[$star]->id() ) ) {
-        $output_line = $output_line . ${$stars}[$star]->id() . "  ";
+     my $id = ${$stars}[$star]->id;
+     if ( defined $id &&
+          Scalar::Util::looks_like_number( $id ) ) {
+        $output_line = $output_line . $id . "  ";
      } else {
         $output_line = $output_line . $star . " ";
      }
@@ -355,9 +357,11 @@ sub _write_catalog {
      $output_line = $output_line . ${$stars}[$star]->ra() . "  ";
      $output_line = $output_line . $dec . "  ";
 
-     if ( defined ${$stars}[$star]->x() && defined ${$stars}[$star]->y() ) {
-        $output_line = $output_line . 
-                ${$stars}[$star]->x() . " " . ${$stars}[$star]->y()  . " ";
+     my $x = ${$stars}[$star]->x;
+     my $y = ${$stars}[$star]->y;
+
+     if ( defined $x && defined $y ) {
+        $output_line = $output_line . $x . " " . $y . " ";
      } else {
         $output_line = $output_line . "0.000  0.000  ";
      }
@@ -367,22 +371,25 @@ sub _write_catalog {
 
        # Grab each magnitude listed in the @out_mags array and append
        # it to the output line.
-       if( defined( $ {$stars}[$star]->get_magnitude( $out_mag ) ) ) {
-         $output_line .= ${$stars}[$star]->get_magnitude( $out_mag ) . "  ";
+       my $out_mag_value = ${$stars}[$star]->get_magnitude( $out_mag );
+       if( defined( $out_mag_value ) ) {
+         $output_line .= $out_mag_value . "  ";
        } else {
          $output_line .= "0.000 ";
        }
 
        # And get the error, if it exists.
-       if( defined( $ {$stars}[$star]->get_errors( $out_mag ) ) ) {
-         $output_line .= ${$stars}[$star]->get_errors( $out_mag ) . "  ";
+       my $out_mag_error = ${$stars}[$star]->get_errors( $out_mag );
+       if( defined( $out_mag_error ) ) {
+         $output_line .= $out_mag_error . "  ";
        } else {
          $output_line .= "0.000 ";
        }
 
        # And the quality.
-       if ( defined ${$stars}[$star]->quality() ) {
-         $output_line .= ${$stars}[$star]->quality() . "  ";
+       my $quality = ${$stars}[$star]->quality;
+       if ( defined $quality ) {
+         $output_line .= $quality . "  ";
        } else {
          $output_line .= "0 ";
        }
@@ -393,22 +400,25 @@ sub _write_catalog {
 
        # Grab each colour listed in the @out_cols array and append it
        # to the output line.
-       if( defined( $ {$stars}[$star]->get_colour( $out_col ) ) ) {
-         $output_line .= ${$stars}[$star]->get_colour( $out_col ) . "  ";
+       my $out_col_value = ${$stars}[$star]->get_colour( $out_col );
+       if( defined( $out_col_value ) ) {
+         $output_line .= $out_col_value . "  ";
        } else {
          $output_line .= "0.000 ";
        }
 
        # And get the error, if it exists.
-       if( defined( $ {$stars}[$star]->get_colourerr( $out_col ) ) ) {
-         $output_line .= ${$stars}[$star]->get_colourerr( $out_col ) . "  ";
+       my $out_col_error = ${$stars}[$star]->get_colourerr( $out_col );
+       if( defined( $out_col_error ) ) {
+         $output_line .= $out_col_error . "  ";
        } else {
          $output_line .= "0.000 ";
        }
 
        # And the quality.
-       if ( defined ${$stars}[$star]->quality() ) {
-         $output_line .= ${$stars}[$star]->quality() . "  ";
+       my $quality = ${$stars}[$star]->quality;
+       if ( defined $quality ) {
+         $output_line .= $quality . "  ";
        } else {
          $output_line .= "0 ";
        }
