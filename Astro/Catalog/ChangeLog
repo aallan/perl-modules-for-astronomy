@@ -1,3 +1,14 @@
+2005-11-15  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Catalog.pm: Add preferred_magnitude_type() method. Speed up
+	popstarbyid() by a factor of 2.
+
+	* IO/Cluster.pm: Do not call various Item methods twice to help
+	speed up writing of catalogues.
+
+	* IO/SExtractor: Allow user to request objects with a specific
+	quality flag.
+	
 2005-11-03  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/Cluster.pm: Filter filters and colours for uniqueness before
