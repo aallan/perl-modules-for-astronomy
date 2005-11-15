@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.55 2005/07/09 02:17:47 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.56 2005/11/15 22:26:17 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.55 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.56 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.55 2005/07/09 02:17:47 cavanagh Exp $
+$Id: Catalog.pm,v 1.56 2005/11/15 22:26:17 cavanagh Exp $
 
 =head1 METHODS
 
@@ -116,6 +116,7 @@ sub new {
 		      REFTIME => undef,
                       FIELDDATE => undef,
 		      AUTO_OBSERVE => 0,
+                      PREFERRED_MAG_TYPE => undef,
 		    }, $class;
 
   # If we have arguments configure the object
@@ -281,6 +282,25 @@ sub errstr {
   return $self->{ERRSTR};
 }
 
+=item B<preferred_magnitude_type>
+
+Set or return the preferred magnitude type to be returned from the
+Astro::Catalog::Item->get_magnitude() method.
+
+  my $type = $catalog->preferred_magnitude_type;
+  $catalog->preferred_magnitude_type( 'MAG_ISO' );
+
+=cut
+
+sub preferred_magnitude_type {
+  my $self = shift;
+  if( @_ ) {
+    my $type = shift;
+    $self->{PREFERRED_MAG_TYPE} = $type;
+  }
+  return $self->{PREFERRED_MAG_TYPE};
+}
+
 =item B<sizeof>
 
 Return the number of stars in the catalogue (post filter).
@@ -386,19 +406,25 @@ sub popstarbyid {
 
   my $id = shift;
 
-  # This may need to be optimized because we traverse the array
-  # twice and we generate a whole new array internally
   # Do not force copy of allstars array yet
-  my @current = $self->stars;
-  my @match = grep { defined $_ && defined $_->id && $_->id eq $id } @current;
-  my @unmatched = grep { defined $_ && defined $_->id && $_->id ne $id } 
-    @current;
-
+  my @matched;
+  my @unmatched;
+  foreach my $item ( $self->stars ) {
+    if( defined( $item ) && defined( $item->id ) ) {
+      if( $item->id eq $id ) {
+        push @matched, $item;
+      } else {
+        push @unmatched, $item;
+      }
+    }
+  }
   @{ $self->stars } = @unmatched;
 
-  return ( wantarray ? @match : \@match );
+  return ( wantarray ? @matched : \@matched );
 
 }
+
+
 
 =item B<allstars>
 
