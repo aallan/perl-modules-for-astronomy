@@ -89,6 +89,11 @@ sub _read_catalog {
     $filter = 'unknown';
   }
 
+  my $quality = $args{'Quality'};
+  if( ! defined( $quality ) ) {
+    $quality = -1;
+  }
+
   my @lines = @$lines; # Dereference, make own copy.
 
   # Create an Astro::Catalog object;
@@ -362,6 +367,15 @@ sub _read_catalog {
     # Form an array of the fields in the catalogue.
     my @fields = split( /\s+/, $line );
 
+    # Don't deal with this object if our requested quality is not -1
+    # and the quality of the object is not equal to the requested
+    # quality and we have a quality flag for this object.
+    if( ( $quality != -1 ) &&
+        ( $flag_column != -1 ) &&
+        ( $fields[$flag_column] != $quality ) ) {
+      next;
+    }
+
     # Create a temporary Astro::Catalog::Item object.
     my $star = new Astro::Catalog::Item();
 
@@ -625,7 +639,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.15 2005/11/04 02:14:56 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.16 2005/11/15 22:34:40 cavanagh Exp $
 
 =head1 FORMAT
 
