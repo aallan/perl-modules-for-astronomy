@@ -64,7 +64,78 @@ the 'ASCII_HEAD' catalogue type from SExtractor. This implementation
 currently only supports reading information from the following output
 parameters:
 
+  NUMBER              id
+  X_IMAGE
+  Y_IMAGE
+  X_PIXEL
+  Y_PIXEL
+  ERRX2_IMAGE
+  ERRY2_IMAGE
+  XWIN_IMAGE
+  YWIN_IMAGE
+  ERRX2WIN_IMAGE
+  ERRY2WIN_IMAGE
+  ALPHA_J2000         coords
+  DELTA_J2000         coords
+  MAG_ISO
+  MAGERR_ISO
+  FLUX_ISO
+  FLUXERR_ISO
+  MAG_ISOCOR
+  MAGERR_ISOCOR
+  FLUX_ISOCOR
+  FLUXERR_ISOCOR
+  MAG_APER
+  MAGERR_APER
+  FLUX_APER
+  FLUXERR_APER
+  MAG_AUTO
+  MAGERR_AUTO
+  FLUX_AUTO
+  FLUXERR_AUTO
+  MAG_BEST
+  MAGERR_BEST
+  FLUX_BEST
+  FLUXERR_BEST
+  ELLIPTICITY         morphology ellipticity
+  THETA_IMAGE         morphology position_angle_pixel
+  ERRTHETA_IMAGE      morphology position_angle_pixel
+  THETA_SKY           morphology position_angle_world
+  ERRTHETA_SKY        morphology position_angle_world
+  B_IMAGE             morphology minor_axis_pixel
+  ERRB_IMAGE          morphology minor_axis_pixel
+  A_IMAGE             morphology major_axis_pixel
+  ERRA_IMAGE          morphology major_axis_pixel
+  B_WORLD             morphology minor_axis_world
+  ERRB_WORLD          morphology minor_axis_world
+  A_WORLD             morphology major_axis_world
+  ERRA_WORLD          morphology major_axis_world
+  ISOAREA_IMAGE       morphology area
+  FLAGS               quality
 
+The pixel coordinate values are special cases. As there are only two
+available methods to hold this information in an
+C<Astro::Catalog::Item> object, x() and y(), and six potential values
+to use, we must make a choice as to which value gets the nod. We
+preferentially use the NDF pixel coordinates (which are only available
+in output from the Starlink version of EXTRACTOR), then the windowed
+coordinates that were made available in SExtractor v2.4.3, then the
+standard coordinates.
+
+For the flux and magnitude values, a separate C<Astro::Flux> object is
+set up for each type with the flux type() equal to the SExtractor
+keyword. For example, if the MAG_AUTO keyword exists in the catalogue,
+then the output C<Astro::Catalog::Item> objects will have an
+C<Astro::Flux> object of the type 'MAG_AUTO' in it.
+
+There are optional named parameters. These are case-sensitive, and are:
+
+=item Filter - An Astro::WaveBand object denoting the waveband that
+the catalogue values were measured in.
+
+=item Quality - If set, then only objects that have an extraction flag
+in the FLAGS column equal to this value will be used to generate the
+output catalogue. Otherwise, all objects will be used.
 
 =cut
 
@@ -639,7 +710,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.16 2005/11/15 22:34:40 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.17 2005/11/22 23:21:00 cavanagh Exp $
 
 =head1 FORMAT
 
