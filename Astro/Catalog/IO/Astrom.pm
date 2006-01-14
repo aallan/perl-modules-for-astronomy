@@ -107,7 +107,7 @@ sub _write_catalog {
     $epoch = "2000.0";
   }
 
-  push @output, "ASTR";
+  push @output, "~ GENE 0.0";
   push @output, "~ $ra_cen $dec_cen J2000 $epoch";
 
 # For each star, write the RA, Dec, epoch, X and Y coordinates.
@@ -154,7 +154,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: Astrom.pm,v 1.7 2005/09/13 02:09:54 cavanagh Exp $
+ $Id: Astrom.pm,v 1.8 2006/01/14 02:57:00 cavanagh Exp $
 
 =head1 SEE ALSO
 
