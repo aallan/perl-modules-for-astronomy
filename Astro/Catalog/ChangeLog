@@ -1,3 +1,11 @@
+2006-01-13  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+  * IO/Astrom.pm: Go with a generic image instead of one from
+  an astrograph.
+
+  * Item/Item.pm: Add extra check when undefining WCS so that
+  WCS actually becomes undefined if desired.
+
 2005-11-15  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* Catalog.pm: Add preferred_magnitude_type() method. Speed up
