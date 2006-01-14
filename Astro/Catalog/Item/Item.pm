@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.9 2005/11/04 02:16:33 cavanagh Exp $
+#     $Id: Item.pm,v 1.10 2006/01/14 02:58:31 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.9 2005/11/04 02:16:33 cavanagh Exp $
+$Id: Item.pm,v 1.10 2006/01/14 02:58:31 cavanagh Exp $
 
 =head1 METHODS
 
@@ -1161,7 +1161,9 @@ sub wcs {
   my $self = shift;
   if( @_ ) {
     my $wcs = shift;
-    if( UNIVERSAL::isa( $wcs, "Starlink::AST" ) ) {
+    if( ! defined( $wcs ) ) {
+      $self->{WCS} = undef;
+    } elsif( UNIVERSAL::isa( $wcs, "Starlink::AST" ) ) {
       $self->{WCS} = $wcs;
     }
   }
