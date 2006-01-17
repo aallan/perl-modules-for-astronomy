@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.10 2006/01/14 02:58:31 cavanagh Exp $
+#     $Id: Item.pm,v 1.11 2006/01/17 23:43:40 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.10 2006/01/14 02:58:31 cavanagh Exp $
+$Id: Item.pm,v 1.11 2006/01/17 23:43:40 cavanagh Exp $
 
 =head1 METHODS
 
@@ -675,9 +675,13 @@ sub get_magnitude {
      my $fluxes = $self->{FLUXES};
      $magnitude = $fluxes->flux( waveband => $filter,
                                  type => $self->preferred_magnitude_type );
-  }
 
-  return $magnitude->quantity( $self->preferred_magnitude_type );
+     if( defined( $magnitude ) ) {
+       return $magnitude->quantity( $self->preferred_magnitude_type );
+     } else {
+       return undef;
+     }
+  }
 }
 
 =item B<get_flux_quantity>
@@ -740,13 +744,16 @@ sub get_errors {
   my $mag_error;
   if (@_) {
 
-     # grab passed filter
-     my $filter = shift;
-     my $fluxes = $self->{FLUXES};
-     my $magnitude = $fluxes->flux( waveband => $filter,
-                                    type => $self->preferred_magnitude_type );
-     $mag_error = $magnitude->error( $self->preferred_magnitude_type );
-     
+    # grab passed filter
+    my $filter = shift;
+    my $fluxes = $self->{FLUXES};
+    my $magnitude = $fluxes->flux( waveband => $filter,
+                                   type => $self->preferred_magnitude_type );
+    if( defined( $magnitude ) ) {
+      return $magnitude->error( $self->preferred_magnitude_type );
+    } else {
+      return undef;
+    }
   }
   return $mag_error;
 }
