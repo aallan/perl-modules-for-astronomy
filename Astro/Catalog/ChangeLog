@@ -3,6 +3,12 @@
 	* Item/Item.pm: Fix get_magnitude() and get_errors() for case
 	where magnitude isn't defined in Item.
 
+	* t/2_cluster.t: Fix test to reflect earlier fixes in
+	IO/Cluster.pm from 2005-11-03.
+
+	* t/helper.t: Sort filters and colours so that filter and colour
+	matching works properly.
+	
 2006-01-13  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
   * IO/Astrom.pm: Go with a generic image instead of one from
