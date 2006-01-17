@@ -1,3 +1,8 @@
+2006-01-17  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Item/Item.pm: Fix get_magnitude() and get_errors() for case
+	where magnitude isn't defined in Item.
+
 2006-01-13  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
   * IO/Astrom.pm: Go with a generic image instead of one from
