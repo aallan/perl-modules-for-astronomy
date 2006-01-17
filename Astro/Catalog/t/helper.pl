@@ -142,17 +142,21 @@ sub compare_star {
   my @ref_filters = $refstar->what_filters();
   is( scalar(@cmp_filters), scalar(@ref_filters), "compare filter count");
 
+  # Sort the filters.
+  @cmp_filters = sort @cmp_filters;
+  @ref_filters = sort @ref_filters;
+
   # Should loop over known filters rather than the filters
   # we got (just in case that is zero)
   foreach my $filter ( 0 ... $#ref_filters ) {
     is( $cmp_filters[$filter], $ref_filters[$filter],
-	"compare filter $ref_filters[$filter]" );
+        "compare filter $ref_filters[$filter]" );
     is( $cmpstar->get_magnitude($cmp_filters[$filter]),
-	$refstar->get_magnitude($ref_filters[$filter]),
-	"compare magnitude $ref_filters[$filter]");
+        $refstar->get_magnitude($ref_filters[$filter]),
+        "compare magnitude $ref_filters[$filter]");
     is( $cmpstar->get_errors($cmp_filters[$filter]),
-	$refstar->get_errors($ref_filters[$filter]),
-	"compare magerr $ref_filters[$filter]");
+        $refstar->get_errors($ref_filters[$filter]),
+        "compare magerr $ref_filters[$filter]");
   }
 
   my @cmp_cols = $cmpstar->what_colours();
@@ -163,6 +167,10 @@ sub compare_star {
   #print Dumper( @ref_cols );
   
   is(scalar(@cmp_cols), scalar(@ref_cols), "compare number of colors");
+
+  # Sort the colours.
+  @cmp_cols = sort @cmp_cols;
+  @ref_cols = sort @ref_cols;
 
   foreach my $col ( 0 ... $#ref_cols ) {
     is( $cmp_cols[$col], $ref_cols[$col],"compare color $ref_cols[$col]" );
