@@ -8,6 +8,10 @@
 
 	* t/helper.t: Sort filters and colours so that filter and colour
 	matching works properly.
+
+	* IO/Cluster.pm: Do not define x or y if either is 0.000 in the
+	file when reading (to make up for Cluster format files not having
+	undefined values).
 	
 2006-01-13  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
