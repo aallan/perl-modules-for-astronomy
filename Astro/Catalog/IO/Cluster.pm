@@ -42,14 +42,14 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Cluster.pm,v 1.18 2005/11/15 22:31:58 cavanagh Exp $
+$Id: Cluster.pm,v 1.19 2006/01/18 01:29:33 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -120,8 +120,12 @@ sub _read_catalog {
       $star->coords( $coords );
 
       # x & y
-      $star->x( $separated[8] );
-      $star->y( $separated[9] );
+      if( $separated[8] ne '0.000' ) {
+        $star->x( $separated[8] );
+      }
+      if( $separated[9] ne '0.000' ) {
+        $star->y( $separated[9] );
+      }
 
       # number of magnitudes and colours
       $lines[1] =~ s/^\s+//;
