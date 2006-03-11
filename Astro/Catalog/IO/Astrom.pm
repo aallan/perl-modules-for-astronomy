@@ -147,6 +147,8 @@ sub _write_catalog {
 
   }
 
+  push @output, "END";
+
   return \@output;
 }
 
@@ -154,7 +156,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: Astrom.pm,v 1.8 2006/01/14 02:57:00 cavanagh Exp $
+ $Id: Astrom.pm,v 1.9 2006/03/11 00:01:41 cavanagh Exp $
 
 =head1 SEE ALSO
 
