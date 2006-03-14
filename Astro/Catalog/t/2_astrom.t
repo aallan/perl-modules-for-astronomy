@@ -1,7 +1,7 @@
 #!perl
 
 # Astro::Catalog test harness
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 use strict;
 use File::Spec;
@@ -86,3 +86,4 @@ __DATA__
 17.246 64.945
 19 08 29.1 -63 57 42.79 J2000 2000.0
 -25.314 57.456
+END
