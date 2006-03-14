@@ -33,7 +33,7 @@ isa_ok( $catalog, "Astro::Catalog" );
 # reference star
 my $star = new Astro::Catalog::Star( id => 'EX Hya',
 				     coords => new Astro::Coords(
-				       ra =>'12 52 25', dec =>'-29 14 58',
+				       ra =>'12 52 25', dec =>'-29 14 57',
 					type=> 'j2000' ) );
 
 #print Dumper ( $star );
