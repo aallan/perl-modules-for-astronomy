@@ -698,19 +698,102 @@ return the lines in an array.
 
 Argument is an C<Astro::Catalog> object.
 
-This method is not yet implemented.
+This method currently only returns the ID, X, Y, RA and Dec values in
+the returned strings, in that order.
 
 =cut
 
 sub _write_catalog {
-  croak "Not yet implemented.";
+  croak ( 'Usage: _write_catalog( $catalog, [%opts] ') unless scalar(@_) >= 1;
+  my $class = shift;
+  my $catalog = shift;
+
+  my @output;
+
+# First, the header. What we write to the header depends on what
+# values we have for our objects, so check for ID, X, Y, RA, and Dec
+# values.
+  my $write_id  = 0;
+  my $write_x   = 0;
+  my $write_y   = 0;
+  my $write_ra  = 0;
+  my $write_dec = 0;
+
+  my @stars = $catalog->stars();
+
+  if( defined( $stars[0]->id ) ) {
+    $write_id = 1;
+  }
+  if( defined( $stars[0]->x ) ) {
+    $write_x = 1;
+  }
+  if( defined( $stars[0]->y ) ) {
+    $write_y = 1;
+  }
+  if( defined( $stars[0]->coords->ra ) ) {
+    $write_ra = 1;
+  }
+  if( defined( $stars[0]->coords->dec ) ) {
+    $write_dec = 1;
+  }
+
+# Now for the header.
+  my $pos = 1;
+  if( $write_id ) {
+    push @output, "#   $pos NUMBER         Running object number";
+    $pos++;
+  }
+  if( $write_x ) {
+    push @output, "#   $pos X_IMAGE        Object position along x                     [pixel]";
+    $pos++;
+  }
+  if( $write_y ) {
+    push @output, "#   $pos Y_IMAGE        Object position along y                     [pixel]";
+    $pos++;
+  }
+  if( $write_ra ) {
+    push @output, "#   $pos ALPHA_J2000    Right ascension of barycenter (J2000)       [deg]";
+    $pos++;
+  }
+  if( $write_dec ) {
+    push @output, "#   $pos DELTA_J2000    Declination of barycenter (J2000)           [deg]";
+    $pos++;
+  }
+
+# Now go through the objects.
+  foreach my $star ( @stars ) {
+
+    my $output_string = "";
+
+    if( $write_id ) {
+      $output_string .= $star->id . " ";
+    }
+    if( $write_x ) {
+      $output_string .= $star->x . " ";
+    }
+    if( $write_y ) {
+      $output_string .= $star->y . " ";
+    }
+    if( $write_ra ) {
+      $output_string .= $star->coords->ra->degrees . " ";
+    }
+    if( $write_dec ) {
+      $output_string .= $star->coords->dec->degrees . " ";
+    }
+
+    push @output, $output_string;
+  }
+
+# And return!
+  return \@output;
+
 }
 
 =back
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.17 2005/11/22 23:21:00 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.18 2006/03/15 21:19:18 cavanagh Exp $
 
 =head1 FORMAT
 
