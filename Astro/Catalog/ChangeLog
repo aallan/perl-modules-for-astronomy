@@ -1,3 +1,10 @@
+2006-03-15  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/SExtractor.pm: Support write_catalog() method for
+	SExtractor-style catalogues.
+
+	* t/2_sextractor.t: Add tests for catalogue writing.
+
 2006-01-17  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* Item/Item.pm: Fix get_magnitude() and get_errors() for case
