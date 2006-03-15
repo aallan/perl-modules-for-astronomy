@@ -3,7 +3,8 @@
 # Test SExtractor format read
 
 # Astro::Catalog test harness
-use Test::More tests => 10;
+use Test::More tests => 15;
+use File::Temp ();
 
 use strict;
 
@@ -14,7 +15,8 @@ my $cat = new Astro::Catalog( Format => 'SExtractor', Data => \*DATA );
 
 isa_ok( $cat, "Astro::Catalog" );
 
-my $star = $cat->popstar();
+my @stars = $cat->stars();
+my $star = $stars[3];
 my $id = $star->id;
 
 is( $id, "4", "SExtractor Star ID" );
@@ -35,6 +37,28 @@ isa_ok( $mag_isocor, "Astro::Flux" );
 my $mag_isocor_quantity = $mag_isocor->quantity('MAG_ISOCOR');
 is( $mag_isocor->quantity('MAG_ISOCOR'), -13.2317, "SExtractor Star magnitude" );
 is( $mag_isocor->error('MAG_ISOCOR'), 0.0073, "SExtractor Star magnitude error" );
+
+# Write out a file, then read it back in.
+my $fh = new File::Temp;
+my $tempfile = $fh->filename;
+ok( $cat->write_catalog( Format => 'SExtractor', File => $tempfile ),
+    "Writing catalogue to disk" );
+
+my $newcat = new Astro::Catalog( Format => 'SExtractor', File => $tempfile );
+
+isa_ok( $newcat, "Astro::Catalog" );
+
+# It's not going to be the same because writing doesn't include
+# magnitudes, so check the RA and Dec of star 4.
+my @newstars = $newcat->stars;
+my $newstar = $newstars[3];
+my $newid = $newstar->id;
+my $newra = $newstar->ra;
+my $newdec = $newstar->dec;
+
+is( $newid,  $id,  "SExtractor written catalogue ID" );
+is( $newra,  $ra,  "SExtractor written catalogue RA" );
+is( $newdec, $dec, "SExtractor written catalogue Dec" );
 
 exit;
 
