@@ -1,16 +1,16 @@
 #!perl
 
-# Test TST format read
+# Test TST format read and write
 
 # Astro::Catalog test harness
-use Test::More tests => 2;
+use Test::More tests => 8;
 
 # strict
 use strict;
 
 #load test
 use File::Spec;
-use Data::Dumper;
+use File::Temp;
 
 # load modules
 require_ok("Astro::Catalog");
@@ -19,7 +19,34 @@ my $cat = new Astro::Catalog( Format => 'TST', Data => \*DATA );
 
 isa_ok( $cat, "Astro::Catalog" );
 
-$cat->write_catalog( Format => 'Simple', File => \*STDOUT );
+# Test out the fourth object.
+my @stars = $cat->stars;
+my $star = $stars[3];
+
+is( $star->id, "Obj. 4", "TST Star ID" );
+is( $star->ra, "05 17 36.30", "TST Star RA" );
+is( $star->dec, "-06 50 40.00", "TST Star Dec" );
+
+# Write out a file, then read it back in.
+my $fh = new File::Temp;
+my $tempfile = $fh->filename;
+ok( $cat->write_catalog( Format => 'TST', File => $tempfile ),
+    "Writing catalogue to disk" );
+
+my $newcat = new Astro::Catalog( Format => 'TST', File => $tempfile );
+
+isa_ok( $newcat, "Astro::Catalog" );
+
+my @newstars = $newcat->stars;
+my $newstar = $newstars[3];
+my $newid = $newstar->id;
+my $newra = $newstar->ra;
+my $newdec = $newstar->dec;
+
+is( $newid,  $star->id,  "SExtractor written catalogue ID" );
+is( $newra,  $star->ra,  "SExtractor written catalogue RA" );
+is( $newdec, $star->dec, "SExtractor written catalogue Dec" );
+
 
 exit;
 
