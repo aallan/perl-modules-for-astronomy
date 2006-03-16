@@ -54,12 +54,9 @@ foreach my $line ( 0 .. $#buffer ) {
     $star->id( $name );
 
     $vmag =~ s/^\s+//;
-    #my %vmag = ( V => $vmag );
-    #$star->magnitudes( \%vmag );
-  
-    $star->fluxes( new Astro::Fluxes( new Astro::Flux(
-	               new Number::Uncertainty( Value => $vmag ),
-			'mag', "V" )));
+
+    $star->fluxes( new Astro::Fluxes( new Astro::Flux( new Number::Uncertainty( Value => $vmag ),
+                                                       'mag', "V" )));
 
     $comment =~ s/^\s+//;
     $star->comment( $comment );
@@ -103,19 +100,22 @@ my $mpc_byname = new Astro::Catalog::Query::MPC( RA => "07 13 42",
                                                  Day => 1.87, );
 
 print "# Connecting to MPC Minor Planet Checker\n";
-my $catalog_byname = $mpc_byname->querydb();
-print "# Continuing tests\n";
+my $catalog_byname;
+eval { $catalog_byname = $mpc_byname->querydb() };
+SKIP: {
+  skip "Cannot connect to MPC website", 199 unless ! $@;
+  print "# Continuing tests\n";
 
 # C O M P A R I S O N ------------------------------------------------------
 
-# check sizes
-print "# DAT has " . $catalog_data->sizeof() . " stars\n";
-print "# NET has " . $catalog_byname->sizeof() . " stars\n";
+  # check sizes
+  print "# DAT has " . $catalog_data->sizeof() . " stars\n";
+  print "# NET has " . $catalog_byname->sizeof() . " stars\n";
 
-# Compare catalogues
-compare_mpc_catalog( $catalog_byname, $catalog_data);
+  # Compare catalogues
+  compare_mpc_catalog( $catalog_byname, $catalog_data);
 
-#print join("\n",$mpc_byname->_dump_raw)."\n";
+} # End SKIP
 
 # quitting time
 exit;
