@@ -99,7 +99,7 @@ sub _read_catalog {
   # Loop over each line
   my $counter = 0;
   for (@$lines) {
-    
+
     # increment line counter
     $counter++;
 
@@ -108,9 +108,9 @@ sub _read_catalog {
     # catalog to change from under the caller.
     my $line = $_;
     chomp($line);
-    
+
     # Simply loop if there is no content
-    #print "PARSING line $counter\n" if $DEBUG;
+    print "PARSING line $counter\n" if $DEBUG;
     next unless $line =~ /\S/;
 
     # Look for comments
@@ -118,7 +118,7 @@ sub _read_catalog {
       # Usually indicates that we can stop parsing.
       # At the very least this means end of data.
       # so reset $intable
-      #print "   FOUND EOD - no need to continue\n" if $DEBUG;
+      print "   FOUND EOD - no need to continue\n" if $DEBUG;
       last;
 
     } elsif ($line =~ /^\s*\#/) {
@@ -126,72 +126,70 @@ sub _read_catalog {
       # some column information
       if ($line =~ /^\s*\#column-(.*):/) {
 
-	# Special key: usually units, types or formats
-	my $key = $1;
+        # Special key: usually units, types or formats
+        my $key = $1;
 
         #print "   FOUND CURSA extension: $key\n" if $DEBUG;
 
-	# Remove the crud
-	$line =~ s/^\s*\#column-$key://;
+        # Remove the crud
+        $line =~ s/^\s*\#column-$key://;
 
-	my @content = $class->_parse_line( $line );
+        my @content = $class->_parse_line( $line );
 
-	# and store it for now
-	$extras{$key} = [] unless exists $extras{$key};
-	push(@{ $extras{$key} }, @content);
+        # and store it for now
+        $extras{$key} = [] unless exists $extras{$key};
+        push(@{ $extras{$key} }, @content);
 
-	warnings::warnif("CURSA-style parameters encountered whilst inside table!")
-	  if $intable;
+        warnings::warnif("CURSA-style parameters encountered whilst inside table!")
+          if $intable;
 
       } else {
-	# Standard comment - strip the hash
-	$line =~ s/^\s*\#//;
+        # Standard comment - strip the hash
+        $line =~ s/^\s*\#//;
         #print "   FOUND standard comment\n" if $DEBUG;
-	push(@comments, $line);
+        push(@comments, $line);
       }
     } elsif ($line =~ /\t/) {
       # Parse the line in standard manner
-      #print "  FOUND standard line\n" if $DEBUG;
+      print "  FOUND standard line\n" if $DEBUG;
       my @content = $class->_parse_line( $line );
-      #print Dumper(@content) if $DEBUG;
-
+      print Dumper(@content) if $DEBUG;
 
       # If the line includes tab characters it is probably a table
       # entry. Either the header or the content or the separator
       if ($intable) {
-	# Must be reading real content
-	warnings::warnif("Column mismatch: name count different to actual content!:\n$line\n") if @columns != @content;
-        #print "  FOUND content line\n" if $DEBUG;
+        # Must be reading real content
+        warnings::warnif("Column mismatch: name count different to actual content!:\n$line\n") if @columns != @content;
+        print "  FOUND content line\n" if $DEBUG;
 
-	# Store the content in a hash indexed by the associated columns
-	# This will be a problem for degenerate headings!
-	my %star = map { lc($columns[$_]), $content[$_] } (0..$#content);
+        # Store the content in a hash indexed by the associated columns
+        # This will be a problem for degenerate headings!
+        my %star = map { lc($columns[$_]), $content[$_] } (0..$#content);
 
-	push(@stars, \%star);
+        push(@stars, \%star);
       } elsif ( !@columns ) {
-	# We have read no column information so this must be
-	# the table description
-        #print "  FOUND table description line\n" if $DEBUG;
-	@columns = @content;
+        # We have read no column information so this must be
+        # the table description
+        print "  FOUND table description line\n" if $DEBUG;
+        @columns = @content;
 
-      #} elsif ($line =~ /^[-\t]+$/) {  # This doesn't seem to parse the
-                                        # SuperCOSMOS TST separator, not
-                                        # sure what's going on here.
-                                        
-      } elsif ( $content[0] =~ /^[-]+$/ && $content[1] =~ /^[-]+$/ ) { 
+        #} elsif ($line =~ /^[-\t]+$/) {  # This doesn't seem to parse the
+                                          # SuperCOSMOS TST separator, not
+                                          # sure what's going on here.
+
+      } elsif ( $content[0] =~ /^[-]+$/ && $content[1] =~ /^[-]+$/ ) {
         # this is probably safe enough, but its another un-Godly hack,
         # sorry Tim, have a look at the SuperCOSMOS.pm module and turn
-        # on debugging in TST to see whats going on here during parsing.                                  
-
+        # on debugging in TST to see whats going on here during parsing.
         #print "  FOUND table separator line\n" if $DEBUG;
-	warnings::warnif("Table separator has already been encountered!")
-	    if $intable;
+        warnings::warnif("Table separator has already been encountered!")
+          if $intable;
 
-	# separator, so next time around is a real table
-	$intable = 1;
+        # separator, so next time around is a real table
+        $intable = 1;
       } else {
-	# Should not get here
-	croak "Fatal parse error reading TST table, line '$line'";
+        # Should not get here
+        croak "Fatal parse error reading TST table, line '$line'";
       }
 
     } elsif ($line =~ /^\w+:/) {
@@ -199,13 +197,13 @@ sub _read_catalog {
       my ($key, $value) = $line =~ /^(\w+):\s*(.*?)\s*$/;
 
       if (defined $key && defined $value) {
-	$params{$key} = $value;
+        $params{$key} = $value;
       } else {
-	warnings::warnif("Error extracting parameter from line '$line'");
+        warnings::warnif("Error extracting parameter from line '$line'");
       }
 
       warnings::warnif("Parameter specified after table has been started. This is non-standard!")
-	  if $intable;
+        if $intable;
 
     } else {
       # This is probably general description
@@ -219,8 +217,8 @@ sub _read_catalog {
   # itself. The supplied values override values read from the file
   %params = (%params, %options);
 
-  #print Dumper( \@descr, \@comments, \@columns, \%params, \%extras, \@stars)
-  #  if $DEBUG;
+  print Dumper( \@descr, \@comments, \@columns, \%params, \%extras, \@stars)
+    if $DEBUG;
 
   # Now we need to go through the parameters to see whether there are
   # any _col parameters that we need to map to an "ra", "dec" and "id"
@@ -247,9 +245,9 @@ sub _read_catalog {
       # Negative value indicates that we are not actually specifying
       # a column
       if ($colnum == -1) {
-	# should the entry "$col" be deleted from each star hash
-	# if it is present but has been designated -1 by a parameter?
-	next;
+        # should the entry "$col" be deleted from each star hash
+        # if it is present but has been designated -1 by a parameter?
+        next;
       }
 
       # The old column name
@@ -277,11 +275,11 @@ sub _read_catalog {
     for my $key (qw/ id ra dec /) {
       # only check first star
       if (not exists $stars[0]->{$key}) {
-	# did not have it, loop over all
-	warnings::warnif("Guessing column $colnum contains $key");
-	for (@stars) {
-	  $_->{$key} = $_->{lc($columns[$colnum])};
-	}
+        # did not have it, loop over all
+        warnings::warnif("Guessing column $colnum contains $key");
+        for (@stars) {
+          $_->{$key} = $_->{lc($columns[$colnum])};
+        }
       }
       $colnum++;
     }
@@ -291,7 +289,7 @@ sub _read_catalog {
 
   # This is a back-of-the-envelope data dictionary from looking at 
   # USNO-A2, 2MASS, Bright Star Catalogues and SuperCOSMOS. Maps the
-  # Aastro::Catalog::Star methods to different columns names
+  # Astro::Catalog::Star methods to different columns names
   my %datadict = (
 		  field => [ qw/ field /, qw/ fldno / ],
 		  quality => [ qw/ qual /, qw/ qflg /, qw/ quality / ],
@@ -324,23 +322,23 @@ sub _read_catalog {
     if (exists $star->{ra} && exists $star->{dec}) {
       my $units;
       if ($star->{ra} =~ /:/) {
-	$units = "sex";
+        $units = "sex";
       } else {
-	# must be decimal degrees
-	$units = "deg";
+        # must be decimal degrees
+        $units = "deg";
       }
 
       my $c = new Astro::Coords( ra => $star->{ra},
-				 dec => $star->{dec},
-				 type => $type,
-				 units => $units,
-				 name => $star->{id}
-			       );
+                                 dec => $star->{dec},
+                                 type => $type,
+                                 units => $units,
+                                 name => $star->{id}
+                               );
 
       if (defined $c) {
-	$construct{coords} = $c;
+        $construct{coords} = $c;
       } else {
-	warnings::warnif("Error instantiating coordinate object");
+        warnings::warnif("Error instantiating coordinate object");
       }
 
     }
@@ -356,13 +354,12 @@ sub _read_catalog {
     # Be very scared if we have to provide mapping routines
     for my $starkey (keys %datadict) {
       for my $colname (@{ $datadict{$starkey} }) {
-	if (exists $star->{$colname}) {
-        
-	  $construct{$starkey} = $star->{$colname};
+        if (exists $star->{$colname}) {
+          $construct{$starkey} = $star->{$colname};
 
-	  # stop looking
-	  next;
-	}
+          # stop looking
+          next;
+        }
       }
     }
 
@@ -384,39 +381,37 @@ sub _read_catalog {
     $construct{magnitudes} = {};
     $construct{magerr} = {};
     for my $key (keys %$star) {
-      
-      #print "LOOPING KEY = $key\n" if $DEBUG;
-      
+
+      print "LOOPING KEY = $key\n" if $DEBUG;
+
       # Un-Goldy hack number #5 for the SuperCOSMOS catalogue, for some
       # bloody stupid reason they've decided to label their magntitudes
       # B_J, R_1, R_2 and I. God help me, if I ever find the guy responsible
       # for this stupid idea. For now lets munge these here and cross our
       # fingers.
       if ( $key eq "b_j" ) {
-         $$star{bj_mag} = $star->{$key};
-         delete $star->{$key};
-         $key = "bj_mag";
+        $$star{bj_mag} = $star->{$key};
+        delete $star->{$key};
+        $key = "bj_mag";
       }
       if (  $key eq "r_1" ) {
-         $$star{r1_mag} = $star->{$key};
-         delete $star->{$key};
-         $key = "r1_mag" ;
+        $$star{r1_mag} = $star->{$key};
+        delete $star->{$key};
+        $key = "r1_mag" ;
       }
       if (  $key eq "r_2" ) {
-         $$star{r2_mag} = $star->{$key};
-         delete $star->{$key};
-         $key = "r2_mag" ;
+        $$star{r2_mag} = $star->{$key};
+        delete $star->{$key};
+        $key = "r2_mag" ;
       }
       if (  $key eq "i" ) {
-         $$star{i_mag} = $star->{$key};
-         delete $star->{$key};
-         $key = "i_mag" ;
+        $$star{i_mag} = $star->{$key};
+        delete $star->{$key};
+        $key = "i_mag" ;
       }
-      
-      
+
       # drop through unless we have a magnitude
       next unless $key =~ /^(.*?)_?mag$/; # non-greedy
-
 
       # No capture - assume R
       my $filter = ( $1 ? uc($1) : "R" );
@@ -424,40 +419,36 @@ sub _read_catalog {
       # if the filter starts with e_ then it is probably an
       # error in the magnitude
       if ($filter =~ /^E_(\w)$/i) {
-	# error in magnitude
-	my $err = $1;
-	$construct{magerr}->{$err} = $star->{$key}
-	  if $star->{$key} =~ /\d/;
-	print "Found Mag Error $err ... \n" if $DEBUG;
+        # error in magnitude
+        my $err = $1;
+        $construct{magerr}->{$err} = $star->{$key}
+        if $star->{$key} =~ /\d/;
+        print "Found Mag Error $err ... \n" if $DEBUG;
       } elsif ($filter =~ /_/) {
-	# is this a color?
-	warnings::warnif "Found unrecognised filter string: $filter\n";
+        # is this a color?
+        warnings::warnif "Found unrecognised filter string: $filter\n";
       } else {
-	# Assume it is a filter
-	$construct{magnitudes}->{$filter} = $star->{$key};
-	print "Found filter $filter ...\n" if $DEBUG;
+        # Assume it is a filter
+        $construct{magnitudes}->{$filter} = $star->{$key};
+        print "Found filter $filter ...\n" if $DEBUG;
       }
-
     }
 
     my ( @fluxes, @colors );
     foreach my $fkey ( keys %{$construct{magnitudes}} ) {
-    
       my $num;
       if ( defined $construct{magerr}->{$fkey} ) {
-	 $num = new Number::Uncertainty( 
-			   Value => $construct{magnitudes}->{$fkey},
-			   Error => $construct{magerr}->{$fkey} );
+        $num = new Number::Uncertainty( Value => $construct{magnitudes}->{$fkey},
+                                        Error => $construct{magerr}->{$fkey} );
       } else {
-          $num = new Number::Uncertainty( 
-                           Value => $construct{magnitudes}->{$fkey}  );     
-      }		   
+        $num = new Number::Uncertainty( Value => $construct{magnitudes}->{$fkey}  );
+      }
       my $mag = new Astro::Flux( $num, 'mag', "$fkey" );
       push @fluxes, $mag;
     }
     delete $construct{magnitudes};
     delete $construct{magerr} if defined $construct{magerr};
-    
+
     # Colors: Look for B-V
     $construct{colours} = {};
     for my $key (keys %$star) {
@@ -467,33 +458,29 @@ sub _read_catalog {
       print "Found colour ".uc($key)." ... \n" if $DEBUG;
     }
     foreach my $ckey ( keys %{$construct{colours}} ) {
-        my @filters = split "-", $ckey;
-        my $color = new Astro::FluxColor( 
-          upper => new Astro::WaveBand( Filter => $filters[0] ),
-          lower => new Astro::WaveBand( Filter => $filters[1] ),
-          quantity => new Number::Uncertainty( 
-        	       Value => $construct{colours}->{$ckey} ) );
-        push @colors, $color;
-
+      my @filters = split "-", $ckey;
+      my $color = new Astro::FluxColor( upper => new Astro::WaveBand( Filter => $filters[0] ),
+                                        lower => new Astro::WaveBand( Filter => $filters[1] ),
+                                        quantity => new Number::Uncertainty( Value => $construct{colours}->{$ckey} ) );
+      push @colors, $color;
     }
     delete $construct{colours};
 
-    # build the fluxes object from the available data  
+    # build the fluxes object from the available data
     if ( defined $fluxes[0]  && defined $colors[0] ) {
-       $construct{fluxes} = new Astro::Fluxes( @fluxes, @colors );
+      $construct{fluxes} = new Astro::Fluxes( @fluxes, @colors );
     } elsif ( defined $colors[0] ) {
-       $construct{fluxes} = new Astro::Fluxes( @colors );
+      $construct{fluxes} = new Astro::Fluxes( @colors );
     } elsif ( defined $fluxes[0] ) {
-       $construct{fluxes} = new Astro::Fluxes( @fluxes );
+      $construct{fluxes} = new Astro::Fluxes( @fluxes );
     } else {
-       delete $construct{fluxes} if defined $construct{fluxes};
+      delete $construct{fluxes} if defined $construct{fluxes};
     }
-    
+
     print Dumper( %construct ) . "\n" if $DEBUG;
-    
+
     # Modify the array in place
     $star = new Astro::Catalog::Star( id => $star->{id}, %construct );
-
   }
 
   return new Astro::Catalog( Stars => \@stars);
@@ -511,7 +498,33 @@ Argument is an C<Astro::Catalog> object.
 =cut
 
 sub _write_catalog {
-  croak "Not yet implemented.";
+  croak ( 'Usage: _write_catalog( $catalog, [%opts] ') unless scalar(@_) >= 1;
+  my $class = shift;
+  my $catalog = shift;
+
+  my @output;
+
+# First, the header. We're only going to write the ID, RA, and Dec.
+  push @output, "Id\tra\tdec";
+  push @output, "--\t--\t---";
+
+# Now loop through the stars and push their respective IDs, RAs, and
+# Decs onto the output array.
+  foreach my $star ( $catalog->stars ) {
+    my $output_string = "";
+
+    $output_string .= $star->id;
+    $output_string .= "\t";
+    $output_string .= $star->coords->ra->string;
+    $output_string .= "\t";
+    $output_string .= $star->coords->dec->string;
+
+    push @output, $output_string;
+
+  }
+
+# And return!
+  return \@output;
 }
 
 =item B<_parse_line>
@@ -555,7 +568,7 @@ sub _parse_line {
 
 =head1 REVISION
 
- $Id: TST.pm,v 1.13 2005/06/15 19:03:42 aa Exp $
+ $Id: TST.pm,v 1.14 2006/03/16 00:15:13 cavanagh Exp $
 
 =head1 FORMAT
 
