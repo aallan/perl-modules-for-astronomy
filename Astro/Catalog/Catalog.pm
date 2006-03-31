@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.56 2005/11/15 22:26:17 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.57 2006/03/31 00:06:18 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.56 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.57 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.56 2005/11/15 22:26:17 cavanagh Exp $
+$Id: Catalog.pm,v 1.57 2006/03/31 00:06:18 cavanagh Exp $
 
 =head1 METHODS
 
@@ -107,17 +107,18 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { ALLSTARS  => [],
-		      CURRENT   => undef, # undefined until we copy
-		      ERRSTR => '',
-		      ORIGIN => 'UNKNOWN',
-		      COORDS => undef,
+                      CURRENT   => undef, # undefined until we copy
+                      ERRSTR => '',
+                      ORIGIN => 'UNKNOWN',
+                      COORDS => undef,
                       RADIUS => undef,
-		      REFPOS => undef,
-		      REFTIME => undef,
+                      REFPOS => undef,
+                      REFTIME => undef,
                       FIELDDATE => undef,
-		      AUTO_OBSERVE => 0,
+                      AUTO_OBSERVE => 0,
                       PREFERRED_MAG_TYPE => undef,
-		    }, $class;
+                      IDS => {},
+                    }, $class;
 
   # If we have arguments configure the object
   # Note that configuration can result in a new object
@@ -349,6 +350,13 @@ sub pushstar {
   # push onto the original array
   push( @$allref, @_ );
 
+  # Update the IDs hash.
+  foreach my $star ( @_ ) {
+    if( defined( $star->id ) ) {
+      $self->{IDS}->{$star->id}++;
+    }
+  }
+
   # And push onto the copy ONLY IF WE HAVE A COPY
   # We do not want to force a copy unnecsarily by using scalar context
   if ($self->_have_copy) {
@@ -375,8 +383,13 @@ object.
 sub popstar {
   my $self = shift;
 
+  my $star = pop( @{$self->stars} );
+  if( defined( $star->id ) ) {
+    $self->{IDS}->{$star->id}--;
+  }
+
   # pop the star out of the stack
-  return pop( @{ $self->stars } );
+  return $star;
 }
 
 =item B<popstarbyid>
@@ -406,25 +419,34 @@ sub popstarbyid {
 
   my $id = shift;
 
-  # Do not force copy of allstars array yet
+  # Return if we know that that star doesn't exist.
+  return () if ( ! $self->{IDS}->{$id} );
+
   my @matched;
   my @unmatched;
-  foreach my $item ( $self->stars ) {
+  my $matched;
+  my @stars = $self->stars;
+  while ( @stars ) {
+    my $item = pop @stars;
     if( defined( $item ) && defined( $item->id ) ) {
       if( $item->id eq $id ) {
         push @matched, $item;
+        $self->{IDS}->{$id}--;
+        last if ( 0 == $self->{IDS}->{$id} );
       } else {
         push @unmatched, $item;
       }
+    } else {
+      push @unmatched, $item;
     }
   }
+
+  push @unmatched, @stars;
   @{ $self->stars } = @unmatched;
 
   return ( wantarray ? @matched : \@matched );
 
 }
-
-
 
 =item B<allstars>
 
@@ -980,6 +1002,46 @@ sub force_ref_time {
   }
 }
 
+=item B<calc_xy>
+
+Calculate the X and Y positions for every item in the catalog, if they
+have an RA and Dec.
+
+  $catalog->calc_xy( $frameset );
+
+The supplied argument must be a Starlink::AST::FrameSet.
+
+=cut
+
+sub calc_xy {
+  my $self = shift;
+  my $frameset = shift;
+
+  if( ! UNIVERSAL::isa( $frameset, "Starlink::AST::FrameSet" ) ) {
+    croak "Argument to calc_xy() must be a Starlink::AST::FrameSet object";
+  }
+
+  # Loop through the items, obtaining the RA and Dec in radians for
+  # each item.
+  my @ras;
+  my @decs;
+  foreach my $item ( $self->stars ) {
+    my ( $ra, $dec ) = $item->coords->radec();
+    push @ras, $ra->radians;
+    push @decs, $dec->radians;
+  }
+
+  # Do the calculations;
+  my( $xref, $yref ) = $frameset->Tran2( \@ras, \@decs, 0 );
+
+  # Loop through the items, pushing in the X and Y values.
+  my $i = 0;
+  foreach my $item ( $self->stars ) {
+    $item->x( $xref->[$i] );
+    $item->y( $yref->[$i] );
+    $i++;
+  }
+}
 
 =back
 
@@ -1435,6 +1497,7 @@ sub _load_io_plugin {
   $format = 'SExtractor' if $format eq 'Sextractor';
   $format = 'FINDOFF' if $format eq 'Findoff';
   $format = 'FITSTable' if $format eq 'Fitstable';
+  $format = 'RITMatch' if $format eq 'Ritmatch';
 
   my $class = "Astro::Catalog::IO::" . $format;
 
