@@ -1,3 +1,17 @@
+2006-03-30  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* Catalog.pm: Introduce IDS hash internal to Catalog object to
+	speed up popstarbyid(). Add calc_xy() method to speed up
+	calculation of x and y positions for all objects in a catalogue.
+
+	* IO/RITMatch.pm, t/2_ritmatch.t: Add support for the RIT Match
+	application.
+
+	* t/2_tst.t: Change number of tests from 8 to 10. Fix output when
+	checking ID, RA, and Dec.
+
+	* t/4_mpc.t: Update list of asteroids to avoid spurious fails.
+
 2006-03-15  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/SExtractor.pm: Support write_catalog() method for
