@@ -23,6 +23,7 @@ IO/GaiaPick.pm
 IO/JCMT.pm
 IO/Makefile.PL
 IO/README
+IO/RITMatch.pm
 IO/SExtractor.pm
 IO/STL.pm
 IO/Simple.pm
@@ -53,6 +54,7 @@ t/2_fitstable.t
 t/2_gaiapick.t
 t/2_jcmt.t
 t/2_jcmt_loose.t
+t/2_ritmatch.t
 t/2_sextractor.t
 t/2_simple.t
 t/2_stl.t
