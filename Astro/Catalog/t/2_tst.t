@@ -3,7 +3,7 @@
 # Test TST format read and write
 
 # Astro::Catalog test harness
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 # strict
 use strict;
@@ -43,9 +43,9 @@ my $newid = $newstar->id;
 my $newra = $newstar->ra;
 my $newdec = $newstar->dec;
 
-is( $newid,  $star->id,  "SExtractor written catalogue ID" );
-is( $newra,  $star->ra,  "SExtractor written catalogue RA" );
-is( $newdec, $star->dec, "SExtractor written catalogue Dec" );
+is( $newid,  $star->id,  "TST written catalogue ID" );
+is( $newra,  $star->ra,  "TST written catalogue RA" );
+is( $newdec, $star->dec, "TST written catalogue Dec" );
 
 
 exit;
