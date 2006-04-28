@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.11 2006/01/17 23:43:40 cavanagh Exp $
+#     $Id: Item.pm,v 1.12 2006/04/28 03:01:51 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -89,7 +89,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +237,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.11 2006/01/17 23:43:40 cavanagh Exp $
+$Id: Item.pm,v 1.12 2006/04/28 03:01:51 cavanagh Exp $
 
 =head1 METHODS
 
@@ -1091,7 +1091,7 @@ sub x {
     # properly between RA/Dec and X/Y, but we can only do this if
     # we load Starlink::AST. So that we don't have a major dependency
     # on that module, load it here at runtime.
-    eval( "require Starlink::AST" );
+    eval{ require Starlink::AST; };
     if( $@ ) {
       croak "Attempted to convert from RA/Dec to X position and cannot load Starlink::AST. Error: $@";
     }
@@ -1133,7 +1133,7 @@ sub y {
     # properly between RA/Dec and X/Y, but we can only do this if
     # we load Starlink::AST. So that we don't have a major dependency
     # on that module, load it here at runtime.
-    eval( "require Starlink::AST" );
+    eval{ require Starlink::AST; };
     if( $@ ) {
       croak "Attempted to convert from RA/Dec to Y position and cannot load Starlink::AST. Error: $@";
     }
