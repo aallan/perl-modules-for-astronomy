@@ -1,3 +1,10 @@
+2006-05-02  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/FITSTable.pm: Add support for obsid.
+
+	* Catalog.pm, IO/XY.pm, t/2_xy.pm: Add support for simple x/y
+	position lists.
+	
 2006-03-30  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* Catalog.pm: Introduce IDS hash internal to Catalog object to
