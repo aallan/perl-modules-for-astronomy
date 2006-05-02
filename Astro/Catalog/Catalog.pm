@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.57 2006/03/31 00:06:18 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.58 2006/05/02 21:41:39 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.57 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.58 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.57 2006/03/31 00:06:18 cavanagh Exp $
+$Id: Catalog.pm,v 1.58 2006/05/02 21:41:39 cavanagh Exp $
 
 =head1 METHODS
 
@@ -1498,6 +1498,7 @@ sub _load_io_plugin {
   $format = 'FINDOFF' if $format eq 'Findoff';
   $format = 'FITSTable' if $format eq 'Fitstable';
   $format = 'RITMatch' if $format eq 'Ritmatch';
+  $format = 'XY' if $format eq 'Xy';
 
   my $class = "Astro::Catalog::IO::" . $format;
 
