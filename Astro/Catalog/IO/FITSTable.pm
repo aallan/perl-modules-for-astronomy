@@ -118,6 +118,13 @@ sub _read_catalog {
   }
   my $filename = $args{'filename'};
 
+  my $obsid;
+  if( defined( $args{'obsid'} ) ) {
+    $obsid = $args{'obsid'};
+  } else {
+    $obsid = [];
+  }
+
   # A lookup table for column name mappings.
   my %column_name = ( 'ID' => 'No.',
                       'X' => 'X_coordinate',
@@ -584,21 +591,21 @@ sub _read_catalog {
 
         # Set up the Astro::Flux objects.
         my $iso_flux_obj = new Astro::Flux( $iso_flux_value, 'isophotal_flux', $waveband,
-                                            datetime => $datetime );
+                                            datetime => $datetime, obsid => $obsid );
         my $total_flux_obj = new Astro::Flux( $total_flux_value, 'total_flux', $waveband,
-                                              datetime => $datetime );
+                                              datetime => $datetime, obsid => $obsid );
         my $core_flux_obj = new Astro::Flux( $core_flux_value, 'core_flux', $waveband,
-                                             datetime => $datetime );
+                                             datetime => $datetime, obsid => $obsid );
         my $core1_flux_obj = new Astro::Flux( $core1_flux_value, 'core1_flux', $waveband,
-                                              datetime => $datetime );
+                                              datetime => $datetime, obsid => $obsid );
         my $core2_flux_obj = new Astro::Flux( $core2_flux_value, 'core2_flux', $waveband,
-                                              datetime => $datetime );
+                                              datetime => $datetime, obsid => $obsid );
         my $core3_flux_obj = new Astro::Flux( $core3_flux_value, 'core3_flux', $waveband,
-                                              datetime => $datetime );
+                                              datetime => $datetime, obsid => $obsid );
         my $core4_flux_obj = new Astro::Flux( $core4_flux_value, 'core4_flux', $waveband,
-                                              datetime => $datetime );
+                                              datetime => $datetime, obsid => $obsid );
         my $core5_flux_obj = new Astro::Flux( $core5_flux_value, 'core5_flux', $waveband,
-                                              datetime => $datetime );
+                                              datetime => $datetime, obsid => $obsid );
 
         # And set up the Astro::Catalog::Item::Morphology object.
         my $morphology = new Astro::Catalog::Item::Morphology( ellipticity => $ell_value,
@@ -664,7 +671,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: FITSTable.pm,v 1.8 2005/06/30 23:51:31 cavanagh Exp $
+  $Id: FITSTable.pm,v 1.9 2006/05/02 21:39:10 cavanagh Exp $
 
 =head1 SEE ALSO
 
