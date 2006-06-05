@@ -134,7 +134,7 @@ sub _write_catalog {
     ( my $newid = $star->id ) =~ s/[^\d]//g;
 
     # Start off the output string.
-    $output_line = join( ' ', $newid, $star->x, $star->y, $newid );
+    $output_line = join( ' ', int($newid), $star->x, $star->y, $newid );
 
     # And push this string to the output array.
     push @output, $output_line;
@@ -149,7 +149,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: FINDOFF.pm,v 1.3 2005/03/31 01:24:53 cavanagh Exp $
+ $Id: FINDOFF.pm,v 1.4 2006/06/05 21:00:32 cavanagh Exp $
 
 =head1 SEE ALSO
 
