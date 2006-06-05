@@ -111,6 +111,8 @@ parameters:
   A_WORLD             morphology major_axis_world
   ERRA_WORLD          morphology major_axis_world
   ISOAREA_IMAGE       morphology area
+  FWHM_IMAGE          morphology fwhm_pixel
+  FWHM_WORLD          morphology fwhm_world
   FLAGS               quality
 
 The pixel coordinate values are special cases. As there are only two
@@ -222,6 +224,8 @@ sub _read_catalog {
   my $major_world_column = -1;
   my $majorerr_world_column = -1;
   my $area_column = -1;
+  my $fwhm_pixel_column = -1;
+  my $fwhm_world_column = -1;
   my $flag_column = -1;
 
   # Loop through the lines.
@@ -416,11 +420,19 @@ sub _read_catalog {
 
       } elsif( $column[2] =~ /^ERRA_WORLD/ ) {
         $majorerr_world_column = $column[1] - 1;
-        print "ERR_AWORLD column is $majorerr_world_column\n" if $DEBUG;
+        print "ERRA_WORLD column is $majorerr_world_column\n" if $DEBUG;
 
       } elsif( $column[2] =~ /^ISOAREA_IMAGE/ ) {
         $area_column = $column[1] - 1;
         print "AREA column is $area_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FWHM_IMAGE/ ) {
+        $fwhm_pixel_column = $column[1] - 1;
+        print "FWHM_IMAGE column is $fwhm_pixel_column\n" if $DEBUG;
+
+      } elsif( $column[2] =~ /^FWHM_WORLD/ ) {
+        $fwhm_world_column = $column[1] - 1;
+        print "FWHM_WORLD column is $fwhm_world_column\n" if $DEBUG;
 
       } elsif( $column[2] =~ /^FLAGS/ ) {
         $flag_column = $column[1] - 1;
@@ -615,6 +627,8 @@ sub _read_catalog {
     my $minor_axis_pixel;
     my $major_axis_world;
     my $minor_axis_world;
+    my $fwhm_pixel;
+    my $fwhm_world;
     my $area;
     if( $ell_column != -1 ) {
       $ellipticity = new Number::Uncertainty( Value => $fields[$ell_column] );
@@ -670,6 +684,12 @@ sub _read_catalog {
     if( $area_column != -1 ) {
       $area = new Number::Uncertainty( Value => $fields[$area_column] );
     }
+    if( $fwhm_pixel_column != -1 ) {
+      $fwhm_pixel = new Number::Uncertainty( Value => $fields[$fwhm_pixel_column] );
+    }
+     if( $fwhm_world_column != -1 ) {
+      $fwhm_world = new Number::Uncertainty( Value => $fields[$fwhm_world_column] );
+    }
     my $morphology = new Astro::Catalog::Item::Morphology( ellipticity => $ellipticity,
                                                            position_angle_pixel => $position_angle_pixel,
                                                            position_angle_world => $position_angle_world,
@@ -678,6 +698,8 @@ sub _read_catalog {
                                                            major_axis_world => $major_axis_world,
                                                            minor_axis_world => $minor_axis_world,
                                                            area => $area,
+                                                           fwhm_pixel => $fwhm_pixel,
+                                                           fwhm_world => $fwhm_world,
                                                          );
     $star->morphology( $morphology );
 
@@ -793,7 +815,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
-  $Id: SExtractor.pm,v 1.18 2006/03/15 21:19:18 cavanagh Exp $
+  $Id: SExtractor.pm,v 1.19 2006/06/05 21:02:49 cavanagh Exp $
 
 =head1 FORMAT
 
