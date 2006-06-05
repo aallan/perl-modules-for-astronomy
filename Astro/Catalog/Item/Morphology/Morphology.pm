@@ -24,7 +24,7 @@ use Number::Uncertainty;
 
 use warnings::register;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 =head1 METHODS
 
@@ -221,6 +221,44 @@ sub area {
   return $self->{AREA};
 }
 
+=item B<fwhm_pixel>
+
+FWHM of the object in pixels.
+
+=cut
+
+sub fwhm_pixel {
+  my $self = shift;
+  if( @_ ) {
+    my $fwhm = shift;
+    if( defined( $fwhm ) &&
+        ! UNIVERSAL::isa( $fwhm, "Number::Uncertainty" ) ) {
+      $fwhm = new Number::Uncertainty( Value => $fwhm );
+    }
+    $self->{FWHM_PIXEL} = $fwhm;
+  }
+  return $self->{FWHM_PIXEL};
+}
+
+=item B<fwhm_world>
+
+FWHM of the object in arcseconds.
+
+=cut
+
+sub fwhm_world {
+  my $self = shift;
+  if( @_ ) {
+    my $fwhm = shift;
+    if( defined( $fwhm ) &&
+        ! UNIVERSAL::isa( $fwhm, "Number::Uncertainty" ) ) {
+      $fwhm = new Number::Uncertainty( Value => $fwhm );
+    }
+    $self->{FWHM_WORLD} = $fwhm;
+  }
+  return $self->{FWHM_WORLD};
+}
+
 =back
 
 =head1 PRIVATE METHODS
@@ -247,7 +285,7 @@ sub _configure {
 
 =head1 REVISION
 
- $Id: Morphology.pm,v 1.3 2005/10/25 01:22:29 cavanagh Exp $
+ $Id: Morphology.pm,v 1.4 2006/06/05 21:03:23 cavanagh Exp $
 
 =head1 COPYRIGHT
 
