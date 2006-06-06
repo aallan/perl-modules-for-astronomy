@@ -1,3 +1,13 @@
+2006-06-05  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+	* IO/FINDOFF.pm: FINDOFF input catalogue has to have integer-based
+	IDs, so int() the ID when writing the catalogue.
+
+	* IO/SExtractor.pm: Add support for FWHM values in catalogue.
+
+	* Item/Morphology/Morphology.pm: Add FWHM values to object through
+	fwhm_pixel and fwhm_world accessor methods.
+
 2006-05-02  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/FITSTable.pm: Add support for obsid.
