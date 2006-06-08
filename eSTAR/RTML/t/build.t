@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 24 };
+BEGIN { plan tests => 25 };
 
 # load modules
 use eSTAR::RTML;
@@ -33,13 +33,15 @@ my $message = new eSTAR::RTML::Build(
 my $status = $message->score_observation(
              Target => 'Test Target',
              RA     => '09 00 00',
-             Dec    => '+60 00 00');
+             Dec    => '+60 00 00',
+	     Priority => 2);
 
 # check some tag information
 ok( $message->port(), 2000 );
 ok( $message->id(), 'IA:aa@bofh.astro.ex.ac.uk:2000:0001' );
 ok( $message->ra(), '09 00 00' );
-ok( $message->dec(), '+60 00 00' );
+ok( $message->dec(), '+60 00 00');
+ok( $message->priority(), '2' );
 
 # dump out the request
 my $doc = $message->dump_rtml();

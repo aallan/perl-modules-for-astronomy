@@ -1,3 +1,10 @@
+2006-06-08  Alasdair Allan <aa@astro.ex.ac.uk>
+
+	 * Build.pm & Parse.pm: Added ability to change the priority attribute
+	   in the Schedule tag, can now specify any number. Defaults to 3.
+	   
+	 * t/build.t & t/parse.t: Changed to test this addition.
+	   
 2005-05-12  Alasdair Allan <aa@astro.ex.ac.uk>
 
          * Fixed modules to parse Declination with or without a plus sign

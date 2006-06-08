@@ -20,7 +20,7 @@ package eSTAR::RTML::Parse;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Parse.pm,v 1.23 2005/05/12 13:51:14 aa Exp $
+#     $Id: Parse.pm,v 1.24 2006/06/08 22:45:17 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -56,13 +56,13 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 
-'$Revision: 1.23 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.24 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Parse.pm,v 1.23 2005/05/12 13:51:14 aa Exp $
+$Id: Parse.pm,v 1.24 2006/06/08 22:45:17 aa Exp $
 
 =head1 METHODS
 
@@ -292,6 +292,18 @@ Return the type of observation we want to make the document
 sub targettype {
   my $self = shift;  
   return ${${$self->{OBSERVATION}}{Target}}{type};
+}
+
+=item B<priority>
+
+Return the prioriy of observation we want to make the document
+
+  $priority = $rtml->priority();
+
+=cut
+sub priority {
+  my $self = shift;  
+  return ${${$self->{OBSERVATION}}{Schedule}}{priority};
 }
 
 =item B<ra>

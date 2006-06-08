@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 24 };
+BEGIN { plan tests => 25 };
 
 # load modules
 use eSTAR::RTML;
@@ -75,6 +75,7 @@ my $accept_message = new eSTAR::RTML::Parse( RTML => $ers_accept );
 # check the parsed document
 ok( $accept_message->dtd(), '2.1' );
 ok( $accept_message->type(), 'confirmation' );
+ok( $accept_message->priority(), '3' );
 
 #print Dumper($accept_message);
 

@@ -20,7 +20,7 @@ package eSTAR::RTML::Build;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Build.pm,v 1.20 2005/05/12 17:00:13 aa Exp $
+#     $Id: Build.pm,v 1.21 2006/06/08 22:45:16 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -65,13 +65,13 @@ use Carp;
 use XML::Writer;
 use XML::Writer::String;
 
-'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: Build.pm,v 1.20 2005/05/12 17:00:13 aa Exp $
+$Id: Build.pm,v 1.21 2006/06/08 22:45:16 aa Exp $
 
 =head1 METHODS
 
@@ -137,7 +137,8 @@ Build a score document
                                           Interval      => $interval,
                                           Tolerance     => $tolerance,
                                           TimeConstraint => [ $start_date,
-                                                              $end_date ] );
+                                                              $end_date ],
+					  Priority      => $obs_priority );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -152,7 +153,7 @@ sub score_observation {
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
                 Snr Flux Filter GroupCount SeriesCount Interval Tolerance 
-                TimeConstraint / ) {
+                TimeConstraint Priority / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -282,8 +283,15 @@ sub score_observation {
            
            $self->{WRITER}->endTag( 'Filter' );
      $self->{WRITER}->endTag( 'Device' );                                    
-                        
-     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
+     
+     my $priority;
+     if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
+        $priority = ${$self->{OPTIONS}}{PRIORITY};
+     } else {
+        $priority = 3;
+     }
+     	     	               
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
@@ -380,7 +388,8 @@ Build a score response document
                                           Interval      => $interval,
                                           Tolerance     => $tolerance,
                                           TimeConstraint => [ $start_date,
-                                                              $end_date ]  );
+                                                              $end_date ],
+					  Priority      => $obs_priority   );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -395,7 +404,7 @@ sub score_response {
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
                     Snr Flux Score Time Filter GroupCount SeriesCount 
-                    Interval Tolerance TimeConstraint / ) {
+                    Interval Tolerance TimeConstraint Priority / ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -526,8 +535,16 @@ sub score_response {
            $self->{WRITER}->endTag( 'Filter' );
      $self->{WRITER}->endTag( 'Device' );    
         
-     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
-
+     
+     my $priority;
+     if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
+        $priority = ${$self->{OPTIONS}}{PRIORITY};
+     } else {
+        $priority = 3;
+     }
+     	     	               
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
+     
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
@@ -628,7 +645,8 @@ Build a request document
                                           Interval      => $interval,
                                           Tolerance     => $tolerance,
                                           TimeConstraint => [ $start_date,
-                                                              $end_date ]  );
+                                                              $end_date ],
+					  Priority      => $obs_priority   );
 
 Use "Exposure", or "Snr" and "Flux", but not both. );
 
@@ -643,7 +661,7 @@ sub request_observation {
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Score Time 
                 Exposure Snr Flux Filter GroupCount SeriesCount 
-                    Interval Tolerance TimeConstraint / ) {
+                    Interval Tolerance TimeConstraint Priority / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
@@ -772,8 +790,16 @@ sub request_observation {
            $self->{WRITER}->endTag( 'Filter' );
      $self->{WRITER}->endTag( 'Device' );    
         
-     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
-
+     
+     my $priority;
+     if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
+        $priority = ${$self->{OPTIONS}}{PRIORITY};
+     } else {
+        $priority = 3;
+     }
+     	     	               
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
+     
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
@@ -875,7 +901,8 @@ Build a confirm response document
                                           Interval      => $interval,
                                           Tolerance     => $tolerance,
                                           TimeConstraint => [ $start_date,
-                                                              $end_date ] );
+                                                              $end_date ],
+					  Priority      => $obs_priority  );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -890,7 +917,7 @@ sub confirm_response {
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
                     Snr Flux Score Time Filter GroupCount SeriesCount 
-                    Interval Tolerance TimeConstraint / ) {
+                    Interval Tolerance TimeConstraint Priority / ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -1021,8 +1048,16 @@ sub confirm_response {
            $self->{WRITER}->endTag( 'Filter' );
      $self->{WRITER}->endTag( 'Device' );    
         
-     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
-
+     
+     my $priority;
+     if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
+        $priority = ${$self->{OPTIONS}}{PRIORITY};
+     } else {
+        $priority = 3;
+     }
+     	     	               
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
+     
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
@@ -1127,7 +1162,8 @@ Build a update response document
                                           Interval      => $interval,
                                           Tolerance     => $tolerance,
                                           TimeConstraint => [ $start_date,
-                                                              $end_date ]  );
+                                                              $end_date ],
+					  Priority      => $obs_priority   );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -1143,7 +1179,7 @@ sub update_response {
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
                     Snr Flux Score Time Filter Catalogue Headers ImageURI
                      GroupCount SeriesCount Interval 
-                     Tolerance TimeConstraint / ) {
+                     Tolerance TimeConstraint Priority / ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -1274,8 +1310,16 @@ sub update_response {
            $self->{WRITER}->endTag( 'Filter' );
      $self->{WRITER}->endTag( 'Device' );    
         
-     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
-
+     
+     my $priority;
+     if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
+        $priority = ${$self->{OPTIONS}}{PRIORITY};
+     } else {
+        $priority = 3;
+     }
+     	     	               
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
+     
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
@@ -1402,7 +1446,8 @@ Build a complete response document
                                           Interval      => $interval,
                                           Tolerance     => $tolerance,
                                           TimeConstraint => [ $start_date,
-                                                              $end_date ]  );
+                                                              $end_date ],
+					  Priority      => $obs_priority   );
 
 Use "Exposure", or "Snr" and "Flux", but not both.
 
@@ -1418,7 +1463,7 @@ sub complete_response {
   for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
                     Snr Flux Score Time Filter Catalogue Headers ImageURI 
                     GroupCount SeriesCount Interval 
-                    Tolerance TimeConstraint / ) {
+                    Tolerance TimeConstraint Priority / ) {
   
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
@@ -1549,8 +1594,16 @@ sub complete_response {
            $self->{WRITER}->endTag( 'Filter' );
      $self->{WRITER}->endTag( 'Device' );    
         
-     $self->{WRITER}->startTag( 'Schedule', 'priority' => '3' );
-
+     
+     my $priority;
+     if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
+        $priority = ${$self->{OPTIONS}}{PRIORITY};
+     } else {
+        $priority = 3;
+     }
+     	     	               
+     $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
+     
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
@@ -2391,7 +2444,7 @@ sub  tolerance {
 }
 
 
-=item B<tolerance>
+=item B<time constraint>
 
 Gets or sets the time constraint, takes an array ref.
 
@@ -2415,6 +2468,22 @@ sub timeconstraint {
 }
 
 
+=item B<priority>
+
+Gets or sets the priority of the observations (monitor groups) to be taken
+
+=cut 
+
+sub  priority {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{PRIORITY} = shift;
+  }
+
+  return ${$self->{OPTIONS}}{PRIORITY};
+
+}
 
 # C O N F I G U R E -------------------------------------------------------
 
