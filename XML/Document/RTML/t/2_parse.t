@@ -4,7 +4,7 @@
 use strict;
 
 #load test
-use Test::More tests => 6;
+use Test::More tests => 11;
 
 # load modules
 BEGIN {
@@ -42,12 +42,23 @@ is( $type, "observation", "Comparing type of document via tha type() method" );
 my $version = $object->version( );
 is( $version, "2.2", "Comparing the RTML specification version used" );
 
+# group count
+my $groupcount = $object->group_count( );
+is( $groupcount, 3, "Group Count" );
 
+# series count
+my $seriescount = $object->series_count( );
+is( $seriescount, undef, "Series Count" );
 
+# priority
+my $priority = $object->priority( );
+is( $priority, 3, "Schedule priority" );
 
-# Dump the RTML document via the dump_tree() method
-#my $rtml = $object->dump_tree();
-#print Dumper($rtml);
+# exposure
+my $exposure_type = $object->exposure_type();
+is( $exposure_type, "time", "Exposure type" );
+my $exposure = $object->exposure_time();
+cmp_ok($exposure, '==', 30.0, "Exposure time" );
 
 # T I M E   A T   T H E   B A R ---------------------------------------------
 
