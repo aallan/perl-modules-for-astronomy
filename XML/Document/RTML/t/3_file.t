@@ -45,7 +45,7 @@ is( $rtml1->series_count(), 3, "<Observation><Schedule><SeriesConstraint><Count>
 # --------------
 
 # grab the test document
-my $rtml2 = new XML::Document::RTML( File => 't/rtml2.2/problem.xml' );
+my $rtml2 = new XML::Document::RTML( File => 't/rtml2.2/problem_1.xml' );
 
 # check the parsed document
 is( $rtml2->dtd(), '2.2', "Comparing the RTML specification version used" );
@@ -63,7 +63,7 @@ is( $rtml2->series_count(), 8, "<Observation><Schedule><SeriesConstraint><Count>
 # --------------
 
 # grab the test document
-my $rtml3 = new XML::Document::RTML( File => 't/rtml2.2/observe.xml' );
+my $rtml3 = new XML::Document::RTML( File => 't/rtml2.2/example_observe.xml' );
 
 # check the parsed document
 is( $rtml3->dtd(), '2.2', "Comparing the RTML specification version used" );
