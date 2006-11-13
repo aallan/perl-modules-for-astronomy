@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.2 2006/11/13 23:13:26 aa Exp $
+#     $Id: RTML.pm,v 1.3 2006/11/13 23:57:24 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -69,13 +69,13 @@ use Carp;
 use Data::Dumper;
 use Class::ISA;
 
-'$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.2 2006/11/13 23:13:26 aa Exp $
+$Id: RTML.pm,v 1.3 2006/11/13 23:57:24 aa Exp $
 
 =head1 METHODS
 
@@ -409,6 +409,14 @@ sub timeconstraint {
    time_constraint( @_ );
 }   
 
+sub start_time {
+   return $self->{DOCUMENT}->{Observation}->{Schedule}->{TimeConstraint}->{StartDateTime};
+}
+
+sub end_time{
+   return $self->{DOCUMENT}->{Observation}->{Schedule}->{TimeConstraint}->{EndDateTime};
+}
+   
 # G E N E R A L ------------------------------------------------------------
 
 =back
