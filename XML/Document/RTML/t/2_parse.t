@@ -60,6 +60,8 @@ is( $exposure_type, "time", "Exposure type" );
 my $exposure = $object->exposure_time();
 cmp_ok($exposure, '==', 30.0, "Exposure time" );
 
+print Dumper( $object );
+
 # T I M E   A T   T H E   B A R ---------------------------------------------
 
 exit;  

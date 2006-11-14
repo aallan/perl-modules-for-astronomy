@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.5 2006/11/14 12:45:35 aa Exp $
+#     $Id: RTML.pm,v 1.6 2006/11/14 17:27:55 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -67,15 +67,17 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 use Data::Dumper;
-use Class::ISA;
 
-'$Revision: 1.5 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+use Astro::FITS::Header;
+use Astro::VO::VOTable;
+
+'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.5 2006/11/14 12:45:35 aa Exp $
+$Id: RTML.pm,v 1.6 2006/11/14 17:27:55 aa Exp $
 
 =head1 METHODS
 
@@ -864,6 +866,29 @@ sub user_name {
   user( @_ );
 } 
 
+=item B<institution>
+
+Return, or set, the institutional affliation of the observer
+
+  my $string = $object->institution();
+  $object->institution( $string );
+
+e.g. University of Exeter
+  
+=cut
+
+sub institution {
+  my $self = shift;
+  if (@_) {
+     $self->{DOCUMENT}->{Contact}->{Institution} = shift;
+  }  
+  return $self->{DOCUMENT}->{Contact}->{Institution};
+}
+
+sub institution_affiliation {
+  institution( @_ );
+}
+
 
 =item B<project>
 
@@ -884,8 +909,153 @@ sub project {
   return $self->{DOCUMENT}->{Project};
 }
 
+ 
+# S C O R I N G  ##############################################################
+
+=back
+
+=head2 Scoring Methods
+
+=over 4
+
+=item B<score>
+
+Sets (or returns) the target score
+
+   my $score = $object->score();
+   $object->score( $score );
+
+the score will be between 0.0 and 1.0
+
+=cut
+
+sub score {
+  my $self = shift;
+
+  if (@_) {
+     $self->{DOCUMENT}->{Score} = shift;
+  }
+
+  # return the current target score
+  return $self->{DOCUMENT}->{Score};
+}
+
+  
+=item B<completion_time>
+
+Sets (or returns) the target completion time
+
+   my $time = $object->completion_time();
+   $object->completion_time( $time );
+
+the completion time should be of the format YYYY-MM-DDTHH:MM:SS
+
+=cut
+
+sub completion_time {
+  my $self = shift;
+
+  if (@_) {
+    $self->{DOCUMENT}->{CompletionTime} = shift;
+  }
+
+  # return the current target score
+  return $self->{DOCUMENT}->{CompletionTime};
+} 
+
+sub completiontime {
+   completion_time( @_ );
+}
+
+sub time {
+   completion_time( @_ );
+}
 
  
+# D A T A  ################################################################
+
+=back
+
+=head2 Data Methods
+
+=over 4
+
+=item B<data>
+
+Sets (or returns) the data associated with the observation
+
+   my @data = $object->data( );
+   $object->data( @data );
+
+Takes an array of hashes where,
+
+   @data = [ { Catalogue => ' ', Header => ' ', URL => ' ' },
+             { Catalogue => ' ', Header => ' ', URL => ' ' },
+	           .
+	           .
+	           .
+             { Catalogue => ' ', Header => ' ', URL => ' ' } ];
+
+and the value of the Catalogue hash entry is a URL pointing to a VOTavle, 
+the Header hash entry is a FITS header block and the URL is either points 
+to a FITS file, or other associated data product. You can I<not> append
+data to an existing memory structure, any data passed via this routine 
+will overwrite any existing data structure in memory.
+
+The routine returns a similar array when queried. This array will be 
+populated either by calling C<build( )>, or through parsing a document.
+
+=cut
+
+sub data {
+  my $self = shift;
+
+  if (@_) {
+     my @array = @_;
+     $self->{DOCUMENT}->{Observation}->{ImageData} = [];
+     foreach my $i ( 0 ... $#array ) {
+        my %hash = %{$array[$i]};
+
+	# Images
+	if ( defined $hash{URL} ) {
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{content} = $hash{URL};
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{delivery} = "url";
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{type} = "FITS16";
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{reduced} = "true";
+	}
+	   
+	# Catalogues
+        if( defined $hash{Catalogue} ) {
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{ObjectList}->{content} = $hash{Catalogue};
+	   if( $hash{Catalogue} =~ "http" && $hash{Catalogue} =~ "votable" ) {
+	      $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{ObjectList}->{type} = "votable-url";
+	   } else {
+	      $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{ObjectList}->{type} = "unknown";
+	   }   
+        }
+	
+	# FITS Headers
+        if( defined $hash{Catalogue} ) {
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{FITSHeader}->{content} = $hash{Header};
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{FITSHeader}->{type} = "all";
+        }
+		
+     } # end of foreach loop
+  } # end of if ( @_ ) block
+
+  
+}
+
+sub headers {
+}
+sub imageuri {
+}
+sub catalogue {
+}
+
+
+
+    
 # G E N E R A L ------------------------------------------------------------
 
 =back
@@ -902,7 +1072,7 @@ Dumps the contents of the RTML buffer in memory to a scalar,
    $object->build( %hash );
    my $document = $object->dump_buffer();
 
-If build() has not been called this function will return an undef.
+If C<build( )> has not been called this function will return an undef.
 
 =cut
 
@@ -932,7 +1102,7 @@ Returns a refence to the parsed RTML document hash currently held in memory,
    my $hash_reference = $object->dump_tree();
 
 should return an undefined value if that tree is empty. This error will occur 
-if we haven't called build() to create a document, or populated the tree using 
+if we haven't called C<build( )> to create a document, or populated the tree using 
 the object creator by calling the XML or File methods to read in a document.
 
 =cut

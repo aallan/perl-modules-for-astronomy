@@ -6,6 +6,7 @@ ChangeLog
 RTML.pm
 t/1_compile.t
 t/2_build.t
+t/2_data.t
 t/2_parse.t
 t/3_file.t
 t/rtml2.2/example_confirmation.xml
