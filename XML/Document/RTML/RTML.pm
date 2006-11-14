@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.6 2006/11/14 17:27:55 aa Exp $
+#     $Id: RTML.pm,v 1.7 2006/11/14 17:48:39 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -71,13 +71,13 @@ use Data::Dumper;
 use Astro::FITS::Header;
 use Astro::VO::VOTable;
 
-'$Revision: 1.6 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.6 2006/11/14 17:27:55 aa Exp $
+$Id: RTML.pm,v 1.7 2006/11/14 17:48:39 aa Exp $
 
 =head1 METHODS
 
@@ -1010,6 +1010,7 @@ populated either by calling C<build( )>, or through parsing a document.
 sub data {
   my $self = shift;
 
+  #  TAKING DATA INTO THE MESSAGE
   if (@_) {
      my @array = @_;
      $self->{DOCUMENT}->{Observation}->{ImageData} = [];
@@ -1043,7 +1044,17 @@ sub data {
      } # end of foreach loop
   } # end of if ( @_ ) block
 
-  
+  # PUSHING DATA OUT OF THE MESSAGE
+  my @output;
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $header = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{FITSHeader}->{content};
+    my $url = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{content};
+    my $catalogue = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{ObjectList}->{content};
+    $output[$j] = ( { Catalogue => $catalogue,
+                      URL => $url,
+		      Header => $header } );
+  }
+  return @output;
 }
 
 sub headers {

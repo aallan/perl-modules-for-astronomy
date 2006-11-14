@@ -4,7 +4,7 @@
 use strict;
 
 #load test
-use Test::More tests => 410;
+use Test::More tests => 416;
 
 # load modules
 BEGIN {
@@ -222,6 +222,16 @@ foreach my $i  ( 0 ... $#output ) {
   is( $buffer[$i], $output[$i], "Comparing line $i of $#output" );
 }
 
+my @pulled = $object->data();
+#print Dumper ( @pulled );
+
+foreach my $j ( 0 ... $#pulled ) {
+  my %array_hash = %{$array[$j]};
+  my %pulled_hash = %{$pulled[$j]};
+  cmp_ok( $array_hash{Catalogue}, "eq", $pulled_hash{Catalogue}, "Comparing \%hash{Catalogue}" );
+  cmp_ok( $array_hash{URL}, "eq", $pulled_hash{URL}, "Comparing \%hash{URL}" );
+  cmp_ok( $array_hash{Header}, "eq", $pulled_hash{Header}, "Comparing \%hash{Header}" );
+}
  
 # T I M E   A T   T H E   B A R ---------------------------------------------
 
