@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.7 2006/11/14 17:48:39 aa Exp $
+#     $Id: RTML.pm,v 1.8 2006/11/14 18:19:59 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -71,13 +71,13 @@ use Data::Dumper;
 use Astro::FITS::Header;
 use Astro::VO::VOTable;
 
-'$Revision: 1.7 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.8 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.7 2006/11/14 17:48:39 aa Exp $
+$Id: RTML.pm,v 1.8 2006/11/14 18:19:59 aa Exp $
 
 =head1 METHODS
 
@@ -1058,10 +1058,36 @@ sub data {
 }
 
 sub headers {
+  my $self = shift;
+  
+  my @output;
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $header = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{FITSHeader}->{content};
+    $output[$j] = $header;
+  }
+  return @output;
 }
-sub imageuri {
+
+sub images {
+  my $self = shift;
+  
+  my @output;
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $url = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{content};
+    $output[$j] = $url;
+  }
+  return @output;
 }
-sub catalogue {
+
+sub catalogues {
+  my $self = shift;
+  
+  my @output;
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $catalogue = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{ObjectList}->{content};
+    $output[$j] = $catalogue;
+  }
+  return @output;
 }
 
 
