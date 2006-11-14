@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.3 2006/11/13 23:57:24 aa Exp $
+#     $Id: RTML.pm,v 1.4 2006/11/14 12:30:39 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -69,13 +69,13 @@ use Carp;
 use Data::Dumper;
 use Class::ISA;
 
-'$Revision: 1.3 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.4 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.3 2006/11/13 23:57:24 aa Exp $
+$Id: RTML.pm,v 1.4 2006/11/14 12:30:39 aa Exp $
 
 =head1 METHODS
 
@@ -151,8 +151,8 @@ sub build {
 
 These methods can be used to set various parameters, and are called during 
 the build() of a document by that method if required. They will only return
-values for parameters after a document has been built using build() or parsed
-on creation of the object itself.
+values for parameters after a document has been built using build() or if a
+document has been parsed during the creation of the object.
 
 =over 4
 
@@ -205,6 +205,12 @@ sub dtd {
 
 # S C H E D U L E #########################################################
 
+=back
+
+=head2 Scheduling Methods
+
+=over 4
+
 =item B<group_count>
 
 Return, or set, the group count of the observation
@@ -224,68 +230,6 @@ sub group_count {
 
 sub groupcount {
   group_count( @_ );
-}  
-
-
-=item B<series_count>
-
-Return, or set, the series count of the observation
-
-  my $num = $object->series_count();
-  $object->series_count( $num );
-  
-=cut
-
-sub series_count {
-  my $self = shift;
-  if (@_) {
-     ${$self->{OPTIONS}}{SERIESCOUNT} = shift;
-  }  
-  return $self->{DOCUMENT}->{Observation}->{Schedule}->{SeriesConstraint}->{Count};
-}
-
-sub seriescount {
-  series_count( @_ );
-}  
-
-=item B<priority>
-
-Return, or set, the priority of the observation
-
-  my $num = $object->priority();
-  $object->priority( $num );
- 
-Schedule (RTML) priority     Phase II Priority  Phase II GUI
-   N/A                       5                  Urgent
-   0                         4                  (default) Normal
-   1                         3                  High
-   2                         2                  Medium
-   3                         1                  Normal
-   default(other)            1                  Normal
-   N/A                       0                  Normal
-
-where: "Schedule (RTML) priority" is the number specified in the RTML:
-<Schedule priority="n">, "Phase II Priority" is the number stored in the 
-Phase II database and "Phase II GUI" is what is displayed in the Phase II GUI.
-
-Note:
-The Phase II priority 4 can be specified by the TEA but cannot be specified 
-by the Phase II GUI (and displays as the default "Normal" in the GUI). The 
-Phase II priority 5 I<cannot> be specified by the TEA but can be specified by 
-the Phase II GUI as Urgent.
-
-=cut
-
-sub priority {
-  my $self = shift;
-  if (@_) {
-     ${$self->{OPTIONS}}{PRIORITY} = shift;
-  }  
-  return $self->{DOCUMENT}->{Observation}->{Schedule}->{priority};
-}
-
-sub schedule_priority {
-  priority( @_ );
 }  
 
 =item B<exposure_time>
@@ -370,6 +314,107 @@ sub exposuretype {
   exposure_type( @_ );
 }  
 
+=item B<series_count>
+
+Return, or set, the series count of the observation
+
+  my $num = $object->series_count();
+  $object->series_count( $num );
+  
+=cut
+
+sub series_count {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{SERIESCOUNT} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Schedule}->{SeriesConstraint}->{Count};
+}
+
+sub seriescount {
+  series_count( @_ );
+}  
+
+=item B<interval>
+
+Return, or set, the interval between a series of observations blocks
+
+  my $num = $object->interval();
+  $object->interval( $num );
+  
+=cut
+
+sub interval {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{INTERVAL} = shift;
+     unless ( ${$self->{OPTIONS}}{INTERVAL} =~ "PT" ) {
+       ${$self->{OPTIONS}}{INTERVAL} = "PT" . ${$self->{OPTIONS}}{INTERVAL};
+     }   
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Schedule}->{SeriesConstraint}->{Interval};
+}
+
+=item B<tolerance>
+
+Return, or set, the tolerance between a series of observations blocks
+
+  my $num = $object->tolerance();
+  $object->tolerance( $num );
+  
+=cut
+
+sub tolerance {
+  my $self = shift;
+  if (@_) {
+    ${$self->{OPTIONS}}{TOLERANCE} = shift;
+    unless ( ${$self->{OPTIONS}}{TOLERANCE} =~ "PT" ) {
+       ${$self->{OPTIONS}}{TOLERANCE} = "PT" . ${$self->{OPTIONS}}{TOLERANCE};
+    }
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Schedule}->{SeriesConstraint}->{Tolerance};
+}
+
+
+=item B<priority>
+
+Return, or set, the priority of the observation
+
+  my $num = $object->priority();
+  $object->priority( $num );
+ 
+Schedule (RTML) priority     Phase II Priority  Phase II GUI
+   N/A                       5                  Urgent
+   0                         4                  (default) Normal
+   1                         3                  High
+   2                         2                  Medium
+   3                         1                  Normal
+   default(other)            1                  Normal
+   N/A                       0                  Normal
+
+where: "Schedule (RTML) priority" is the number specified in the RTML:
+<Schedule priority="n">, "Phase II Priority" is the number stored in the 
+Phase II database and "Phase II GUI" is what is displayed in the Phase II GUI.
+
+Note:
+The Phase II priority 4 can be specified by the TEA but cannot be specified 
+by the Phase II GUI (and displays as the default "Normal" in the GUI). The 
+Phase II priority 5 I<cannot> be specified by the TEA but can be specified by 
+the Phase II GUI as Urgent.
+
+=cut
+
+sub priority {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{PRIORITY} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Schedule}->{priority};
+}
+
+sub schedule_priority {
+  priority( @_ );
+}  
 
 =item B<time_constraint>
 
@@ -410,13 +455,441 @@ sub timeconstraint {
 }   
 
 sub start_time {
+   my $self = shift;
    return $self->{DOCUMENT}->{Observation}->{Schedule}->{TimeConstraint}->{StartDateTime};
 }
 
 sub end_time{
+   my $self = shift;
    return $self->{DOCUMENT}->{Observation}->{Schedule}->{TimeConstraint}->{EndDateTime};
 }
+
+# D E V I C E ##############################################################
+
+=back
+
+=head2 Device Methods
+
+=over 4
+
+=item B<device_type>
+
+Return, or set, the device type for the observation
+
+  my $string = $object->device_type();
+  $object->device_type( $string );
+  
+=cut
+
+sub device_type {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{DEVICETYPE} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Device}->{type};
+}
+
+sub devicetype {
+  device_type( @_ );
+}  
+
+sub device {
+  device( @_ );
+}
+
+=item B<filter_type>
+
+Return, or set, the filter type for the observation
+
+  my $string = $object->filter_type();
+  $object->filter_type( $string );
+  
+=cut
+
+sub filter_type {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{FILTER} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Device}->{Filter}->{FilterType};
+}
+
+sub filtertype {
+  filter_type( @_ );
+}  
+
+sub filter {
+  filter( @_ );
+} 
+ 
+# T A R G E T ##############################################################
+
+=back
+
+=head2 Target Methods
+
+=over 4
+
+=item B<target_type>
+
+Return, or set, the type of target for the observation
+
+  my $string = $object->target_type();
+  $object->target_type( $string );
+
+there are two types of valid target type; "normal" or "toop". A normal 
+observation is placed into the queue
+  
+=cut
+
+sub target_type {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{TARGETTYPE} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Target}->{type};
+}
+
+sub targettype {
+  target_type( @_ );
+}  
+
+
+=item B<target_ident>
+
+Return, or set, the type identifier of target for the observation
+
+  my $string = $object->target_ident();
+  $object->target_ident( $string );
+
+The target identity is used by the eSTAR system to choose post-observation
+processing blocks, e.g.
+
+  <Target type="normal" ident="ExoPlanetMonitor">
+  
+signifies a normal queued observation which is part of the exo-planet
+monitoring programme on Robonet-1.0.
+
+=cut
+
+sub target_ident {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{TARGETIDENT} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Target}->{ident};
+}
+
+sub targetident {
+  target_ident( @_ );
+}  
+
+sub identity {
+  target_ident( @_ );
+}  
+
+=item B<target_name>
+
+Return, or set, the target name for the observation
+
+  my $string = $object->target_name();
+  $object->target_name( $string );
+
+=cut
+
+sub target_name {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{TARGET} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Target}->{TARGETNAME};
+}
+
+sub targetname {
+  target_name( @_ );
+}  
+
+sub target {
+  target_name( @_ );
+}  
+
+
+=item B<ra>
+
+Sets (or returns) the target RA
+
+   my $ra = $object->ra();
+   $object->ra( '12 35 65.0' );
+
+must be in the form HH MM SS.S.
+
+=cut
+
+sub ra {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{RA} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}->{Target}->{Coordinates}->{RightAscension}->{content};
+}  
+ 
+sub ra_format {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{RAFORMAT} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}->{Target}->{Coordinates}->{RightAscension}->{format};
+}
+ 
+sub ra_units {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{RAUNITS} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}->{Target}->{Coordinates}->{RightAscension}->{units};
+} 
+
+=item B<dec>
+
+Sets (or returns) the target DEC
+
+   my $dec = $object->dec();
+   $object->dec( '+60 35 32' );
+
+must be in the form SDD MM SS.S.
+
+=cut
+
+sub dec {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{DEC} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}->{Target}->{Coordinates}->{Declination}->{content};
+}  
+ 
+sub dec_format {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{DECFORMAT} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}->{Target}->{Coordinates}->{Declination}->{format};
+}
    
+sub dec_units {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{DECUNITS} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}->{Target}->{Coordinates}->{Declination}->{units};
+} 
+
+
+=item B<equinox>
+
+Sets (or returns) the equinox of the target co-ordinates
+
+   my $equnox = $object->equinox();
+   $object->equinox( 'B1950' );
+
+default is J2000, currently the telescope expects J2000.0 coordinates, no
+translation is currently carried out by the library before formatting the
+RTML message. It is therefore suggested that the user provides their 
+coordinates in J2000.0 as this is merely a placeholder routine.
+
+=cut
+
+sub equinox {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{EQUINOX} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}->{Target}->{Coordinates}->{Equinox};
+}
+
+ 
+# A G E N T ##############################################################
+
+=back
+
+=head2 Agent Methods
+
+=over 4
+
+=item B<host>
+
+Return, or set, the host to return asynchronous messages to regarding the
+status of the observation, see also C<port( )>.
+
+  my $string = $object->host();
+  $object->host( $string );
+
+defaults to the current machine's IP address
+  
+=cut
+
+sub host {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{HOST} = shift;
+  }  
+  return $self->{DOCUMENT}->{IntelligentAgent}->{host};
+}
+
+sub host_name {
+  host( @_ );
+}  
+
+sub agent_host {
+  host( @_ );
+}   
+
+=item B<port>
+
+Return, or set, the port to return asynchronous messages to regarding the
+status of the observation, see also C<host( )>.
+
+  my $string = $object->port();
+  $object->port( $string );
+
+defaults to 8000.
+  
+=cut
+
+sub port {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{PORT} = shift;
+  }  
+  return $self->{DOCUMENT}->{IntelligentAgent}->{port};
+}
+
+sub port_number {
+  port( @_ );
+} 
+
+sub portnumber {
+  port( @_ );
+} 
+
+=item B<id>
+
+Sets (or returns) the unique ID for the observation request
+
+   my $id = $object->id();
+   $object->id( 'IATEST0001:CT1:0013' );
+
+note that there is NO DEFAULT, a unique ID for the score/observing 
+request must be supplied, see the eSTAR Communications and the TEA 
+command set documents for further details.
+
+Note: This is I<not> the same thing as the I<target identity> for the
+observation.
+
+=cut
+
+sub id {
+  my $self = shift;
+
+  if (@_) {
+    ${$self->{OPTIONS}}{ID} = shift;
+  }
+
+  # return the current ID
+  return ${$self->{OPTIONS}}{IntelligentAgent}->{content};
+} 
+ 
+sub unique_id {
+  id( @_ );
+}   
+
+ 
+# C O N A C T ##############################################################
+
+=back
+
+=head2 Contact Methods
+
+=over 4
+
+=item B<name>
+
+Return, or set, the name of the observer
+
+  my $string = $object->name();
+  $object->name( $string );
+
+  
+=cut
+
+sub name {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{NAME} = shift;
+  }  
+  return $self->{DOCUMENT}->{Contact}->{Name};
+}
+
+sub observer_name {
+  name( @_ );
+}  
+
+sub real_name {
+  name( @_ );
+}   
+
+=item B<user>
+
+Return, or set, the user name of the observer
+
+  my $string = $object->user();
+  $object->user( $string );
+
+e.g. PATT/keith.horne
+  
+=cut
+
+sub user {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{USER} = shift;
+  }  
+  return $self->{DOCUMENT}->{Contact}->{User};
+}
+
+sub user_name {
+  user( @_ );
+} 
+
+
+=item B<project>
+
+Return, or set, the user name of the observer
+
+  my $string = $object->user();
+  $object->user( $string );
+
+e.g. PATT/keith.horne
+  
+=cut
+
+sub project {
+  my $self = shift;
+  if (@_) {
+     ${$self->{OPTIONS}}{PROJECT} = shift;
+  }  
+  return $self->{DOCUMENT}->{Project};
+}
+
+
+ 
 # G E N E R A L ------------------------------------------------------------
 
 =back
@@ -547,9 +1020,15 @@ sub configure {
   ${$self->{OPTIONS}}{PORT} = '8000';
   
   ${$self->{OPTIONS}}{EQUINOX} = 'J2000';
+  ${$self->{OPTIONS}}{RAFORMAT} = 'hh mm ss.ss';
+  ${$self->{OPTIONS}}{RAUNITS} = 'hms';
+  ${$self->{OPTIONS}}{DECFORMAT} = 'dd mm ss.ss';
+  ${$self->{OPTIONS}}{DECUNITS} = 'dms';
   
   ${$self->{OPTIONS}}{TARGETTYPE} = 'normal';
   ${$self->{OPTIONS}}{TARGETIDENT} = 'SingleExposure';
+  
+  ${$self->{OPTIONS}}{DEVICETYPE} = 'camera';
 
   # CONFIGURE FROM ARGUEMENTS
   # -------------------------
