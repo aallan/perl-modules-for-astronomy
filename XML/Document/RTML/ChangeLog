@@ -1,3 +1,8 @@
+2006-11-14 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+	* RTML.pm: Working parsing routine for RTML 2.2documents, needs
+	  more tests as test coverage is still fairly poor.
+	  
 2006-11-13 Alasdair Allan <aa@astro.ex.ac.uk> 
 
         * Original version.
