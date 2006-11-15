@@ -1,6 +1,12 @@
+2006-11-15 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+	* RTML.pm: Working build, able to parse a valid document and 
+	  replicate this using the build() function. Needs more test
+	  coverage.
+	  
 2006-11-14 Alasdair Allan <aa@astro.ex.ac.uk> 
 
-	* RTML.pm: Working parsing routine for RTML 2.2documents, needs
+	* RTML.pm: Working parsing routine for RTML 2.2 documents, needs
 	  more tests as test coverage is still fairly poor.
 	  
 2006-11-13 Alasdair Allan <aa@astro.ex.ac.uk> 

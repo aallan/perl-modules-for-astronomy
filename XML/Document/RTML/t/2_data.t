@@ -644,7 +644,7 @@ SEEING  =         9.990000E+02 / [Dummy] Unable to calculate                    
                                             ]
                            },
           'IntelligentAgent' => {
-                                  'port' => '8000',
+                                  'port' => 8000,
                                   'host' => '127.0.0.1'
                                 }
         };

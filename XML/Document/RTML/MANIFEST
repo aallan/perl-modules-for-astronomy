@@ -9,6 +9,7 @@ t/2_build.t
 t/2_data.t
 t/2_parse.t
 t/3_file.t
+t/4_replicate.t
 t/rtml2.2/example_confirmation.xml
 t/rtml2.2/example_request.xml
 t/rtml2.2/example_score.xml
