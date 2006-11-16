@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test::More;
-BEGIN { plan tests => 206 };
+BEGIN { plan tests => 426 };
 
 # load modules
 BEGIN {
@@ -347,5 +347,358 @@ my @images3 = $rtml3->images();
 is ( $#images3, -1, "Number of images" );
 my @catalog3 = $rtml3->catalogues();
 is ( $#catalog3, -1, "Number of catalogues" );
+
+# grab test document 4
+# --------------------
+print "Testing document t/rtml2.2/example_confirmation.xml\n";
+my $rtml4 = new XML::Document::RTML( File => 't/rtml2.2/example_confirmation.xml' );
+
+# check the parsed document
+is( $rtml4->dtd(), '2.2', "Comparing the RTML specification version used" );
+
+is( $rtml4->type(), 'confirmation', "Comparing type of document" );
+is( $rtml4->role(), 'confirmation', "Comparing type of document" );
+is( $rtml4->determine_type(), 'confirmation', "Comparing type of document" );
+
+is( $rtml4->version(), '2.2', "Comparing version of document" );
+
+is( $rtml4->group_count(), 2, "Comparing the group count" );
+is( $rtml4->groupcount(), 2, "Comparing the group count" );
+
+cmp_ok( $rtml4->exposure_time(), '==', 120.0, "Comparing the exposure time" );
+cmp_ok( $rtml4->exposuretime(), '==', 120.0, "Comparing the exposure time" );
+cmp_ok( $rtml4->exposure(), '==', 120.0, "Comparing the exposure time" );
+
+is( $rtml4->exposure_type(), "time", "Comparing the type of exposure" );
+is( $rtml4->exposuretype(), "time", "Comparing the type of exposure" );
+
+is( $rtml4->series_count(), 3, "Comparing the series count" );
+is( $rtml4->seriescount(), 3, "Comparing the series count" );
+
+is( $rtml4->interval(), "PT1H", "Comparing the series intervals" );
+is( $rtml4->tolerance(), "PT30M", "Comparing the tolerance of the intervals" );
+
+is( $rtml4->priority(), undef, "Comparing the priority of the invtervals" );
+is( $rtml4->schedule_priority(), undef, "Comparing the priority of the intervals" );
+
+my @times4a = $rtml4->time_constraint();
+is( $times4a[0], "2005-01-01T12:00:00", "Observation start time" );
+is( $times4a[1], "2005-12-31T12:00:00", "Observation end time" );
+my @times4b = $rtml4->timeconstraint();
+is( $times4b[0], "2005-01-01T12:00:00", "Observation start time" );
+is( $times4b[1], "2005-12-31T12:00:00", "Observation end time" );
+is( $rtml4->start_time(), "2005-01-01T12:00:00", "Observation start time" );
+is( $rtml4->end_time(), "2005-12-31T12:00:00", "Observation end time" );
+
+is( $rtml4->device_type(), "camera", "Comparing the device type" );
+is( $rtml4->devicetype(), "camera", "Comparing the device type" );
+is( $rtml4->device(), "camera", "Comparing the device type" );
+is( $rtml4->filter(), "R", "Comparing the filter type" );
+is( $rtml4->filtertype(), "R", "Comparing the filter type" );
+is( $rtml4->filter_type(), "R", "Comparing the filter type" );
+
+is( $rtml4->target_type(), "normal", "Comparing the target type" );
+is( $rtml4->targettype(), "normal", "Comparing the target type" );
+is( $rtml4->targetident(), "test-ident", "Comparing the target identity" );
+is( $rtml4->target_ident(), "test-ident", "Comparing the target identity" );
+is( $rtml4->identity(), "test-ident", "Comparing the target identity" );
+
+is( $rtml4->target_name(), "test", "Comparing the target name" );
+is( $rtml4->targetname(), "test", "Comparing the target name" );
+is( $rtml4->target(), "test", "Comparing the target name" );
+
+is( $rtml4->ra(), "01 02 03.00", "Comparing the RA" );
+is( $rtml4->ra_format(), "hh mm ss.ss", "Comparing the RA format" );
+is( $rtml4->ra_units(), "hms", "Comparing the RA units" );
+
+is( $rtml4->dec(), "+45 56 01.00", "Comparing the Dec" );
+is( $rtml4->dec_format(), "sdd mm ss.ss", "Comparing the Dec format" );
+is( $rtml4->dec_units(), "dms", "Comparing the Dec units" );
+
+is( $rtml4->equinox(), "J2000", "Comparing the Equinox" );
+
+is( $rtml4->host(), "localhost", "Comparing the host" );
+is( $rtml4->host_name(), "localhost", "Comparing the host" );
+is( $rtml4->agent_host(), "localhost", "Comparing the host" );
+
+is( $rtml4->port(), "1234", "Comparing the port" );
+is( $rtml4->portnumber(), "1234", "Comparing the port" );
+is( $rtml4->port_number(), "1234", "Comparing the port" );
+
+is( $rtml4->id(), "12345", "Comparing the unique id" );
+is( $rtml4->unique_id(), "12345", "Comparing the unique id" );
+
+is( $rtml4->name(), "Chris Mottram", "Comparing the observer's real name" );
+is( $rtml4->observer_name(), "Chris Mottram", "Comparing the observer's real name" );
+is( $rtml4->real_name(), "Chris Mottram", "Comparing the observer's real name" );
+
+is( $rtml4->user(), "TMC/estar", "Comparing the observer's user name" );
+is( $rtml4->user_name(), "TMC/estar", "Comparing the observer's user name" );
+
+is( $rtml4->institution(), undef, "Comparing the observer's instituiton" );
+is( $rtml4->institution_affiliation(), undef, "Comparing the observer's instituiton" );
+
+is( $rtml4->project(), "agent_test", "Comparing the projects" );
+
+is( $rtml4->score(), 0.25, "Comparing the score" );
+
+is( $rtml4->completion_time(), '2005-01-02T12:00:00', "Comparing the completion time" );
+is( $rtml4->completiontime(), '2005-01-02T12:00:00', "Comparing the completion time" );
+is( $rtml4->time(), '2005-01-02T12:00:00', "Comparing the completion time" );
+
+my @data4 = $rtml4->data();
+foreach my $k ( 0 ... $#data4 ) {
+   is ( keys %{$data4[$k]}, 0, "Size of data hash $k" );
+}
+my @headers4 = $rtml4->headers();
+is ( $#headers4, -1, "Number of headers" );
+my @images4 = $rtml4->images();
+is ( $#images4, -1, "Number of images" );
+my @catalog4 = $rtml4->catalogues();
+is ( $#catalog4, -1, "Number of catalogues" );
+
+# grab test document 5
+# --------------------
+print "Testing document t/rtml2.2/example_observe.xml\n";
+my $rtml5 = new XML::Document::RTML( File => 't/rtml2.2/example_observe.xml' );
+
+# check the parsed document
+is( $rtml5->dtd(), '2.2', "Comparing the RTML specification version used" );
+
+is( $rtml5->type(), 'observation', "Comparing type of document" );
+is( $rtml5->role(), 'observation', "Comparing type of document" );
+is( $rtml5->determine_type(), 'observation', "Comparing type of document" );
+
+is( $rtml5->version(), '2.2', "Comparing version of document" );
+
+is( $rtml5->group_count(), 2, "Comparing the group count" );
+is( $rtml5->groupcount(), 2, "Comparing the group count" );
+
+cmp_ok( $rtml5->exposure_time(), '==', 63.5, "Comparing the exposure time" );
+cmp_ok( $rtml5->exposuretime(), '==', 63.5, "Comparing the exposure time" );
+cmp_ok( $rtml5->exposure(), '==', 63.5, "Comparing the exposure time" );
+
+is( $rtml5->exposure_type(), "time", "Comparing the type of exposure" );
+is( $rtml5->exposuretype(), "time", "Comparing the type of exposure" );
+
+is( $rtml5->series_count(), 8, "Comparing the series count" );
+is( $rtml5->seriescount(), 8, "Comparing the series count" );
+
+is( $rtml5->interval(), "PT2700.0S", "Comparing the series intervals" );
+is( $rtml5->tolerance(), "PT1350.0S", "Comparing the tolerance of the intervals" );
+
+is( $rtml5->priority(), undef, "Comparing the priority of the invtervals" );
+is( $rtml5->schedule_priority(), undef, "Comparing the priority of the intervals" );
+
+my @times5a = $rtml5->time_constraint();
+is( $times5a[0], "2005-05-12T09:00:00", "Observation start time" );
+is( $times5a[1], "2005-05-13T03:00:00", "Observation end time" );
+my @times5b = $rtml5->timeconstraint();
+is( $times5b[0], "2005-05-12T09:00:00", "Observation start time" );
+is( $times5b[1], "2005-05-13T03:00:00", "Observation end time" );
+is( $rtml5->start_time(), "2005-05-12T09:00:00", "Observation start time" );
+is( $rtml5->end_time(), "2005-05-13T03:00:00", "Observation end time" );
+
+is( $rtml5->device_type(), "camera", "Comparing the device type" );
+is( $rtml5->devicetype(), "camera", "Comparing the device type" );
+is( $rtml5->device(), "camera", "Comparing the device type" );
+is( $rtml5->filter(), "R", "Comparing the filter type" );
+is( $rtml5->filtertype(), "R", "Comparing the filter type" );
+is( $rtml5->filter_type(), "R", "Comparing the filter type" );
+
+is( $rtml5->target_type(), "normal", "Comparing the target type" );
+is( $rtml5->targettype(), "normal", "Comparing the target type" );
+is( $rtml5->targetident(), "ExoPlanetMonitor", "Comparing the target identity" );
+is( $rtml5->target_ident(), "ExoPlanetMonitor", "Comparing the target identity" );
+is( $rtml5->identity(), "ExoPlanetMonitor", "Comparing the target identity" );
+
+is( $rtml5->target_name(), "OGLE-2005-blg-158", "Comparing the target name" );
+is( $rtml5->targetname(), "OGLE-2005-blg-158", "Comparing the target name" );
+is( $rtml5->target(), "OGLE-2005-blg-158", "Comparing the target name" );
+
+is( $rtml5->ra(), "18 06 04.24", "Comparing the RA" );
+is( $rtml5->ra_format(), "hh mm ss.ss", "Comparing the RA format" );
+is( $rtml5->ra_units(), "hms", "Comparing the RA units" );
+
+is( $rtml5->dec(), "-28 30 51.50", "Comparing the Dec" );
+is( $rtml5->dec_format(), "sdd mm ss.ss", "Comparing the Dec format" );
+is( $rtml5->dec_units(), "dms", "Comparing the Dec units" );
+
+is( $rtml5->equinox(), "J2000", "Comparing the Equinox" );
+
+is( $rtml5->host(), "144.173.229.20", "Comparing the host" );
+is( $rtml5->host_name(), "144.173.229.20", "Comparing the host" );
+is( $rtml5->agent_host(), "144.173.229.20", "Comparing the host" );
+
+is( $rtml5->port(), "2050", "Comparing the port" );
+is( $rtml5->portnumber(), "2050", "Comparing the port" );
+is( $rtml5->port_number(), "2050", "Comparing the port" );
+
+is( $rtml5->id(), "000106:UA:v1-15:run#10:user#agent", "Comparing the unique id" );
+is( $rtml5->unique_id(), "000106:UA:v1-15:run#10:user#agent", "Comparing the unique id" );
+
+is( $rtml5->name(), "Alasdair Allan", "Comparing the observer's real name" );
+is( $rtml5->observer_name(), "Alasdair Allan", "Comparing the observer's real name" );
+is( $rtml5->real_name(), "Alasdair Allan", "Comparing the observer's real name" );
+
+is( $rtml5->user(), "Robonet/keith.horne", "Comparing the observer's user name" );
+is( $rtml5->user_name(), "Robonet/keith.horne", "Comparing the observer's user name" );
+
+is( $rtml5->institution(), "University of Exeter", "Comparing the observer's instituiton" );
+is( $rtml5->institution_affiliation(), "University of Exeter", "Comparing the observer's instituiton" );
+
+is( $rtml5->project(), "Planetsearch1", "Comparing the projects" );
+
+cmp_ok( $rtml5->score(), '==', 0.4530854938271604, "Comparing the score" );
+
+is( $rtml5->completion_time(), '2005-05-12T08:59:08', "Comparing the completion time" );
+is( $rtml5->completiontime(), '2005-05-12T08:59:08', "Comparing the completion time" );
+is( $rtml5->time(), '2005-05-12T08:59:08', "Comparing the completion time" );
+
+my @data5 = $rtml5->data();
+#print Dumper( @data5 );
+
+foreach my $k ( 0 ... $#data5 ) {
+   my $size = keys %{$data5[$k]};
+   is ( $size, 3, "Size of data hash $k (got $size, expected 3)" );
+}
+my @headers5 = $rtml5->headers();
+is ( scalar(@headers5), 4, "Number of headers (got ". scalar(@headers5) . ", expected 4)" );
+foreach my $head ( 0 ... $#headers5 ) {
+   is ( $headers5[$head], undef, "Header $head is undefined as expected" );
+}   
+my @images5 = $rtml5->images();
+is ( scalar(@images5), 4, "Number of images (got ". scalar(@images5) . ", expected 4)" );
+is ( $images5[0], 'http://150.204.240.8/~estar/data/home/estar/data/c_e_20050511_198_1_1_1.fits', "Image 1 present as expected" );
+is ( $images5[1], 'http://150.204.240.8/~estar/data/home/estar/data/c_e_20050511_198_2_1_1.fits', "Image 2 present as expected" );
+is ( $images5[2], 'http://150.204.240.8/~estar/data/home/estar/data/c_e_20050511_208_1_1_1.fits', "Image 3 present as expected" );
+is ( $images5[3], 'http://150.204.240.8/~estar/data/home/estar/data/c_e_20050511_208_2_1_1.fits', "Image 3 present as expected" );
+my @catalog5 = $rtml5->catalogues();
+is ( scalar(@catalog5), 4, "Number of catalogues (got ". scalar(@catalog5) . ", expected 4)" );
+foreach my $cat ( 0 ... $#catalog5 ) {
+   is ( $catalog5[$cat], undef, "Catalogue $cat is undefined as expected" );
+} 
+
+# grab test document 6
+# --------------------
+print "Testing document t/rtml2.2/problem_1.xml\n";
+my $rtml6 = new XML::Document::RTML( File => 't/rtml2.2/problem_1.xml' );
+
+# check the parsed document
+is( $rtml6->dtd(), '2.2', "Comparing the RTML specification version used" );
+
+is( $rtml6->type(), 'update', "Comparing type of document" );
+is( $rtml6->role(), 'update', "Comparing type of document" );
+is( $rtml6->determine_type(), 'update', "Comparing type of document" );
+
+is( $rtml6->version(), '2.2', "Comparing version of document" );
+
+is( $rtml6->group_count(), 2, "Comparing the group count" );
+is( $rtml6->groupcount(), 2, "Comparing the group count" );
+
+cmp_ok( $rtml6->exposure_time(), '==', 63.5, "Comparing the exposure time" );
+cmp_ok( $rtml6->exposuretime(), '==', 63.5, "Comparing the exposure time" );
+cmp_ok( $rtml6->exposure(), '==', 63.5, "Comparing the exposure time" );
+
+is( $rtml6->exposure_type(), "time", "Comparing the type of exposure" );
+is( $rtml6->exposuretype(), "time", "Comparing the type of exposure" );
+
+is( $rtml6->series_count(), 8, "Comparing the series count" );
+is( $rtml6->seriescount(), 8, "Comparing the series count" );
+
+is( $rtml6->interval(), "PT2700.0S", "Comparing the series intervals" );
+is( $rtml6->tolerance(), "PT1350.0S", "Comparing the tolerance of the intervals" );
+
+is( $rtml6->priority(), undef, "Comparing the priority of the invtervals" );
+is( $rtml6->schedule_priority(), undef, "Comparing the priority of the intervals" );
+
+my @times6a = $rtml6->time_constraint();
+is( $times6a[0], "2005-05-12T09:00:00", "Observation start time" );
+is( $times6a[1], "2005-05-13T03:00:00", "Observation end time" );
+my @times6b = $rtml6->timeconstraint();
+is( $times6b[0], "2005-05-12T09:00:00", "Observation start time" );
+is( $times6b[1], "2005-05-13T03:00:00", "Observation end time" );
+is( $rtml6->start_time(), "2005-05-12T09:00:00", "Observation start time" );
+is( $rtml6->end_time(), "2005-05-13T03:00:00", "Observation end time" );
+
+is( $rtml6->device_type(), "camera", "Comparing the device type" );
+is( $rtml6->devicetype(), "camera", "Comparing the device type" );
+is( $rtml6->device(), "camera", "Comparing the device type" );
+is( $rtml6->filter(), "R", "Comparing the filter type" );
+is( $rtml6->filtertype(), "R", "Comparing the filter type" );
+is( $rtml6->filter_type(), "R", "Comparing the filter type" );
+
+is( $rtml6->target_type(), "normal", "Comparing the target type" );
+is( $rtml6->targettype(), "normal", "Comparing the target type" );
+is( $rtml6->targetident(), "ExoPlanetMonitor", "Comparing the target identity" );
+is( $rtml6->target_ident(), "ExoPlanetMonitor", "Comparing the target identity" );
+is( $rtml6->identity(), "ExoPlanetMonitor", "Comparing the target identity" );
+
+is( $rtml6->target_name(), "OGLE-2005-blg-158", "Comparing the target name" );
+is( $rtml6->targetname(), "OGLE-2005-blg-158", "Comparing the target name" );
+is( $rtml6->target(), "OGLE-2005-blg-158", "Comparing the target name" );
+
+is( $rtml6->ra(), "18 06 04.24", "Comparing the RA" );
+is( $rtml6->ra_format(), "hh mm ss.ss", "Comparing the RA format" );
+is( $rtml6->ra_units(), "hms", "Comparing the RA units" );
+
+is( $rtml6->dec(), "-28 30 51.50", "Comparing the Dec" );
+is( $rtml6->dec_format(), "sdd mm ss.ss", "Comparing the Dec format" );
+is( $rtml6->dec_units(), "dms", "Comparing the Dec units" );
+
+is( $rtml6->equinox(), "J2000", "Comparing the Equinox" );
+
+is( $rtml6->host(), "144.173.229.20", "Comparing the host" );
+is( $rtml6->host_name(), "144.173.229.20", "Comparing the host" );
+is( $rtml6->agent_host(), "144.173.229.20", "Comparing the host" );
+
+is( $rtml6->port(), "2050", "Comparing the port" );
+is( $rtml6->portnumber(), "2050", "Comparing the port" );
+is( $rtml6->port_number(), "2050", "Comparing the port" );
+
+is( $rtml6->id(), "000106:UA:v1-15:run#10:user#agent", "Comparing the unique id" );
+is( $rtml6->unique_id(), "000106:UA:v1-15:run#10:user#agent", "Comparing the unique id" );
+
+is( $rtml6->name(), "Alasdair Allan", "Comparing the observer's real name" );
+is( $rtml6->observer_name(), "Alasdair Allan", "Comparing the observer's real name" );
+is( $rtml6->real_name(), "Alasdair Allan", "Comparing the observer's real name" );
+
+is( $rtml6->user(), "Robonet/keith.horne", "Comparing the observer's user name" );
+is( $rtml6->user_name(), "Robonet/keith.horne", "Comparing the observer's user name" );
+
+is( $rtml6->institution(), "University of Exeter", "Comparing the observer's instituiton" );
+is( $rtml6->institution_affiliation(), "University of Exeter", "Comparing the observer's instituiton" );
+
+is( $rtml6->project(), "Planetsearch1", "Comparing the projects" );
+
+cmp_ok( $rtml6->score(), '==', 0.4530854938271604, "Comparing the score" );
+
+is( $rtml6->completion_time(), '2005-05-12T15:55:24', "Comparing the completion time" );
+is( $rtml6->completiontime(), '2005-05-12T15:55:24', "Comparing the completion time" );
+is( $rtml6->time(), '2005-05-12T15:55:24', "Comparing the completion time" );
+
+my @data6 = $rtml6->data();
+#print Dumper( @data6 );
+
+foreach my $m ( 0 ... $#data6 ) {
+   my $size = keys %{$data6[$m]};
+   is ( $size, 0, "Size of data hash $m" );
+}
+my @headers6 = $rtml6->headers();
+is ( scalar(@headers6), 0, "Number of headers (got ". scalar(@headers6) . ", expected 4)" );
+foreach my $head ( 0 ... $#headers6 ) {
+   is ( $headers6[$head], undef, "Header $head is undefined as expected" );
+}   
+my @images6 = $rtml6->images();
+is ( scalar(@images6), 0, "Number of images (got ". scalar(@images6) . ", expected 4)" );
+foreach my $head ( 0 ... $#headers6 ) {
+   is ( $headers6[$head], undef, "Header $head is undefined as expected" );
+} 
+my @catalog6 = $rtml6->catalogues();
+is ( scalar(@catalog6), 0, "Number of catalogues (got ". scalar(@catalog6) . ", expected 4)" );
+foreach my $cat ( 0 ... $#catalog6 ) {
+   is ( $catalog6[$cat], undef, "Catalogue $cat is undefined as expected" );
+} 
+
 
 exit;

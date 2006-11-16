@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.10 2006/11/16 13:32:14 aa Exp $
+#     $Id: RTML.pm,v 1.11 2006/11/16 15:09:31 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -72,13 +72,13 @@ use Scalar::Util qw(reftype);
 use Astro::FITS::Header;
 use Astro::VO::VOTable;
 
-'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.10 2006/11/16 13:32:14 aa Exp $
+$Id: RTML.pm,v 1.11 2006/11/16 15:09:31 aa Exp $
 
 =head1 METHODS
 
@@ -365,27 +365,26 @@ sub build {
         }	
 	
      $self->{WRITER}->endTag( 'Schedule' );
-  $self->{WRITER}->endTag( 'Observation' );  
-    
-  # Data tags
-  # ---------
-  my @images = $self->images();
-  my @image_type = $self->image_type();
-  my @image_delivery = $self->image_delivery();
-  my @image_reduced = $self->image_reduced();
+
+     # Data tags
+     # ---------
+     my @images = $self->images();
+     my @image_type = $self->image_type();
+     my @image_delivery = $self->image_delivery();
+     my @image_reduced = $self->image_reduced();
   
-  my @catalogues = $self->catalogues();
-  my @catalogue_types = $self->catalogue_type();
+     my @catalogues = $self->catalogues();
+     my @catalogue_types = $self->catalogue_type();
   
-  my @headers = $self->headers();
-  my @header_types = $self->header_type();
+     my @headers = $self->headers();
+     my @header_types = $self->header_type();
   
-  foreach my $j ( 0 .. $#images ) {
+     foreach my $j ( 0 .. $#images ) {
   
-     $self->{WRITER}->startTag( 'ImageData',
-                      'type'     => $image_type[$j],
-		      'delivery' => $image_delivery[$j],
-		      'reduced'  => $image_reduced[$j] );
+        $self->{WRITER}->startTag( 'ImageData',
+                         'type'     => $image_type[$j],
+		         'delivery' => $image_delivery[$j],
+		         'reduced'  => $image_reduced[$j] );
         
 	# FITSHeader
 	# ----------
@@ -407,9 +406,11 @@ sub build {
 	# ---------
 	$self->{WRITER}->characters( $images[$j] );
 	
-     $self->{WRITER}->endTag( 'ImageData' );		      
-  }  
-   
+        $self->{WRITER}->endTag( 'ImageData' );		      
+     }  
+     
+  $self->{WRITER}->endTag( 'Observation' );  
+       
   # Score Tags
   # ---------- 
   if (defined $self->{DOCUMENT}->{Score} ) {
@@ -1395,43 +1396,48 @@ sub data {
   #  TAKING DATA INTO THE MESSAGE
   if (@_) {
      my @array = @_;
-     $self->{DOCUMENT}->{ImageData} = [];
+     $self->{DOCUMENT}->{Observation}->{ImageData} = [];
      foreach my $i ( 0 ... $#array ) {
         my %hash = %{$array[$i]};
 
 	# Images
 	if ( defined $hash{URL} ) {
-	   $self->{DOCUMENT}->{ImageData}[$i]->{content} = $hash{URL};
-	   $self->{DOCUMENT}->{ImageData}[$i]->{delivery} = "url";
-	   $self->{DOCUMENT}->{ImageData}[$i]->{type} = "FITS16";
-	   $self->{DOCUMENT}->{ImageData}[$i]->{reduced} = "true";
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{content} = $hash{URL};
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{delivery} = "url";
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{type} = "FITS16";
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{reduced} = "true";
 	}
 	   
 	# Catalogues
         if( defined $hash{Catalogue} ) {
-	   $self->{DOCUMENT}->{ImageData}[$i]->{ObjectList}->{content} = $hash{Catalogue};
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{ObjectList}->{content} = $hash{Catalogue};
 	   if( $hash{Catalogue} =~ "http" && $hash{Catalogue} =~ "votable" ) {
-	      $self->{DOCUMENT}->{ImageData}[$i]->{ObjectList}->{type} = "votable-url";
+	      $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{ObjectList}->{type} = "votable-url";
 	   } else {
-	      $self->{DOCUMENT}->{ImageData}[$i]->{ObjectList}->{type} = "unknown";
+	      $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{ObjectList}->{type} = "unknown";
 	   }   
         }
 	
 	# FITS Headers
         if( defined $hash{Catalogue} ) {
-	   $self->{DOCUMENT}->{ImageData}[$i]->{FITSHeader}->{content} = $hash{Header};
-	   $self->{DOCUMENT}->{ImageData}[$i]->{FITSHeader}->{type} = "all";
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{FITSHeader}->{content} = $hash{Header};
+	   $self->{DOCUMENT}->{Observation}->{ImageData}[$i]->{FITSHeader}->{type} = "all";
         }
 		
      } # end of foreach loop
   } # end of if ( @_ ) block
 
   # PUSHING DATA OUT OF THE MESSAGE
+  if ( defined $self->{DOCUMENT}->{Observation}->{ImageData} && 
+       reftype($self->{DOCUMENT}->{Observation}->{ImageData}) eq "HASH" ) { 
+       return (); 
+  } 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $header = $self->{DOCUMENT}->{ImageData}[$j]->{FITSHeader}->{content};
-    my $url = $self->{DOCUMENT}->{ImageData}[$j]->{content};
-    my $catalogue = $self->{DOCUMENT}->{ImageData}[$j]->{ObjectList}->{content};
+  
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $header = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{FITSHeader}->{content};
+    my $url = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{content};
+    my $catalogue = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{ObjectList}->{content};
     $output[$j] = ( { Catalogue => $catalogue,
                       URL => $url,
 		      Header => $header } );
@@ -1442,9 +1448,13 @@ sub data {
 sub headers {
   my $self = shift;
   
+  if ( defined $self->{DOCUMENT}->{Observation}->{ImageData} && 
+       reftype($self->{DOCUMENT}->{Observation}->{ImageData}) eq "HASH" ) { 
+       return (); 
+  } 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $header = $self->{DOCUMENT}->{ImageData}[$j]->{FITSHeader}->{content};
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $header = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{FITSHeader}->{content};
     $output[$j] = $header;
   }
   return @output;
@@ -1453,9 +1463,13 @@ sub headers {
 sub images {
   my $self = shift;
 
+  if ( defined $self->{DOCUMENT}->{Observation}->{ImageData} && 
+       reftype($self->{DOCUMENT}->{Observation}->{ImageData}) eq "HASH" ) { 
+       return (); 
+  } 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $url = $self->{DOCUMENT}->{ImageData}[$j]->{content};
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $url = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{content};
     $output[$j] = $url;
   }
   return @output;
@@ -1464,9 +1478,13 @@ sub images {
 sub catalogues {
   my $self = shift;
   
+  if ( defined $self->{DOCUMENT}->{Observation}->{ImageData} && 
+       reftype($self->{DOCUMENT}->{Observation}->{ImageData}) eq "HASH" ) { 
+       return (); 
+  } 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $catalogue = $self->{DOCUMENT}->{ImageData}[$j]->{ObjectList}->{content};
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $catalogue = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{ObjectList}->{content};
     $output[$j] = $catalogue;
   }
   return @output;
@@ -1476,8 +1494,8 @@ sub image_delivery {
   my $self = shift;
 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $delivery = $self->{DOCUMENT}->{ImageData}[$j]->{delivery};
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $delivery = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{delivery};
     $output[$j] = $delivery;
   }
   return @output;
@@ -1487,8 +1505,8 @@ sub image_type {
   my $self = shift;
 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $type = $self->{DOCUMENT}->{ImageData}[$j]->{type};
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $type = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{type};
     $output[$j] = $type;
   }
   return @output;
@@ -1498,8 +1516,8 @@ sub image_reduced {
   my $self = shift;
 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $reduced = $self->{DOCUMENT}->{ImageData}[$j]->{reduced};
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $reduced = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{reduced};
     $output[$j] = $reduced;
   }
   return @output;
@@ -1509,8 +1527,8 @@ sub catalogue_type {
   my $self = shift;
 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $type = $self->{DOCUMENT}->{ImageData}[$j]->{ObjectList}->{type};
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $type = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{ObjectList}->{type};
     $output[$j] = $type;
   }
   return @output;
@@ -1520,8 +1538,8 @@ sub header_type {
   my $self = shift;
 
   my @output;
-  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{ImageData}} ) {
-    my $type = $self->{DOCUMENT}->{ImageData}[$j]->{FITSHeader}->{type};
+  foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
+    my $type = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{FITSHeader}->{type};
     $output[$j] = $type;
   }
   return @output;

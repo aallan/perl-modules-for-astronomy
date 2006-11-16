@@ -89,19 +89,19 @@ __DATA__
                 <EndDateTime>2006-09-12T00:12:51+0100</EndDateTime>
             </TimeConstraint>
         </Schedule>
+        <ImageData type="FITS16" delivery="url" reduced="true">
+            <FITSHeader type="all">HEADER 1</FITSHeader>
+            <ObjectList type="votable-url">http://161.72.57.3/~estar/data/c_e_20060910_36_1_1_1.votable</ObjectList>        http://161.72.57.3/~estar/data/c_e_20060910_36_1_1_2.fits    
+        </ImageData>
+        <ImageData type="FITS16" delivery="url" reduced="true">
+            <FITSHeader type="all">HEADER 2</FITSHeader>
+            <ObjectList type="votable-url">http://161.72.57.3/~estar/data/c_e_20060910_36_2_1_1.votable</ObjectList>        http://161.72.57.3/~estar/data/c_e_20060910_36_2_1_2.fits    
+        </ImageData>
+        <ImageData type="FITS16" delivery="url" reduced="true">
+            <FITSHeader type="all">HEADER 3</FITSHeader>
+            <ObjectList type="votable-url">http://161.72.57.3/~estar/data/c_e_20060910_36_3_1_1.votable</ObjectList>        http://161.72.57.3/~estar/data/c_e_20060910_36_3_1_2.fits    
+        </ImageData>
     </Observation>
-    <ImageData type="FITS16" delivery="url" reduced="true">
-        <FITSHeader type="all">HEADER 1</FITSHeader>
-        <ObjectList type="votable-url">http://161.72.57.3/~estar/data/c_e_20060910_36_1_1_1.votable</ObjectList>        http://161.72.57.3/~estar/data/c_e_20060910_36_1_1_2.fits    
-    </ImageData>
-    <ImageData type="FITS16" delivery="url" reduced="true">
-        <FITSHeader type="all">HEADER 2</FITSHeader>
-        <ObjectList type="votable-url">http://161.72.57.3/~estar/data/c_e_20060910_36_2_1_1.votable</ObjectList>        http://161.72.57.3/~estar/data/c_e_20060910_36_2_1_2.fits    
-    </ImageData>
-    <ImageData type="FITS16" delivery="url" reduced="true">
-        <FITSHeader type="all">HEADER 3</FITSHeader>
-        <ObjectList type="votable-url">http://161.72.57.3/~estar/data/c_e_20060910_36_3_1_1.votable</ObjectList>        http://161.72.57.3/~estar/data/c_e_20060910_36_3_1_2.fits    
-    </ImageData>
     <Score>0.10720720720720721</Score>
     <CompletionTime>2006-09-12T00:12:51+0100</CompletionTime>
 </RTML>

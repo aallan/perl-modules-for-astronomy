@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE RTML SYSTEM "http://www.estar.org.uk/documents/rtml2.2.dtd">
-<RTML version="2.2" type="confirmation">
+<RTML version="2.2" type="observation">
   <Contact>
     <Name>Alasdair Allan</Name>
     <User>Robonet/keith.horne</User>
