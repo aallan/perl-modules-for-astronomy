@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.11 2006/11/16 15:09:31 aa Exp $
+#     $Id: RTML.pm,v 1.12 2006/11/16 17:29:15 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -72,13 +72,13 @@ use Scalar::Util qw(reftype);
 use Astro::FITS::Header;
 use Astro::VO::VOTable;
 
-'$Revision: 1.11 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.11 2006/11/16 15:09:31 aa Exp $
+$Id: RTML.pm,v 1.12 2006/11/16 17:29:15 aa Exp $
 
 =head1 METHODS
 
@@ -538,11 +538,15 @@ sub exposure_time {
      if ( defined $self->exposure_units() && $self->exposure_units() eq "ms" ) {
         $exposure = $exposure / 1000.0;
      }
+     $exposure =~ s/^\s*//;
+     $exposure =~ s/\s*$//;
      $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{content} = $exposure;
      $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{type} = "time";
      $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{units} = "seconds";
   }
   my $exposure = $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{content};
+  $exposure =~ s/^\s*//;
+  $exposure =~ s/\s*$//;
   if ( $self->exposure_units() eq "ms" ) {
      $exposure = $exposure / 1000.0;
      $self->exposure_units( "seconds" );
@@ -1438,6 +1442,15 @@ sub data {
     my $header = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{FITSHeader}->{content};
     my $url = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{content};
     my $catalogue = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{ObjectList}->{content};
+    if ( defined $url ) {
+       $url =~ s/^\s*//;
+       $url  =~ s/\s*$//;    
+    
+    }
+    if ( defined $catalogue ) {
+       $catalogue =~ s/^\s*//;
+       $catalogue =~ s/\s*$//;
+    }   
     $output[$j] = ( { Catalogue => $catalogue,
                       URL => $url,
 		      Header => $header } );
@@ -1470,6 +1483,10 @@ sub images {
   my @output;
   foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
     my $url = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{content};
+    if ( defined $url ) {
+       $url =~ s/^\s*//;
+       $url =~ s/\s*$//;
+    }
     $output[$j] = $url;
   }
   return @output;
@@ -1485,6 +1502,10 @@ sub catalogues {
   my @output;
   foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}->{ImageData}} ) {
     my $catalogue = $self->{DOCUMENT}->{Observation}->{ImageData}[$j]->{ObjectList}->{content};
+    if ( defined $catalogue ) {
+       $catalogue =~ s/^\s*//;
+       $catalogue =~ s/\s*$//;
+    }
     $output[$j] = $catalogue;
   }
   return @output;

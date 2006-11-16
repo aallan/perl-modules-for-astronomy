@@ -1,6 +1,6 @@
 2006-11-16 Alasdair Allan <aa@astro.ex.ac.uk> 
 
-	* RTML.pm: Some bug fixes to project() and exposure_time()
+	* RTML.pm: Lots of bug fixes, some odd corner cases fixed.
 	
 	* t/*: Increased test coverage
 	

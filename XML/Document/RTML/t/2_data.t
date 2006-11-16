@@ -233,6 +233,12 @@ foreach my $j ( 0 ... $#pulled ) {
   cmp_ok( $array_hash{Header}, "eq", $pulled_hash{Header}, "Comparing \%hash{Header}" );
 }
  
+#use Astro::FITS::Header;
+#my $raw = $pulled[0]{Header};
+#my @cards = split "\n", $header;
+#my $header = new Astro::FITS::Header( Cards => \@cards );
+#print Dumper( $header );
+ 
 # T I M E   A T   T H E   B A R ---------------------------------------------
 
 exit;  

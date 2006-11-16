@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test::More;
-BEGIN { plan tests => 426 };
+BEGIN { plan tests => 494 };
 
 # load modules
 BEGIN {
@@ -50,8 +50,8 @@ is( $rtml1->seriescount(), 3, "Comparing the series count" );
 is( $rtml1->interval(), "PT1H", "Comparing the series intervals" );
 is( $rtml1->tolerance(), "PT30M", "Comparing the tolerance of the intervals" );
 
-is( $rtml1->priority(), "3", "Comparing the priority of the invtervals" );
-is( $rtml1->schedule_priority(), "3", "Comparing the priority of the intervals" );
+is( $rtml1->priority(), "3", "Comparing the priority " );
+is( $rtml1->schedule_priority(), "3", "Comparing the priority" );
 
 my @times1a = $rtml1->time_constraint();
 is( $times1a[0], "2005-01-01T12:00:00", "Observation start time" );
@@ -159,8 +159,8 @@ is( $rtml2->seriescount(), 3, "Comparing the series count" );
 is( $rtml2->interval(), "PT1H", "Comparing the series intervals" );
 is( $rtml2->tolerance(), "PT30M", "Comparing the tolerance of the intervals" );
 
-is( $rtml2->priority(), undef, "Comparing the priority of the invtervals" );
-is( $rtml2->schedule_priority(), undef, "Comparing the priority of the intervals" );
+is( $rtml2->priority(), undef, "Comparing the priority " );
+is( $rtml2->schedule_priority(), undef, "Comparing the priority" );
 
 my @times2a = $rtml2->time_constraint();
 is( $times2a[0], "2005-01-01T12:00:00", "Observation start time" );
@@ -269,8 +269,8 @@ is( $rtml3->seriescount(), 3, "Comparing the series count" );
 is( $rtml3->interval(), "PT1H", "Comparing the series intervals" );
 is( $rtml3->tolerance(), "PT30M", "Comparing the tolerance of the intervals" );
 
-is( $rtml3->priority(), undef, "Comparing the priority of the invtervals" );
-is( $rtml3->schedule_priority(), undef, "Comparing the priority of the intervals" );
+is( $rtml3->priority(), undef, "Comparing the priority " );
+is( $rtml3->schedule_priority(), undef, "Comparing the priority" );
 
 my @times3a = $rtml3->time_constraint();
 is( $times3a[0], "2005-01-01T12:00:00", "Observation start time" );
@@ -378,8 +378,8 @@ is( $rtml4->seriescount(), 3, "Comparing the series count" );
 is( $rtml4->interval(), "PT1H", "Comparing the series intervals" );
 is( $rtml4->tolerance(), "PT30M", "Comparing the tolerance of the intervals" );
 
-is( $rtml4->priority(), undef, "Comparing the priority of the invtervals" );
-is( $rtml4->schedule_priority(), undef, "Comparing the priority of the intervals" );
+is( $rtml4->priority(), undef, "Comparing the priority " );
+is( $rtml4->schedule_priority(), undef, "Comparing the priority" );
 
 my @times4a = $rtml4->time_constraint();
 is( $times4a[0], "2005-01-01T12:00:00", "Observation start time" );
@@ -487,8 +487,8 @@ is( $rtml5->seriescount(), 8, "Comparing the series count" );
 is( $rtml5->interval(), "PT2700.0S", "Comparing the series intervals" );
 is( $rtml5->tolerance(), "PT1350.0S", "Comparing the tolerance of the intervals" );
 
-is( $rtml5->priority(), undef, "Comparing the priority of the invtervals" );
-is( $rtml5->schedule_priority(), undef, "Comparing the priority of the intervals" );
+is( $rtml5->priority(), undef, "Comparing the priority " );
+is( $rtml5->schedule_priority(), undef, "Comparing the priority" );
 
 my @times5a = $rtml5->time_constraint();
 is( $times5a[0], "2005-05-12T09:00:00", "Observation start time" );
@@ -609,8 +609,8 @@ is( $rtml6->seriescount(), 8, "Comparing the series count" );
 is( $rtml6->interval(), "PT2700.0S", "Comparing the series intervals" );
 is( $rtml6->tolerance(), "PT1350.0S", "Comparing the tolerance of the intervals" );
 
-is( $rtml6->priority(), undef, "Comparing the priority of the invtervals" );
-is( $rtml6->schedule_priority(), undef, "Comparing the priority of the intervals" );
+is( $rtml6->priority(), undef, "Comparing the priority " );
+is( $rtml6->schedule_priority(), undef, "Comparing the priority" );
 
 my @times6a = $rtml6->time_constraint();
 is( $times6a[0], "2005-05-12T09:00:00", "Observation start time" );
@@ -685,20 +685,141 @@ foreach my $m ( 0 ... $#data6 ) {
    is ( $size, 0, "Size of data hash $m" );
 }
 my @headers6 = $rtml6->headers();
-is ( scalar(@headers6), 0, "Number of headers (got ". scalar(@headers6) . ", expected 4)" );
+is ( scalar(@headers6), 0, "Number of headers (got ". scalar(@headers6) . ", expected 0)" );
 foreach my $head ( 0 ... $#headers6 ) {
    is ( $headers6[$head], undef, "Header $head is undefined as expected" );
 }   
 my @images6 = $rtml6->images();
-is ( scalar(@images6), 0, "Number of images (got ". scalar(@images6) . ", expected 4)" );
+is ( scalar(@images6), 0, "Number of images (got ". scalar(@images6) . ", expected 0)" );
 foreach my $head ( 0 ... $#headers6 ) {
    is ( $headers6[$head], undef, "Header $head is undefined as expected" );
 } 
 my @catalog6 = $rtml6->catalogues();
-is ( scalar(@catalog6), 0, "Number of catalogues (got ". scalar(@catalog6) . ", expected 4)" );
+is ( scalar(@catalog6), 0, "Number of catalogues (got ". scalar(@catalog6) . ", expected 0)" );
 foreach my $cat ( 0 ... $#catalog6 ) {
    is ( $catalog6[$cat], undef, "Catalogue $cat is undefined as expected" );
 } 
 
+# grab test document 7
+# --------------------
+print "Testing document t/rtml2.2/problem_2.xml\n";
+my $rtml7 = new XML::Document::RTML( File => 't/rtml2.2/problem_2.xml' );
+
+# check the parsed document
+is( $rtml7->dtd(), '2.2', "Comparing the RTML specification version used" );
+
+is( $rtml7->type(), 'failed', "Comparing type of document" );
+is( $rtml7->role(), 'failed', "Comparing type of document" );
+is( $rtml7->determine_type(), 'failed', "Comparing type of document" );
+
+is( $rtml7->version(), '2.2', "Comparing version of document" );
+
+is( $rtml7->group_count(), 4, "Comparing the group count" );
+is( $rtml7->groupcount(), 4, "Comparing the group count" );
+
+cmp_ok( $rtml7->exposure_time(), '==', 106, "Comparing the exposure time" );
+cmp_ok( $rtml7->exposuretime(), '==', 106, "Comparing the exposure time" );
+cmp_ok( $rtml7->exposure(), '==', 106, "Comparing the exposure time" );
+
+is( $rtml7->exposure_type(), "time", "Comparing the type of exposure" );
+is( $rtml7->exposuretype(), "time", "Comparing the type of exposure" );
+
+is( $rtml7->series_count(), 1, "Comparing the series count" );
+is( $rtml7->seriescount(), 1, "Comparing the series count" );
+
+is( $rtml7->interval(), "PT21600.0S", "Comparing the series intervals" );
+is( $rtml7->tolerance(), "PT10800.0S", "Comparing the tolerance of the intervals" );
+
+is( $rtml7->priority(), undef, "Comparing the priority" );
+is( $rtml7->schedule_priority(), undef, "Comparing the priority" );
+
+my @times7a = $rtml7->time_constraint();
+is( $times7a[0], "2005-05-11T15:00:00", "Observation start time" );
+is( $times7a[1], "2005-05-12T15:00:00", "Observation end time" );
+my @times7b = $rtml7->timeconstraint();
+is( $times7b[0], "2005-05-11T15:00:00", "Observation start time" );
+is( $times7b[1], "2005-05-12T15:00:00", "Observation end time" );
+is( $rtml7->start_time(), "2005-05-11T15:00:00", "Observation start time" );
+is( $rtml7->end_time(), "2005-05-12T15:00:00", "Observation end time" );
+
+is( $rtml7->device_type(), "camera", "Comparing the device type" );
+is( $rtml7->devicetype(), "camera", "Comparing the device type" );
+is( $rtml7->device(), "camera", "Comparing the device type" );
+is( $rtml7->filter(), "R", "Comparing the filter type" );
+is( $rtml7->filtertype(), "R", "Comparing the filter type" );
+is( $rtml7->filter_type(), "R", "Comparing the filter type" );
+
+is( $rtml7->target_type(), "normal", "Comparing the target type" );
+is( $rtml7->targettype(), "normal", "Comparing the target type" );
+is( $rtml7->targetident(), "ExoPlanetMonitor", "Comparing the target identity" );
+is( $rtml7->target_ident(), "ExoPlanetMonitor", "Comparing the target identity" );
+is( $rtml7->identity(), "ExoPlanetMonitor", "Comparing the target identity" );
+
+is( $rtml7->target_name(), "OGLE-2005-blg-006", "Comparing the target name" );
+is( $rtml7->targetname(), "OGLE-2005-blg-006", "Comparing the target name" );
+is( $rtml7->target(), "OGLE-2005-blg-006", "Comparing the target name" );
+
+is( $rtml7->ra(), "17 52 32.36", "Comparing the RA" );
+is( $rtml7->ra_format(), "hh mm ss.ss", "Comparing the RA format" );
+is( $rtml7->ra_units(), "hms", "Comparing the RA units" );
+
+is( $rtml7->dec(), "-32 32 54.70", "Comparing the Dec" );
+is( $rtml7->dec_format(), "sdd mm ss.ss", "Comparing the Dec format" );
+is( $rtml7->dec_units(), "dms", "Comparing the Dec units" );
+
+is( $rtml7->equinox(), "J2000", "Comparing the Equinox" );
+
+is( $rtml7->host(), "144.173.229.20", "Comparing the host" );
+is( $rtml7->host_name(), "144.173.229.20", "Comparing the host" );
+is( $rtml7->agent_host(), "144.173.229.20", "Comparing the host" );
+
+is( $rtml7->port(), "2050", "Comparing the port" );
+is( $rtml7->portnumber(), "2050", "Comparing the port" );
+is( $rtml7->port_number(), "2050", "Comparing the port" );
+
+is( $rtml7->id(), "000052:UA:v1-15:run#10:user#agent", "Comparing the unique id" );
+is( $rtml7->unique_id(), "000052:UA:v1-15:run#10:user#agent", "Comparing the unique id" );
+
+is( $rtml7->name(), "Alasdair Allan", "Comparing the observer's real name" );
+is( $rtml7->observer_name(), "Alasdair Allan", "Comparing the observer's real name" );
+is( $rtml7->real_name(), "Alasdair Allan", "Comparing the observer's real name" );
+
+is( $rtml7->user(), "TEST/estar", "Comparing the observer's user name" );
+is( $rtml7->user_name(), "TEST/estar", "Comparing the observer's user name" );
+
+is( $rtml7->institution(), "University of Exeter", "Comparing the observer's instituiton" );
+is( $rtml7->institution_affiliation(), "University of Exeter", "Comparing the observer's instituiton" );
+
+is( $rtml7->project(), "TEA01", "Comparing the projects" );
+
+my $score7 = sprintf("%.3f", $rtml7->score() );
+cmp_ok( $score7, '==', 0.319, "Comparing the score" );
+
+is( $rtml7->completion_time(), '2005-05-12T16:26:39', "Comparing the completion time" );
+is( $rtml7->completiontime(), '2005-05-12T16:26:39', "Comparing the completion time" );
+is( $rtml7->time(), '2005-05-12T16:26:39', "Comparing the completion time" );
+
+my @data7 = $rtml7->data();
+#print Dumper( @data7 );
+
+foreach my $m ( 0 ... $#data7 ) {
+   my $size = keys %{$data7[$m]};
+   is ( $size, 0, "Size of data hash $m" );
+}
+my @headers7 = $rtml7->headers();
+is ( scalar(@headers7), 0, "Number of headers (got ". scalar(@headers7) . ", expected 0)" );
+foreach my $head ( 0 ... $#headers7 ) {
+   is ( $headers7[$head], undef, "Header $head is undefined as expected" );
+}   
+my @images7 = $rtml7->images();
+is ( scalar(@images7), 0, "Number of images (got ". scalar(@images7) . ", expected 0)" );
+foreach my $head ( 0 ... $#headers7 ) {
+   is ( $headers7[$head], undef, "Header $head is undefined as expected" );
+} 
+my @catalog7 = $rtml7->catalogues();
+is ( scalar(@catalog7), 0, "Number of catalogues (got ". scalar(@catalog7) . ", expected 0)" );
+foreach my $cat ( 0 ... $#catalog7 ) {
+   is ( $catalog7[$cat], undef, "Catalogue $cat is undefined as expected" );
+} 
 
 exit;
