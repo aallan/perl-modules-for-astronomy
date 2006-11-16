@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.9 2006/11/15 17:52:43 aa Exp $
+#     $Id: RTML.pm,v 1.10 2006/11/16 13:32:14 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -67,17 +67,18 @@ use Net::Domain qw(hostname hostdomain);
 use File::Spec;
 use Carp;
 use Data::Dumper;
+use Scalar::Util qw(reftype);
 
 use Astro::FITS::Header;
 use Astro::VO::VOTable;
 
-'$Revision: 1.9 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.10 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.9 2006/11/15 17:52:43 aa Exp $
+$Id: RTML.pm,v 1.10 2006/11/16 13:32:14 aa Exp $
 
 =head1 METHODS
 
@@ -532,11 +533,20 @@ Return, or set, the exposure time of the observation
 sub exposure_time {
   my $self = shift;
   if (@_) {
-     $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{content} = shift;
+     my $exposure = shift;
+     if ( defined $self->exposure_units() && $self->exposure_units() eq "ms" ) {
+        $exposure = $exposure / 1000.0;
+     }
+     $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{content} = $exposure;
      $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{type} = "time";
      $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{units} = "seconds";
+  }
+  my $exposure = $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{content};
+  if ( $self->exposure_units() eq "ms" ) {
+     $exposure = $exposure / 1000.0;
+     $self->exposure_units( "seconds" );
   }  
-  return $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{content};
+  return $exposure;
 }
 
 sub exposuretime {
@@ -793,7 +803,7 @@ sub devicetype {
 }  
 
 sub device {
-  device( @_ );
+  device_type( @_ );
 }
 
 =item B<filter_type>
@@ -818,7 +828,7 @@ sub filtertype {
 }  
 
 sub filter {
-  filter( @_ );
+  filter_type( @_ );
 } 
  
 # T A R G E T ##############################################################
@@ -1275,7 +1285,10 @@ sub project {
   if (@_) {
      $self->{DOCUMENT}->{Project} = shift;
   }  
-  return $self->{DOCUMENT}->{Project};
+  my $project = $self->{DOCUMENT}->{Project};
+  return $project unless defined reftype($project);
+  $project = undef if reftype($project) eq "HASH"; # hash implies an empty tag
+  return $project;
 }
 
  
@@ -1700,11 +1713,13 @@ sub _parse {
 
   # Loop over the allowed keys
   for my $key (qw / File XML / ) {
-     if ( lc($key) eq "file" && exists $args{$key} ) { 
+     if ( lc($key) eq "file" && exists $args{$key} ) {
+        $args{$key} =~ s/US_ASCII/ISO-8859-1/; 
 	$self->{DOCUMENT} = $xs->XMLin( $args{$key} );
 	last;
 	
      } elsif ( lc($key) eq "xml"  && exists $args{$key} ) {
+        $args{$key} =~ s/US_ASCII/ISO-8859-1/; 
 	$self->{DOCUMENT} = $xs->XMLin( $args{$key} );
 	last;
 	
