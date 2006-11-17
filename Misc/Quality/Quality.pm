@@ -2,13 +2,13 @@ package Misc::Quality;
 
 =head1 NAME
 
-Astro::Quality - Class for handling quality flags for astronomical objects.
+Misc::Quality - Class for handling quality flags for astronomical objects.
 
 =head1 SYNOPSIS
 
-  use Astro::Quality;
+  use Misc::Quality;
 
-  $quality = new Astro::Quality( 'derived' => 1 );
+  $quality = new Misc::Quality( 'derived' => 1 );
 
   $derived = $quality->query('derived');
 
@@ -27,7 +27,7 @@ use warnings;
 use warnings::register;
 use Carp;
 
-# CVS version $Id: Quality.pm,v 1.2 2005/06/10 00:50:04 aa Exp $
+# CVS version $Id: Quality.pm,v 1.3 2006/11/17 16:58:16 aa Exp $
 our $VERSION = '0.01';
 
 sub new {
