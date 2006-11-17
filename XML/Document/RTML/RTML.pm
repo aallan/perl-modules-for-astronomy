@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.13 2006/11/17 15:42:49 aa Exp $
+#     $Id: RTML.pm,v 1.14 2006/11/17 15:45:54 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -72,13 +72,13 @@ use Scalar::Util qw(reftype);
 use Astro::FITS::Header;
 use Astro::VO::VOTable;
 
-'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.13 2006/11/17 15:42:49 aa Exp $
+$Id: RTML.pm,v 1.14 2006/11/17 15:45:54 aa Exp $
 
 =head1 METHODS
 
@@ -128,14 +128,14 @@ sub build {
    
   # Loop over the rest of the keys
   for my $key (qw / Role Type Version DTD GroupCount ExposureTime Exposure
-                      SignalToNoise Snr Flux ExposureType ExposureUnits
-                      SeriesCount Interval Tolerance Priority TimeConstraint
-                      DeviceType Device FilterType Filter TargetType TargetIdent
-                      Identity TargetName Target CoordinateType Coordtype  
-                      RA RAFormat RAUnits Dec DecFormat DecUnits Equinox
-                      Host Port PortNumber ID UniqueID Name ObserverName
-                      RealName User UserName Institution Email EmailAddress
-                      Project Score CompletionTime Time Data  / ) {
+                    SignalToNoise Snr Flux ExposureType ExposureUnits
+                    SeriesCount Interval Tolerance Priority TimeConstraint
+                    DeviceType Device FilterType Filter TargetType TargetIdent
+                    Identity TargetName Target CoordinateType Coordtype  
+                    RA RAFormat RAUnits Dec DecFormat DecUnits Equinox
+                    Host Port PortNumber ID UniqueID Name ObserverName
+                    RealName User UserName Institution Email EmailAddress
+                    Project Score CompletionTime Time Data  / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }    

@@ -1,3 +1,9 @@
+2006-11-17 Alasdair Allan <aa@astro.ex.ac.uk> 
+
+	* RTML.pm: Numerous bug fixes.
+	
+	* t/*: Reached 100% test coverage?
+	
 2006-11-16 Alasdair Allan <aa@astro.ex.ac.uk> 
 
 	* RTML.pm: Lots of bug fixes, some odd corner cases fixed.
