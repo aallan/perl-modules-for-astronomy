@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test::More;
-BEGIN { plan tests => 494 };
+BEGIN { plan tests => 570 };
 
 # load modules
 BEGIN {
@@ -682,20 +682,20 @@ my @data6 = $rtml6->data();
 
 foreach my $m ( 0 ... $#data6 ) {
    my $size = keys %{$data6[$m]};
-   is ( $size, 0, "Size of data hash $m" );
+   is ( $size, 3, "Size of data hash $m (expected 3)" );
 }
 my @headers6 = $rtml6->headers();
-is ( scalar(@headers6), 0, "Number of headers (got ". scalar(@headers6) . ", expected 0)" );
+is ( scalar(@headers6), 1, "Number of headers (got ". scalar(@headers6) . ", expected 1)" );
 foreach my $head ( 0 ... $#headers6 ) {
    is ( $headers6[$head], undef, "Header $head is undefined as expected" );
 }   
 my @images6 = $rtml6->images();
-is ( scalar(@images6), 0, "Number of images (got ". scalar(@images6) . ", expected 0)" );
+is ( scalar(@images6), 1, "Number of images (got ". scalar(@images6) . ", expected 1)" );
 foreach my $head ( 0 ... $#headers6 ) {
-   is ( $headers6[$head], undef, "Header $head is undefined as expected" );
+   is ( $images6[$head], "http://150.204.240.8/~estar/data/home/estar/data/c_e_20050511_208_1_1_1.fits", "Header $head is undefined as expected" );
 } 
 my @catalog6 = $rtml6->catalogues();
-is ( scalar(@catalog6), 0, "Number of catalogues (got ". scalar(@catalog6) . ", expected 0)" );
+is ( scalar(@catalog6), 1, "Number of catalogues (got ". scalar(@catalog6) . ", expected 1)" );
 foreach my $cat ( 0 ... $#catalog6 ) {
    is ( $catalog6[$cat], undef, "Catalogue $cat is undefined as expected" );
 } 
@@ -814,12 +814,133 @@ foreach my $head ( 0 ... $#headers7 ) {
 my @images7 = $rtml7->images();
 is ( scalar(@images7), 0, "Number of images (got ". scalar(@images7) . ", expected 0)" );
 foreach my $head ( 0 ... $#headers7 ) {
-   is ( $headers7[$head], undef, "Header $head is undefined as expected" );
+   is ( $images7[$head], undef, "Header $head is undefined as expected" );
 } 
 my @catalog7 = $rtml7->catalogues();
 is ( scalar(@catalog7), 0, "Number of catalogues (got ". scalar(@catalog7) . ", expected 0)" );
 foreach my $cat ( 0 ... $#catalog7 ) {
    is ( $catalog7[$cat], undef, "Catalogue $cat is undefined as expected" );
 } 
+
+
+# grab test document 8
+# --------------------
+print "Testing document t/rtml2.2/example_update.xml\n";
+my $rtml8 = new XML::Document::RTML( File => 't/rtml2.2/example_update.xml' );
+
+# check the parsed document
+is( $rtml8->dtd(), '2.2', "Comparing the RTML specification version used" );
+
+is( $rtml8->type(), 'update', "Comparing type of document" );
+is( $rtml8->role(), 'update', "Comparing type of document" );
+is( $rtml8->determine_type(), 'update', "Comparing type of document" );
+
+is( $rtml8->version(), '2.2', "Comparing version of document" );
+
+is( $rtml8->group_count(), 2, "Comparing the group count" );
+is( $rtml8->groupcount(), 2, "Comparing the group count" );
+
+cmp_ok( $rtml8->exposure_time(), '==', 63.5, "Comparing the exposure time" );
+cmp_ok( $rtml8->exposuretime(), '==', 63.5, "Comparing the exposure time" );
+cmp_ok( $rtml8->exposure(), '==', 63.5, "Comparing the exposure time" );
+
+is( $rtml8->exposure_type(), "time", "Comparing the type of exposure" );
+is( $rtml8->exposuretype(), "time", "Comparing the type of exposure" );
+
+is( $rtml8->series_count(), 8, "Comparing the series count" );
+is( $rtml8->seriescount(), 8, "Comparing the series count" );
+
+is( $rtml8->interval(), "PT2700.0S", "Comparing the series intervals" );
+is( $rtml8->tolerance(), "PT1350.0S", "Comparing the tolerance of the intervals" );
+
+is( $rtml8->priority(), undef, "Comparing the priority " );
+is( $rtml8->schedule_priority(), undef, "Comparing the priority" );
+
+my @times8a = $rtml8->time_constraint();
+is( $times8a[0], "2005-05-12T09:00:00", "Observation start time" );
+is( $times8a[1], "2005-05-13T03:00:00", "Observation end time" );
+my @times8b = $rtml8->timeconstraint();
+is( $times8b[0], "2005-05-12T09:00:00", "Observation start time" );
+is( $times8b[1], "2005-05-13T03:00:00", "Observation end time" );
+is( $rtml8->start_time(), "2005-05-12T09:00:00", "Observation start time" );
+is( $rtml8->end_time(), "2005-05-13T03:00:00", "Observation end time" );
+
+is( $rtml8->device_type(), "camera", "Comparing the device type" );
+is( $rtml8->devicetype(), "camera", "Comparing the device type" );
+is( $rtml8->device(), "camera", "Comparing the device type" );
+is( $rtml8->filter(), "R", "Comparing the filter type" );
+is( $rtml8->filtertype(), "R", "Comparing the filter type" );
+is( $rtml8->filter_type(), "R", "Comparing the filter type" );
+
+is( $rtml8->target_type(), "normal", "Comparing the target type" );
+is( $rtml8->targettype(), "normal", "Comparing the target type" );
+is( $rtml8->targetident(), "ExoPlanetMonitor", "Comparing the target identity" );
+is( $rtml8->target_ident(), "ExoPlanetMonitor", "Comparing the target identity" );
+is( $rtml8->identity(), "ExoPlanetMonitor", "Comparing the target identity" );
+
+is( $rtml8->target_name(), "OGLE-2005-blg-158", "Comparing the target name" );
+is( $rtml8->targetname(), "OGLE-2005-blg-158", "Comparing the target name" );
+is( $rtml8->target(), "OGLE-2005-blg-158", "Comparing the target name" );
+
+is( $rtml8->ra(), "18 06 04.24", "Comparing the RA" );
+is( $rtml8->ra_format(), "hh mm ss.ss", "Comparing the RA format" );
+is( $rtml8->ra_units(), "hms", "Comparing the RA units" );
+
+is( $rtml8->dec(), "-28 30 51.50", "Comparing the Dec" );
+is( $rtml8->dec_format(), "sdd mm ss.ss", "Comparing the Dec format" );
+is( $rtml8->dec_units(), "dms", "Comparing the Dec units" );
+
+is( $rtml8->equinox(), "J2000", "Comparing the Equinox" );
+
+is( $rtml8->host(), "144.173.229.20", "Comparing the host" );
+is( $rtml8->host_name(), "144.173.229.20", "Comparing the host" );
+is( $rtml8->agent_host(), "144.173.229.20", "Comparing the host" );
+
+is( $rtml8->port(), "2050", "Comparing the port" );
+is( $rtml8->portnumber(), "2050", "Comparing the port" );
+is( $rtml8->port_number(), "2050", "Comparing the port" );
+
+is( $rtml8->id(), "000106:UA:v1-15:run#10:user#agent", "Comparing the unique id" );
+is( $rtml8->unique_id(), "000106:UA:v1-15:run#10:user#agent", "Comparing the unique id" );
+
+is( $rtml8->name(), "Alasdair Allan", "Comparing the observer's real name" );
+is( $rtml8->observer_name(), "Alasdair Allan", "Comparing the observer's real name" );
+is( $rtml8->real_name(), "Alasdair Allan", "Comparing the observer's real name" );
+
+is( $rtml8->user(), "Robonet/keith.horne", "Comparing the observer's user name" );
+is( $rtml8->user_name(), "Robonet/keith.horne", "Comparing the observer's user name" );
+
+is( $rtml8->institution(), "University of Exeter", "Comparing the observer's instituiton" );
+is( $rtml8->institution_affiliation(), "University of Exeter", "Comparing the observer's instituiton" );
+
+is( $rtml8->project(), "Planetsearch1", "Comparing the projects" );
+
+cmp_ok( $rtml8->score(), '==', 0.4530854938271604, "Comparing the score" );
+
+is( $rtml8->completion_time(), '2005-05-12T08:59:08', "Comparing the completion time" );
+is( $rtml8->completiontime(), '2005-05-12T08:59:08', "Comparing the completion time" );
+is( $rtml8->time(), '2005-05-12T08:59:08', "Comparing the completion time" );
+
+my @data8 = $rtml8->data();
+#print Dumper( @data8 );
+
+foreach my $k ( 0 ... $#data8 ) {
+   my $size = keys %{$data8[$k]};
+   is ( $size, 3, "Size of data hash $k (got $size, expected 3)" );
+}
+my @headers8 = $rtml8->headers();
+is ( scalar(@headers8), 1, "Number of headers (got ". scalar(@headers8) . ", expected 1)" );
+foreach my $head ( 0 ... $#headers8 ) {
+   is ( $headers8[$head], undef, "Header $head is undefined as expected" );
+}   
+my @images8 = $rtml8->images();
+is ( scalar(@images8), 1, "Number of images (got ". scalar(@images8) . ", expected 1)" );
+is ( $images8[0], 'http://150.204.240.8/~estar/data/home/estar/data/c_e_20050511_198_1_1_1.fits', "Image 1 present as expected" );
+my @catalog8 = $rtml8->catalogues();
+is ( scalar(@catalog8), 1, "Number of catalogues (got ". scalar(@catalog8) . ", expected 1)" );
+foreach my $cat ( 0 ... $#catalog8 ) {
+   is ( $catalog8[$cat], undef, "Catalogue $cat is undefined as expected" );
+} 
+
 
 exit;

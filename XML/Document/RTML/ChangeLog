@@ -1,4 +1,9 @@
+2006-11-18 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.16)
 
+	* RTML.pm: Major bug fixed, now parses messages with only
+	  one <ImageData> tag, used ForceArray => ["ImageData"] to
+	  fix this problem. Was previously assuming multiple tags.
+	  
 2006-11-17 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.14)
 
 	* RTML.pm: Numerous bug fixes, packaged for shipping.

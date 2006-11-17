@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.15 2006/11/17 16:04:52 aa Exp $
+#     $Id: RTML.pm,v 1.16 2006/11/17 20:43:26 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -71,13 +71,13 @@ use Scalar::Util qw(reftype);
 #use Astro::FITS::Header;
 #use Astro::VO::VOTable;
 
-'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.16 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.15 2006/11/17 16:04:52 aa Exp $
+$Id: RTML.pm,v 1.16 2006/11/17 20:43:26 aa Exp $
 
 =head1 METHODS
 
@@ -1817,12 +1817,12 @@ sub _parse {
   for my $key (qw / File XML / ) {
      if ( lc($key) eq "file" && exists $args{$key} ) {
         $args{$key} =~ s/US_ASCII/ISO-8859-1/; 
-	$self->{DOCUMENT} = $xs->XMLin( $args{$key} );
+	$self->{DOCUMENT} = $xs->XMLin( $args{$key}, ForceArray => [ "ImageData" ] );
 	last;
 	
      } elsif ( lc($key) eq "xml"  && exists $args{$key} ) {
         $args{$key} =~ s/US_ASCII/ISO-8859-1/; 
-	$self->{DOCUMENT} = $xs->XMLin( $args{$key} );
+	$self->{DOCUMENT} = $xs->XMLin( $args{$key}, ForceArray => [ "ImageData" ] );
 	last;
 	
      }  
