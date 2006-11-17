@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.14 2006/11/17 15:45:54 aa Exp $
+#     $Id: RTML.pm,v 1.15 2006/11/17 16:04:52 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -58,7 +58,6 @@ of the standard is supported by the module.
 use strict;
 use vars qw/ $VERSION $SELF /;
 
-#use XML::Parser;
 use XML::Simple;
 use XML::Writer;
 use XML::Writer::String;
@@ -69,16 +68,16 @@ use Carp;
 use Data::Dumper;
 use Scalar::Util qw(reftype);
 
-use Astro::FITS::Header;
-use Astro::VO::VOTable;
+#use Astro::FITS::Header;
+#use Astro::VO::VOTable;
 
-'$Revision: 1.14 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.15 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.14 2006/11/17 15:45:54 aa Exp $
+$Id: RTML.pm,v 1.15 2006/11/17 16:04:52 aa Exp $
 
 =head1 METHODS
 
@@ -404,7 +403,7 @@ sub build {
 		         'reduced'  => $image_reduced[$j] );
         
 	# FITSHeader
-	# ----------
+	# ----------
 	if( defined $headers[$j] && defined $header_types[$j] ) {
            $self->{WRITER}->startTag( 'FITSHeader', 'type' => $header_types[$j] );	
 	   $self->{WRITER}->characters( $headers[$j] );

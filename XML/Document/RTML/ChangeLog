@@ -1,6 +1,7 @@
-2006-11-17 Alasdair Allan <aa@astro.ex.ac.uk> 
 
-	* RTML.pm: Numerous bug fixes.
+2006-11-17 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.14)
+
+	* RTML.pm: Numerous bug fixes, packaged for shipping.
 	
 	* t/*: Reached 100% test coverage?
 	
