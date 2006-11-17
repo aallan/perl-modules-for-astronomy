@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.12 2006/11/16 17:29:15 aa Exp $
+#     $Id: RTML.pm,v 1.13 2006/11/17 15:42:49 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -72,13 +72,13 @@ use Scalar::Util qw(reftype);
 use Astro::FITS::Header;
 use Astro::VO::VOTable;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.12 2006/11/16 17:29:15 aa Exp $
+$Id: RTML.pm,v 1.13 2006/11/17 15:42:49 aa Exp $
 
 =head1 METHODS
 
@@ -127,14 +127,15 @@ sub build {
   } 
    
   # Loop over the rest of the keys
-  for my $key (qw /  Role Version GroupCount ExposureTime
-                    SignalToNoise ExposureType SeriesCount 
-		    Interval Tolerance Priority TimeConstraint 
-		    DeviceType Filter TargetType TargetIdent 
-		    Target CoordinateType RA RAFormat RAUnits 
-		    Dec DecFormat DecUnits Equinox Host Port 
-		    ID RealName UserName Institution Email 
-		    Project Score CompletionTime Data  / ) {
+  for my $key (qw / Role Type Version DTD GroupCount ExposureTime Exposure
+                      SignalToNoise Snr Flux ExposureType ExposureUnits
+                      SeriesCount Interval Tolerance Priority TimeConstraint
+                      DeviceType Device FilterType Filter TargetType TargetIdent
+                      Identity TargetName Target CoordinateType Coordtype  
+                      RA RAFormat RAUnits Dec DecFormat DecUnits Equinox
+                      Host Port PortNumber ID UniqueID Name ObserverName
+                      RealName User UserName Institution Email EmailAddress
+                      Project Score CompletionTime Time Data  / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }    
@@ -146,6 +147,9 @@ sub build {
   
   if ( $self->version() == 2.2 ) {
      $self->{WRITER}->doctype( 'RTML', '', $self->{DTD} );
+  } elsif ( $self->version() == 2.1 ) {
+     $self->{WRITER}->doctype( 'RTML', '',
+          "http://astro.livjm.ac.uk/HaGS/rtml2.1.dtd" );
   } else {
      $self->{WRITER}->doctype( 'RTML' );
   }
@@ -281,6 +285,19 @@ sub build {
         $self->{WRITER}->endTag( 'Equinox' );
 
         $self->{WRITER}->endTag( 'Coordinates' );       
+
+ 
+        # Flux
+        # ----
+        if( $self->exposure_type() eq "snr" ) {
+     
+           $self->{WRITER}->startTag( 'Flux', 
+                                      'type'       => 'continuum', 
+	                              'units'      => 'mag', 
+                                      'wavelength' => $self->filter_type() ); 
+           $self->{WRITER}->characters( $self->reference_flux() );
+           $self->{WRITER}->endTag( 'Flux' );
+        }
 	
      $self->{WRITER}->endTag( 'Target' );
      
@@ -295,7 +312,7 @@ sub build {
         $self->{WRITER}->characters( $self->filter_type() );
         $self->{WRITER}->endTag( 'FilterType' ); 
         $self->{WRITER}->endTag( 'Filter' );
-     $self->{WRITER}->endTag( 'Device' );  
+     $self->{WRITER}->endTag( 'Device' );          
      	
      # Schedule
      # --------
@@ -545,12 +562,14 @@ sub exposure_time {
      $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{units} = "seconds";
   }
   my $exposure = $self->{DOCUMENT}->{Observation}->{Schedule}->{Exposure}->{content};
-  $exposure =~ s/^\s*//;
-  $exposure =~ s/\s*$//;
-  if ( $self->exposure_units() eq "ms" ) {
-     $exposure = $exposure / 1000.0;
-     $self->exposure_units( "seconds" );
-  }  
+  if ( defined $exposure ) {
+     $exposure =~ s/^\s*//;
+     $exposure =~ s/\s*$//;
+     if ( $self->exposure_units() eq "ms" ) {
+        $exposure = $exposure / 1000.0;
+        $self->exposure_units( "seconds" );
+     } 
+  }
   return $exposure;
 }
 
@@ -586,6 +605,30 @@ sub signaltonoise {
 
 sub snr {
   signal_to_noise( @_ );
+}  
+
+=item B<reference_flux>
+
+Sets (or returns) the flux of the object needed for signal to noise
+calculations for the image
+
+   my $mag = $object->reference_flux();
+   $object->reference_flux( $mag );
+
+the flux should be a continuum R band magnitude value.
+  
+=cut
+
+sub reference_flux {
+  my $self = shift;
+  if (@_) {
+     $self->{DOCUMENT}->{Observation}->{Target}->{Flux}->{content} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}->{Target}->{Flux}->{content};
+}
+
+sub flux {
+  reference_flux( @_ );
 }  
 
 =item B<exposure_type>
@@ -1171,7 +1214,10 @@ sub id {
 sub unique_id {
   id( @_ );
 }   
-
+ 
+sub uniqueid {
+  id( @_ );
+}
  
 # C O N A C T ##############################################################
 
@@ -1207,6 +1253,15 @@ sub real_name {
   name( @_ );
 }   
 
+
+sub observername {
+  name( @_ );
+}  
+
+sub realname {
+  name( @_ );
+}
+
 =item B<user>
 
 Return, or set, the user name of the observer
@@ -1227,6 +1282,10 @@ sub user {
 }
 
 sub user_name {
+  user( @_ );
+} 
+
+sub username {
   user( @_ );
 } 
 
@@ -1271,7 +1330,11 @@ sub email {
 }
 
 sub email_address {
-  email_address( @_ );
+  email( @_ );
+}
+
+sub emailddress {
+  email( @_ );
 }
 
 =item B<project>
@@ -1719,14 +1782,15 @@ sub configure {
   }	
   
   # Loop over the rest of the keys
-  for my $other (qw / Role Version GroupCount ExposureTime
-                    SignalToNoise ExposureType SeriesCount 
-		    Interval Tolerance Priority TimeConstraint 
-		    DeviceType Filter TargetType TargetIdent 
-		    Target CoordinateType RA RAFormat RAUnits 
-		    Dec DecFormat DecUnits Equinox Host Port 
-		    ID RealName UserName Institution Email 
-		    Project Score CompletionTime Data / ) {
+  for my $other (qw / Role Type Version DTD GroupCount ExposureTime Exposure
+                      SignalToNoise Snr Flux ExposureType ExposureUnits
+                      SeriesCount Interval Tolerance Priority TimeConstraint
+                      DeviceType Device FilterType Filter TargetType TargetIdent
+                      Identity TargetName Target CoordinateType Coordtype  
+                      RA RAFormat RAUnits Dec DecFormat DecUnits Equinox
+                      Host Port PortNumber ID UniqueID Name ObserverName
+                      RealName User UserName Institution Email EmailAddress
+                      Project Score CompletionTime Time Data / ) {
       my $method = lc($other);
       $self->$method( $args{$other} ) if exists $args{$other};
   }
