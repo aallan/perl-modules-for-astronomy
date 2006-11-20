@@ -10,6 +10,7 @@ t/2_data.t
 t/2_parse.t
 t/3_file.t
 t/3_rtml2.1.t
+t/4_multiple.t
 t/4_replicate.t
 t/rtml2.1/ers_observation_accepted.xml
 t/rtml2.1/ers_observation_rejected.xml
@@ -19,6 +20,7 @@ t/rtml2.1/ers_target_observed.xml
 t/rtml2.1/ia_observation_request.xml
 t/rtml2.1/ia_score_request.xml
 t/rtml2.2/example_confirmation.xml
+t/rtml2.2/example_multiple_observe.xml
 t/rtml2.2/example_observe.xml
 t/rtml2.2/example_request.xml
 t/rtml2.2/example_score.xml

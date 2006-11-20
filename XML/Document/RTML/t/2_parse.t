@@ -4,7 +4,7 @@
 use strict;
 
 #load test
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 # load modules
 BEGIN {
@@ -63,6 +63,10 @@ cmp_ok($exposure, '==', 30.0, "Exposure time" );
 # project
 my $project = $object->project();
 is( $project, "PL04B17", "Project ID" );
+
+# number of observations
+my $num = $object->number_of_observations();
+is( $num, 1, "Number of observations" );
 
 #print Dumper( $object );
 

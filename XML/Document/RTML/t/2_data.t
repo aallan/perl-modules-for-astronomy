@@ -4,7 +4,7 @@
 use strict;
 
 #load test
-use Test::More tests => 428;
+use Test::More tests => 430;
 
 # load modules
 BEGIN {
@@ -247,37 +247,38 @@ exit;
 
 __DATA__
 $VAR1 = {
-          'Observation' => {
-                             'Device' => {
-                                           'Filter' => {
-                                                         'FilterType' => 'R'
-                                                       },
-                                           'type' => 'camera'
-                                         },
-                             'Target' => {
-                                           'type' => 'normal',
-                                           'ident' => 'SingleExposure',
-                                           'Coordinates' => {
-                                                              'RightAscension' => {
-                                                                                    'format' => 'hh mm ss.ss',
-                                                                                    'units' => 'hms'
-                                                                                  },
-                                                              'Equinox' => 'J2000',
-                                                              'type' => 'equatorial',
-                                                              'Declination' => {
-                                                                                 'format' => 'dd mm ss.ss',
-                                                                                 'units' => 'dms'
-                                                                               }
-                                                            }
-                                         },
-                             'ImageData' => [
-                                              {
-                                                'ObjectList' => {
-                                                                  'content' => 'http://161.72.57.3/~estar/data/c_e_20060910_36_1_1_1.votable',
-                                                                  'type' => 'votable-url'
-                                                                },
-                                                'FITSHeader' => {
-                                                                  'content' => 'SIMPLE  =                    T / A valid FITS file                              
+          'Observation' => [
+                             {
+                               'Device' => {
+                                             'Filter' => {
+                                                           'FilterType' => 'R'
+                                                         },
+                                             'type' => 'camera'
+                                           },
+                               'Target' => {
+                                             'type' => 'normal',
+                                             'ident' => 'SingleExposure',
+                                             'Coordinates' => {
+                                                                'RightAscension' => {
+                                                                                      'format' => 'hh mm ss.ss',
+                                                                                      'units' => 'hms'
+                                                                                    },
+                                                                'Equinox' => 'J2000',
+                                                                'type' => 'equatorial',
+                                                                'Declination' => {
+                                                                                   'format' => 'dd mm ss.ss',
+                                                                                   'units' => 'dms'
+                                                                                 }
+                                                              }
+                                           },
+                               'ImageData' => [
+                                                {
+                                                  'ObjectList' => {
+                                                                    'content' => 'http://161.72.57.3/~estar/data/c_e_20060910_36_1_1_1.votable',
+                                                                    'type' => 'votable-url'
+                                                                  },
+                                                  'FITSHeader' => {
+                                                                    'content' => 'SIMPLE  =                    T / A valid FITS file                              
 BITPIX  =                   16 / Comment                                        
 NAXIS   =                    2 / Number of axes                                 
 NAXIS1  =                 1024 / Comment                                        
@@ -454,20 +455,20 @@ BACKGRD =         7.023166E+03 / [counts] frame background level in counts
 STDDEV  =         1.982379E+02 / [counts] Standard deviation of Backgrd in count
 L1SEEING=         9.990000E+02 / [Dummy] Unable to calculate                    
 SEEING  =         9.990000E+02 / [Dummy] Unable to calculate                    ',
-                                                                  'type' => 'all'
-                                                                },
-                                                'delivery' => 'url',
-                                                'content' => 'http://161.72.57.3/~estar/data/c_e_20060910_36_1_1_2.fits',
-                                                'reduced' => 'true',
-                                                'type' => 'FITS16'
-                                              },
-                                              {
-                                                'ObjectList' => {
-                                                                  'content' => 'http://231.231.45.5/~estar/data/c_e_20060910_36_1_1_1.votable',
-                                                                  'type' => 'votable-url'
-                                                                },
-                                                'FITSHeader' => {
-                                                                  'content' => 'SIMPLE  =                    T / A valid FITS file                              
+                                                                    'type' => 'all'
+                                                                  },
+                                                  'delivery' => 'url',
+                                                  'content' => 'http://161.72.57.3/~estar/data/c_e_20060910_36_1_1_2.fits',
+                                                  'reduced' => 'true',
+                                                  'type' => 'FITS16'
+                                                },
+                                                {
+                                                  'ObjectList' => {
+                                                                    'content' => 'http://231.231.45.5/~estar/data/c_e_20060910_36_1_1_1.votable',
+                                                                    'type' => 'votable-url'
+                                                                  },
+                                                  'FITSHeader' => {
+                                                                    'content' => 'SIMPLE  =                    T / A valid FITS file                              
 BITPIX  =                   16 / Comment                                        
 NAXIS   =                    2 / Number of axes                                 
 NAXIS1  =                 1024 / Comment                                        
@@ -644,22 +645,23 @@ BACKGRD =         7.023166E+03 / [counts] frame background level in counts
 STDDEV  =         1.982379E+02 / [counts] Standard deviation of Backgrd in count
 L1SEEING=         9.990000E+02 / [Dummy] Unable to calculate                    
 SEEING  =         9.990000E+02 / [Dummy] Unable to calculate                    ',
-                                                                  'type' => 'all'
-                                                                },
-                                                'delivery' => 'url',
-                                                'content' => 'http://231.45.45.45/~estar/data/c_e_20060910_36_1_1_2.fits',
-                                                'reduced' => 'true',
-                                                'type' => 'FITS16'
-                                              }
-                                            ],
-                             'Schedule' => {
-                                             'priority' => 3,
-                                             'Exposure' => {
-                                                             'type' => 'time',
-                                                             'units' => 'seconds'
-                                                           }
-                                           }
-                           },
+                                                                    'type' => 'all'
+                                                                  },
+                                                  'delivery' => 'url',
+                                                  'content' => 'http://231.45.45.45/~estar/data/c_e_20060910_36_1_1_2.fits',
+                                                  'reduced' => 'true',
+                                                  'type' => 'FITS16'
+                                                }
+                                              ],
+                               'Schedule' => {
+                                               'priority' => 3,
+                                               'Exposure' => {
+                                                               'type' => 'time',
+                                                               'units' => 'seconds'
+                                                             }
+                                             }
+                             }
+                           ],
           'version' => '2.2',
           'IntelligentAgent' => {
                                   'port' => 8000,

@@ -1,3 +1,8 @@
+2006-11-18 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.17)
+
+	* RTML.pm: Added support for multiple <Observation> blocks,
+	  now doing a ForceArray on <ImageData> and <Observation> tags
+	
 2006-11-18 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.16)
 
 	* RTML.pm: Major bug fixed, now parses messages with only
