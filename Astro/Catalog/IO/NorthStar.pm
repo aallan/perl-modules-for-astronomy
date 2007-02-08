@@ -82,8 +82,11 @@ sub _read_catalog {
 
     my ($name, $c1, $c2, $system, $comment) = split (/\s+/,$line,5);
 
+    # skip "OTHER" since we do not know what to do with it
+    next if $system =~ /other/i;
+
     my ($ctype1, $ctype2);
-    if ($system =~ /gal/) {
+    if ($system =~ /gal/i) {
       $ctype1 = "long";
       $ctype2 = "lat";
     } else {
