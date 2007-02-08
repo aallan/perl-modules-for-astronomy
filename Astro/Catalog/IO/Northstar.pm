@@ -2,13 +2,13 @@ package Astro::Catalog::IO::Northstar;
 
 =head1 NAME
 
-Astro::Catalog::IO::NorthStar - NorthStar format catalogue parser
+Astro::Catalog::IO::Northstar - NorthStar format catalogue parser
 
 =head1 SYNOPSIS
 
-  $cat = Astro::Catalog::IO::JCMT->_read_catalog( \@lines );
-  $arrref = Astro::Catalog::IO::JCMT->_write_catalog( $cat, %options );
-  $filename = Astro::Catalog::IO::JCMT->_default_file();
+  $cat = Astro::Catalog::IO::Northstar->_read_catalog( \@lines );
+  $arrref = Astro::Catalog::IO::Northstar->_write_catalog( $cat, %options );
+  $filename = Astro::Catalog::IO::Northstar->_default_file();
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,7 @@ $DEBUG   = 0;
 Parses the catalogue lines and returns a new C<Astro::Catalog>
 object containing the catalog entries.
 
- $cat = Astro::Catalog::IO::NorthStar->_read_catalog( \@lines, %options );
+ $cat = Astro::Catalog::IO::Northstar->_read_catalog( \@lines, %options );
 
 Supported options (with defaults) are:
 
@@ -79,8 +79,9 @@ sub _read_catalog {
   for my $line (@$lines) {
     $line =~ s/^\s*//;
     $line =~ s/\s*$//;
-
+    next unless $line =~ /\w/;
     my ($name, $c1, $c2, $system, $comment) = split (/\s+/,$line,5);
+    next unless (defined $c1 && defined $c2 && defined $system);
 
     # skip "OTHER" since we do not know what to do with it
     next if $system =~ /other/i;
@@ -100,7 +101,7 @@ sub _read_catalog {
 			       name => $name,
 			     );
     $c->telescope($tel) if defined $tel;
-    $c->comment($comment) if $comment =~ /\w/;
+    $c->comment($comment) if (defined $comment && $comment =~ /\w/);
 
     # Field name should simply be linked to the telescope
     my $field = (defined $tel ? $tel->name : '<UNKNOWN>' );
