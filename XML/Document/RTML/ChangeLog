@@ -1,3 +1,10 @@
+2007-04-04 Alasdair Allan <aa@astro.ex.ac.uk>
+
+	* t/2_scores.pl: Testing for new <Scores> tag.
+	
+	* t/rtml2.2/example_score_reply_scores.rtml: Test file with
+	  new <Scores> tag.
+
 2006-11-18 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.17)
 
 	* RTML.pm: Added support for multiple <Observation> blocks,

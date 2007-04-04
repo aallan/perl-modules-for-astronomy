@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE RTML SYSTEM "http://www.estar.org.uk/documents/rtml2.2.dtd">
+<RTML version="2.2" type="score">
+  <Contact>
+    <Name>Chris Mottram</Name>
+    <User>TMC/estar</User>
+  </Contact>
+  <Project>agent_test</Project>
+  <Telescope/>
+  <IntelligentAgent host="localhost" port="1234">12345</IntelligentAgent>
+  <Observation>
+    <Target type="normal" ident="test-ident">
+      <TargetName>test</TargetName>
+      <Coordinates>
+        <RightAscension units="hms" format="hh mm ss.ss">01 02 03.00</RightAscension>
+        <Declination units="dms" format="sdd mm ss.ss">+45 56 01.00</Declination>
+        <Equinox>J2000</Equinox>
+      </Coordinates>
+    </Target>
+    <Device type="camera" region="optical">
+      <Filter>
+        <FilterType>R</FilterType>
+      </Filter>
+      <Detector>
+        <Binning rows="2" columns="2"/>
+      </Detector>ratcam</Device>
+    <Schedule priority="1">
+      <Exposure type="time" units="ms">
+        <Count>2</Count>120000.0</Exposure>
+      <TimeConstraint>
+        <StartDateTime>2005-01-01T12:00:00+0000</StartDateTime>
+        <EndDateTime>2005-12-31T12:00:00+0000</EndDateTime>
+      </TimeConstraint>
+      <SeriesConstraint>
+        <Count>3</Count>
+        <Interval>PT1H</Interval>
+        <Tolerance>PT30M</Tolerance>
+      </SeriesConstraint>
+    </Schedule>
+  </Observation>
+  <Score>0.25</Score>
+  <Scores>
+    <Score delay="P" probability="NaN" cumulative="NaN"/>
+    <Score delay="PT1H" probability="0.1" cumulative="0.1"/>
+    <Score delay="PT2H" probability="NaN" cumulative="0.1"/>
+    <Score delay="PT4H" probability="0.3" cumulative="0.4"/>
+  </Scores>
+  <CompletionTime>2005-01-02T12:00:00+0000</CompletionTime>
+</RTML>
