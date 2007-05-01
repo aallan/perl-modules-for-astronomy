@@ -26,6 +26,6 @@ t/rtml2.2/example_observe.xml
 t/rtml2.2/example_request.xml
 t/rtml2.2/example_score.xml
 t/rtml2.2/example_score_reply.xml
-t/rtml2.2/example_score_reply_scores.xml
+t/rtml2.2/example_score_reply_scores.rtml
 t/rtml2.2/problem_1.xml
 t/rtml2.2/problem_2.xml
