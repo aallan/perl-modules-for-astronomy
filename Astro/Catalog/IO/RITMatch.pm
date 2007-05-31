@@ -100,7 +100,7 @@ sub _read_catalog {
 
     $line =~ s/^\s+//;
 
-    my ( $id, $x, $y, $mag, $comment ) = split /\s+/, $line, 5;
+    my ( $id, $x, $y, $mag ) = split /\s+/, $line, 4;
 
     # Create the Astro::Flux object for this magnitude.
     my $flux = new Astro::Flux( new Number::Uncertainty( Value => $mag ),
@@ -115,7 +115,6 @@ sub _read_catalog {
                                          X       => $x,
                                          Y       => $y,
                                          Fluxes  => $fluxes,
-                                         Comment => $comment,
                                        );
 
     # Push it into the catalogue.
@@ -169,16 +168,17 @@ sub _write_catalog {
   my @output;
   my $output_line;
 
+  my $newid = 1;
+
   # Loop through the items in the catalogue.
   foreach my $item ( $catalog->stars ) {
 
-    my $id = $item->id;
     my $x = $item->x;
     my $y = $item->y;
     my $fluxes = $item->fluxes;
 
     # We need at a bare minimum the X, Y, ID, and a magnitude.
-    next if ( ! defined( $id ) ||
+    next if ( ! defined( $newid ) ||
               ! defined( $x ) ||
               ! defined( $y ) ||
               ! defined( $fluxes ) );
@@ -189,21 +189,16 @@ sub _write_catalog {
 
     next if ( uc( $flux->type ) ne uc( $mag_type ) );
 
-    # Grab comments.
-    my $comments = '';
-    if ( defined( $item->comment ) ) {
-      $comments = $item->comment;
-    }
-
     # Create the output string.
-    $output_line = join ' ', $id,
+    $output_line = join ' ', $newid,
                              $x,
                              $y,
-                             $flux->quantity($mag_type),
-                             $comments;
+                             $flux->quantity($mag_type);
 
     # And push this string to the output array.
     push @output, $output_line;
+
+    $newid++;
   }
 
   # All done looping through the items, so return the array ref.
@@ -214,7 +209,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: RITMatch.pm,v 1.1 2006/03/30 23:35:07 cavanagh Exp $
+ $Id: RITMatch.pm,v 1.2 2007/05/31 01:45:07 cavanagh Exp $
 
 =head1 SEE ALSO
 

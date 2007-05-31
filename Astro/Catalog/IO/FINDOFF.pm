@@ -123,6 +123,8 @@ sub _write_catalog {
   my @output;
   my $output_line;
 
+  my $newid = 1;
+
   # Loop through the stars.
   foreach my $star ( $catalog->stars ) {
 
@@ -131,13 +133,15 @@ sub _write_catalog {
               ! defined( $star->y ) ||
               ! defined( $star->id ) );
 
-    ( my $newid = $star->id ) =~ s/[^\d]//g;
+    ( my $comment = $star->id ) =~ s/[^\d]//g;
 
     # Start off the output string.
-    $output_line = join( ' ', int($newid), $star->x, $star->y, $newid );
+    $output_line = join( ' ', $newid, $star->x, $star->y, $newid );
 
     # And push this string to the output array.
     push @output, $output_line;
+
+    $newid++;
 
   }
 
@@ -149,7 +153,7 @@ sub _write_catalog {
 
 =head1 REVISION
 
- $Id: FINDOFF.pm,v 1.4 2006/06/05 21:00:32 cavanagh Exp $
+ $Id: FINDOFF.pm,v 1.5 2007/05/31 01:42:34 cavanagh Exp $
 
 =head1 SEE ALSO
 
