@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.17 2006/11/20 12:07:48 aa Exp $
+#     $Id: RTML.pm,v 1.18 2007/06/21 14:49:45 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -71,13 +71,13 @@ use Scalar::Util qw(reftype);
 #use Astro::FITS::Header;
 #use Astro::VO::VOTable;
 
-'$Revision: 1.17 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.17 2006/11/20 12:07:48 aa Exp $
+$Id: RTML.pm,v 1.18 2007/06/21 14:49:45 aa Exp $
 
 =head1 METHODS
 
@@ -135,7 +135,7 @@ sub build {
                     RA RAFormat RAUnits Dec DecFormat DecUnits Equinox
                     Host Port PortNumber ID UniqueID Name ObserverName
                     RealName User UserName Institution Email EmailAddress
-                    Project Score CompletionTime Time Data  / ) {
+                    Project Score CompletionTime Time Data DeviceRegion Region / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }    
@@ -303,8 +303,13 @@ sub build {
      
      # Device
      # ------
-     $self->{WRITER}->startTag( 'Device', 'type' => $self->device_type() );
-    
+     if( defined $self->region() ) {
+        $self->{WRITER}->startTag( 'Device', 'type' => $self->device_type(),
+	                                     'region' => $self->region() );
+
+     } else {
+        $self->{WRITER}->startTag( 'Device', 'type' => $self->device_type() );
+     }
         # Filter
 	# ------
         $self->{WRITER}->startTag( 'Filter' ); 
@@ -853,6 +858,27 @@ sub devicetype {
 sub device {
   device_type( @_ );
 }
+
+=item B<region>
+
+Return, or set, the region for the device type for the observation
+
+  my $string = $object->region();
+  $object->region( "infrared" );
+  
+=cut
+
+sub device_region {
+  my $self = shift;
+  if (@_) {
+     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Device}->{region} = shift;
+  }  
+  return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Device}->{region};
+}
+
+sub region {
+  device_region( @_ );
+}  
 
 =item B<filter_type>
 
@@ -1832,7 +1858,7 @@ sub configure {
                       RA RAFormat RAUnits Dec DecFormat DecUnits Equinox
                       Host Port PortNumber ID UniqueID Name ObserverName
                       RealName User UserName Institution Email EmailAddress
-                      Project Score CompletionTime Time Data / ) {
+                      Project Score CompletionTime Time Data DeviceRegion Region / ) {
       my $method = lc($other);
       $self->$method( $args{$other} ) if exists $args{$other};
   }

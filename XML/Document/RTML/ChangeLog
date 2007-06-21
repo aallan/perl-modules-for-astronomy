@@ -1,3 +1,10 @@
+2007-06-21 Alasdair Allan <aa@astro.ex.ac.uk>
+
+	* RTML.pm: Added support for SuperIRCAM on the LT with addition of
+	  the <Device type="" region="" /> region attribute.
+
+        * t/5_ir.t: Added test harness for above.
+
 2007-04-04 Alasdair Allan <aa@astro.ex.ac.uk>
 
 	* t/2_scores.pl: Testing for new <Scores> tag.
