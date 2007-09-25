@@ -19,7 +19,7 @@ package Astro::Catalog::Item;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Item.pm,v 1.12 2006/04/28 03:01:51 cavanagh Exp $
+#     $Id: Item.pm,v 1.13 2007/09/25 23:23:43 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -53,6 +53,7 @@ Astro::Catalog::Item - A generic star object in a stellar catalogue.
 	       LongStarType => $long_star_type,
 	       MoreInfo     => $url,
                InsertDate   => new Time::Piece(),
+               Misc  => $hash_ref,
 				  );
 
 =head1 DESCRIPTION
@@ -89,7 +90,7 @@ use warnings::register;
 # This is not meant to part of the documented public interface.
 use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
-'$Revision: 1.12 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -237,7 +238,7 @@ my %STAR_TYPE_LOOKUP = (
 
 =head1 REVISION
 
-$Id: Item.pm,v 1.12 2006/04/28 03:01:51 cavanagh Exp $
+$Id: Item.pm,v 1.13 2007/09/25 23:23:43 cavanagh Exp $
 
 =head1 METHODS
 
@@ -268,6 +269,7 @@ Create a new instance from a hash of options
 	       LongStarType => $long_star_type,
 	       MoreInfo     => $url,
                InsertDate   => new Time::Piece(),
+               Misc   => $misc,
 				  );
 
 returns a reference to an Astro::Catalog::Item object.
@@ -301,6 +303,7 @@ sub new {
 		      MOREINFO   => undef,
                       INSERTDATE => undef,
                       PREFERRED_MAG_TYPE => undef,
+                      MISC => undef,
 		    }, $class;
 
   # If we have arguments configure the object
@@ -1376,6 +1379,30 @@ sub within {
 }
 
 
+=item B<misc>
+
+A hold-all method to contain information not covered by other methods.
+
+  my $misc = $item->misc;
+  $item->misc( $misc );
+
+This accessor can hold any type of variable, although it is
+recommended that a hash reference is used for easier lookups:
+
+  my $misc = $item->misc;
+  my $vrad = $misc->{'vrad'};
+  my $vopt = $misc->{'vopt'}
+
+=cut
+
+sub misc {
+  my $self = shift;
+  if( @_ ) {
+    $self->{'MISC'} = shift;
+  }
+  return $self->{'MISC'};
+}
+
 =back
 
 =head2 Obsolete Methods
@@ -1431,8 +1458,7 @@ Configures the object from multiple pieces of information.
 Takes a hash as argument with the list of keywords.
 The keys are not case-sensitive and map to accessor methods.
 
-Note that RA and Dec keys are allowed. The values should be
-sexagesimal.
+Note that RA and Dec keys are allowed. The values can be supplied in either sexagesimal or decimal degrees.
 
 =cut
 
