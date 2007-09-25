@@ -104,6 +104,7 @@ my $catalog_byname;
 eval { $catalog_byname = $mpc_byname->querydb() };
 SKIP: {
   skip "Cannot connect to MPC website", 199 unless ! $@;
+  skip "No asteroids returned from MPC", 199 if ( $catalog_byname->sizeof() == 0 );
   print "# Continuing tests\n";
 
 # C O M P A R I S O N ------------------------------------------------------
