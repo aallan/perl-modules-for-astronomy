@@ -244,6 +244,20 @@ sub _write_catalog {
     $srcdata{vdefn}  = 'RADIO';
     $srcdata{vframe} = 'LSR';
 
+    # Get the miscellaneous data.
+    my $misc = $star->misc;
+    if( defined( $misc ) ) {
+      $srcdata{vrange} = ( defined( $misc->{'velocity_range'} ) ?
+                           sprintf( "%s", $misc->{'velocity_range'} ) :
+                           "n/a" );
+      $srcdata{flux850} = ( defined( $misc->{'flux850'} ) ?
+                            sprintf( "%s", $misc->{'flux850'} ) :
+                            "n/a" );
+    } else {
+      $srcdata{vrange} = "n/a";
+      $srcdata{flux850} = "n/a";
+    }
+
     # Get the type of source
     my $type = $src->type;
     if ($type eq 'RADEC') {
@@ -409,6 +423,8 @@ sub _write_catalog {
     my $rv      = $src->{rv};
     my $vdefn   = $src->{vdefn};
     my $vframe  = $src->{vframe};
+    my $vrange  = $src->{vrange};
+    my $flux850 = $src->{flux850};
 
     $comment = '' unless defined $comment;
 
@@ -431,8 +447,8 @@ sub _write_catalog {
 
     push @lines,
       sprintf("%-". MAX_SRC_LENGTH.
-      "s    %02d %02d %06.3f %1s %02d %02d %04.1f  %2s  %s  n/a   n/a   %-4s %s %s\n",
-      $name, @$long, @$lat, $system, $rv, $vframe, $vdefn, $comment);
+      "s    %02d %02d %06.3f %1s %02d %02d %04.1f  %2s  %s %5s  %5s  %-4s %s %s\n",
+      $name, @$long, @$lat, $system, $rv, $flux850, $vrange, $vframe, $vdefn, $comment);
 
   }
 
@@ -539,20 +555,12 @@ sub _parse_line {
     return;
   }
 
-  # Read the flux as a comment
-  my $fcol = 9;  # flux column
-  my $ccol = 13; # comment column
-
-  my $flux = (defined $match[$fcol] ? $match[$fcol] : '');
-  $flux = '' if $flux =~ /n\/a/i;
-
   # catalog comments are space delimited
+  my $ccol = 13;
   my $cat_comm = (defined $match[$ccol] ? $match[$ccol] : '');
-  my $comment = $flux;
-  $comment .= " $cat_comm" if $cat_comm;
 
   # Replace multiple spaces in comment with single space
-  $comment =~ s/\s+/ /g;
+  $cat_comm =~ s/\s+/ /g;
 
   # velocity
   $coords{vdefn} = "RADIO";
@@ -577,10 +585,21 @@ sub _parse_line {
   }
 
   $source->telescope( $tel ) if $tel;
-  $source->comment($comment);
+  $source->comment($cat_comm);
 
   # Field name should simply be linked to the telescope
   my $field = (defined $tel ? $tel->name : '<UNKNOWN>' );
+
+  my %misc;
+  # Grab the line's velocity range, if it isn't "n/a".
+  if( $match[10] !~ /n\/a/ ) {
+    $misc{'velocity_range'} = $match[10];
+  }
+
+  # Grab the 850-micron flux, if it isn't "n/a".
+  if( $match[9] !~ /n\/a/ ) {
+    $misc{'flux850'} = $match[9];
+  }
 
   print "Created a new source in _parse_line: $target in field $field\n" if $DEBUG;
 
@@ -588,7 +607,8 @@ sub _parse_line {
   return new Astro::Catalog::Star( id => $target,
                                    coords => $source,
                                    field => $field,
-                                   comment => $comment,
+                                   comment => $cat_comm,
+                                   misc => \%misc,
                                  );
 
 }
