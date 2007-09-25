@@ -110,8 +110,8 @@ is($f->flux( waveband => new Astro::WaveBand( Filter => 'R' ) )->datetime(), $ti
 # --------
 
 my $star1 = new Astro::Catalog::Item( ID         => '1',
-                                     RA         => '17.55398',
-                                     Dec        => '60.07673',
+                                     RA         => '1:10:12.955',
+                                     Dec        => '60:04:36.228',
                                      Fluxes     => $fluxes,
                                      Quality    => '0',
                                      GSC        => 'FALSE',
@@ -121,8 +121,8 @@ my $star1 = new Astro::Catalog::Item( ID         => '1',
 isa_ok($star1,"Astro::Catalog::Item");
 				     
 my $star2 = new Astro::Catalog::Item( ID         => '2',
-                                     RA         => '18.55398',
-                                     Dec        => '60.07673',
+                                     RA         => '1:14:12.955',
+                                     Dec        => '60:04:36.228',
                                      Fluxes     => $fluxes,
                                      Quality    => '0',
                                      GSC        => 'FALSE',
@@ -132,8 +132,8 @@ my $star2 = new Astro::Catalog::Item( ID         => '2',
 isa_ok($star2,"Astro::Catalog::Item");
 
 my $star3 = new Astro::Catalog::Item( ID         => '2',
-                                     RA         => '17.554',
-                                     Dec        => '60.07673',
+                                     RA         => '1:10:12.96',
+                                     Dec        => '60:04:36.228',
                                      Fluxes     => $fluxes,
                                      Quality    => '0',
                                      GSC        => 'FALSE',
@@ -143,7 +143,7 @@ my $star3 = new Astro::Catalog::Item( ID         => '2',
 isa_ok($star3,"Astro::Catalog::Item");
 
 is( sprintf ("%.2f", $star1->distancetostar($star2)), 1795.85, "Distance from 1 to 2");
-is( sprintf ("%.4f", $star1->distancetostar($star3)), 0.0359, "Distance from 1 to 3");
+is( sprintf ("%.4f", $star1->distancetostar($star3)), 0.0374, "Distance from 1 to 3");
 
 is( $star1->within($star2, 1), 0, "Star 2 within 1 arcsec of star 1");
 is( $star1->within($star3, 1), 1, "Star 2 within 1 arcsec of star 1");
