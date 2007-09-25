@@ -1,3 +1,9 @@
+2007-09-25  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+	* Item/Item.pm: Add misc() accessor method.
+
+	* IO/JCMT.pm: Use misc() accessor method to hold line velocity
+	width and 850-micron flux.
+
 2006-06-05  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
 	* IO/FINDOFF.pm: FINDOFF input catalogue has to have integer-based
