@@ -137,14 +137,14 @@ sub _read_catalog {
 
   # Default options
   my %defaults = ( telescope => 'JCMT',
-		   incplanets => 1);
+                   incplanets => 1);
 
   my %options = (%defaults, @_);
 
   croak "Must supply catalogue contents as a reference to an array"
     unless ref($lines) eq 'ARRAY';
 
-  # Create a new telescope to associate with this 
+  # Create a new telescope to associate with this
   my $tel;
   $tel = new Astro::Telescope( $options{telescope} )
     if $options{telescope};
@@ -161,24 +161,24 @@ sub _read_catalog {
     # And associate a telescope
     if ($tel) {
       for (@planets) {
-	$_->telescope($tel);
+        $_->telescope($tel);
       }
     }
 
     # And create the star objects
-    push(@stars, map { new Astro::Catalog::Star( 
-						field => 'JCMT',
-						id => $_->name,
-						coords => $_,
-						comment => 'Added automatically',
-					       ) } @planets);
+    push(@stars, map { new Astro::Catalog::Star(
+                                                field => 'JCMT',
+                                                id => $_->name,
+                                                coords => $_,
+                                                comment => 'Added automatically',
+                                               ) } @planets);
 
   }
 
   # Create the catalog object
   return new Astro::Catalog( Stars => \@stars,
-			     Origin => 'JCMT',
-			   );
+                             Origin => 'JCMT',
+                           );
 
 }
 
@@ -212,8 +212,8 @@ sub _write_catalog {
   # after cleaning. We need this so that we can make sure
   # a generated name derived from a duplication (with target mismatch)
   # does not generate a name that already existed explicitly.
-  my %allnames = map { $class->clean_target_name($_->coords->name), undef } 
-                      @sources;
+  my %allnames = map { $class->clean_target_name($_->coords->name), undef }
+                     @sources;
 
   # Loop over each source and extract catalog information
   # Make sure that we remove unique entries
@@ -256,12 +256,12 @@ sub _write_catalog {
       # Get the velocity information
       my $rv = $src->rv;
       if ($rv) {
-	$srcdata{rv}    = $rv;
-	$srcdata{vdefn}  = $src->vdefn;
-	$srcdata{vframe} = $src->vframe;
+        $srcdata{rv}    = $rv;
+        $srcdata{vdefn}  = $src->vdefn;
+        $srcdata{vframe} = $src->vframe;
 
-	# JCMT compatibility
-	$srcdata{vframe} = "LSR" if $srcdata{vframe} eq 'LSRK';
+        # JCMT compatibility
+        $srcdata{vframe} = "LSR" if $srcdata{vframe} eq 'LSRK';
 
       }
 
@@ -312,66 +312,68 @@ sub _write_catalog {
 			    $srcdata{rv}, $srcdata{vdefn}, $srcdata{vframe});
 
       if ($prevcoords eq $curcoords) {
-	# This is the same target so we can ignore it
+        # This is the same target so we can ignore it
       } else {
-	# Make up a new name. Use the unknown counter for this since we probably
-	# have not used it before. Probably not the best approach and might have
-	# problems in edge cases but good enough for now
-	my $oldname = $srcdata{name};
+        # Make up a new name. Use the unknown counter for this since
+        # we probably have not used it before. Probably not the best
+        # approach and might have problems in edge cases but good
+        # enough for now
+        my $oldname = $srcdata{name};
 
-	# loop for 100 times
-	my $count;
-	while (1) {
-	  # protection loop
-	  $count++;
+        # loop for 100 times
+        my $count;
+        while (1) {
+          # protection loop
+          $count++;
 
-	  # Try to construct a new name based on a global counter
-	  # rather than a counter that starts at 1 for each root
-	  my $suffix = "_$unk";
+          # Try to construct a new name based on a global counter
+          # rather than a counter that starts at 1 for each root
+          my $suffix = "_$unk";
 
-	  # increment $unk for next try
-	  $unk++;
+          # increment $unk for next try
+          $unk++;
 
-	  # Abort if we have gone round too many times
-	  # Making sure that $unk is incremented first
-	  if ($count > 100) {
-	    $srcdata{name} = substr($oldname,0,int(MAX_SRC_LENGTH/2)) . 
-	        int(rand(10000)+1000);
-	    warn "Uncontrollable looping (or unfeasibly large number of duplicate sources with different coordinates). Panicked and generated random source name of $srcdata{name}.\n";
-	    last;
-	  }
+          # Abort if we have gone round too many times
+          # Making sure that $unk is incremented first
+          if ($count > 100) {
+            $srcdata{name} = substr($oldname,0,int(MAX_SRC_LENGTH/2)) .
+                             int(rand(10000)+1000);
+            warn "Uncontrollable looping (or unfeasibly large number of duplicate sources with different coordinates). Panicked and generated random source name of $srcdata{name}.\n";
+            last;
+          }
 
-	  # Assume the old name will do fine
-	  my $root = $oldname;
+          # Assume the old name will do fine
+          my $root = $oldname;
 
-	  # Do not want to truncate the _XX off the end later on
-	  if (length($oldname) > MAX_SRC_LENGTH - length($suffix)) {
-	    # This may well be confusing but we have no choice. Since _XX
-	    # is unique the only time we will get a name clash by simply chopping
-	    # the string is if we have a duplicate that is too long along with a
-	    # target name that includes _XX amd matches the truncated source name!
-	    $root = substr($oldname, 0, (MAX_SRC_LENGTH-length($suffix)) );
+          # Do not want to truncate the _XX off the end later on
+          if (length($oldname) > MAX_SRC_LENGTH - length($suffix)) {
+            # This may well be confusing but we have no choice. Since
+            # _XX is unique the only time we will get a name clash by
+            # simply chopping the string is if we have a duplicate
+            # that is too long along with a target name that includes
+            # _XX amd matches the truncated source name!
+            $root = substr($oldname, 0, (MAX_SRC_LENGTH-length($suffix)) );
 
-	  }
+          }
 
-	  # Form the new name
-	  my $newname = $root . $suffix;
+          # Form the new name
+          my $newname = $root . $suffix;
 
-	  # check to see if this name is in the existing target list
-	  next if exists $allnames{$newname};
+          # check to see if this name is in the existing target list
+          next if exists $allnames{$newname};
 
-	  # Store it in the targets array and exit loop
-	  $srcdata{name} = $newname;
-	  last;
-	}
+          # Store it in the targets array and exit loop
+          $srcdata{name} = $newname;
+          last;
+        }
 
-	# different target
-	warn "Found target with the same name [$oldname] but with different coordinates, renaming it to $srcdata{name}!\n";
+        # different target
+        warn "Found target with the same name [$oldname] but with different coordinates, renaming it to $srcdata{name}!\n";
 
-	$targets{$srcdata{name}} = \%srcdata;
+        $targets{$srcdata{name}} = \%srcdata;
 
-	# Store it in the array
-	push(@processed, \%srcdata);
+        # Store it in the array
+        push(@processed, \%srcdata);
 
       }
 
@@ -427,7 +429,7 @@ sub _write_catalog {
     # if we have appended _X....
     $name = substr($name,0,MAX_SRC_LENGTH);
 
-    push @lines, 
+    push @lines,
       sprintf("%-". MAX_SRC_LENGTH.
       "s    %02d %02d %06.3f %1s %02d %02d %04.1f  %2s  %s  n/a   n/a   %-4s %s %s\n",
       $name, @$long, @$lat, $system, $rv, $vframe, $vdefn, $comment);
@@ -466,37 +468,37 @@ sub _parse_line {
 
   # Use a pattern match parser
   my @match = ( $line =~ m/^(.*?)  # Target name (non greedy)
-		          \s*   # optional trailing space
-                          (\d{1,2}) # 1 or 2 digits [RA:h] [greedy]
-		          \s+       # separator
-		          (\d{1,2}) # 1 or 2 digits [RA:m]
-		          \s+       # separator
-		          (\d{1,2}(?:\.\d*)?) # 1|2 digits opt .fraction [RA:s]
-		                    # no capture on fraction
-		          \s+
-		          ([+-]?\s*\d{1,2}) # 1|2 digit [dec:d] inc sign
-		          \s+
-		          (\d{1,2}) # 1|2 digit [dec:m]
-		          \s+
-		          (\d{1,2}(?:\.\d*)?) # arcsecond (optional fraction)
-                                              # no capture on fraction
-		          \s+
-		          (RJ|RB|GA|AZ) # coordinate type
-		         # most everything else is optional
-		         # [sign]velocity, flux,vrange,vel_def,frame,comments
-		         \s*
-		         (n\/a|[+-]\s*\d+(?:\.\d*)?)?  # velocity [8]
-		         \s*
-		         (n\/a|\d+(?:\.\d*)?)?    # flux [9]
-		         \s*
-		         (n\/a|\d+(?:\.\d*)?)?    # vel range [10]
-		         \s*
-		         ([\w\/]+)?               # vel frame [11]
-		         \s*
-		         ([\w\/]+)?               # vel defn [12]
-		         \s*
-		         (.*)$                    # comment [13]
-		/xi);
+                           \s*   # optional trailing space
+                           (\d{1,2}) # 1 or 2 digits [RA:h] [greedy]
+                           \s+       # separator
+                           (\d{1,2}) # 1 or 2 digits [RA:m]
+                           \s+       # separator
+                           (\d{1,2}(?:\.\d*)?) # 1|2 digits opt .fraction [RA:s]
+                           # no capture on fraction
+                           \s+
+                           ([+-]?\s*\d{1,2}) # 1|2 digit [dec:d] inc sign
+                           \s+
+                           (\d{1,2}) # 1|2 digit [dec:m]
+                           \s+
+                           (\d{1,2}(?:\.\d*)?) # arcsecond (optional fraction)
+                           # no capture on fraction
+                           \s+
+                           (RJ|RB|GA|AZ) # coordinate type
+                           # most everything else is optional
+                           # [sign]velocity, flux,vrange,vel_def,frame,comments
+                           \s*
+                           (n\/a|[+-]\s*\d+(?:\.\d*)?)?  # velocity [8]
+                           \s*
+                           (n\/a|\d+(?:\.\d*)?)?    # flux [9]
+                           \s*
+                           (n\/a|\d+(?:\.\d*)?)?    # vel range [10]
+                           \s*
+                           ([\w\/]+)?               # vel frame [11]
+                           \s*
+                           ([\w\/]+)?               # vel defn [12]
+                           \s*
+                           (.*)$                    # comment [13]
+                           /xi);
 
   # Abort if we do not have matches for the first 8 fields
   for (0..7) {
@@ -584,10 +586,10 @@ sub _parse_line {
 
   # Now create the star object
   return new Astro::Catalog::Star( id => $target,
-				   coords => $source,
-				   field => $field,
-				   comment => $comment,
-				 );
+                                   coords => $source,
+                                   field => $field,
+                                   comment => $comment,
+                                 );
 
 }
 
