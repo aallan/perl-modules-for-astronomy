@@ -19,7 +19,7 @@ package Astro::Catalog;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Catalog.pm,v 1.58 2006/05/02 21:41:39 cavanagh Exp $
+#     $Id: Catalog.pm,v 1.59 2007/10/31 22:10:48 cavanagh Exp $
 
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
@@ -72,7 +72,7 @@ use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-'$Revision: 1.58 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.59 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 $DEBUG = 0;
 
 
@@ -80,7 +80,7 @@ $DEBUG = 0;
 
 =head1 REVISION
 
-$Id: Catalog.pm,v 1.58 2006/05/02 21:41:39 cavanagh Exp $
+$Id: Catalog.pm,v 1.59 2007/10/31 22:10:48 cavanagh Exp $
 
 =head1 METHODS
 
@@ -420,6 +420,8 @@ sub popstarbyid {
   my $id = shift;
 
   # Return if we know that that star doesn't exist.
+  return () if ( ! defined( $self->{IDS} ) );
+  return () if ( ! defined( $self->{IDS}->{$id} ) );
   return () if ( ! $self->{IDS}->{$id} );
 
   my @matched;
