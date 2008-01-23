@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE RTML SYSTEM "http://www.estar.org.uk/documents/rtml2.2.dtd">
+<RTML version="2.2" type="request">
+  <Contact>
+    <Name>Alasdair Allan</Name>
+    <User>PATT/keith.horne</User>
+    <Institution>eSTAR Project</Institution>
+    <Email>aa@astro.ex.ac.uk</Email>
+  </Contact>
+  <Project>PL04B17</Project>
+  <Telescope/>
+  <IntelligentAgent host="144.173.229.22" port="2047">Test-001</IntelligentAgent>
+  <Observation>
+    <Target type="normal" ident="ExoPlanetMonitor">
+      <TargetName>OB07006</TargetName>
+      <Coordinates>
+        <RightAscension units="hms" format="hh mm ss.ss">17 02 52.50</RightAscension>
+        <Declination units="dms" format="sdd mm ss.ss">+22 15 11.80</Declination>
+        <Equinox>J2000</Equinox>
+      </Coordinates>
+    </Target>
+    <Device type="camera" region="infrared"> 
+       <Filter>
+        <FilterType>J</FilterType>
+       </Filter>
+         <Detector>
+	  <Binning rows="1" columns="1" />
+         </Detector>
+    </Device>
+    <Schedule priority="0">
+      <Exposure type="time" units="seconds">
+        <Count>9</Count>20.0</Exposure>
+      <TimeConstraint>
+        <StartDateTime>2007-03-22T06:00:56</StartDateTime>
+        <EndDateTime>2007-03-22T16:23:56</EndDateTime>
+      </TimeConstraint>
+      <SeriesConstraint>
+        <Count>72</Count>
+        <Interval>PT3600.0S</Interval>
+        <Tolerance>PT3400.0S</Tolerance>
+      </SeriesConstraint>
+    </Schedule>
+  </Observation>
+</RTML>
