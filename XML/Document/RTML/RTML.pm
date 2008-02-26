@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.18 2007/06/21 14:49:45 aa Exp $
+#     $Id: RTML.pm,v 1.19 2008/02/26 15:17:37 aa Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -71,13 +71,13 @@ use Scalar::Util qw(reftype);
 #use Astro::FITS::Header;
 #use Astro::VO::VOTable;
 
-'$Revision: 1.18 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.18 2007/06/21 14:49:45 aa Exp $
+$Id: RTML.pm,v 1.19 2008/02/26 15:17:37 aa Exp $
 
 =head1 METHODS
 
@@ -747,7 +747,7 @@ Return, or set, the priority of the observation
  
 Schedule (RTML) priority     Phase II Priority  Phase II GUI
    N/A                       5                  Urgent
-   0                         4                  (default) Normal
+   0                         4                  Quite Urgent
    1                         3                  High
    2                         2                  Medium
    3                         1                  Normal

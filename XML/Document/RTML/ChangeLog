@@ -1,3 +1,7 @@
+2008-02-26 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.18)
+
+        * Modified the priority table to reflect current events
+
 2007-06-21 Alasdair Allan <aa@astro.ex.ac.uk>
 
 	* RTML.pm: Added support for SuperIRCAM on the LT with addition of
