@@ -15,7 +15,7 @@ package XML::Document::RTML;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: RTML.pm,v 1.19 2008/02/26 15:17:37 aa Exp $
+#     $Id: RTML.pm,v 1.20 2008/11/17 18:07:22 saunders Exp $
 
 #  Copyright:
 #     Copyright (C) 200s University of Exeter. All Rights Reserved.
@@ -71,13 +71,13 @@ use Scalar::Util qw(reftype);
 #use Astro::FITS::Header;
 #use Astro::VO::VOTable;
 
-'$Revision: 1.19 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.20 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
-$Id: RTML.pm,v 1.19 2008/02/26 15:17:37 aa Exp $
+$Id: RTML.pm,v 1.20 2008/11/17 18:07:22 saunders Exp $
 
 =head1 METHODS
 
@@ -116,6 +116,368 @@ sub new {
 }
 
 # B U I L D   M E T H O D ------------------------------------------------
+
+
+# Alternative low level build method which accepts no arguments except the 
+# document type. It expects all parameters to have been previously configured
+# at the object. It allows multiple <Observation> blocks to be specified, so
+# you can chain arbitrary filters, exposures, or positions, for example.
+sub build_multi {
+  my $self = shift;
+  my $doctype = shift;
+
+
+  # open the document
+  $self->{WRITER}->xmlDecl( 'ISO-8859-1' );
+   
+  # BEGIN DOCUMENT ------------------------------------------------------- 
+  
+  if ( $self->version() == 2.2 ) {
+     $self->{WRITER}->doctype( 'RTML', '', $self->{DTD} );
+  } elsif ( $self->version() == 2.1 ) {
+     $self->{WRITER}->doctype( 'RTML', '',
+          "http://astro.livjm.ac.uk/HaGS/rtml2.1.dtd" );
+  } else {
+     $self->{WRITER}->doctype( 'RTML' );
+  }
+   
+  # open the RTML document
+  # ======================
+  $self->{WRITER}->startTag( 'RTML','version' => $self->version(),
+                             'type' => $doctype );
+			        
+  # Contact Tag
+  # -----------
+  if( defined $self->user_name() || 
+      defined $self->real_name() ||
+      defined $self->institution() ||
+      defined $self->email() ) {
+      
+     $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
+
+     if (defined $self->real_name() ) {
+     
+        $self->{WRITER}->startTag( 'Name');                          
+        $self->{WRITER}->characters( $self->real_name() );
+        $self->{WRITER}->endTag( 'Name' );  
+     } else {
+        $self->{WRITER}->emptyTag( 'Name');                          
+     }
+     if (defined $self->user_name() ) {
+        $self->{WRITER}->startTag( 'User');                          
+        $self->{WRITER}->characters( $self->user_name() );
+        $self->{WRITER}->endTag( 'User' );
+     } else {
+        $self->{WRITER}->emptyTag( 'User');                          
+     }
+     if (defined $self->institution() ) {
+      
+        $self->{WRITER}->startTag( 'Institution');                          
+        $self->{WRITER}->characters( $self->institution() );
+        $self->{WRITER}->endTag( 'Institution' ); 
+     } else {
+        $self->{WRITER}->emptyTag( 'Institution');                          
+     }
+     if (defined $self->email() ) {
+      
+        $self->{WRITER}->startTag( 'Email');                          
+        $self->{WRITER}->characters( $self->email() );
+        $self->{WRITER}->endTag( 'Email' ); 
+     } else {
+        $self->{WRITER}->emptyTag( 'Email');                          
+     }
+     
+     $self->{WRITER}->endTag( 'Contact' ); 
+  } else {
+     $self->{WRITER}->emptyTag( 'Contact' );
+  }   
+  
+  # Project Tag
+  # -----------
+  if (defined $self->project() ) {
+    $self->{WRITER}->startTag( 'Project' );     
+    $self->{WRITER}->characters( $self->project() );
+    $self->{WRITER}->endTag( 'Project' );          		     
+  } else {
+    $self->{WRITER}->emptyTag( 'Project' );
+  }
+
+  # Telescope Tag
+  # -------------
+  $self->{WRITER}->emptyTag( 'Telescope' );
+
+  # IntelligentAgent Tag
+  # --------------------
+
+  if (defined $self->id() && defined $self->host() && defined $self->port() ) {
+
+     $self->{WRITER}->startTag( 'IntelligentAgent', 
+        'host' => $self->host(), 'port' => $self->port() ); 	
+     
+     $self->{WRITER}->characters( $self->id() );
+  
+     $self->{WRITER}->endTag( 'IntelligentAgent' );     
+  } 
+   
+  # Observation tag
+  # ---------------
+  
+  my $n_observation_blocks = $self->number_of_observations;
+  $self->observation(0);
+  while ( $n_observation_blocks > 0 ) {
+
+     $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
+
+     # Target
+     # ------
+     $self->{WRITER}->startTag( 'Target', , 
+                                'type'  => $self->target_type(),
+                                'ident' => $self->target_ident() 
+                               );
+
+     # Target Name
+     # -----------
+        if ( defined $self->target() ) {
+     	   $self->{WRITER}->startTag( 'TargetName' );
+     	   $self->{WRITER}->characters( $self->target() );
+     	   $self->{WRITER}->endTag( 'TargetName' );
+        } else {
+           $self->{WRITER}->emptyTag( 'TargetName' );
+        }
+
+        # Co-ordinates
+        # ------------
+        if ( defined $self->coordinate_type() ) {
+           $self->{WRITER}->startTag( 'Coordinates', 
+	                              'type' => $self->coordinate_type());
+        } else {
+           $self->{WRITER}->startTag( 'Coordinates' );	
+        }
+           $self->{WRITER}->startTag( 'RightAscension', 
+        			      'format' => $self->raformat(), 
+     				      'units'  => $self->raunits() );
+           $self->{WRITER}->characters( $self->ra() );
+           
+              if ( defined $self->ra_offset ) {
+                 $self->{WRITER}->startTag( 'AngleOffset',
+                                            'units' => $self->ra_offset_units );
+                 $self->{WRITER}->characters( $self->ra_offset );
+                 $self->{WRITER}->endTag( 'AngleOffset' );
+              }
+           
+           $self->{WRITER}->endTag( 'RightAscension' );
+
+           $self->{WRITER}->startTag( 'Declination', 
+     			              'format' => $self->decformat(), 
+				      'units'  => $self->decunits() );
+
+           if ( $self->dec() =~ m/^\+/ ) {
+     	      $self->{WRITER}->characters( $self->dec() );
+           } else {			    
+              if ( $self->dec() =~ m/-/ ) { 
+     	        $self->{WRITER}->characters( $self->dec() );
+     	      } else {		    
+     	        $self->{WRITER}->characters( "+" . $self->dec() );
+     	      }  
+           }
+
+              if ( defined $self->dec_offset ) {
+                 $self->{WRITER}->startTag( 'AngleOffset',
+                                            'units' => $self->dec_offset_units );
+                 $self->{WRITER}->characters( $self->dec_offset );
+                 $self->{WRITER}->endTag( 'AngleOffset' );
+              }
+
+           $self->{WRITER}->endTag( 'Declination' );   
+
+           $self->{WRITER}->startTag( 'Equinox'  );
+              $self->{WRITER}->characters( $self->equinox() );
+           $self->{WRITER}->endTag( 'Equinox' );
+
+        $self->{WRITER}->endTag( 'Coordinates' );       
+
+
+        # Flux
+        # ----
+        if( $self->exposure_type() eq "snr" ) {
+
+           $self->{WRITER}->startTag( 'Flux', 
+                                      'type'       => 'continuum', 
+	                              'units'      => 'mag', 
+                                      'wavelength' => $self->filter_type() ); 
+           $self->{WRITER}->characters( $self->reference_flux() );
+           $self->{WRITER}->endTag( 'Flux' );
+        }
+
+     $self->{WRITER}->endTag( 'Target' );
+
+        # Device
+        # ------
+        if( defined $self->region() ) {
+           $self->{WRITER}->startTag( 'Device', 'type' => $self->device_type(),
+	                                        'region' => $self->region() );
+
+        } else {
+           $self->{WRITER}->startTag( 'Device', 'type' => $self->device_type() );
+        }
+           # Filter
+	   # ------
+           $self->{WRITER}->startTag( 'Filter' ); 
+           $self->{WRITER}->startTag( 'FilterType'); 
+           $self->{WRITER}->characters( $self->filter_type() );
+           $self->{WRITER}->endTag( 'FilterType' ); 
+           $self->{WRITER}->endTag( 'Filter' );
+        $self->{WRITER}->endTag( 'Device' );          
+
+        # Schedule
+        # --------
+        $self->{WRITER}->startTag( 'Schedule', 'priority' => $self->priority() );
+
+     	   # Exposure
+	   # --------
+           if ( $self->exposure_type() eq "time" ) {
+              $self->{WRITER}->startTag( 'Exposure',
+                                         'type'  => $self->exposure_type(), 
+				         'units' => $self->exposure_units() );
+              if( defined $self->group_count() && $self->group_count() > 1 ) {
+                 $self->{WRITER}->startTag( 'Count'); 
+                 $self->{WRITER}->characters( $self->group_count() );
+                 $self->{WRITER}->endTag( 'Count' ); 
+              }                        
+              $self->{WRITER}->characters( $self->exposure_time() );   
+
+           } else {
+     	      $self->exposure_type( "snr" );
+              $self->{WRITER}->startTag( 'Exposure',
+                                         'type'  => $self->exposure_type() );	
+              if( defined $self->group_count() && $self->group_count() > 1 ) {
+                 $self->{WRITER}->startTag( 'Count'); 
+                 $self->{WRITER}->characters( $self->group_count() );
+                 $self->{WRITER}->endTag( 'Count' ); 
+              }                        
+              $self->{WRITER}->characters( $self->signal_to_noise() );   
+
+           }
+           $self->{WRITER}->endTag( 'Exposure' );
+
+	   # TimeConstraint
+	   # --------------
+           if( defined $self->start_time() && defined $self->end_time() ) {
+              $self->{WRITER}->startTag( 'TimeConstraint' );
+              $self->{WRITER}->startTag( 'StartDateTime' );
+              $self->{WRITER}->characters( $self->start_time() );
+              $self->{WRITER}->endTag( 'StartDateTime' );
+              $self->{WRITER}->startTag( 'EndDateTime' );
+              $self->{WRITER}->characters( $self->end_time() );
+              $self->{WRITER}->endTag( 'EndDateTime' );	    
+              $self->{WRITER}->endTag( 'TimeConstraint' );
+           }	
+
+	   # SeriesConstraint
+	   # ----------------
+           if ( defined $self->series_count() &&
+                defined $self->interval() &&
+                defined $self->tolerance() ) {
+
+                $self->{WRITER}->startTag( 'SeriesConstraint' );
+
+                $self->{WRITER}->startTag( 'Count' );
+                $self->{WRITER}->characters($self->series_count() );
+                $self->{WRITER}->endTag( 'Count' );
+
+                $self->{WRITER}->startTag( 'Interval' );
+                $self->{WRITER}->characters( $self->interval() );
+                $self->{WRITER}->endTag( 'Interval' );               
+
+                $self->{WRITER}->startTag( 'Tolerance' );
+                $self->{WRITER}->characters( $self->tolerance() );
+                $self->{WRITER}->endTag( 'Tolerance' );               
+
+                $self->{WRITER}->endTag( 'SeriesConstraint' );
+           }	
+
+        $self->{WRITER}->endTag( 'Schedule' );
+
+        # Data tags
+        # ---------
+        my @images = $self->images();
+        my @image_type = $self->image_type();
+        my @image_delivery = $self->image_delivery();
+        my @image_reduced = $self->image_reduced();
+
+        my @catalogues = $self->catalogues();
+        my @catalogue_types = $self->catalogue_type();
+
+        my @headers = $self->headers();
+        my @header_types = $self->header_type();
+
+        foreach my $j ( 0 .. $#images ) {
+
+           $self->{WRITER}->startTag( 'ImageData',
+                            'type'     => $image_type[$j],
+		            'delivery' => $image_delivery[$j],
+		            'reduced'  => $image_reduced[$j] );
+
+	   # FITSHeader
+	   # ----------
+	   if( defined $headers[$j] && defined $header_types[$j] ) {
+              $self->{WRITER}->startTag( 'FITSHeader', 'type' => $header_types[$j] );	
+	      $self->{WRITER}->characters( $headers[$j] );
+              $self->{WRITER}->endTag( 'FITSHeader' );		      
+	   }
+
+	   # ObjectList
+	   # ----------
+	   if ( defined $catalogues[$j] && defined $catalogue_types[$j] ) {
+              $self->{WRITER}->startTag( 'ObjectList', 'type' => $catalogue_types[$j] );	
+	      $self->{WRITER}->characters( $catalogues[$j] );
+              $self->{WRITER}->endTag( 'ObjectList' );	
+	   }
+
+	   # FITS file
+	   # ---------
+	   $self->{WRITER}->characters( $images[$j] );
+
+           $self->{WRITER}->endTag( 'ImageData' );		      
+        }  
+
+     $self->{WRITER}->endTag( 'Observation' );  
+  
+      # Decrement the number of blocks left to write out...
+      $n_observation_blocks--;
+      
+      #Increment the number of the current block for the next loop...
+      $self->observation(1 + $self->observation);
+  }
+  
+  
+       
+  # Score Tags
+  # ---------- 
+  if (defined $self->{DOCUMENT}->{Score} ) {
+     $self->{WRITER}->startTag( 'Score' );
+     $self->{WRITER}->characters( $self->{DOCUMENT}->{Score} );
+     $self->{WRITER}->endTag( 'Score' );
+  }
+  if ( defined $self->{DOCUMENT}->{CompletionTime} ) {   
+     $self->{WRITER}->startTag( 'CompletionTime' );
+     $self->{WRITER}->characters( $self->{DOCUMENT}->{CompletionTime} );
+     $self->{WRITER}->endTag( 'CompletionTime' );       
+  }    
+  
+  # close the RTML DOCUMENT
+  # =======================
+
+  $self->{WRITER}->endTag( 'RTML' );
+  $self->{WRITER}->end();
+
+  # END DOCUMENT --------------------------------------------------------
+
+  my $xml = $self->{BUFFER}->value();
+  $self->_parse( XML => $xml ); # populates the object with a parsed document
+  return $xml;  
+
+}
 
 sub build {
   my $self = shift;
@@ -1076,6 +1438,25 @@ sub raunits {
   ra_units( @_ );
 }  
 
+sub ra_offset {
+   my $self = shift;
+
+  if (@_) {
+    $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{AngleOffset}->{content} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{AngleOffset}->{content};
+}
+
+sub ra_offset_units {
+  my $self = shift;
+
+  if (@_) {
+    $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{AngleOffset}->{units} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{AngleOffset}->{units};
+} 
+
+
 =item B<dec>
 
 Sets (or returns) the target DEC
@@ -1121,6 +1502,25 @@ sub dec_units {
 sub decunits {
   dec_units( @_ );
 }  
+
+sub dec_offset {
+   my $self = shift;
+
+  if (@_) {
+    $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{AngleOffset}->{content} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{AngleOffset}->{content};
+}
+
+sub dec_offset_units {
+  my $self = shift;
+
+  if (@_) {
+    $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{AngleOffset}->{units} = shift;
+  }
+  return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{AngleOffset}->{units};
+} 
+
 
 =item B<equinox>
 

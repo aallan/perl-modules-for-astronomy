@@ -1,3 +1,10 @@
+2008-11-17 Eric Saunders <saunders@astro.ex.ac.uk>
+
+	* RTML.pm: Implemented build_multi() method to allow specification
+          of multiple <Observation> blocks.
+
+	* build_multi_rtml_test.pl: Script demonstrating example use.
+
 2008-02-26 Alasdair Allan <aa@astro.ex.ac.uk> (Version 1.18)
 
         * Modified the priority table to reflect current events
