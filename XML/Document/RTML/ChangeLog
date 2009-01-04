@@ -1,3 +1,7 @@
+2009-01-04 Alasdair Allan <aa@astro.ex.ac.uk>
+
+	* MANIFEST: Fixed faulty manifest for distribution.
+	
 2008-11-17 Eric Saunders <saunders@astro.ex.ac.uk>
 
 	* RTML.pm: Implemented build_multi() method to allow specification

@@ -4,6 +4,7 @@ MANIFEST
 Makefile.PL
 README
 RTML.pm
+build_multi_rtml_test.pl
 t/1_compile.t
 t/2_build.t
 t/2_data.t
@@ -28,6 +29,7 @@ t/rtml2.2/example_request.xml
 t/rtml2.2/example_score.xml
 t/rtml2.2/example_score_reply.xml
 t/rtml2.2/example_score_reply_scores.rtml
+t/rtml2.2/example_update.xml
 t/rtml2.2/problem_1.xml
 t/rtml2.2/problem_2.xml
 t/rtml2.2/supircam.rtml
