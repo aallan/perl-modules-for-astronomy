@@ -1,6 +1,0 @@
-Create a first_child_element() utility method that returns the first
-child element of an element. This should skip over attribute and text
-fields until the child element is found. Ditto for
-next_child_element() and last_child_element().
-
-Include constants which define the libxml2 node types.

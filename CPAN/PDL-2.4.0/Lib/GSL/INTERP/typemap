@@ -1,3 +1,0 @@
-TYPEMAP
-GslSpline *	T_PTROBJ
-GslAccel *	T_PTROBJ
