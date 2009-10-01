@@ -385,7 +385,6 @@ sub _set_cfg_file {
       $cfg_file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
     }
   }
-    print "CFG FILE IS $cfg_file\n";
   return $cfg_file;
 }
 
