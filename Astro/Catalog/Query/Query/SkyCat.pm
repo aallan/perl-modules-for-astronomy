@@ -356,8 +356,9 @@ contents into the query object itself.
 
 =cut
 
-{
+sub _set_cfg_file {
   my $cfg_file;
+
   if( exists $ENV{SKYCAT_CFG} ) {
      $cfg_file = $ENV{SKYCAT_CFG};
   } elsif ( -f File::Spec->catfile( $ENV{HOME}, ".skycat", "skycat.cfg") ){
@@ -372,28 +373,40 @@ contents into the query object itself.
     my @path;
     foreach my $i ( 0 .. $#dirs-2 ) {
       push @path, $dirs[$i];
-    }  
+    }
     my $directory = File::Spec->catdir( @path, 'etc' );
-    
+
     # reset to the default
     $cfg_file = File::Spec->catfile( $directory, "skycat.cfg" ); 
-    
+
     # debugging and testing purposes
     unless ( -f $cfg_file ) {
       # use blib version!
       $cfg_file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
-    }    
-  }
-  
-  sub cfg_file {
-    my $class = shift;
-    if (@_) {
-      $cfg_file = shift;
-      $class->_load_config() || ($cfg_file = undef);
     }
-    return $cfg_file;
   }
+    print "CFG FILE IS $cfg_file\n";
+  return $cfg_file;
+}
 
+sub cfg_file {
+  my $class = shift;
+  my $cfg_file;
+  if (@_) {
+    $cfg_file = shift;
+    if( ( defined( $class->{CFG_FILE} ) &&
+          $cfg_file ne $class->{CFG_FILE} ) ||
+        ! defined( $class->{CFG_FILE} ) ) {
+
+      # We were given a new config file, so load it.
+      $class->_load_config($cfg_file);
+      $class->{CFG_FILE} = $cfg_file;
+    }
+  }
+  if( ! defined( $class->{CFG_FILE} ) ) {
+    $class->{CFG_FILE} = _set_cfg_file;
+  }
+  return $class->{CFG_FILE};
 }
 
 =begin __PRIVATE_METHODS__
@@ -424,13 +437,13 @@ has not previously been read.
 
 sub _load_config {
   my $self = shift;
-  my $cfg = $self->cfg_file;
+  my $cfg = shift;
 
   print "SkyCat.pm: \$cfg = $cfg\n" if $DEBUG;
 
   if (!defined $cfg) {
-    warnings::warnif("Config file not specified (undef)");
-    return;
+    $cfg = _set_cfg_file;
+    $self->cfg_file( $cfg );
   }
 
   unless (-e $cfg) {
