@@ -1,3 +1,12 @@
+2010-02-10  Boyd Duffee <b dot duffee at isc dot keele dot ac dot uk>
+
+	* Fixed bugs in Query.pm: 
+		- #35645 filed at rt.cpan.org (Ampersands);
+		- last line missing from data fetch (while condition tested 
+			in wrong order)
+
+	* updated tests to reflect current ADS values and test for bug #35645
+
 2003-07-15  Alasdair Allan <aa@astro.ex.ac.uk>
 
         * ADS.pm: Introduced a placeholder class to get round a documentation

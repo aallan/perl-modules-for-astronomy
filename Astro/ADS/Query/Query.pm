@@ -730,7 +730,11 @@ sub _make_query {
 
    # loop round all the options keys and build the query
    foreach my $key ( keys %{$self->{OPTIONS}} ) {
-      $options = $options . "&$key=${$self->{OPTIONS}}{$key}";
+      # some bibcodes have & and needs to be made "web safe"
+      my $websafe_option = ${$self->{OPTIONS}}{$key};
+      $websafe_option =~ s/&/%26/g;
+      $options = $options . "&$key=$websafe_option";
+
    }
 
    # build final query URL
@@ -903,8 +907,9 @@ sub _parse_query {
         # LOOP THROUGH PAPER
         my ( @title, @authors, @affil, @journal, @pubdate, @keywords, 
              @origin, @links, @url, @object, @abstract, @score );
-        while ( substr( $buffer[$counter], 0, 2 ) ne "%R" &&
-                $counter < $#buffer ) {
+        while ( $counter <= $#buffer &&
+                substr( $buffer[$counter], 0, 2 ) ne "%R" ) {
+
 
            # grab the tags
            if( substr( $buffer[$counter], 0, 1 ) eq "%" ) {
@@ -1325,6 +1330,18 @@ sub _dump_options {
 =back
 
 =end __PRIVATE_METHODS__
+
+=head1 BUGS
+
+=over
+
+=item #35645 filed at rt.cpan.org (Ampersands)
+
+Older versions can't handle ampersands in the bibcode, such as A&A for Astronomy & Astrophysics.
+Fixed in this version - Boyd Duffee E<lt>b dot duffee at isc dot keele dot ac dot ukE<gt>, 5/2009.
+
+=back
+
 
 =head1 COPYRIGHT
 

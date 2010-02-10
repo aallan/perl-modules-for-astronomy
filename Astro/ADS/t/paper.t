@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 49 };
+BEGIN { plan tests => 50 };
 
 # load modules
 use Astro::ADS::Query;
@@ -160,13 +160,20 @@ print "# Connecting to ADS\n";
 my $refs = $paper->references();
 print "# Continuing Tests\n";
 
-# should be 27 references on ADS for this paper
-ok( $refs->sizeof(), 27 );
+#### Source of Possible Confusion #### 
+# As of Feb 2010, there are 27 citations and 30 references reported by ADS
+# There were 27 references on ADS for this paper in July 2003,
+# but there were 30 references on ADS for this paper in May 2009
+# There are 32 references in the original paper
+####
+ok( $refs->sizeof(), 30 );
 
 # do a followup query
 print "# Connecting to ADS\n";
 my $cites = $paper->citations();
 print "# Continuing Tests\n";
+# 27 citations as of Feb 2010
+ok( $cites->sizeof(), 27 );
 
 # shouldn't be a TOC with this paper
 print "# Connecting to ADS\n";
