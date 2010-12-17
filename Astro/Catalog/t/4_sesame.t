@@ -33,7 +33,7 @@ isa_ok( $catalog, "Astro::Catalog" );
 # reference star
 my $star = new Astro::Catalog::Star( id => 'EX Hya',
 				     coords => new Astro::Coords(
-				       ra =>'12 52 25', dec =>'-29 14 57',
+				       ra =>'12 52 24.40', dec =>'-29 14 56',
 					type=> 'j2000' ) );
 
 #print Dumper ( $star );
@@ -44,8 +44,8 @@ my $sesame2 = new Astro::Catalog::Query::Sesame( Target => 'V* HT Cas' );
 my $catalog2 = $sesame2->querydb();
 
 my $star2 = new Astro::Catalog::Star( id => 'V* HT Cas',
-                                      coords => new Astro::Coords( ra => '01 10 13',
-                                                                   dec => '+60 04 36',
+                                      coords => new Astro::Coords( ra => '01 10 13.13',
+                                                                   dec => '+60 04 35',
                                                                    type => 'J2000' ),
                                     );
 

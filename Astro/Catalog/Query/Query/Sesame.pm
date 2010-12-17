@@ -221,64 +221,14 @@ sub _parse_query {
   # GRAB DEC
   # --------
 
-  # grab Dec
-  my $dec = $coords[2];  
-  #print "dec $dec\n";
-  
-  my $decdot = index $dec, ".";
-  my $deg = substr $dec, 0, $decdot;
-  #print "deg $deg\n";
-  
-  my $min = substr $dec, $decdot+1, length($dec);
-  $min = "0." . $min;
-  $min = $min * 60.0;  
+  # create an Astro::Coords::Angle for coordinate conversion
+  my $ang = new Astro::Coords::Angle($coords[2], units => 'deg');
+  my $objdec = $ang->string;
 
-  my $secdot = index $min, ".";
-  my $sec = substr $min, $secdot+1, length($min);
-  $min = substr $min, 0, $secdot;
-  $sec = "0." . $sec;
-  $sec = POSIX::ceil($sec * 60.0);  
-  
-  if ( $sec == 60 ) {
-     $sec = 0;
-     $min = $min+1;
-  }   
-  #print "min $min\n";
-  #print "sec $sec\n";
-  
-  my $objdec = "$deg $min $sec";  
-  
   # GRAB RA
   # -------
-  
-  # grab RA
-  my $ra = $coords[1];
-  $ra = $ra/15.0;
-  #print "ra $ra\n";
-  
-  my $radot = index $ra, ".";
-  my $hours = substr $ra, 0, $radot;
-  #print "hours $hours\n";
-  
-  $min = substr $ra, $radot+1, length($ra);
-  $min = "0." . $min;
-  $min = $min * 60.0;  
-
-  $secdot = index $min, ".";
-  $sec = substr $min, $secdot+1, length($min);
-  $min = substr $min, 0, $secdot;
-  $sec = "0." . $sec;
-  $sec = POSIX::ceil($sec * 60.0);  
-  
-  if ( $sec == 60 ) {
-     $sec = 0;
-     $min = $min+1;
-  }   
-  #print "min $min\n";
-  #print "sec $sec\n";
-  
-  my $objra = "$hours $min $sec";  
-
+  $ang = new Astro::Coords::Angle($coords[1]/15.0, units => 'deg');
+  my $objra = $ang->string;
 
   $star->coords( new Astro::Coords(ra => $objra,
                                    dec => $objdec,
