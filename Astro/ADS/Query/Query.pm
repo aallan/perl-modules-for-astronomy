@@ -20,6 +20,7 @@ package Astro::ADS::Query;
 
 #  Revision:
 #     $Id: Query.pm,v 1.21 2002/09/23 21:07:49 aa Exp $
+#     $Id: Query.pm,v 1.22 2009/05/01 bjd Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -67,13 +68,14 @@ use Astro::ADS::Result::Paper;
 use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.21 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.22 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
 =head1 REVISION
 
 $Id: Query.pm,v 1.21 2002/09/23 21:07:49 aa Exp $
+$Id: Query.pm,v 1.22 2009/05/01 bjd Exp $
 
 =head1 METHODS
 

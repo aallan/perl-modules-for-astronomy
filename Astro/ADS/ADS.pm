@@ -35,6 +35,6 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 use strict;
 use vars qw/ $VERSION /;
-$VERSION = '1.20.7';
+$VERSION = '1.20.8';
 
 1;                                                                  
