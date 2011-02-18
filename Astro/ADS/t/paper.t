@@ -166,14 +166,22 @@ print "# Continuing Tests\n";
 # but there were 30 references on ADS for this paper in May 2009
 # There are 32 references in the original paper
 ####
-ok( $refs->sizeof(), 30 );
+my $references_found = $refs->sizeof();
+ok( $references_found >= 30 && $references_found <= 32 );
 
 # do a followup query
 print "# Connecting to ADS\n";
 my $cites = $paper->citations();
 print "# Continuing Tests\n";
+# 27 citations as of Feb 2010
+# 28 citations as of Feb 2011
 # 32 citations as of May 2012
-ok( $cites->sizeof(), 32 );
+# The number of citations is always increasing, so as long as
+# this value is greater than 32, you should be fine.  If in doubt,
+# check http://adsabs.harvard.edu/abs/1998MNRAS.295..167A
+
+my $current_number_of_citations = $cites->sizeof();
+ok( $current_number_of_citations >= 32 );
 
 # shouldn't be a TOC with this paper
 print "# Connecting to ADS\n";
