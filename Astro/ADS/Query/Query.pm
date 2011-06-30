@@ -19,8 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.21 2002/09/23 21:07:49 aa Exp $
-#     $Id: Query.pm,v 1.22 2009/05/01 bjd Exp $
+#     $Id: Query.pm,v 1.23 2011/07/01 bjd Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -68,7 +67,7 @@ use Astro::ADS::Result::Paper;
 use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.22 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.23 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 # C O N S T R U C T O R ----------------------------------------------------
 
@@ -76,6 +75,7 @@ use Carp;
 
 $Id: Query.pm,v 1.21 2002/09/23 21:07:49 aa Exp $
 $Id: Query.pm,v 1.22 2009/05/01 bjd Exp $
+$Id: Query.pm,v 1.23 2009/07/01 bjd Exp $
 
 =head1 METHODS
 
@@ -777,12 +777,20 @@ sub _make_query {
       # we definately have an error
       if( $error_flag ) {
          $self->{BUFFER} = undef;
-         croak("Error ${$reply}{_rc}: Failed to establish network connection");
+		 my $proxy_string = undef;
+		 if ($proxy_string = $ua->proxy('http')) { substr($proxy_string, 0, 0) = ' using proxy '; }
+		 else { $proxy_string = ' (no proxy)'; }
+         croak("Error ${$reply}{_rc}: Failed to establish network connection to $URL",
+				$proxy_string, "\n");
       }
 
    } else {
       $self->{BUFFER} = undef;
-      croak("Error ${$reply}{_rc}: Failed to establish network connection");
+	  my $proxy_string = undef;
+	  if ($proxy_string = $ua->proxy('http')) { substr($proxy_string, 0, 0) = ' using proxy '; }
+	  else { $proxy_string = ' (no proxy)'; }
+      croak("Error ${$reply}{_rc}: Failed to establish network connection to $URL",
+				$proxy_string, "\n");
    }
 
 
@@ -809,6 +817,7 @@ sub _make_followup {
 
    # which paper?
    my $bibcode = shift;
+   $bibcode =~ s/&/%26/g;	# make ampersands websafe
 
    # which followup?
    my $refs = shift;
@@ -832,7 +841,11 @@ sub _make_followup {
       $self->{BUFFER} = ${$reply}{"_content"};
    } else {
       $self->{BUFFER} = undef;
-      croak("Error ${$reply}{_rc}: Failed to establish network connection" . $self->{BUFFER} ."\n");
+	  my $proxy_string = undef;
+	  if ($proxy_string = $ua->proxy('http')) { substr($proxy_string, 0, 0) = ' using proxy '; }
+	  else { $proxy_string = ' (no proxy) '; }
+      croak("Error ${$reply}{_rc}: Failed to establish network connection to $URL" .
+			$proxy_string . $self->{BUFFER} ."\n");
    }
 }
 

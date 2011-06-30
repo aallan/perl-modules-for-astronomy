@@ -5,7 +5,7 @@ use strict;
 
 #load test
 use Test;
-BEGIN { plan tests => 25 };
+BEGIN { plan tests => 26 };
 
 # load modules
 use Astro::ADS::Query;
@@ -203,6 +203,10 @@ my $aNa_bibcode = $aNa_paper->bibcode();
 # title from Web search
 ok( $aNa_title, 'NGC 1510 - A young elliptical galaxy' );
 ok( $aNa_bibcode, $bibcode5 );
+
+# check the references with ampersand in bibcode
+my $aNa_references = $aNa_paper->references();
+ok( $aNa_references->sizeof(), 39 );
 
 exit;
 

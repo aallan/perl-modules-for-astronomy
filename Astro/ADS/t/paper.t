@@ -175,6 +175,7 @@ my $cites = $paper->citations();
 print "# Continuing Tests\n";
 # 27 citations as of Feb 2010
 # 28 citations as of Feb 2011
+# 30 citations as of Jul 2011
 # 32 citations as of May 2012
 # The number of citations is always increasing, so as long as
 # this value is greater than 32, you should be fine.  If in doubt,
