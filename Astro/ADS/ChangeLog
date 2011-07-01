@@ -1,3 +1,14 @@
+2011-07-11  Boyd Duffee <b dot duffee at isc dot keele dot ac dot uk>
+
+	* Query.pm
+		- applied same fix as #35645 to the followup queries
+		- improved error reporting on HTTP::Request to include URL 
+			and HTTP_PROXY in output
+		- changed URL to access a new class attribute, accessible via the 
+			ads_mirror class method
+
+	* added and updated tests and released as v1.21.0
+
 2010-02-10  Boyd Duffee <b dot duffee at isc dot keele dot ac dot uk>
 
 	* Fixed bugs in Query.pm: 

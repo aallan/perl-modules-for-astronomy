@@ -19,7 +19,7 @@ package Astro::ADS::Query;
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
 #  Revision:
-#     $Id: Query.pm,v 1.23 2011/07/01 bjd Exp $
+#     $Id: Query.pm,v 1.24 2011/07/01 bjd Exp $
 
 #  Copyright:
 #     Copyright (C) 2001 University of Exeter. All Rights Reserved.
@@ -67,7 +67,17 @@ use Astro::ADS::Result::Paper;
 use Net::Domain qw(hostname hostdomain);
 use Carp;
 
-'$Revision: 1.23 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+'$Revision: 1.24 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+
+# C L A S S   A T T R I B U T E S ------------------------------------------
+{
+	my $_ads_mirror = 'cdsads.u-strasbg.fr';
+	sub ads_mirror {
+		my ($class, $new_mirror) = @_;
+		$_ads_mirror = $new_mirror if @_ > 1;
+		return $_ads_mirror;
+	}
+}
 
 # C O N S T R U C T O R ----------------------------------------------------
 
@@ -75,7 +85,7 @@ use Carp;
 
 $Id: Query.pm,v 1.21 2002/09/23 21:07:49 aa Exp $
 $Id: Query.pm,v 1.22 2009/05/01 bjd Exp $
-$Id: Query.pm,v 1.23 2009/07/01 bjd Exp $
+$Id: Query.pm,v 1.24 2009/07/01 bjd Exp $
 
 =head1 METHODS
 
@@ -241,10 +251,15 @@ Return (or set) the current base URL for the ADS query.
 
 if not defined the default URL is cdsads.u-strasbg.fr
 
+As of v1.24, this method sets a class attribute to keep it
+consistant across all objects.  Not terribly thread safe, but
+at least you know where your query is going.
+
 =cut
 
 sub url {
   my $self = shift;
+  my $class = ref($self);	# now re-implemented as a class attribute
 
   # SETTING URL
   if (@_) {
@@ -252,6 +267,7 @@ sub url {
     # set the url option
     my $base_url = shift;
     $self->{URL} = $base_url;
+    $class->ads_mirror( $base_url );
     if( defined $base_url ) {
        $self->{QUERY} = "http://$base_url/cgi-bin/nph-abs_connect?";
        $self->{FOLLOWUP} = "http://$base_url/cgi-bin/nph-ref_query?";
@@ -259,7 +275,7 @@ sub url {
   }
 
   # RETURNING URL
-  return $self->{URL};
+  return $class->ads_mirror();
 }
 
 =item B<agent>
@@ -608,15 +624,15 @@ Does nothing if the array is not supplied.
 
 sub configure {
   my $self = shift;
+  my $class = ref($self);
 
   # CONFIGURE DEFAULTS
   # ------------------
 
   # define the default base URL
-  $self->{URL} = "cdsads.u-strasbg.fr";
+  my $default_url = $class->ads_mirror();
 
   # define the query URLs
-  my $default_url = $self->{URL};
   $self->{QUERY} = "http://$default_url/cgi-bin/nph-abs_connect?";
   $self->{FOLLOWUP} = "http://$default_url/cgi-bin/nph-ref_query?";
 

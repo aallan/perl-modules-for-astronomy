@@ -42,8 +42,8 @@ the B<Astro::ADS::Result::Paper> objects it returns use the default URL in the
 B<references>, B<citations>, B<alsoread> and B<tableofcontents> methods.  This
 is likely not what you want if you are doing a lot of followup queries.
 
-You can re-use the original query with the followup method or I can turn the
-URL from an object variable to a class variable.
+You can re-use the original query with the followup method or use v1.21.0 or
+above which turns the URL from an object variable to a class variable.
 
 =back
 
@@ -52,6 +52,6 @@ URL from an object variable to a class variable.
 
 use strict;
 use vars qw/ $VERSION /;
-$VERSION = '1.20.9';
+$VERSION = '1.21.0';
 
 1;
