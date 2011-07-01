@@ -1353,7 +1353,8 @@ sub _dump_options {
 =item #35645 filed at rt.cpan.org (Ampersands)
 
 Older versions can't handle ampersands in the bibcode, such as A&A for Astronomy & Astrophysics.
-Fixed in this version - Boyd Duffee E<lt>b dot duffee at isc dot keele dot ac dot ukE<gt>, 5/2009.
+Fixed for queries in 1.22 - 5/2009.
+Fixed for references in 1.23 - Boyd Duffee E<lt>b dot duffee at isc dot keele dot ac dot ukE<gt>, 7/2011.
 
 =back
 

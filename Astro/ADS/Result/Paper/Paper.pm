@@ -4,7 +4,7 @@ package Astro::ADS::Result::Paper;
 
 #+
 #  Name:
-#    Astro::ADS::Result:;Paper
+#    Astro::ADS::Result::Paper
 
 #  Purposes:
 #    Perl wrapper for the ADS database

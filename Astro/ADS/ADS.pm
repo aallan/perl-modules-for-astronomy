@@ -31,10 +31,27 @@ License.
 
 Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
+=head1 BUGS
+
+=over
+
+=item Followup queries using default URL
+
+When an B<Astro::ADS::Query> object has set the url to a non-default server, 
+the B<Astro::ADS::Result::Paper> objects it returns use the default URL in the
+B<references>, B<citations>, B<alsoread> and B<tableofcontents> methods.  This
+is likely not what you want if you are doing a lot of followup queries.
+
+You can re-use the original query with the followup method or I can turn the
+URL from an object variable to a class variable.
+
+=back
+
+
 =cut
 
 use strict;
 use vars qw/ $VERSION /;
-$VERSION = '1.20.8';
+$VERSION = '1.20.9';
 
 1;
