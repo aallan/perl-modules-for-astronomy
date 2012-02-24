@@ -67,9 +67,7 @@ t/4_cmc.t
 t/4_gsc.t
 t/4_mpc.t
 t/4_sesame.t
-t/4_simbad.t
 t/4_skycat_gsc.t
-t/4_skycat_supercos.t
 t/4_usnoa2.t
 t/helper.pl
 t/data/cat.fit
