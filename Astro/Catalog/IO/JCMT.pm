@@ -565,7 +565,7 @@ sub _parse_line {
   # velocity
   $coords{vdefn} = "RADIO";
   $coords{vframe} = "LSR";
-  if ($match[8] !~ /n/) {
+  if (defined $match[8] && $match[8] !~ /n/) {
     $match[8] =~ s/\s//g; # remove spaces
     $coords{rv} = $match[8];
     $coords{vdefn} = $match[12];
@@ -592,12 +592,12 @@ sub _parse_line {
 
   my %misc;
   # Grab the line's velocity range, if it isn't "n/a".
-  if( $match[10] !~ /n\/a/ ) {
+  if( defined $match[10] && $match[10] !~ /n\/a/ ) {
     $misc{'velocity_range'} = $match[10];
   }
 
   # Grab the 850-micron flux, if it isn't "n/a".
-  if( $match[9] !~ /n\/a/ ) {
+  if( defined $match[9] && $match[9] !~ /n\/a/ ) {
     $misc{'flux850'} = $match[9];
   }
 
