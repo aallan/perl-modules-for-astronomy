@@ -1,5 +1,5 @@
 
-This directory contains the "plugins" for catalogue I/O.
+This lib/Astro/Catalog/IO directory contains the "plugins" for catalogue I/O.
 
 Currently supported formats are:
 
