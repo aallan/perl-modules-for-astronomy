@@ -90,7 +90,7 @@ $Id: Catalog.pm,v 1.59 2007/10/31 22:10:48 cavanagh Exp $
 
 =item B<new>
 
-Create a new instance from a hash of options 
+Create a new instance from a hash of options
 
   $catalog = new Astro::Catalog( Stars  => \@array );
   $catalog = new Astro::Catalog( Format => 'Cluster', File => $file_name );
@@ -141,7 +141,7 @@ sub new {
 Will serialise the catalogue object in a variety of file formats using
 pluggable IO, see the C<Astro::Catalog::IO> classes
 
-   $catalog->write_catalog( 
+   $catalog->write_catalog(
           File => $file_name, Format => $file_type, [%opts] )
      or die $catalog->errstr;
 
@@ -150,7 +150,7 @@ can be obtained using the C<errstr> method). The C<%opts> are optional
 arguments and are dependant on the output format chosen.  Current
 valid output formats are 'Simple', 'Cluster', 'JCMT' and 'VOTable'.
 
-The File argument can refer to a file name on disk (simple scalar), 
+The File argument can refer to a file name on disk (simple scalar),
 a glob (eg \*STDOUT), a reference to a scalar (\$content) or reference
 to an array. For the last two options, the contents of the catalogue
 file are stored in the scalar or in the array (a line per array entry
@@ -465,18 +465,18 @@ so use this with care.
 Addendum: This is pretty much for internal use only, but if you do this
 
   $catalog->allstars( @stars );
-  
+
 you repalce the stars array with the array passed. Don't do this, it's bad!
 
 =cut
 
 sub allstars {
   my $self = shift;
-  
+
   if (@_) {
     @{$self->{ALLSTARS}} = @_;
-  }  
-  
+  }
+
   return (wantarray ? @{ $self->{ALLSTARS} } : $self->{ALLSTARS} );
 }
 
@@ -549,7 +549,7 @@ Set the field centre and radius of the catalogue (if appropriate)
      $catalog->fieldcentre( RA     => $ra,
                             Dec    => $dec,
                             Radius => $radius,
-                            Coords => new Astro::Coords() 
+                            Coords => new Astro::Coords()
                            );
 
 RA and Dec must be given together or as Coords.
@@ -887,7 +887,7 @@ sub configure {
 
   # Check for deprecation
   if ( exists $args{cluster} ) {
-    warnings::warnif("deprecated", 
+    warnings::warnif("deprecated",
      "Cluster option now deprecated. Use Format=>'Cluster',File=>file instead");
     $args{file} = $args{cluster};
     $args{format} = 'Cluster';
@@ -1123,7 +1123,7 @@ sub filter_by_id {
 =item B<filter_by_distance>
 
 Retrieve all targets that are within the specified distance of the
-reference position. 
+reference position.
 
   @selected = $catalog->filter_by_distance( $radius, $refpos );
 
@@ -1265,7 +1265,7 @@ sub sort_catalog {
 
     # Just sort it all
     @$stars = sort $mode, @$stars;
-    
+
   } else {
 
     # see if we have a reference object
@@ -1441,7 +1441,7 @@ sub _have_copy {
 
 =item B<_normalize_hash>
 
-Given a hash, returns a new hash with each key down cased. If a 
+Given a hash, returns a new hash with each key down cased. If a
 key is duplicated after downcasing a warning is issued if the keys
 contain differing values.
 

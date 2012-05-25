@@ -1,7 +1,7 @@
 package XML::Document::RTML;
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    XML::Document::RTML
 
@@ -30,18 +30,18 @@ XML::Document::RTML - module which builds and parses RTML documents
 
 =head1 SYNOPSIS
 
-An object instance can be created from an existing RTML document in a 
+An object instance can be created from an existing RTML document in a
 scalar, or directly from a file on local disk.
 
 
    my $object = new XML::Document::RTML( XML => $xml );
    my $object = new XML::Document::RTML( File => $file );
-   
+
 or via the build method,
 
-   my $object = new XML::Document::RTML() 
+   my $object = new XML::Document::RTML()
    $document = $object->build( %hash );
-   
+
 once instantiated various query methods are supported, e.g.,
 
    my $object = new XML::Document::RTML( File => $file );
@@ -109,7 +109,7 @@ sub new {
 		    }, $class;
 
   # Configure the object
-  $block->configure( @_ ); 
+  $block->configure( @_ );
 
   return $block;
 
@@ -118,7 +118,7 @@ sub new {
 # B U I L D   M E T H O D ------------------------------------------------
 
 
-# Alternative low level build method which accepts no arguments except the 
+# Alternative low level build method which accepts no arguments except the
 # document type. It expects all parameters to have been previously configured
 # at the object. It allows multiple <Observation> blocks to be specified, so
 # you can chain arbitrary filters, exposures, or positions, for example.
@@ -129,9 +129,9 @@ sub build_multi {
 
   # open the document
   $self->{WRITER}->xmlDecl( 'ISO-8859-1' );
-   
-  # BEGIN DOCUMENT ------------------------------------------------------- 
-  
+
+  # BEGIN DOCUMENT -------------------------------------------------------
+
   if ( $self->version() == 2.2 ) {
      $self->{WRITER}->doctype( 'RTML', '', $self->{DTD} );
   } elsif ( $self->version() == 2.1 ) {
@@ -140,64 +140,64 @@ sub build_multi {
   } else {
      $self->{WRITER}->doctype( 'RTML' );
   }
-   
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML','version' => $self->version(),
                              'type' => $doctype );
-			        
+
   # Contact Tag
   # -----------
-  if( defined $self->user_name() || 
+  if( defined $self->user_name() ||
       defined $self->real_name() ||
       defined $self->institution() ||
       defined $self->email() ) {
-      
+
      $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
 
      if (defined $self->real_name() ) {
-     
-        $self->{WRITER}->startTag( 'Name');                          
+
+        $self->{WRITER}->startTag( 'Name');
         $self->{WRITER}->characters( $self->real_name() );
-        $self->{WRITER}->endTag( 'Name' );  
+        $self->{WRITER}->endTag( 'Name' );
      } else {
-        $self->{WRITER}->emptyTag( 'Name');                          
+        $self->{WRITER}->emptyTag( 'Name');
      }
      if (defined $self->user_name() ) {
-        $self->{WRITER}->startTag( 'User');                          
+        $self->{WRITER}->startTag( 'User');
         $self->{WRITER}->characters( $self->user_name() );
         $self->{WRITER}->endTag( 'User' );
      } else {
-        $self->{WRITER}->emptyTag( 'User');                          
+        $self->{WRITER}->emptyTag( 'User');
      }
      if (defined $self->institution() ) {
-      
-        $self->{WRITER}->startTag( 'Institution');                          
+
+        $self->{WRITER}->startTag( 'Institution');
         $self->{WRITER}->characters( $self->institution() );
-        $self->{WRITER}->endTag( 'Institution' ); 
+        $self->{WRITER}->endTag( 'Institution' );
      } else {
-        $self->{WRITER}->emptyTag( 'Institution');                          
+        $self->{WRITER}->emptyTag( 'Institution');
      }
      if (defined $self->email() ) {
-      
-        $self->{WRITER}->startTag( 'Email');                          
+
+        $self->{WRITER}->startTag( 'Email');
         $self->{WRITER}->characters( $self->email() );
-        $self->{WRITER}->endTag( 'Email' ); 
+        $self->{WRITER}->endTag( 'Email' );
      } else {
-        $self->{WRITER}->emptyTag( 'Email');                          
+        $self->{WRITER}->emptyTag( 'Email');
      }
-     
-     $self->{WRITER}->endTag( 'Contact' ); 
+
+     $self->{WRITER}->endTag( 'Contact' );
   } else {
      $self->{WRITER}->emptyTag( 'Contact' );
-  }   
-  
+  }
+
   # Project Tag
   # -----------
   if (defined $self->project() ) {
-    $self->{WRITER}->startTag( 'Project' );     
+    $self->{WRITER}->startTag( 'Project' );
     $self->{WRITER}->characters( $self->project() );
-    $self->{WRITER}->endTag( 'Project' );          		     
+    $self->{WRITER}->endTag( 'Project' );
   } else {
     $self->{WRITER}->emptyTag( 'Project' );
   }
@@ -211,28 +211,28 @@ sub build_multi {
 
   if (defined $self->id() && defined $self->host() && defined $self->port() ) {
 
-     $self->{WRITER}->startTag( 'IntelligentAgent', 
-        'host' => $self->host(), 'port' => $self->port() ); 	
-     
+     $self->{WRITER}->startTag( 'IntelligentAgent',
+        'host' => $self->host(), 'port' => $self->port() );
+
      $self->{WRITER}->characters( $self->id() );
-  
-     $self->{WRITER}->endTag( 'IntelligentAgent' );     
-  } 
-   
+
+     $self->{WRITER}->endTag( 'IntelligentAgent' );
+  }
+
   # Observation tag
   # ---------------
-  
+
   my $n_observation_blocks = $self->number_of_observations;
   $self->observation(0);
   while ( $n_observation_blocks > 0 ) {
 
-     $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
+     $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );
 
      # Target
      # ------
-     $self->{WRITER}->startTag( 'Target', , 
+     $self->{WRITER}->startTag( 'Target', ,
                                 'type'  => $self->target_type(),
-                                'ident' => $self->target_ident() 
+                                'ident' => $self->target_ident()
                                );
 
      # Target Name
@@ -248,37 +248,37 @@ sub build_multi {
         # Co-ordinates
         # ------------
         if ( defined $self->coordinate_type() ) {
-           $self->{WRITER}->startTag( 'Coordinates', 
+           $self->{WRITER}->startTag( 'Coordinates',
 	                              'type' => $self->coordinate_type());
         } else {
-           $self->{WRITER}->startTag( 'Coordinates' );	
+           $self->{WRITER}->startTag( 'Coordinates' );
         }
-           $self->{WRITER}->startTag( 'RightAscension', 
-        			      'format' => $self->raformat(), 
+           $self->{WRITER}->startTag( 'RightAscension',
+        			      'format' => $self->raformat(),
      				      'units'  => $self->raunits() );
            $self->{WRITER}->characters( $self->ra() );
-           
+
               if ( defined $self->ra_offset ) {
                  $self->{WRITER}->startTag( 'AngleOffset',
                                             'units' => $self->ra_offset_units );
                  $self->{WRITER}->characters( $self->ra_offset );
                  $self->{WRITER}->endTag( 'AngleOffset' );
               }
-           
+
            $self->{WRITER}->endTag( 'RightAscension' );
 
-           $self->{WRITER}->startTag( 'Declination', 
-     			              'format' => $self->decformat(), 
+           $self->{WRITER}->startTag( 'Declination',
+     			              'format' => $self->decformat(),
 				      'units'  => $self->decunits() );
 
            if ( $self->dec() =~ m/^\+/ ) {
      	      $self->{WRITER}->characters( $self->dec() );
-           } else {			    
-              if ( $self->dec() =~ m/-/ ) { 
+           } else {
+              if ( $self->dec() =~ m/-/ ) {
      	        $self->{WRITER}->characters( $self->dec() );
-     	      } else {		    
+     	      } else {
      	        $self->{WRITER}->characters( "+" . $self->dec() );
-     	      }  
+     	      }
            }
 
               if ( defined $self->dec_offset ) {
@@ -288,23 +288,23 @@ sub build_multi {
                  $self->{WRITER}->endTag( 'AngleOffset' );
               }
 
-           $self->{WRITER}->endTag( 'Declination' );   
+           $self->{WRITER}->endTag( 'Declination' );
 
            $self->{WRITER}->startTag( 'Equinox'  );
               $self->{WRITER}->characters( $self->equinox() );
            $self->{WRITER}->endTag( 'Equinox' );
 
-        $self->{WRITER}->endTag( 'Coordinates' );       
+        $self->{WRITER}->endTag( 'Coordinates' );
 
 
         # Flux
         # ----
         if( $self->exposure_type() eq "snr" ) {
 
-           $self->{WRITER}->startTag( 'Flux', 
-                                      'type'       => 'continuum', 
-	                              'units'      => 'mag', 
-                                      'wavelength' => $self->filter_type() ); 
+           $self->{WRITER}->startTag( 'Flux',
+                                      'type'       => 'continuum',
+	                              'units'      => 'mag',
+                                      'wavelength' => $self->filter_type() );
            $self->{WRITER}->characters( $self->reference_flux() );
            $self->{WRITER}->endTag( 'Flux' );
         }
@@ -322,12 +322,12 @@ sub build_multi {
         }
            # Filter
 	   # ------
-           $self->{WRITER}->startTag( 'Filter' ); 
-           $self->{WRITER}->startTag( 'FilterType'); 
+           $self->{WRITER}->startTag( 'Filter' );
+           $self->{WRITER}->startTag( 'FilterType');
            $self->{WRITER}->characters( $self->filter_type() );
-           $self->{WRITER}->endTag( 'FilterType' ); 
+           $self->{WRITER}->endTag( 'FilterType' );
            $self->{WRITER}->endTag( 'Filter' );
-        $self->{WRITER}->endTag( 'Device' );          
+        $self->{WRITER}->endTag( 'Device' );
 
         # Schedule
         # --------
@@ -337,25 +337,25 @@ sub build_multi {
 	   # --------
            if ( $self->exposure_type() eq "time" ) {
               $self->{WRITER}->startTag( 'Exposure',
-                                         'type'  => $self->exposure_type(), 
+                                         'type'  => $self->exposure_type(),
 				         'units' => $self->exposure_units() );
               if( defined $self->group_count() && $self->group_count() > 1 ) {
-                 $self->{WRITER}->startTag( 'Count'); 
+                 $self->{WRITER}->startTag( 'Count');
                  $self->{WRITER}->characters( $self->group_count() );
-                 $self->{WRITER}->endTag( 'Count' ); 
-              }                        
-              $self->{WRITER}->characters( $self->exposure_time() );   
+                 $self->{WRITER}->endTag( 'Count' );
+              }
+              $self->{WRITER}->characters( $self->exposure_time() );
 
            } else {
      	      $self->exposure_type( "snr" );
               $self->{WRITER}->startTag( 'Exposure',
-                                         'type'  => $self->exposure_type() );	
+                                         'type'  => $self->exposure_type() );
               if( defined $self->group_count() && $self->group_count() > 1 ) {
-                 $self->{WRITER}->startTag( 'Count'); 
+                 $self->{WRITER}->startTag( 'Count');
                  $self->{WRITER}->characters( $self->group_count() );
-                 $self->{WRITER}->endTag( 'Count' ); 
-              }                        
-              $self->{WRITER}->characters( $self->signal_to_noise() );   
+                 $self->{WRITER}->endTag( 'Count' );
+              }
+              $self->{WRITER}->characters( $self->signal_to_noise() );
 
            }
            $self->{WRITER}->endTag( 'Exposure' );
@@ -369,9 +369,9 @@ sub build_multi {
               $self->{WRITER}->endTag( 'StartDateTime' );
               $self->{WRITER}->startTag( 'EndDateTime' );
               $self->{WRITER}->characters( $self->end_time() );
-              $self->{WRITER}->endTag( 'EndDateTime' );	    
+              $self->{WRITER}->endTag( 'EndDateTime' );
               $self->{WRITER}->endTag( 'TimeConstraint' );
-           }	
+           }
 
 	   # SeriesConstraint
 	   # ----------------
@@ -387,14 +387,14 @@ sub build_multi {
 
                 $self->{WRITER}->startTag( 'Interval' );
                 $self->{WRITER}->characters( $self->interval() );
-                $self->{WRITER}->endTag( 'Interval' );               
+                $self->{WRITER}->endTag( 'Interval' );
 
                 $self->{WRITER}->startTag( 'Tolerance' );
                 $self->{WRITER}->characters( $self->tolerance() );
-                $self->{WRITER}->endTag( 'Tolerance' );               
+                $self->{WRITER}->endTag( 'Tolerance' );
 
                 $self->{WRITER}->endTag( 'SeriesConstraint' );
-           }	
+           }
 
         $self->{WRITER}->endTag( 'Schedule' );
 
@@ -421,50 +421,50 @@ sub build_multi {
 	   # FITSHeader
 	   # ----------
 	   if( defined $headers[$j] && defined $header_types[$j] ) {
-              $self->{WRITER}->startTag( 'FITSHeader', 'type' => $header_types[$j] );	
+              $self->{WRITER}->startTag( 'FITSHeader', 'type' => $header_types[$j] );
 	      $self->{WRITER}->characters( $headers[$j] );
-              $self->{WRITER}->endTag( 'FITSHeader' );		      
+              $self->{WRITER}->endTag( 'FITSHeader' );
 	   }
 
 	   # ObjectList
 	   # ----------
 	   if ( defined $catalogues[$j] && defined $catalogue_types[$j] ) {
-              $self->{WRITER}->startTag( 'ObjectList', 'type' => $catalogue_types[$j] );	
+              $self->{WRITER}->startTag( 'ObjectList', 'type' => $catalogue_types[$j] );
 	      $self->{WRITER}->characters( $catalogues[$j] );
-              $self->{WRITER}->endTag( 'ObjectList' );	
+              $self->{WRITER}->endTag( 'ObjectList' );
 	   }
 
 	   # FITS file
 	   # ---------
 	   $self->{WRITER}->characters( $images[$j] );
 
-           $self->{WRITER}->endTag( 'ImageData' );		      
-        }  
+           $self->{WRITER}->endTag( 'ImageData' );
+        }
 
-     $self->{WRITER}->endTag( 'Observation' );  
-  
+     $self->{WRITER}->endTag( 'Observation' );
+
       # Decrement the number of blocks left to write out...
       $n_observation_blocks--;
-      
+
       #Increment the number of the current block for the next loop...
       $self->observation(1 + $self->observation);
   }
-  
-  
-       
+
+
+
   # Score Tags
-  # ---------- 
+  # ----------
   if (defined $self->{DOCUMENT}->{Score} ) {
      $self->{WRITER}->startTag( 'Score' );
      $self->{WRITER}->characters( $self->{DOCUMENT}->{Score} );
      $self->{WRITER}->endTag( 'Score' );
   }
-  if ( defined $self->{DOCUMENT}->{CompletionTime} ) {   
+  if ( defined $self->{DOCUMENT}->{CompletionTime} ) {
      $self->{WRITER}->startTag( 'CompletionTime' );
      $self->{WRITER}->characters( $self->{DOCUMENT}->{CompletionTime} );
-     $self->{WRITER}->endTag( 'CompletionTime' );       
-  }    
-  
+     $self->{WRITER}->endTag( 'CompletionTime' );
+  }
+
   # close the RTML DOCUMENT
   # =======================
 
@@ -475,7 +475,7 @@ sub build_multi {
 
   my $xml = $self->{BUFFER}->value();
   $self->_parse( XML => $xml ); # populates the object with a parsed document
-  return $xml;  
+  return $xml;
 
 }
 
@@ -486,27 +486,27 @@ sub build {
   # mandatory tags
   unless ( exists $args{Type} ) {
      return undef;
-  } 
-   
+  }
+
   # Loop over the rest of the keys
   for my $key (qw / Role Type Version DTD GroupCount ExposureTime Exposure
                     SignalToNoise Snr Flux ExposureType ExposureUnits
                     SeriesCount Interval Tolerance Priority TimeConstraint
                     DeviceType Device FilterType Filter TargetType TargetIdent
-                    Identity TargetName Target CoordinateType Coordtype  
+                    Identity TargetName Target CoordinateType Coordtype
                     RA RAFormat RAUnits Dec DecFormat DecUnits Equinox
                     Host Port PortNumber ID UniqueID Name ObserverName
                     RealName User UserName Institution Email EmailAddress
                     Project Score CompletionTime Time Data DeviceRegion Region / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
-  }    
+  }
 
   # open the document
   $self->{WRITER}->xmlDecl( 'ISO-8859-1' );
-   
-  # BEGIN DOCUMENT ------------------------------------------------------- 
-  
+
+  # BEGIN DOCUMENT -------------------------------------------------------
+
   if ( $self->version() == 2.2 ) {
      $self->{WRITER}->doctype( 'RTML', '', $self->{DTD} );
   } elsif ( $self->version() == 2.1 ) {
@@ -515,64 +515,64 @@ sub build {
   } else {
      $self->{WRITER}->doctype( 'RTML' );
   }
-   
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML','version' => $self->version(),
                              'type' => $self->type() );
-			        
+
   # Contact Tag
   # -----------
-  if( defined $self->user_name() || 
+  if( defined $self->user_name() ||
       defined $self->real_name() ||
       defined $self->institution() ||
       defined $self->email() ) {
-      
+
      $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
 
      if (defined $self->real_name() ) {
-     
-        $self->{WRITER}->startTag( 'Name');                          
+
+        $self->{WRITER}->startTag( 'Name');
         $self->{WRITER}->characters( $self->real_name() );
-        $self->{WRITER}->endTag( 'Name' );  
+        $self->{WRITER}->endTag( 'Name' );
      } else {
-        $self->{WRITER}->emptyTag( 'Name');                          
+        $self->{WRITER}->emptyTag( 'Name');
      }
      if (defined $self->user_name() ) {
-        $self->{WRITER}->startTag( 'User');                          
+        $self->{WRITER}->startTag( 'User');
         $self->{WRITER}->characters( $self->user_name() );
         $self->{WRITER}->endTag( 'User' );
      } else {
-        $self->{WRITER}->emptyTag( 'User');                          
+        $self->{WRITER}->emptyTag( 'User');
      }
      if (defined $self->institution() ) {
-      
-        $self->{WRITER}->startTag( 'Institution');                          
+
+        $self->{WRITER}->startTag( 'Institution');
         $self->{WRITER}->characters( $self->institution() );
-        $self->{WRITER}->endTag( 'Institution' ); 
+        $self->{WRITER}->endTag( 'Institution' );
      } else {
-        $self->{WRITER}->emptyTag( 'Institution');                          
+        $self->{WRITER}->emptyTag( 'Institution');
      }
      if (defined $self->email() ) {
-      
-        $self->{WRITER}->startTag( 'Email');                          
+
+        $self->{WRITER}->startTag( 'Email');
         $self->{WRITER}->characters( $self->email() );
-        $self->{WRITER}->endTag( 'Email' ); 
+        $self->{WRITER}->endTag( 'Email' );
      } else {
-        $self->{WRITER}->emptyTag( 'Email');                          
+        $self->{WRITER}->emptyTag( 'Email');
      }
-     
-     $self->{WRITER}->endTag( 'Contact' ); 
+
+     $self->{WRITER}->endTag( 'Contact' );
   } else {
      $self->{WRITER}->emptyTag( 'Contact' );
-  }   
-  
+  }
+
   # Project Tag
   # -----------
   if (defined $self->project() ) {
-    $self->{WRITER}->startTag( 'Project' );     
+    $self->{WRITER}->startTag( 'Project' );
     $self->{WRITER}->characters( $self->project() );
-    $self->{WRITER}->endTag( 'Project' );          		     
+    $self->{WRITER}->endTag( 'Project' );
   } else {
     $self->{WRITER}->emptyTag( 'Project' );
   }
@@ -586,24 +586,24 @@ sub build {
 
   if (defined $self->id() && defined $self->host() && defined $self->port() ) {
 
-     $self->{WRITER}->startTag( 'IntelligentAgent', 
-        'host' => $self->host(), 'port' => $self->port() ); 	
-     
+     $self->{WRITER}->startTag( 'IntelligentAgent',
+        'host' => $self->host(), 'port' => $self->port() );
+
      $self->{WRITER}->characters( $self->id() );
-  
-     $self->{WRITER}->endTag( 'IntelligentAgent' );     
-  } 
-   
+
+     $self->{WRITER}->endTag( 'IntelligentAgent' );
+  }
+
   # Observation tag
-  # ---------------   
-  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
-   
+  # ---------------
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );
+
      # Target
      # ------
-     $self->{WRITER}->startTag( 'Target', , 
+     $self->{WRITER}->startTag( 'Target', ,
        'type' => $self->target_type(),
        'ident' => $self->target_ident() );
-    
+
         # Target Name
 	# -----------
         if ( defined $self->target() ) {
@@ -613,56 +613,56 @@ sub build {
         } else {
            $self->{WRITER}->emptyTag( 'TargetName' );
         }
-	
+
         # Co-ordinates
         # ------------
 	if ( defined $self->coordinate_type() ) {
-           $self->{WRITER}->startTag( 'Coordinates', 
+           $self->{WRITER}->startTag( 'Coordinates',
 	                              'type' => $self->coordinate_type());
 	} else {
-           $self->{WRITER}->startTag( 'Coordinates' );	
+           $self->{WRITER}->startTag( 'Coordinates' );
 	}
-        $self->{WRITER}->startTag( 'RightAscension', 
-        			   'format' => $self->raformat(), 
+        $self->{WRITER}->startTag( 'RightAscension',
+        			   'format' => $self->raformat(),
      				   'units'  => $self->raunits() );
         $self->{WRITER}->characters( $self->ra() );
         $self->{WRITER}->endTag( 'RightAscension' );
-     	
-        $self->{WRITER}->startTag( 'Declination', 
-     			           'format' => $self->decformat(), 
+
+        $self->{WRITER}->startTag( 'Declination',
+     			           'format' => $self->decformat(),
 				   'units'  => $self->decunits() );
         if ( $self->dec() =~ m/^\+/ ) {
      	   $self->{WRITER}->characters( $self->dec() );
-        } else {			    
-           if ( $self->dec() =~ m/-/ ) { 
+        } else {
+           if ( $self->dec() =~ m/-/ ) {
      	     $self->{WRITER}->characters( $self->dec() );
-     	   } else {		    
+     	   } else {
      	     $self->{WRITER}->characters( "+" . $self->dec() );
-     	   }  
+     	   }
         }
-        $self->{WRITER}->endTag( 'Declination' );   
+        $self->{WRITER}->endTag( 'Declination' );
 
         $self->{WRITER}->startTag( 'Equinox'  );
         $self->{WRITER}->characters( $self->equinox() );
         $self->{WRITER}->endTag( 'Equinox' );
 
-        $self->{WRITER}->endTag( 'Coordinates' );       
+        $self->{WRITER}->endTag( 'Coordinates' );
 
- 
+
         # Flux
         # ----
         if( $self->exposure_type() eq "snr" ) {
-     
-           $self->{WRITER}->startTag( 'Flux', 
-                                      'type'       => 'continuum', 
-	                              'units'      => 'mag', 
-                                      'wavelength' => $self->filter_type() ); 
+
+           $self->{WRITER}->startTag( 'Flux',
+                                      'type'       => 'continuum',
+	                              'units'      => 'mag',
+                                      'wavelength' => $self->filter_type() );
            $self->{WRITER}->characters( $self->reference_flux() );
            $self->{WRITER}->endTag( 'Flux' );
         }
-	
+
      $self->{WRITER}->endTag( 'Target' );
-     
+
      # Device
      # ------
      if( defined $self->region() ) {
@@ -674,44 +674,44 @@ sub build {
      }
         # Filter
 	# ------
-        $self->{WRITER}->startTag( 'Filter' ); 
-        $self->{WRITER}->startTag( 'FilterType'); 
+        $self->{WRITER}->startTag( 'Filter' );
+        $self->{WRITER}->startTag( 'FilterType');
         $self->{WRITER}->characters( $self->filter_type() );
-        $self->{WRITER}->endTag( 'FilterType' ); 
+        $self->{WRITER}->endTag( 'FilterType' );
         $self->{WRITER}->endTag( 'Filter' );
-     $self->{WRITER}->endTag( 'Device' );          
-     	
+     $self->{WRITER}->endTag( 'Device' );
+
      # Schedule
      # --------
      $self->{WRITER}->startTag( 'Schedule', 'priority' => $self->priority() );
-     
+
      	# Exposure
 	# --------
         if ( $self->exposure_type() eq "time" ) {
            $self->{WRITER}->startTag( 'Exposure',
-                                      'type'  => $self->exposure_type(), 
+                                      'type'  => $self->exposure_type(),
 				      'units' => $self->exposure_units() );
            if( defined $self->group_count() && $self->group_count() > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( $self->group_count() );
-              $self->{WRITER}->endTag( 'Count' ); 
-           }                        
-           $self->{WRITER}->characters( $self->exposure_time() );   
-	
+              $self->{WRITER}->endTag( 'Count' );
+           }
+           $self->{WRITER}->characters( $self->exposure_time() );
+
         } else {
      	   $self->exposure_type( "snr" );
            $self->{WRITER}->startTag( 'Exposure',
-                                      'type'  => $self->exposure_type() );	
+                                      'type'  => $self->exposure_type() );
            if( defined $self->group_count() && $self->group_count() > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( $self->group_count() );
-              $self->{WRITER}->endTag( 'Count' ); 
-           }                        
-           $self->{WRITER}->characters( $self->signal_to_noise() );   
-	
+              $self->{WRITER}->endTag( 'Count' );
+           }
+           $self->{WRITER}->characters( $self->signal_to_noise() );
+
         }
         $self->{WRITER}->endTag( 'Exposure' );
-		
+
 	# TimeConstraint
 	# --------------
         if( defined $self->start_time() && defined $self->end_time() ) {
@@ -721,33 +721,33 @@ sub build {
            $self->{WRITER}->endTag( 'StartDateTime' );
            $self->{WRITER}->startTag( 'EndDateTime' );
            $self->{WRITER}->characters( $self->end_time() );
-           $self->{WRITER}->endTag( 'EndDateTime' );	    
+           $self->{WRITER}->endTag( 'EndDateTime' );
            $self->{WRITER}->endTag( 'TimeConstraint' );
-        }	
-	
+        }
+
 	# SeriesConstraint
 	# ----------------
         if ( defined $self->series_count() &&
              defined $self->interval() &&
              defined $self->tolerance() ) {
-             
+
              $self->{WRITER}->startTag( 'SeriesConstraint' );
-             
+
              $self->{WRITER}->startTag( 'Count' );
              $self->{WRITER}->characters($self->series_count() );
              $self->{WRITER}->endTag( 'Count' );
-             
+
              $self->{WRITER}->startTag( 'Interval' );
              $self->{WRITER}->characters( $self->interval() );
-             $self->{WRITER}->endTag( 'Interval' );               
-             
+             $self->{WRITER}->endTag( 'Interval' );
+
              $self->{WRITER}->startTag( 'Tolerance' );
              $self->{WRITER}->characters( $self->tolerance() );
-             $self->{WRITER}->endTag( 'Tolerance' );               
-            
+             $self->{WRITER}->endTag( 'Tolerance' );
+
              $self->{WRITER}->endTag( 'SeriesConstraint' );
-        }	
-	
+        }
+
      $self->{WRITER}->endTag( 'Schedule' );
 
      # Data tags
@@ -756,58 +756,58 @@ sub build {
      my @image_type = $self->image_type();
      my @image_delivery = $self->image_delivery();
      my @image_reduced = $self->image_reduced();
-  
+
      my @catalogues = $self->catalogues();
      my @catalogue_types = $self->catalogue_type();
-  
+
      my @headers = $self->headers();
      my @header_types = $self->header_type();
-  
+
      foreach my $j ( 0 .. $#images ) {
-  
+
         $self->{WRITER}->startTag( 'ImageData',
                          'type'     => $image_type[$j],
 		         'delivery' => $image_delivery[$j],
 		         'reduced'  => $image_reduced[$j] );
-        
+
 	# FITSHeader
 	# ----------
 	if( defined $headers[$j] && defined $header_types[$j] ) {
-           $self->{WRITER}->startTag( 'FITSHeader', 'type' => $header_types[$j] );	
+           $self->{WRITER}->startTag( 'FITSHeader', 'type' => $header_types[$j] );
 	   $self->{WRITER}->characters( $headers[$j] );
-           $self->{WRITER}->endTag( 'FITSHeader' );		      
+           $self->{WRITER}->endTag( 'FITSHeader' );
 	}
 
 	# ObjectList
 	# ----------
 	if ( defined $catalogues[$j] && defined $catalogue_types[$j] ) {
-           $self->{WRITER}->startTag( 'ObjectList', 'type' => $catalogue_types[$j] );	
+           $self->{WRITER}->startTag( 'ObjectList', 'type' => $catalogue_types[$j] );
 	   $self->{WRITER}->characters( $catalogues[$j] );
-           $self->{WRITER}->endTag( 'ObjectList' );	
+           $self->{WRITER}->endTag( 'ObjectList' );
 	}
-	
+
 	# FITS file
 	# ---------
 	$self->{WRITER}->characters( $images[$j] );
-	
-        $self->{WRITER}->endTag( 'ImageData' );		      
-     }  
-     
-  $self->{WRITER}->endTag( 'Observation' );  
-       
+
+        $self->{WRITER}->endTag( 'ImageData' );
+     }
+
+  $self->{WRITER}->endTag( 'Observation' );
+
   # Score Tags
-  # ---------- 
+  # ----------
   if (defined $self->{DOCUMENT}->{Score} ) {
      $self->{WRITER}->startTag( 'Score' );
      $self->{WRITER}->characters( $self->{DOCUMENT}->{Score} );
      $self->{WRITER}->endTag( 'Score' );
   }
-  if ( defined $self->{DOCUMENT}->{CompletionTime} ) {   
+  if ( defined $self->{DOCUMENT}->{CompletionTime} ) {
      $self->{WRITER}->startTag( 'CompletionTime' );
      $self->{WRITER}->characters( $self->{DOCUMENT}->{CompletionTime} );
-     $self->{WRITER}->endTag( 'CompletionTime' );       
-  }    
-  
+     $self->{WRITER}->endTag( 'CompletionTime' );
+  }
+
   # close the RTML DOCUMENT
   # =======================
 
@@ -818,9 +818,9 @@ sub build {
 
   my $xml = $self->{BUFFER}->value();
   $self->_parse( XML => $xml ); # populates the object with a parsed document
-  return $xml;  
+  return $xml;
 
-}  
+}
 
 # A C C E S S O R   M E T H O D S -------------------------------------------
 
@@ -868,7 +868,7 @@ sub version {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{version} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{version};
 }
 
@@ -891,20 +891,20 @@ Return, or set, the group count of the observation
 
   my $num = $object->group_count();
   $object->group_count( $num );
-  
+
 =cut
 
 sub group_count {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{Exposure}->{Count} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{Exposure}->{Count};
 }
 
 sub groupcount {
   group_count( @_ );
-}  
+}
 
 =item B<exposure_time>
 
@@ -912,7 +912,7 @@ Return, or set, the exposure time of the observation
 
   my $num = $object->exposure_time();
   $object->exposure_time( $num );
-  
+
 =cut
 
 sub exposure_time {
@@ -935,18 +935,18 @@ sub exposure_time {
      if ( $self->exposure_units() eq "ms" ) {
         $exposure = $exposure / 1000.0;
         $self->exposure_units( "seconds" );
-     } 
+     }
   }
   return $exposure;
 }
 
 sub exposuretime {
   exposure_time( @_ );
-}  
+}
 
 sub exposure {
   exposure_time( @_ );
-}  
+}
 
 =item B<signal_to_noise>
 
@@ -954,7 +954,7 @@ Return, or set, the S/N of the observation
 
   my $num = $object->signal_to_noise();
   $object->signal_to_noise( $num );
-  
+
 =cut
 
 sub signal_to_noise {
@@ -962,17 +962,17 @@ sub signal_to_noise {
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{Exposure}->{content} = shift;
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{Exposure}->{type} = "snr";
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{Exposure}->{content};
 }
 
 sub signaltonoise {
   signal_to_noise( @_ );
-}  
+}
 
 sub snr {
   signal_to_noise( @_ );
-}  
+}
 
 =item B<reference_flux>
 
@@ -983,20 +983,20 @@ calculations for the image
    $object->reference_flux( $mag );
 
 the flux should be a continuum R band magnitude value.
-  
+
 =cut
 
 sub reference_flux {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Flux}->{content} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Flux}->{content};
 }
 
 sub flux {
   reference_flux( @_ );
-}  
+}
 
 =item B<exposure_type>
 
@@ -1006,7 +1006,7 @@ Return, or set, the type of exposure of the observation
   $object->exposure_type( $string );
 
 where $string can have values of "snr" or "time".
-  
+
 =cut
 
 sub exposure_type {
@@ -1019,13 +1019,13 @@ sub exposure_type {
         $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{Exposure}->{type} = "time";
         $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{Exposure}->{units} = "seconds";
      }
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{Exposure}->{type};
 }
 
 sub exposuretype {
   exposure_type( @_ );
-}  
+}
 
 sub exposure_units {
   my $self = shift;
@@ -1034,7 +1034,7 @@ sub exposure_units {
 
 sub exposureunits {
   exposure_units( @_ );
-}  
+}
 
 =item B<series_count>
 
@@ -1042,20 +1042,20 @@ Return, or set, the series count of the observation
 
   my $num = $object->series_count();
   $object->series_count( $num );
-  
+
 =cut
 
 sub series_count {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{SeriesConstraint}->{Count} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{SeriesConstraint}->{Count};
 }
 
 sub seriescount {
   series_count( @_ );
-}  
+}
 
 =item B<interval>
 
@@ -1063,7 +1063,7 @@ Return, or set, the interval between a series of observations blocks
 
   my $num = $object->interval();
   $object->interval( $num );
-  
+
 =cut
 
 sub interval {
@@ -1072,9 +1072,9 @@ sub interval {
      my $arg = shift;
      unless ( $arg =~ "PT" ) {
        $arg = "PT" . $arg;
-     }   
+     }
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{SeriesConstraint}->{Interval} = $arg;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{SeriesConstraint}->{Interval};
 }
 
@@ -1084,7 +1084,7 @@ Return, or set, the tolerance between a series of observations blocks
 
   my $num = $object->tolerance();
   $object->tolerance( $num );
-  
+
 =cut
 
 sub tolerance {
@@ -1095,7 +1095,7 @@ sub tolerance {
        $arg = "PT" . $arg;
     }
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{SeriesConstraint}->{Tolerance} = $arg;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{SeriesConstraint}->{Tolerance};
 }
 
@@ -1106,7 +1106,7 @@ Return, or set, the priority of the observation
 
   my $num = $object->priority();
   $object->priority( $num );
- 
+
 Schedule (RTML) priority     Phase II Priority  Phase II GUI
    N/A                       5                  Urgent
    0                         4                  Quite Urgent
@@ -1117,13 +1117,13 @@ Schedule (RTML) priority     Phase II Priority  Phase II GUI
    N/A                       0                  Normal
 
 where: "Schedule (RTML) priority" is the number specified in the RTML:
-<Schedule priority="n">, "Phase II Priority" is the number stored in the 
+<Schedule priority="n">, "Phase II Priority" is the number stored in the
 Phase II database and "Phase II GUI" is what is displayed in the Phase II GUI.
 
 Note:
-The Phase II priority 4 can be specified by the TEA but cannot be specified 
-by the Phase II GUI (and displays as the default "Normal" in the GUI). The 
-Phase II priority 5 I<cannot> be specified by the TEA but can be specified by 
+The Phase II priority 4 can be specified by the TEA but cannot be specified
+by the Phase II GUI (and displays as the default "Normal" in the GUI). The
+Phase II priority 5 I<cannot> be specified by the TEA but can be specified by
 the Phase II GUI as Urgent.
 
 =cut
@@ -1132,13 +1132,13 @@ sub priority {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{priority} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{priority};
 }
 
 sub schedule_priority {
   priority( @_ );
-}  
+}
 
 =item B<time_constraint>
 
@@ -1154,29 +1154,29 @@ times, e.g. my $array_reference = [ $start, $end ] which maps to,
         <StartDateTime>2006-09-10T11:12:51+0100</StartDateTime>
         <EndDateTime>2006-09-12T00:12:51+0100</EndDateTime>
       </TimeConstraint>
-  
+
 =cut
 
 sub time_constraint {
   my $self = shift;
 
   if (@_) {
-    
+
     my $ref = shift;
     my @array = @{$ref};
-  
+
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{TimeConstraint}->{StartDateTime} = $array[0];
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{TimeConstraint}->{EndDateTime} = $array[1];
   }
 
   return ( $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{TimeConstraint}->{StartDateTime},
            $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Schedule}->{TimeConstraint}->{EndDateTime} );
-	   
+
 }
 
 sub timeconstraint {
    time_constraint( @_ );
-}   
+}
 
 sub start_time {
    my $self = shift;
@@ -1202,20 +1202,20 @@ Return, or set, the device type for the observation
 
   my $string = $object->device_type();
   $object->device_type( $string );
-  
+
 =cut
 
 sub device_type {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Device}->{type} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Device}->{type};
 }
 
 sub devicetype {
   device_type( @_ );
-}  
+}
 
 sub device {
   device_type( @_ );
@@ -1227,20 +1227,20 @@ Return, or set, the region for the device type for the observation
 
   my $string = $object->region();
   $object->region( "infrared" );
-  
+
 =cut
 
 sub device_region {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Device}->{region} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Device}->{region};
 }
 
 sub region {
   device_region( @_ );
-}  
+}
 
 =item B<filter_type>
 
@@ -1248,25 +1248,25 @@ Return, or set, the filter type for the observation
 
   my $string = $object->filter_type();
   $object->filter_type( $string );
-  
+
 =cut
 
 sub filter_type {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Device}->{Filter}->{FilterType} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Device}->{Filter}->{FilterType};
 }
 
 sub filtertype {
   filter_type( @_ );
-}  
+}
 
 sub filter {
   filter_type( @_ );
-} 
- 
+}
+
 # T A R G E T ##############################################################
 
 =back
@@ -1282,22 +1282,22 @@ Return, or set, the type of target for the observation
   my $string = $object->target_type();
   $object->target_type( $string );
 
-there are two types of valid target type; "normal" or "toop". A normal 
+there are two types of valid target type; "normal" or "toop". A normal
 observation is placed into the queue
-  
+
 =cut
 
 sub target_type {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{type} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{type};
 }
 
 sub targettype {
   target_type( @_ );
-}  
+}
 
 
 =item B<target_ident>
@@ -1311,7 +1311,7 @@ The target identity is used by the eSTAR system to choose post-observation
 processing blocks, e.g.
 
   <Target type="normal" ident="ExoPlanetMonitor">
-  
+
 signifies a normal queued observation which is part of the exo-planet
 monitoring programme on Robonet-1.0.
 
@@ -1321,17 +1321,17 @@ sub target_ident {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{ident} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{ident};
 }
 
 sub targetident {
   target_ident( @_ );
-}  
+}
 
 sub identity {
   target_ident( @_ );
-}  
+}
 
 =item B<target_name>
 
@@ -1346,17 +1346,17 @@ sub target_name {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{TargetName} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{TargetName};
 }
 
 sub targetname {
   target_name( @_ );
-}  
+}
 
 sub target {
   target_name( @_ );
-}  
+}
 
 =item B<coordinate_type>
 
@@ -1373,25 +1373,25 @@ methods provided by the class.
 
 sub coordinate_type {
   my $self = shift;
-  
+
   if (@_) {
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{type} = shift;
   }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{type};
-}  
+}
 
 sub coord_type {
   coordinate_type( @_ );
-} 
+}
 
 sub coordinatetype {
   coordinate_type( @_ );
-} 
+}
 
 sub coordtype {
   coordinate_type( @_ );
-} 
- 
+}
+
 =item B<ra>
 
 Sets (or returns) the target RA
@@ -1410,8 +1410,8 @@ sub ra {
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{content} = shift;
   }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{content};
-}  
- 
+}
+
 sub ra_format {
   my $self = shift;
 
@@ -1424,7 +1424,7 @@ sub ra_format {
 sub raformat {
   ra_format( @_ );
 }
-   
+
 sub ra_units {
   my $self = shift;
 
@@ -1432,11 +1432,11 @@ sub ra_units {
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{units} = shift;
   }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{units};
-} 
+}
 
 sub raunits {
   ra_units( @_ );
-}  
+}
 
 sub ra_offset {
    my $self = shift;
@@ -1454,7 +1454,7 @@ sub ra_offset_units {
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{AngleOffset}->{units} = shift;
   }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{RightAscension}->{AngleOffset}->{units};
-} 
+}
 
 
 =item B<dec>
@@ -1475,8 +1475,8 @@ sub dec {
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{content} = shift;
   }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{content};
-}  
- 
+}
+
 sub dec_format {
   my $self = shift;
 
@@ -1488,8 +1488,8 @@ sub dec_format {
 
 sub decformat {
   dec_format( @_ );
-}  
-   
+}
+
 sub dec_units {
   my $self = shift;
 
@@ -1497,11 +1497,11 @@ sub dec_units {
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{units} = shift;
   }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{units};
-} 
+}
 
 sub decunits {
   dec_units( @_ );
-}  
+}
 
 sub dec_offset {
    my $self = shift;
@@ -1519,7 +1519,7 @@ sub dec_offset_units {
     $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{AngleOffset}->{units} = shift;
   }
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Declination}->{AngleOffset}->{units};
-} 
+}
 
 
 =item B<equinox>
@@ -1531,7 +1531,7 @@ Sets (or returns) the equinox of the target co-ordinates
 
 default is J2000, currently the telescope expects J2000.0 coordinates, no
 translation is currently carried out by the library before formatting the
-RTML message. It is therefore suggested that the user provides their 
+RTML message. It is therefore suggested that the user provides their
 coordinates in J2000.0 as this is merely a placeholder routine.
 
 =cut
@@ -1545,7 +1545,7 @@ sub equinox {
   return $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{Target}->{Coordinates}->{Equinox};
 }
 
- 
+
 # A G E N T ##############################################################
 
 =back
@@ -1563,24 +1563,24 @@ status of the observation, see also C<port( )>.
   $object->host( $string );
 
 defaults to the current machine's IP address
-  
+
 =cut
 
 sub host {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{IntelligentAgent}->{host} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{IntelligentAgent}->{host};
 }
 
 sub host_name {
   host( @_ );
-}  
+}
 
 sub agent_host {
   host( @_ );
-}   
+}
 
 =item B<port>
 
@@ -1591,24 +1591,24 @@ status of the observation, see also C<host( )>.
   $object->port( $string );
 
 defaults to 8000.
-  
+
 =cut
 
 sub port {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{IntelligentAgent}->{port} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{IntelligentAgent}->{port};
 }
 
 sub port_number {
   port( @_ );
-} 
+}
 
 sub portnumber {
   port( @_ );
-} 
+}
 
 =item B<id>
 
@@ -1617,8 +1617,8 @@ Sets (or returns) the unique ID for the observation request
    my $id = $object->id();
    $object->id( 'IATEST0001:CT1:0013' );
 
-note that there is NO DEFAULT, a unique ID for the score/observing 
-request must be supplied, see the eSTAR Communications and the TEA 
+note that there is NO DEFAULT, a unique ID for the score/observing
+request must be supplied, see the eSTAR Communications and the TEA
 command set documents for further details.
 
 Note: This is I<not> the same thing as the I<target identity> for the
@@ -1635,16 +1635,16 @@ sub id {
 
   # return the current ID
   return $self->{DOCUMENT}->{IntelligentAgent}->{content};
-} 
- 
+}
+
 sub unique_id {
   id( @_ );
-}   
- 
+}
+
 sub uniqueid {
   id( @_ );
 }
- 
+
 # C O N A C T ##############################################################
 
 =back
@@ -1660,29 +1660,29 @@ Return, or set, the name of the observer
   my $string = $object->name();
   $object->name( $string );
 
-  
+
 =cut
 
 sub name {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Contact}->{Name} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Contact}->{Name};
 }
 
 sub observer_name {
   name( @_ );
-}  
+}
 
 sub real_name {
   name( @_ );
-}   
+}
 
 
 sub observername {
   name( @_ );
-}  
+}
 
 sub realname {
   name( @_ );
@@ -1696,24 +1696,24 @@ Return, or set, the user name of the observer
   $object->user( $string );
 
 e.g. PATT/keith.horne
-  
+
 =cut
 
 sub user {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Contact}->{User} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Contact}->{User};
 }
 
 sub user_name {
   user( @_ );
-} 
+}
 
 sub username {
   user( @_ );
-} 
+}
 
 =item B<institution>
 
@@ -1723,14 +1723,14 @@ Return, or set, the institutional affliation of the observer
   $object->institution( $string );
 
 e.g. University of Exeter
-  
+
 =cut
 
 sub institution {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Contact}->{Institution} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Contact}->{Institution};
 }
 
@@ -1744,14 +1744,14 @@ Return, or set, the email address of the observer
 
   my $string = $object->email();
   $object->email( $string );
-  
+
 =cut
 
 sub email {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Contact}->{Email} = shift;
-  }  
+  }
   return $self->{DOCUMENT}->{Contact}->{Email};
 }
 
@@ -1771,21 +1771,21 @@ Return, or set, the user name of the observer
   $object->user( $string );
 
 e.g. PATT/keith.horne
-  
+
 =cut
 
 sub project {
   my $self = shift;
   if (@_) {
      $self->{DOCUMENT}->{Project} = shift;
-  }  
+  }
   my $project = $self->{DOCUMENT}->{Project};
   return $project unless defined reftype($project);
   $project = undef if reftype($project) eq "HASH"; # hash implies an empty tag
   return $project;
 }
 
- 
+
 # S C O R I N G  ##############################################################
 
 =back
@@ -1816,7 +1816,7 @@ sub score {
   return $self->{DOCUMENT}->{Score};
 }
 
-  
+
 =item B<completion_time>
 
 Sets (or returns) the target completion time
@@ -1837,7 +1837,7 @@ sub completion_time {
 
   # return the current target score
   return $self->{DOCUMENT}->{CompletionTime};
-} 
+}
 
 sub completiontime {
    completion_time( @_ );
@@ -1847,7 +1847,7 @@ sub time {
    completion_time( @_ );
 }
 
- 
+
 # D A T A  ################################################################
 
 =back
@@ -1872,13 +1872,13 @@ Takes an array of hashes where,
 	           .
              { Catalogue => ' ', Header => ' ', URL => ' ' } ];
 
-and the value of the Catalogue hash entry is a URL pointing to a VOTavle, 
-the Header hash entry is a FITS header block and the URL is either points 
+and the value of the Catalogue hash entry is a URL pointing to a VOTavle,
+the Header hash entry is a FITS header block and the URL is either points
 to a FITS file, or other associated data product. You can I<not> append
-data to an existing memory structure, any data passed via this routine 
+data to an existing memory structure, any data passed via this routine
 will overwrite any existing data structure in memory.
 
-The routine returns a similar array when queried. This array will be 
+The routine returns a similar array when queried. This array will be
 populated either by calling C<build( )>, or through parsing a document.
 
 =cut
@@ -1900,7 +1900,7 @@ sub data {
 	   $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$i]->{type} = "FITS16";
 	   $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$i]->{reduced} = "true";
 	}
-	   
+
 	# Catalogues
         if( defined $hash{Catalogue} ) {
 	   $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$i]->{ObjectList}->{content} = $hash{Catalogue};
@@ -1908,38 +1908,38 @@ sub data {
 	      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$i]->{ObjectList}->{type} = "votable-url";
 	   } else {
 	      $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$i]->{ObjectList}->{type} = "unknown";
-	   }   
+	   }
         }
-	
+
 	# FITS Headers
         if( defined $hash{Catalogue} ) {
 	   $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$i]->{FITSHeader}->{content} = $hash{Header};
 	   $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$i]->{FITSHeader}->{type} = "all";
         }
-		
+
      } # end of foreach loop
   } # end of if ( @_ ) block
 
   # PUSHING DATA OUT OF THE MESSAGE
-  if ( defined $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData} && 
-       reftype($self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}) eq "HASH" ) { 
-       return (); 
-  } 
+  if ( defined $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData} &&
+       reftype($self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}) eq "HASH" ) {
+       return ();
+  }
   my @output;
-  
+
   foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}} ) {
     my $header = $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$j]->{FITSHeader}->{content};
     my $url = $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$j]->{content};
     my $catalogue = $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$j]->{ObjectList}->{content};
     if ( defined $url ) {
        $url =~ s/^\s*//;
-       $url  =~ s/\s*$//;    
-    
+       $url  =~ s/\s*$//;
+
     }
     if ( defined $catalogue ) {
        $catalogue =~ s/^\s*//;
        $catalogue =~ s/\s*$//;
-    }   
+    }
     $output[$j] = ( { Catalogue => $catalogue,
                       URL => $url,
 		      Header => $header } );
@@ -1949,11 +1949,11 @@ sub data {
 
 sub headers {
   my $self = shift;
-  
-  if ( defined $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData} && 
-       reftype($self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}) eq "HASH" ) { 
-       return (); 
-  } 
+
+  if ( defined $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData} &&
+       reftype($self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}) eq "HASH" ) {
+       return ();
+  }
   my @output;
   foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}} ) {
     my $header = $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$j]->{FITSHeader}->{content};
@@ -1965,10 +1965,10 @@ sub headers {
 sub images {
   my $self = shift;
 
-  if ( defined $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData} && 
-       reftype($self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}) eq "HASH" ) { 
-       return (); 
-  } 
+  if ( defined $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData} &&
+       reftype($self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}) eq "HASH" ) {
+       return ();
+  }
   my @output;
   foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}} ) {
     my $url = $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$j]->{content};
@@ -1983,11 +1983,11 @@ sub images {
 
 sub catalogues {
   my $self = shift;
-  
-  if ( defined $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData} && 
-       reftype($self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}) eq "HASH" ) { 
-       return (); 
-  } 
+
+  if ( defined $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData} &&
+       reftype($self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}) eq "HASH" ) {
+       return ();
+  }
   my @output;
   foreach my $j ( 0 .. $#{$self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}} ) {
     my $catalogue = $self->{DOCUMENT}->{Observation}[$self->{OBS}]->{ImageData}[$j]->{ObjectList}->{content};
@@ -2021,7 +2021,7 @@ sub image_type {
   }
   return @output;
 }
-  
+
 sub image_reduced {
   my $self = shift;
 
@@ -2031,7 +2031,7 @@ sub image_reduced {
     $output[$j] = $reduced;
   }
   return @output;
-}  
+}
 
 sub catalogue_type {
   my $self = shift;
@@ -2054,7 +2054,7 @@ sub header_type {
   }
   return @output;
 }
-   
+
 # G E N E R A L ------------------------------------------------------------
 
 =back
@@ -2065,7 +2065,7 @@ sub header_type {
 
 =item B<observation>
 
-Retrieve or set the current <Observation> block being inspected 
+Retrieve or set the current <Observation> block being inspected
 
    my $num = $object->observation( );
    $object->Observation( 0 );
@@ -2076,7 +2076,7 @@ defaults to 0.
 
 sub observation {
   my $self = shift;
- 
+
   if (@_) {
      $self->{OBS} = shift;
   }
@@ -2097,9 +2097,9 @@ typically there will only be 1.
 
 sub number_of_observations {
   my $self = shift;
- 
+
   my $num = scalar( @{$self->{DOCUMENT}->{Observation}} );
-  
+
   # return the current target score
   return $num;
 }
@@ -2119,7 +2119,7 @@ If C<build( )> has not been called this function will return an undef.
 
 sub dump_buffer {
   my $self = shift;
-  
+
   if ( defined $self->{BUFFER} ){
      return $self->{BUFFER}->value();
   } else {
@@ -2129,11 +2129,11 @@ sub dump_buffer {
 
 sub dump_rtml {
   dump_buffer( @_ );
-} 
+}
 
 sub buffer {
   dump_buffer( @_ );
-}   
+}
 
 =item B<dump_tree>
 
@@ -2142,15 +2142,15 @@ Returns a refence to the parsed RTML document hash currently held in memory,
    my $object = new XML::Document::RTML( XML => $xml );
    my $hash_reference = $object->dump_tree();
 
-should return an undefined value if that tree is empty. This error will occur 
-if we haven't called C<build( )> to create a document, or populated the tree using 
+should return an undefined value if that tree is empty. This error will occur
+if we haven't called C<build( )> to create a document, or populated the tree using
 the object creator by calling the XML or File methods to read in a document.
 
 =cut
 
 sub dump_tree {
   my $self = shift;
-  
+
   if ( defined $self->{DOCUMENT} ){
      return $self->{DOCUMENT};
   } else {
@@ -2160,11 +2160,11 @@ sub dump_tree {
 
 sub dump_hash {
   dump_tree( @_ );
-}  
+}
 
 sub tree {
   dump_tree( @_ );
-} 
+}
 
 
 # C O N F I G U R E ---------------------------------------------------------
@@ -2186,23 +2186,23 @@ sub configure {
 
   # BLESS XML WRITER
   # ----------------
-  $self->{BUFFER} = new XML::Writer::String();  
+  $self->{BUFFER} = new XML::Writer::String();
   $self->{WRITER} = new XML::Writer( OUTPUT      => $self->{BUFFER},
-                                     DATA_MODE   => 1, 
-                                     UNSAFE      => 1, 
+                                     DATA_MODE   => 1,
+                                     UNSAFE      => 1,
                                      DATA_INDENT => 4 );
-				     
+
   # DEFAULTS
   # --------
-  
+
   # use the RTML Namespace as defined by the v2.2 DTD by default
   $self->version( 2.2 );
-  $self->{DTD} = "http://www.estar.org.uk/documents/rtml" . $self->version() . ".dtd"; 
-  
+  $self->{DTD} = "http://www.estar.org.uk/documents/rtml" . $self->version() . ".dtd";
+
   # we're guessing we're talking to
   $self->host( "127.0.0.1" );
   $self->port( 8000 );
-  
+
   # default to J2000
   $self->coordinate_type( "equatorial" );
   $self->equinox ( "J2000" );
@@ -2210,13 +2210,13 @@ sub configure {
   $self->raunits( "hms" );
   $self->decformat( "dd mm ss.ss" );
   $self->decunits( "dms" );
-  
+
   # default to using the queue with "normal" priority
   $self->priority( 3 );
   $self->target_type( "normal" );
   $self->target_ident( "SingleExposure" );
   $self->exposure_type( "time" );
-  
+
   # default to a CCD camera, and an R-band filter
   $self->device_type( "camera" );
   $self->filter_type( "R" );
@@ -2229,32 +2229,32 @@ sub configure {
 
   # grab the argument list
   my %args = @_;
-				        
+
   # Loop over the keys that mean we're parsing a document
   for my $key (qw / File XML / ) {
-     if ( lc($key) eq "file" && exists $args{$key} ) { 
+     if ( lc($key) eq "file" && exists $args{$key} ) {
         eval { $self->_parse( File => $args{$key} ); };
 	if ( $@ ) {
 	   die "$@";
-	}   
+	}
 	last;
-	
+
      } elsif ( lc($key) eq "xml"  && exists $args{$key} ) {
         eval { $self->_parse( XML => $args{$key} ); };
 	if ( $@ ) {
 	   die "$@";
 	}
 	last;
-	      
-     }  
-  }	
-  
+
+     }
+  }
+
   # Loop over the rest of the keys
   for my $other (qw / Role Type Version DTD GroupCount ExposureTime Exposure
                       SignalToNoise Snr Flux ExposureType ExposureUnits
                       SeriesCount Interval Tolerance Priority TimeConstraint
                       DeviceType Device FilterType Filter TargetType TargetIdent
-                      Identity TargetName Target CoordinateType Coordtype  
+                      Identity TargetName Target CoordinateType Coordtype
                       RA RAFormat RAUnits Dec DecFormat DecUnits Equinox
                       Host Port PortNumber ID UniqueID Name ObserverName
                       RealName User UserName Institution Email EmailAddress
@@ -2262,7 +2262,7 @@ sub configure {
       my $method = lc($other);
       $self->$method( $args{$other} ) if exists $args{$other};
   }
-  
+
   # Nothing to configure...
   return undef;
 
@@ -2285,24 +2285,24 @@ sub _parse {
   # Loop over the allowed keys
   for my $key (qw / File XML / ) {
      if ( lc($key) eq "file" && exists $args{$key} ) {
-        $args{$key} =~ s/US_ASCII/ISO-8859-1/; 
-	$self->{DOCUMENT} = $xs->XMLin( $args{$key}, 
+        $args{$key} =~ s/US_ASCII/ISO-8859-1/;
+	$self->{DOCUMENT} = $xs->XMLin( $args{$key},
 	                                ForceArray => [ "ImageData", "Observation" ] );
 	last;
-	
+
      } elsif ( lc($key) eq "xml"  && exists $args{$key} ) {
-        $args{$key} =~ s/US_ASCII/ISO-8859-1/; 
-	$self->{DOCUMENT} = $xs->XMLin( $args{$key}, 
+        $args{$key} =~ s/US_ASCII/ISO-8859-1/;
+	$self->{DOCUMENT} = $xs->XMLin( $args{$key},
 	                                ForceArray => [ "ImageData", "Observation" ] );
 	last;
-	
-     }  
+
+     }
   }
-  
-  #print Dumper( $self->{DOCUMENT} );      
+
+  #print Dumper( $self->{DOCUMENT} );
   return;
 }
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

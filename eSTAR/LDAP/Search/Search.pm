@@ -11,13 +11,13 @@ use AutoLoader qw(AUTOLOAD);
 
 our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	
+
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	
+
 );
 '$Revision: 1.2 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
@@ -25,13 +25,13 @@ our @EXPORT = qw(
 ####
 # constructor - takes these arguments:
 
-#  host - the hostname of the machine that the mds is running on to do 
+#  host - the hostname of the machine that the mds is running on to do
 #         the query against
 
-#  port - the mds port number (if undef, then the default port will 
+#  port - the mds port number (if undef, then the default port will
 #         be used (2135)
 
-#  branchpoint - Location in DIT from which to start the search. The 
+#  branchpoint - Location in DIT from which to start the search. The
 #                default is "o=eSTAR"
 
 #  filter - mds search filter
@@ -116,7 +116,7 @@ sub _options {
 ###
 sub execute {
    my $self = shift;
-   my $ldap = Net::LDAP->new( 
+   my $ldap = Net::LDAP->new(
                              $self->{'host'},
                              port => "$self->{'port'}",
                              timeout =>  "$self->{'timeout'}"
@@ -136,7 +136,7 @@ sub execute {
    $self->{'error'} = $mesg->error;
    $self->{'count'} = $mesg->count;
 
-   
+
    $self->set_entries($mesg->all_entries);
 
    $ldap->unbind;   # take down session
@@ -153,7 +153,7 @@ sub set_branch {
   my $self = shift;
   my $branch = shift;
   if(!defined($branch)) { return undef; }
-  $self->{'branch'} = $branch; 
+  $self->{'branch'} = $branch;
   return $branch;
 }
 
@@ -225,9 +225,9 @@ eSTAR::LDAP::Search - Perl extension for doing GIS/GIIS/GRIS searches
   foreach $entry (@entries) {
      my @atts = $entry->attributes;
      print "\n\n";
-     foreach (@atts) { 
-       print "$_="; my $val = $entry->get_value($_); 
-       print "$val\n"; 
+     foreach (@atts) {
+       print "$_="; my $val = $entry->get_value($_);
+       print "$val\n";
     }
   }
 

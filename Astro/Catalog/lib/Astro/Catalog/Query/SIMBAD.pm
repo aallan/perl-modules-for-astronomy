@@ -188,7 +188,7 @@ sub _parse_query {
   # create an Astro::Catalog object to hold the search results
   my $catalog = new Astro::Catalog();
 
-  # loop round the returned buffer 
+  # loop round the returned buffer
   my @target;       # raw HTML lines, one per object
   foreach my $line ( 0 ... $#buffer ) {
 
@@ -197,8 +197,8 @@ sub _parse_query {
       # Number of objects found
       my $number = $1;
 
-      # GRAB EACH OBJECT - starting from 2 lines after the 
-      # current position (since that is the table header and 
+      # GRAB EACH OBJECT - starting from 2 lines after the
+      # current position (since that is the table header and
       # table separator
       @target = map { $buffer[$_] } ($line+2 ... $line+$number+1);
 
@@ -213,7 +213,7 @@ sub _parse_query {
     # create a temporary place holder object
     my $star = new Astro::Catalog::Star();
 
-    # split each line using the "pipe" symbol separating 
+    # split each line using the "pipe" symbol separating
     # the table columns
     my @separated = split( /\|/, $line );
 
@@ -229,7 +229,7 @@ sub _parse_query {
     # grab the url based on quotes around the string
     my $start_index = index( $separated[0], q/"/ );
     my $last_index = rindex( $separated[0], q/"/ );
-    my $url = substr( $separated[0], $start_index+1, 
+    my $url = substr( $separated[0], $start_index+1,
 		      $last_index-$start_index-1);
 
     # push it into the object

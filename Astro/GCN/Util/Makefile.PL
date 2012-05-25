@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::GCN::Util',
 	       'VERSION_FROM'   => 'Util.pm',
                'PREREQ_PM'      => {  },

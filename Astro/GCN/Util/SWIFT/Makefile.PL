@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::GCN::Util::SWIFT',
 	       'VERSION_FROM'   => 'SWIFT.pm',
                'PREREQ_PM'      => {  },

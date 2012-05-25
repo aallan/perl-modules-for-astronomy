@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::SIMBAD',
 	       'VERSION_FROM'   => 'SIMBAD.pm',
                'PREREQ_PM'      => { 'LWP' => 5.53, 'HTML::Tree' => 3.17, 'HTML::Parser' => 3.36 },

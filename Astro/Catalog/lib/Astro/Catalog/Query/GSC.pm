@@ -18,13 +18,13 @@ Astro::Catalog::Query::GSC - A query request to the GSC Catalog
 
 =head1 DESCRIPTION
 
-The module is an object orientated interface to the online Guide Star 
-catalogue at the ESO/ST-ECF archive site. 
+The module is an object orientated interface to the online Guide Star
+catalogue at the ESO/ST-ECF archive site.
 
 Stores information about an prospective GSC query and allows the query to
 be made, returning an Astro::Catalog::GSC::Catalog object.
 
-The object will by default pick up the proxy information from the HTTP_PROXY 
+The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
@@ -139,7 +139,7 @@ sub _get_default_options {
 =item B<_parse_query>
 
 Private function used to parse the results returned in an GSC query.
-Should not be called directly. Instead use the querydb() assessor method to 
+Should not be called directly. Instead use the querydb() assessor method to
 make and parse the results.
 
 =cut
@@ -209,7 +209,7 @@ sub _parse_query {
            if ( defined $separated[0] ) {
 
               # create a temporary place holder object
-              $star = new Astro::Catalog::Star(); 
+              $star = new Astro::Catalog::Star();
 
               # ID
               my $id = $separated[2];
@@ -236,7 +236,7 @@ sub _parse_query {
               # B Magnitude
               #my %b_mag = ( B => $separated[10] );
               #$star->magnitudes( \%b_mag );
-	      
+
 	      $star->fluxes( new Astro::Fluxes( new Astro::Flux(
 	               new Number::Uncertainty( Value => $separated[10],
 		                                Error => $separated[11] ),

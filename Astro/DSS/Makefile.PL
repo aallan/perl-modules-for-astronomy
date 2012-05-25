@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::DSS',
 	       'VERSION'        => '1.6.1',
                'PREREQ_PM'      => { LWP         => 5.53,

@@ -2,7 +2,7 @@ package Astro::SIMBAD::Query;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::SIMBAD::Query
 
@@ -63,7 +63,7 @@ the object query is expected to obtain only one result, but returns extra
 data about that target.  An object query is performed if the target name
 is specified and the Error radius is 0; otherwise, a list query is done.
 
-The object will by default pick up the proxy information from the HTTP_PROXY 
+The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
@@ -239,10 +239,10 @@ sub url {
   my $self = shift;
 
   # SETTING URL
-  if (@_) { 
+  if (@_) {
 
-    # set the url option 
-    my $base_url = shift; 
+    # set the url option
+    my $base_url = shift;
     if( defined $base_url ) {
        $self->{URL} = $base_url;
        $self->{QUERY} = "http://$base_url/sim-id.pl?";
@@ -284,23 +284,23 @@ sub ra {
   my $self = shift;
 
   # SETTING R.A.
-  if (@_) { 
-    
+  if (@_) {
+
     # grab the new R.A.
     my $ra = shift;
-    
-    # mutilate it and stuff it and the current $self->{RA} 
+
+    # mutilate it and stuff it and the current $self->{RA}
     # into the ${$self->{OPTIONS}}{"Ident"} hash item.
     $ra =~ s/\s/\+/g;
     $self->{RA} = $ra;
-    
+
     # grab the currently set DEC
     my $dec = $self->{DEC};
-    
+
     # set the identifier
     ${$self->{OPTIONS}}{"Ident"} = "$ra+$dec";
   }
-  
+
   # un-mutilate and return a nicely formated string to the user
   my $ra = $self->{RA};
   $ra =~ s/\+/ /g;
@@ -319,28 +319,28 @@ or -40 25 67.89
 
 =cut
 
-sub dec { 
+sub dec {
   my $self = shift;
 
   # SETTING DEC
-  if (@_) { 
+  if (@_) {
 
     # grab the new Dec
     my $dec = shift;
-    
-    # mutilate it and stuff it and the current $self->{DEC} 
+
+    # mutilate it and stuff it and the current $self->{DEC}
     # into the ${$self->{OPTIONS}}{"Ident"} hash item.
     $dec =~ s/\+/%2B/g;
     $dec =~ s/\s/\+/g;
     $self->{DEC} = $dec;
-    
+
     # grab the currently set RA
     my $ra = $self->{RA};
-    
+
     # set the identifier
     ${$self->{OPTIONS}}{"Ident"} = "$ra+$dec";
   }
-  
+
   # un-mutilate and return a nicely formated string to the user
   my $dec = $self->{DEC};
   $dec =~ s/\+/ /g;
@@ -367,26 +367,26 @@ sub target {
   my $self = shift;
 
   # SETTING IDENTIFIER
-  if (@_) { 
+  if (@_) {
 
     # grab the new object name
     my $ident = shift;
-    
-    # mutilate it and stuff it into ${$self->{OPTIONS}}{"Ident"} 
+
+    # mutilate it and stuff it into ${$self->{OPTIONS}}{"Ident"}
     $ident =~ s/\s/\+/g;
     ${$self->{OPTIONS}}{"Ident"} = $ident;
 
     # refigure object/list search type
     $self->_update_nbident();
   }
-  
+
   return ${$self->{OPTIONS}}{"Ident"};
 
 }
 
 =item B<Error>
 
-The error radius to be searched for SIMBAD objects around the target R.A. 
+The error radius to be searched for SIMBAD objects around the target R.A.
 and Dec, the radius defaults to 10 arc seconds, with the radius unit being
 set using the units() method.
 
@@ -398,7 +398,7 @@ set using the units() method.
 sub error {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     # If searching with a nonzero radius, do a list query.
     # If radius is zero, get a detailed object query.
     ${$self->{OPTIONS}}{"Radius"} = shift;
@@ -406,7 +406,7 @@ sub error {
     # refigure object/list search type
     $self->_update_nbident();
   }
-  
+
   return ${$self->{OPTIONS}}{"Radius"};
 
 }
@@ -427,13 +427,13 @@ sub units {
   my $self = shift;
 
   if (@_) {
-  
-    my $unit = shift; 
+
+    my $unit = shift;
     if( $unit eq "arcsec" || $unit eq "arcmin" || $unit eq "deg" ) {
        ${$self->{OPTIONS}}{"Radius.unit"} = $unit;
-    }   
+    }
   }
-  
+
   return ${$self->{OPTIONS}}{"Radius.unit"};
 
 }
@@ -470,13 +470,13 @@ sub frame {
   my $self = shift;
 
   if (@_) {
-  
-    my $frame = shift; 
+
+    my $frame = shift;
     if( $frame eq "FK5" || $frame eq "FK4"  ) {
        ${$self->{OPTIONS}}{"CooFrame"} = $frame;
-    }   
+    }
   }
-  
+
   return ${$self->{OPTIONS}}{"CooFrame"};
 
 }
@@ -495,10 +495,10 @@ defaults to 2000
 sub epoch {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{OPTIONS}}{"CooEpoch"} = shift;
   }
-  
+
   return ${$self->{OPTIONS}}{"CooEpoch"};
 
 }
@@ -517,10 +517,10 @@ defaults to 2000
 sub equinox {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{OPTIONS}}{"CooEqui"} = shift;
   }
-  
+
   return ${$self->{OPTIONS}}{"CooEqui"};
 
 }
@@ -545,7 +545,7 @@ sub queryurl {
 
    # build final query URL
    $URL = $URL . $options;
-   
+
    return $URL;
 }
 
@@ -573,14 +573,14 @@ sub configure {
   # CONFIGURE DEFAULTS
   # ------------------
 
-  # default the R.A. and DEC to blank strings to avoid uninitialized 
+  # default the R.A. and DEC to blank strings to avoid uninitialized
   # value problems when creating the object
   $self->{RA} = "";
   $self->{DEC} = "";
 
   # define the default base URLs
   $self->{URL} = "simbad.u-strasbg.fr";
-  
+
   # define the query URLs
   my $default_url = $self->{URL};
   $self->{QUERY} = "http://$default_url/sim-id.pl?";
@@ -588,7 +588,7 @@ sub configure {
   # Setup the LWP::UserAgent
   my $HOST = hostname();
   my $DOMAIN = hostdomain();
-  $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
+  $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 );
   $self->{USERAGENT}->agent("Astro::SIMBAD/$VERSION ($HOST.$DOMAIN)");
 
   # Grab Proxy details from local environment
@@ -613,12 +613,12 @@ sub configure {
   ${$self->{OPTIONS}}{"Frame1"}             = "FK5";
   ${$self->{OPTIONS}}{"Equi1"}              = "2000.0";
   ${$self->{OPTIONS}}{"Epoch1"}             = "2000.0";
-  
+
   # Frame 2, FK4 1950/1950
   ${$self->{OPTIONS}}{"Frame2"}             = "FK4";
   ${$self->{OPTIONS}}{"Equi2"}              = "1950.0";
   ${$self->{OPTIONS}}{"Epoch2"}             = "1950.0";
-  
+
   # Frame 3, Galactic
   ${$self->{OPTIONS}}{"Frame3"}             = "G";
   ${$self->{OPTIONS}}{"Equi3"}              = "2000.0";
@@ -626,7 +626,7 @@ sub configure {
 
   # TYPE LOOKUP HASH TABLE
   # ----------------------
- 
+
   # build the data table
   ${$self->{LOOKUP}}{"?"}    =     "Object of unknown nature";
   ${$self->{LOOKUP}}{"Rad"}  =     "Radio-source";
@@ -779,7 +779,7 @@ sub configure {
   # that due to the order these are called in supplying both and RA and Dec
   # and an object Identifier (e.g. HT Cas) will cause the query to default
   # to using the identifier rather than the supplied co-ordinates.
-  for my $key (qw / RA Dec Target Error Units Frame Epoch Equinox 
+  for my $key (qw / RA Dec Target Error Units Frame Epoch Equinox
                     Proxy Timeout URL / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
@@ -817,7 +817,7 @@ sub _make_query {
 
    # grab the base URL
    my $URL = $self->queryurl();
-   
+
    # build request
    my $request = new HTTP::Request('GET', $URL);
 
@@ -835,7 +835,7 @@ sub _make_query {
 
 =item B<_parse_query>
 
-Private function used to parse the results returned in an SIMBAD query. Should 
+Private function used to parse the results returned in an SIMBAD query. Should
 not be called directly. Instead use the querydb() assessor method to make and
 parse the results.
 
@@ -881,82 +881,82 @@ sub _parse_list_query {
       my $starline = $buffer[$linepos];
 
       # create a temporary place holder object
-      my $object = new Astro::SIMBAD::Result::Object();  
-     
+      my $object = new Astro::SIMBAD::Result::Object();
+
       # split each line using the "pipe" symbol separating the table columns
       my @separated = split( /\|/, $starline );
-     
+
 
       $self->_insert_query_params($object);
-     
+
       # URL
       # ---
- 
+
       # grab the url based on quotes around the string
       my $start_index = index( $separated[0], q/"/ );
       my $last_index = rindex( $separated[0], q/"/ );
-      my $url = substr( $separated[0], $start_index+1, 
+      my $url = substr( $separated[0], $start_index+1,
 			$last_index-$start_index-1);
 
       # push it into the object
       $object->url( $url );
-     
+
       # NAME
       # ----
-     
+
       # get the object name from the same section
       my $final_index = rindex( $separated[0], "<" ) - 1;
       my $name = substr($separated[0],$last_index+2,$final_index-$last_index-1);
-     
+
       # push it into the object
       $object->name( $name );
-    
+
       # TYPE
       # ----
       my $type = trim($separated[1]);
-      
+
       # push it into the object
       $object->type( $type );
-      
+
       # LONG TYPE
       # ---------
-     
+
       # do the lookup
       for my $key (keys %{$self->{LOOKUP}}) {
-        
+
 	  if( $object->type() eq $key ) {
-        
+
 	      # push it into the object
 	      my $long = ${$self->{LOOKUP}}{$key};
 	      $object->long( $long );
 	      last;
 	  }
-      }     
-     
+      }
+
       # RA and DEC
       my ($ra, $dec) = $self->_coordinates($separated[2]);
       $object->ra($ra);
       $object->dec($dec);
-      
+
       # B, V magnitudes; field may contain none, one or both
       my ($bmag, $vmag) = split /\s+/, trim($separated[3]);
       if ($bmag && $bmag ne ":") {
 	  $object->bmag($bmag);
       }
       $object->vmag($vmag);
-    
+
       # SPECTRAL TYPE
       # -------------
       my $spectral = trim($separated[4]);
-      
+
       # push it into the object
       $object->spec($spectral);
-      
+
       # Add the target object to the Astro::SIMBAD::Result object
       # ---------------------------------------------------------
       $result->addobject( $object );
   }
-  
+
   # return an Astro::SIMBAD::Result object, or undef if no abstracts returned
   return $result;
 }
@@ -1073,7 +1073,7 @@ sub _insert_query_params {
 
   # FRAME
   # -----
-     
+
   # grab the current co-ordinate frame from the query object itself
   my @coord_frame = ( ${$self->{OPTIONS}}{"CooFrame"},
 		      ${$self->{OPTIONS}}{"CooEpoch"},
@@ -1111,12 +1111,12 @@ sub _coordinates {
 
      # RA
      # --
-     
+
      my $coords = trim(shift);
-     
+
      # split the RA and Dec line into an array elements
      my @radec = split( /\s+/, $coords );
-     
+
      # ...and then rebuild it
      my $ra;
      unless( $radec[2] =~ '\+' || $radec[2] =~ '-' ) {
@@ -1124,11 +1124,11 @@ sub _coordinates {
      } else {
        $ra = "$radec[0] $radec[1] 00.0";
      }
-      
-     
+
+
      # DEC
      # ---
-     
+
      # ...and rebuild the Dec
      my $dec;
      unless ( $radec[2] =~ '\+' || $radec[2] =~ '-' ) {
@@ -1149,7 +1149,7 @@ the raw output of the last SIMBAD query made using querydb().
 
 sub _dump_raw {
    my $self = shift;
-   
+
    # split the BUFFER into an array
    my @portable = split( /\n/,$self->{BUFFER});
    chomp @portable;

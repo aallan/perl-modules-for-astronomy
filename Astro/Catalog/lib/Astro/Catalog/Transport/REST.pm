@@ -234,7 +234,7 @@ sub query_url {
 
 =item B<url>
 
-Return the current remote host for the query (the full URL 
+Return the current remote host for the query (the full URL
 can be returned using the C<query_url> method).
 
    $host = $q->url();
@@ -256,7 +256,7 @@ sub url {
   my $self = shift;
 
   # SETTING URL
-  if (@_) { 
+  if (@_) {
 
     # set the url option
     my $base_url = shift;

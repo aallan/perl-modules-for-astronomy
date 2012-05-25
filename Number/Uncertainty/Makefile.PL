@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'          => 'Number::Uncertainty',
 	       'VERSION'       => '0.1',
                'PREREQ_PM'     => {  },

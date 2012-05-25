@@ -2,7 +2,7 @@ package eSTAR::RTML::Build;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    eSTAR::RTML::Build
 
@@ -13,7 +13,7 @@ package eSTAR::RTML::Build;
 #    Perl module
 
 #  Description:
-#    This module creates outgoing RTML messages needed by the intelligent 
+#    This module creates outgoing RTML messages needed by the intelligent
 #    agent to communicate with the Discovery Node.
 
 #  Authors:
@@ -42,13 +42,13 @@ eSTAR::RTML::Build - module which creates valid RTML messages
                                       Name        => $real_name,
                                       Institution => $institution,
                                       Email       => $email_address );
- 
+
 
 =head1 DESCRIPTION
 
 The module builds RTML messages which will be sent over GlobusIO from the
 intelligent agent to the dscovery node. Two types of messages can be
-constructed, these being score and observation request documents. 
+constructed, these being score and observation request documents.
 
 =cut
 
@@ -151,155 +151,155 @@ sub score_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                Snr Flux Filter GroupCount SeriesCount Interval Tolerance 
+  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure
+                Snr Flux Filter GroupCount SeriesCount Interval Tolerance
                 TimeConstraint Priority / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
-  
+
   # open the document
   $self->{WRITER}->xmlDecl( 'US-ASCII' );
   $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
- 
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
                              'version' => '2.2',
                              'type' => 'score' );
-  
+
   # IntelligentAgent Tag
   # --------------------
-  
-  # identify the IA               
-  $self->{WRITER}->startTag( 'IntelligentAgent', 
+
+  # identify the IA
+  $self->{WRITER}->startTag( 'IntelligentAgent',
                              'host' => ${$self->{OPTIONS}}{HOST},
-                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
-  
+                             'port' =>  ${$self->{OPTIONS}}{PORT} );
+
   # unique IA identity sting
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
-  
+
   $self->{WRITER}->endTag( 'IntelligentAgent' );
-  
+
   # Telescope Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Telescope' );
-  
+
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
-                             
-     $self->{WRITER}->startTag( 'User');                          
+
+     $self->{WRITER}->startTag( 'User');
      $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
      $self->{WRITER}->endTag( 'User' );
-  
-     $self->{WRITER}->startTag( 'Name');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
-     $self->{WRITER}->endTag( 'Name' );  
-      
-     $self->{WRITER}->startTag( 'Institution');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
-     $self->{WRITER}->endTag( 'Institution' ); 
-      
-     $self->{WRITER}->startTag( 'Email');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
-     $self->{WRITER}->endTag( 'Email' ); 
 
-  $self->{WRITER}->endTag( 'Contact' ); 
-  
+     $self->{WRITER}->startTag( 'Name');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );
+
+     $self->{WRITER}->startTag( 'Institution');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' );
+
+     $self->{WRITER}->startTag( 'Email');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' );
+
+  $self->{WRITER}->endTag( 'Contact' );
+
   # Project Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Project' );
-    
+
   # Observation tag
   # ---------------
-  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
-  
-     $self->{WRITER}->startTag( 'Target', 
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );
+
+     $self->{WRITER}->startTag( 'Target',
                                 'type' => ${$self->{OPTIONS}}{TARGETTYPE},
                                 'ident' => ${$self->{OPTIONS}}{TARGETIDENT} );
-    
+
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
         $self->{WRITER}->endTag( 'TargetName' );
 
         $self->{WRITER}->startTag( 'Coordinates', 'type' => 'equatorial' );
-        
-           $self->{WRITER}->startTag( 'RightAscension', 
+
+           $self->{WRITER}->startTag( 'RightAscension',
                                     'format' => 'hh mm ss.s', units => 'hms' );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{RA} );
            $self->{WRITER}->endTag( 'RightAscension' );
-           
-           $self->{WRITER}->startTag( 'Declination', 
+
+           $self->{WRITER}->startTag( 'Declination',
                                     'format' => 'sdd mm ss.s', units => 'dms' );
-                                    
+
            if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
            } else {
-              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) { 
+              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) {
                 $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-              } else {                    
+              } else {
                 $self->{WRITER}->characters( "+" . ${$self->{OPTIONS}}{DEC} );
-              }  
+              }
            }
-           $self->{WRITER}->endTag( 'Declination' );   
+           $self->{WRITER}->endTag( 'Declination' );
 
            $self->{WRITER}->startTag( 'Equinox'  );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EQUINOX} );
            $self->{WRITER}->endTag( 'Equinox' );
 
         $self->{WRITER}->endTag( 'Coordinates' );
-        
+
         if( defined ${$self->{OPTIONS}}{SNR} ) {
 
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 
-               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
-           } else {        
-              $self->{WRITER}->startTag( 'Flux', 
+              $self->{WRITER}->startTag( 'Flux',
+               'type' => 'continuum', 'units' => 'mag',
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );
+           } else {
+              $self->{WRITER}->startTag( 'Flux',
                'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
-        
+
      $self->{WRITER}->endTag( 'Target' );
 
-        
+
      $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
-        
-           $self->{WRITER}->startTag( 'Filter' ); 
+
+           $self->{WRITER}->startTag( 'Filter' );
 
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->startTag( 'FilterType');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
-              $self->{WRITER}->endTag( 'FilterType' ); 
-           } else {          
-              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
+           } else {
+              $self->{WRITER}->startTag( 'FilterType' );
               $self->{WRITER}->characters( 'V' );
-              $self->{WRITER}->endTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
            }
-           
+
            $self->{WRITER}->endTag( 'Filter' );
-     $self->{WRITER}->endTag( 'Device' );                                    
-     
+     $self->{WRITER}->endTag( 'Device' );
+
      my $priority;
      if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
         $priority = ${$self->{OPTIONS}}{PRIORITY};
      } else {
         $priority = 3;
      }
-     	     	               
+
      $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
 
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
+              $self->{WRITER}->endTag( 'Count' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
@@ -307,56 +307,56 @@ sub score_observation {
                                    'type' => 'time', 'units' => 'seconds' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
-           }                        
+              $self->{WRITER}->endTag( 'Count' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
-        }                              
+        }
         $self->{WRITER}->endTag( 'Exposure' );
-        
+
         if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
             defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
-            
+
              $self->{WRITER}->startTag( 'TimeConstraint' );
              $self->{WRITER}->startTag( 'StartDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
              $self->{WRITER}->endTag( 'StartDateTime' );
              $self->{WRITER}->startTag( 'EndDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
-             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'EndDateTime' );
              $self->{WRITER}->endTag( 'TimeConstraint' );
         }
-        
+
         if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
              defined ${$self->{OPTIONS}}{INTERVAL} &&
              defined ${$self->{OPTIONS}}{TOLERANCE} ) {
-             
+
              $self->{WRITER}->startTag( 'SeriesConstraint' );
-             
+
              $self->{WRITER}->startTag( 'Count' );
              $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
              $self->{WRITER}->endTag( 'Count' );
-             
+
              $self->{WRITER}->startTag( 'Interval' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
-             $self->{WRITER}->endTag( 'Interval' );               
-             
+             $self->{WRITER}->endTag( 'Interval' );
+
              $self->{WRITER}->startTag( 'Tolerance' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
-             $self->{WRITER}->endTag( 'Tolerance' );               
-            
+             $self->{WRITER}->endTag( 'Tolerance' );
+
              $self->{WRITER}->endTag( 'SeriesConstraint' );
-            
+
         }
-             
-           
+
+
 
      $self->{WRITER}->endTag( 'Schedule' );
-                  
-  $self->{WRITER}->endTag( 'Observation' );  
-     
-    
+
+  $self->{WRITER}->endTag( 'Observation' );
+
+
   # close the RTML document
   # =======================
   $self->{WRITER}->endTag( 'RTML' );
@@ -372,7 +372,7 @@ sub score_observation {
 
 Build a score response document
 
-   $status = $message->score_response( Target        => $target_name, 
+   $status = $message->score_response( Target        => $target_name,
                                        TargetIdent    => "Observation",
                                        RA            => $ra,
                                        Dec           => $dec,
@@ -402,99 +402,99 @@ sub score_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                    Snr Flux Score Time Filter GroupCount SeriesCount 
+  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure
+                    Snr Flux Score Time Filter GroupCount SeriesCount
                     Interval Tolerance TimeConstraint Priority / ) {
-  
+
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
-  
+
   # open the document
   $self->{WRITER}->xmlDecl( 'US-ASCII' );
   $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
- 
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
                              'version' => '2.1',
                              'type' => 'score' );
-  
+
   # IntelligentAgent Tag
   # --------------------
-  
-  # identify the IA               
-  $self->{WRITER}->startTag( 'IntelligentAgent', 
+
+  # identify the IA
+  $self->{WRITER}->startTag( 'IntelligentAgent',
                              'host' => ${$self->{OPTIONS}}{HOST},
-                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
-  
+                             'port' =>  ${$self->{OPTIONS}}{PORT} );
+
   # unique IA identity sting
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
-  
+
   $self->{WRITER}->endTag( 'IntelligentAgent' );
-  
+
   # Telescope Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Telescope' );
-  
+
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
-                             
-     $self->{WRITER}->startTag( 'User');                          
+
+     $self->{WRITER}->startTag( 'User');
      $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
      $self->{WRITER}->endTag( 'User' );
-  
-     $self->{WRITER}->startTag( 'Name');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
-     $self->{WRITER}->endTag( 'Name' );  
-      
-     $self->{WRITER}->startTag( 'Institution');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
-     $self->{WRITER}->endTag( 'Institution' ); 
-      
-     $self->{WRITER}->startTag( 'Email');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
-     $self->{WRITER}->endTag( 'Email' ); 
 
-  $self->{WRITER}->endTag( 'Contact' ); 
-  
+     $self->{WRITER}->startTag( 'Name');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );
+
+     $self->{WRITER}->startTag( 'Institution');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' );
+
+     $self->{WRITER}->startTag( 'Email');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' );
+
+  $self->{WRITER}->endTag( 'Contact' );
+
   # Project Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Project' );
-    
+
   # Observation tag
   # ---------------
-  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
-  
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );
+
      $self->{WRITER}->startTag( 'Target',
                                 'type' => ${$self->{OPTIONS}}{TARGETTYPE},
                                 'ident' => ${$self->{OPTIONS}}{TARGETIDENT} );
-    
+
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
         $self->{WRITER}->endTag( 'TargetName' );
 
         $self->{WRITER}->startTag( 'Coordinates', 'type' => 'equatorial' );
-        
-           $self->{WRITER}->startTag( 'RightAscension', 
+
+           $self->{WRITER}->startTag( 'RightAscension',
                                     'format' => 'hh mm ss.s', units => 'hms' );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{RA} );
            $self->{WRITER}->endTag( 'RightAscension' );
-           
-           $self->{WRITER}->startTag( 'Declination', 
+
+           $self->{WRITER}->startTag( 'Declination',
                                     'format' => 'sdd mm ss.s', units => 'dms' );
            if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-           } else {                       
-              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) { 
+           } else {
+              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) {
                 $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-              } else {                    
+              } else {
                 $self->{WRITER}->characters( "+" . ${$self->{OPTIONS}}{DEC} );
-              }  
+              }
            }
-           $self->{WRITER}->endTag( 'Declination' );   
+           $self->{WRITER}->endTag( 'Declination' );
 
            $self->{WRITER}->startTag( 'Equinox'  );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EQUINOX} );
@@ -505,53 +505,53 @@ sub score_response {
         if( defined ${$self->{OPTIONS}}{SNR} ) {
 
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 
-               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
-           } else {        
-              $self->{WRITER}->startTag( 'Flux', 
+              $self->{WRITER}->startTag( 'Flux',
+               'type' => 'continuum', 'units' => 'mag',
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );
+           } else {
+              $self->{WRITER}->startTag( 'Flux',
                'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
 
-     $self->{WRITER}->endTag( 'Target' );        
-     
+     $self->{WRITER}->endTag( 'Target' );
+
      $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
-        
-           $self->{WRITER}->startTag( 'Filter' ); 
- 
+
+           $self->{WRITER}->startTag( 'Filter' );
+
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->startTag( 'FilterType');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
-              $self->{WRITER}->endTag( 'FilterType' ); 
-           } else {          
-              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
+           } else {
+              $self->{WRITER}->startTag( 'FilterType' );
               $self->{WRITER}->characters( 'V' );
-              $self->{WRITER}->endTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
            }
-           
+
            $self->{WRITER}->endTag( 'Filter' );
-     $self->{WRITER}->endTag( 'Device' );    
-        
-     
+     $self->{WRITER}->endTag( 'Device' );
+
+
      my $priority;
      if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
         $priority = ${$self->{OPTIONS}}{PRIORITY};
      } else {
         $priority = 3;
      }
-     	     	               
+
      $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
-     
+
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
+              $self->{WRITER}->endTag( 'Count' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
@@ -559,62 +559,62 @@ sub score_response {
                                    'type' => 'time', 'units' => 'seconds' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
-           }                        
+              $self->{WRITER}->endTag( 'Count' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
-        }                              
+        }
         $self->{WRITER}->endTag( 'Exposure' );
-        
+
         if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
             defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
-            
+
              $self->{WRITER}->startTag( 'TimeConstraint' );
              $self->{WRITER}->startTag( 'StartDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
              $self->{WRITER}->endTag( 'StartDateTime' );
              $self->{WRITER}->startTag( 'EndDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
-             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'EndDateTime' );
              $self->{WRITER}->endTag( 'TimeConstraint' );
         }
-        
+
         if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
              defined ${$self->{OPTIONS}}{INTERVAL} &&
              defined ${$self->{OPTIONS}}{TOLERANCE} ) {
-             
+
              $self->{WRITER}->startTag( 'SeriesConstraint' );
-             
+
              $self->{WRITER}->startTag( 'Count' );
              $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
              $self->{WRITER}->endTag( 'Count' );
-             
+
              $self->{WRITER}->startTag( 'Interval' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
-             $self->{WRITER}->endTag( 'Interval' );               
-             
+             $self->{WRITER}->endTag( 'Interval' );
+
              $self->{WRITER}->startTag( 'Tolerance' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
-             $self->{WRITER}->endTag( 'Tolerance' );               
-            
+             $self->{WRITER}->endTag( 'Tolerance' );
+
              $self->{WRITER}->endTag( 'SeriesConstraint' );
-            
+
         }
 
      $self->{WRITER}->endTag( 'Schedule' );
-                  
-  $self->{WRITER}->endTag( 'Observation' );  
-   
+
+  $self->{WRITER}->endTag( 'Observation' );
+
   # Score Tags
-  # ---------- 
+  # ----------
   $self->{WRITER}->startTag( 'Score' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{SCORE} );
   $self->{WRITER}->endTag( 'Score' );
   $self->{WRITER}->startTag( 'CompletionTime' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{COMPLETIONTIME} );
-  $self->{WRITER}->endTag( 'CompletionTime' );       
-    
+  $self->{WRITER}->endTag( 'CompletionTime' );
+
   # close the RTML document
   # =======================
   $self->{WRITER}->endTag( 'RTML' );
@@ -659,154 +659,154 @@ sub request_observation {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Score Time 
-                Exposure Snr Flux Filter GroupCount SeriesCount 
+  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Score Time
+                Exposure Snr Flux Filter GroupCount SeriesCount
                     Interval Tolerance TimeConstraint Priority / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
-  
+
   # open the document
   $self->{WRITER}->xmlDecl( 'US-ASCII' );
   $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
- 
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
                              'version' => '2.1',
                              'type' => 'request' );
-  
+
   # IntelligentAgent Tag
   # --------------------
-  
-  # identify the IA               
-  $self->{WRITER}->startTag( 'IntelligentAgent', 
+
+  # identify the IA
+  $self->{WRITER}->startTag( 'IntelligentAgent',
                              'host' =>  ${$self->{OPTIONS}}{HOST},
-                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
-  
+                             'port' =>  ${$self->{OPTIONS}}{PORT} );
+
   # unique IA identity sting
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
-  
+
   $self->{WRITER}->endTag( 'IntelligentAgent' );
-  
+
   # Telescope Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Telescope' );
-    
+
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
-                             
-     $self->{WRITER}->startTag( 'User');                          
+
+     $self->{WRITER}->startTag( 'User');
      $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
      $self->{WRITER}->endTag( 'User' );
-  
-     $self->{WRITER}->startTag( 'Name');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
-     $self->{WRITER}->endTag( 'Name' );  
-      
-     $self->{WRITER}->startTag( 'Institution');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
-     $self->{WRITER}->endTag( 'Institution' ); 
-      
-     $self->{WRITER}->startTag( 'Email');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
-     $self->{WRITER}->endTag( 'Email' ); 
 
-  $self->{WRITER}->endTag( 'Contact' ); 
-  
+     $self->{WRITER}->startTag( 'Name');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );
+
+     $self->{WRITER}->startTag( 'Institution');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' );
+
+     $self->{WRITER}->startTag( 'Email');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' );
+
+  $self->{WRITER}->endTag( 'Contact' );
+
   # Project Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Project' );
-      
+
   # Observation tag
   # ---------------
-  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
-  
-     $self->{WRITER}->startTag( 'Target', , 
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );
+
+     $self->{WRITER}->startTag( 'Target', ,
                                 'type' => ${$self->{OPTIONS}}{TARGETTYPE},
                                 'ident' => ${$self->{OPTIONS}}{TARGETIDENT} );
-    
+
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
         $self->{WRITER}->endTag( 'TargetName' );
 
         $self->{WRITER}->startTag( 'Coordinates', 'type' => 'equatorial' );
-        
-           $self->{WRITER}->startTag( 'RightAscension', 
+
+           $self->{WRITER}->startTag( 'RightAscension',
                                     'format' => 'hh mm ss.s', units => 'hms' );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{RA} );
            $self->{WRITER}->endTag( 'RightAscension' );
-           
-           $self->{WRITER}->startTag( 'Declination', 
+
+           $self->{WRITER}->startTag( 'Declination',
                                     'format' => 'sdd mm ss.s', units => 'dms' );
            if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-           } else {                       
-              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) { 
+           } else {
+              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) {
                 $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-              } else {                    
+              } else {
                 $self->{WRITER}->characters( "+" . ${$self->{OPTIONS}}{DEC} );
-              }  
+              }
            }
-           $self->{WRITER}->endTag( 'Declination' );   
+           $self->{WRITER}->endTag( 'Declination' );
 
            $self->{WRITER}->startTag( 'Equinox'  );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EQUINOX} );
            $self->{WRITER}->endTag( 'Equinox' );
 
         $self->{WRITER}->endTag( 'Coordinates' );
- 
+
         if( defined ${$self->{OPTIONS}}{SNR} ) {
 
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 
-               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
-           } else {        
-              $self->{WRITER}->startTag( 'Flux', 
+              $self->{WRITER}->startTag( 'Flux',
+               'type' => 'continuum', 'units' => 'mag',
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );
+           } else {
+              $self->{WRITER}->startTag( 'Flux',
                'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
-                                       
+
      $self->{WRITER}->endTag( 'Target' );
-        
+
      $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
-        
-           $self->{WRITER}->startTag( 'Filter' ); 
+
+           $self->{WRITER}->startTag( 'Filter' );
 
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->startTag( 'FilterType');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
-              $self->{WRITER}->endTag( 'FilterType' ); 
-           } else {          
-              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
+           } else {
+              $self->{WRITER}->startTag( 'FilterType' );
               $self->{WRITER}->characters( 'V' );
-              $self->{WRITER}->endTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
            }
-           
+
            $self->{WRITER}->endTag( 'Filter' );
-     $self->{WRITER}->endTag( 'Device' );    
-        
-     
+     $self->{WRITER}->endTag( 'Device' );
+
+
      my $priority;
      if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
         $priority = ${$self->{OPTIONS}}{PRIORITY};
      } else {
         $priority = 3;
      }
-     	     	               
+
      $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
-     
+
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
+              $self->{WRITER}->endTag( 'Count' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
@@ -814,63 +814,63 @@ sub request_observation {
                                    'type' => 'time', 'units' => 'seconds' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
-           }                        
+              $self->{WRITER}->endTag( 'Count' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
-        }                              
+        }
         $self->{WRITER}->endTag( 'Exposure' );
-        
+
         if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
             defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
-            
+
              $self->{WRITER}->startTag( 'TimeConstraint' );
              $self->{WRITER}->startTag( 'StartDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
              $self->{WRITER}->endTag( 'StartDateTime' );
              $self->{WRITER}->startTag( 'EndDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
-             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'EndDateTime' );
              $self->{WRITER}->endTag( 'TimeConstraint' );
         }
-        
+
         if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
              defined ${$self->{OPTIONS}}{INTERVAL} &&
              defined ${$self->{OPTIONS}}{TOLERANCE} ) {
-             
+
              $self->{WRITER}->startTag( 'SeriesConstraint' );
-             
+
              $self->{WRITER}->startTag( 'Count' );
              $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
              $self->{WRITER}->endTag( 'Count' );
-             
+
              $self->{WRITER}->startTag( 'Interval' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
-             $self->{WRITER}->endTag( 'Interval' );               
-             
+             $self->{WRITER}->endTag( 'Interval' );
+
              $self->{WRITER}->startTag( 'Tolerance' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
-             $self->{WRITER}->endTag( 'Tolerance' );               
-            
+             $self->{WRITER}->endTag( 'Tolerance' );
+
              $self->{WRITER}->endTag( 'SeriesConstraint' );
-            
+
         }
 
      $self->{WRITER}->endTag( 'Schedule' );
-     
-  $self->{WRITER}->endTag( 'Observation' );  
-   
+
+  $self->{WRITER}->endTag( 'Observation' );
+
   # Score Tags
-  # ---------- 
+  # ----------
   $self->{WRITER}->startTag( 'Score' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{SCORE} );
   $self->{WRITER}->endTag( 'Score' );
   $self->{WRITER}->startTag( 'CompletionTime' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{COMPLETIONTIME} );
   $self->{WRITER}->endTag( 'CompletionTime' );
-  
-    
+
+
   # close the RTML document
   # =======================
   $self->{WRITER}->endTag( 'RTML' );
@@ -915,99 +915,99 @@ sub confirm_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                    Snr Flux Score Time Filter GroupCount SeriesCount 
+  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure
+                    Snr Flux Score Time Filter GroupCount SeriesCount
                     Interval Tolerance TimeConstraint Priority / ) {
-  
+
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
-  
+
   # open the document
   $self->{WRITER}->xmlDecl( 'US-ASCII' );
   $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
- 
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
                              'version' => '2.1',
                              'type' => 'confirmation' );
-  
+
   # IntelligentAgent Tag
   # --------------------
-  
-  # identify the IA               
-  $self->{WRITER}->startTag( 'IntelligentAgent', 
+
+  # identify the IA
+  $self->{WRITER}->startTag( 'IntelligentAgent',
                              'host' => ${$self->{OPTIONS}}{HOST},
-                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
-  
+                             'port' =>  ${$self->{OPTIONS}}{PORT} );
+
   # unique IA identity sting
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
-  
+
   $self->{WRITER}->endTag( 'IntelligentAgent' );
-  
+
   # Telescope Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Telescope' );
-  
+
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
-                             
-     $self->{WRITER}->startTag( 'User');                          
+
+     $self->{WRITER}->startTag( 'User');
      $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
      $self->{WRITER}->endTag( 'User' );
-  
-     $self->{WRITER}->startTag( 'Name');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
-     $self->{WRITER}->endTag( 'Name' );  
-      
-     $self->{WRITER}->startTag( 'Institution');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
-     $self->{WRITER}->endTag( 'Institution' ); 
-      
-     $self->{WRITER}->startTag( 'Email');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
-     $self->{WRITER}->endTag( 'Email' ); 
 
-  $self->{WRITER}->endTag( 'Contact' ); 
-  
+     $self->{WRITER}->startTag( 'Name');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );
+
+     $self->{WRITER}->startTag( 'Institution');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' );
+
+     $self->{WRITER}->startTag( 'Email');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' );
+
+  $self->{WRITER}->endTag( 'Contact' );
+
   # Project Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Project' );
-    
+
   # Observation tag
   # ---------------
-  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
-  
-     $self->{WRITER}->startTag( 'Target', , 
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );
+
+     $self->{WRITER}->startTag( 'Target', ,
                                 'type' => ${$self->{OPTIONS}}{TARGETTYPE},
                                 'ident' => ${$self->{OPTIONS}}{TARGETIDENT} );
-    
+
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
         $self->{WRITER}->endTag( 'TargetName' );
 
         $self->{WRITER}->startTag( 'Coordinates', 'type' => 'equatorial' );
-        
-           $self->{WRITER}->startTag( 'RightAscension', 
+
+           $self->{WRITER}->startTag( 'RightAscension',
                                     'format' => 'hh mm ss.s', units => 'hms' );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{RA} );
            $self->{WRITER}->endTag( 'RightAscension' );
-           
-           $self->{WRITER}->startTag( 'Declination', 
+
+           $self->{WRITER}->startTag( 'Declination',
                                     'format' => 'sdd mm ss.s', units => 'dms' );
            if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-           } else {                       
-              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) { 
+           } else {
+              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) {
                 $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-              } else {                    
+              } else {
                 $self->{WRITER}->characters( "+" . ${$self->{OPTIONS}}{DEC} );
-              }  
+              }
            }
-           $self->{WRITER}->endTag( 'Declination' );   
+           $self->{WRITER}->endTag( 'Declination' );
 
            $self->{WRITER}->startTag( 'Equinox'  );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EQUINOX} );
@@ -1018,53 +1018,53 @@ sub confirm_response {
         if( defined ${$self->{OPTIONS}}{SNR} ) {
 
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 
-               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
-           } else {        
-              $self->{WRITER}->startTag( 'Flux', 
+              $self->{WRITER}->startTag( 'Flux',
+               'type' => 'continuum', 'units' => 'mag',
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );
+           } else {
+              $self->{WRITER}->startTag( 'Flux',
                'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
 
-     $self->{WRITER}->endTag( 'Target' );        
-     
+     $self->{WRITER}->endTag( 'Target' );
+
      $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
-        
-           $self->{WRITER}->startTag( 'Filter' ); 
- 
+
+           $self->{WRITER}->startTag( 'Filter' );
+
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->startTag( 'FilterType');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
-              $self->{WRITER}->endTag( 'FilterType' ); 
-           } else {          
-              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
+           } else {
+              $self->{WRITER}->startTag( 'FilterType' );
               $self->{WRITER}->characters( 'V' );
-              $self->{WRITER}->endTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
            }
-           
+
            $self->{WRITER}->endTag( 'Filter' );
-     $self->{WRITER}->endTag( 'Device' );    
-        
-     
+     $self->{WRITER}->endTag( 'Device' );
+
+
      my $priority;
      if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
         $priority = ${$self->{OPTIONS}}{PRIORITY};
      } else {
         $priority = 3;
      }
-     	     	               
+
      $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
-     
+
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
+              $self->{WRITER}->endTag( 'Count' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
@@ -1072,62 +1072,62 @@ sub confirm_response {
                                    'type' => 'time', 'units' => 'seconds' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
-           }                        
+              $self->{WRITER}->endTag( 'Count' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
-        }                              
+        }
         $self->{WRITER}->endTag( 'Exposure' );
-        
+
         if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
             defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
-            
+
              $self->{WRITER}->startTag( 'TimeConstraint' );
              $self->{WRITER}->startTag( 'StartDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
              $self->{WRITER}->endTag( 'StartDateTime' );
              $self->{WRITER}->startTag( 'EndDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
-             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'EndDateTime' );
              $self->{WRITER}->endTag( 'TimeConstraint' );
         }
-        
+
         if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
              defined ${$self->{OPTIONS}}{INTERVAL} &&
              defined ${$self->{OPTIONS}}{TOLERANCE} ) {
-             
+
              $self->{WRITER}->startTag( 'SeriesConstraint' );
-             
+
              $self->{WRITER}->startTag( 'Count' );
              $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
              $self->{WRITER}->endTag( 'Count' );
-             
+
              $self->{WRITER}->startTag( 'Interval' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
-             $self->{WRITER}->endTag( 'Interval' );               
-             
+             $self->{WRITER}->endTag( 'Interval' );
+
              $self->{WRITER}->startTag( 'Tolerance' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
-             $self->{WRITER}->endTag( 'Tolerance' );               
-            
+             $self->{WRITER}->endTag( 'Tolerance' );
+
              $self->{WRITER}->endTag( 'SeriesConstraint' );
-            
+
         }
 
      $self->{WRITER}->endTag( 'Schedule' );
-                  
-  $self->{WRITER}->endTag( 'Observation' );  
-   
+
+  $self->{WRITER}->endTag( 'Observation' );
+
   # Score Tags
-  # ---------- 
+  # ----------
   $self->{WRITER}->startTag( 'Score' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{SCORE} );
   $self->{WRITER}->endTag( 'Score' );
   $self->{WRITER}->startTag( 'CompletionTime' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{COMPLETIONTIME} );
-  $self->{WRITER}->endTag( 'CompletionTime' );       
-    
+  $self->{WRITER}->endTag( 'CompletionTime' );
+
   # close the RTML document
   # =======================
   $self->{WRITER}->endTag( 'RTML' );
@@ -1176,100 +1176,100 @@ sub update_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
+  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure
                     Snr Flux Score Time Filter Catalogue Headers ImageURI
-                     GroupCount SeriesCount Interval 
+                     GroupCount SeriesCount Interval
                      Tolerance TimeConstraint Priority / ) {
-  
+
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
-  
+
   # open the document
   $self->{WRITER}->xmlDecl( 'US-ASCII' );
   $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
- 
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
                              'version' => '2.1',
                              'type' => 'update' );
-  
+
   # IntelligentAgent Tag
   # --------------------
-  
-  # identify the IA               
-  $self->{WRITER}->startTag( 'IntelligentAgent', 
+
+  # identify the IA
+  $self->{WRITER}->startTag( 'IntelligentAgent',
                              'host' => ${$self->{OPTIONS}}{HOST},
-                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
-  
+                             'port' =>  ${$self->{OPTIONS}}{PORT} );
+
   # unique IA identity sting
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
-  
+
   $self->{WRITER}->endTag( 'IntelligentAgent' );
-  
+
   # Telescope Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Telescope' );
-  
+
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
-                             
-     $self->{WRITER}->startTag( 'User');                          
+
+     $self->{WRITER}->startTag( 'User');
      $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
      $self->{WRITER}->endTag( 'User' );
-  
-     $self->{WRITER}->startTag( 'Name');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
-     $self->{WRITER}->endTag( 'Name' );  
-      
-     $self->{WRITER}->startTag( 'Institution');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
-     $self->{WRITER}->endTag( 'Institution' ); 
-      
-     $self->{WRITER}->startTag( 'Email');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
-     $self->{WRITER}->endTag( 'Email' ); 
 
-  $self->{WRITER}->endTag( 'Contact' ); 
-  
+     $self->{WRITER}->startTag( 'Name');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );
+
+     $self->{WRITER}->startTag( 'Institution');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' );
+
+     $self->{WRITER}->startTag( 'Email');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' );
+
+  $self->{WRITER}->endTag( 'Contact' );
+
   # Project Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Project' );
-    
+
   # Observation tag
   # ---------------
-  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
-  
-     $self->{WRITER}->startTag( 'Target', 
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );
+
+     $self->{WRITER}->startTag( 'Target',
                                 'type' => ${$self->{OPTIONS}}{TARGETTYPE},
                                 'ident' => ${$self->{OPTIONS}}{TARGETIDENT} );
-    
+
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
         $self->{WRITER}->endTag( 'TargetName' );
 
         $self->{WRITER}->startTag( 'Coordinates', 'type' => 'equatorial' );
-        
-           $self->{WRITER}->startTag( 'RightAscension', 
+
+           $self->{WRITER}->startTag( 'RightAscension',
                                     'format' => 'hh mm ss.s', units => 'hms' );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{RA} );
            $self->{WRITER}->endTag( 'RightAscension' );
-           
-           $self->{WRITER}->startTag( 'Declination', 
+
+           $self->{WRITER}->startTag( 'Declination',
                                     'format' => 'sdd mm ss.s', units => 'dms' );
            if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-           } else {                       
-              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) { 
+           } else {
+              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) {
                 $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-              } else {                    
+              } else {
                 $self->{WRITER}->characters( "+" . ${$self->{OPTIONS}}{DEC} );
-              }  
+              }
            }
-           $self->{WRITER}->endTag( 'Declination' );   
+           $self->{WRITER}->endTag( 'Declination' );
 
            $self->{WRITER}->startTag( 'Equinox'  );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EQUINOX} );
@@ -1280,53 +1280,53 @@ sub update_response {
         if( defined ${$self->{OPTIONS}}{SNR} ) {
 
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 
-               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
-           } else {        
-              $self->{WRITER}->startTag( 'Flux', 
+              $self->{WRITER}->startTag( 'Flux',
+               'type' => 'continuum', 'units' => 'mag',
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );
+           } else {
+              $self->{WRITER}->startTag( 'Flux',
                'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
 
-     $self->{WRITER}->endTag( 'Target' );        
-     
+     $self->{WRITER}->endTag( 'Target' );
+
      $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
-        
-           $self->{WRITER}->startTag( 'Filter' ); 
- 
+
+           $self->{WRITER}->startTag( 'Filter' );
+
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->startTag( 'FilterType');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
-              $self->{WRITER}->endTag( 'FilterType' ); 
-           } else {          
-              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
+           } else {
+              $self->{WRITER}->startTag( 'FilterType' );
               $self->{WRITER}->characters( 'V' );
-              $self->{WRITER}->endTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
            }
-           
+
            $self->{WRITER}->endTag( 'Filter' );
-     $self->{WRITER}->endTag( 'Device' );    
-        
-     
+     $self->{WRITER}->endTag( 'Device' );
+
+
      my $priority;
      if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
         $priority = ${$self->{OPTIONS}}{PRIORITY};
      } else {
         $priority = 3;
      }
-     	     	               
+
      $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
-     
+
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
+              $self->{WRITER}->endTag( 'Count' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
@@ -1334,85 +1334,85 @@ sub update_response {
                                    'type' => 'time', 'units' => 'seconds' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
-           }                        
+              $self->{WRITER}->endTag( 'Count' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
-        }                              
+        }
         $self->{WRITER}->endTag( 'Exposure' );
-        
+
         if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
             defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
-            
+
              $self->{WRITER}->startTag( 'TimeConstraint' );
              $self->{WRITER}->startTag( 'StartDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
              $self->{WRITER}->endTag( 'StartDateTime' );
              $self->{WRITER}->startTag( 'EndDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
-             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'EndDateTime' );
              $self->{WRITER}->endTag( 'TimeConstraint' );
         }
-        
+
         if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
              defined ${$self->{OPTIONS}}{INTERVAL} &&
              defined ${$self->{OPTIONS}}{TOLERANCE} ) {
-             
+
              $self->{WRITER}->startTag( 'SeriesConstraint' );
-             
+
              $self->{WRITER}->startTag( 'Count' );
              $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
              $self->{WRITER}->endTag( 'Count' );
-             
+
              $self->{WRITER}->startTag( 'Interval' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
-             $self->{WRITER}->endTag( 'Interval' );               
-             
+             $self->{WRITER}->endTag( 'Interval' );
+
              $self->{WRITER}->startTag( 'Tolerance' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
-             $self->{WRITER}->endTag( 'Tolerance' );               
-            
+             $self->{WRITER}->endTag( 'Tolerance' );
+
              $self->{WRITER}->endTag( 'SeriesConstraint' );
-            
+
         }
-             
+
      $self->{WRITER}->endTag( 'Schedule' );
-     
+
      # ObjectList
      # ----------
-     $self->{WRITER}->startTag( 'ObjectList', 
-'type' => "cluster", 'number' => "all", 
+     $self->{WRITER}->startTag( 'ObjectList',
+'type' => "cluster", 'number' => "all",
 'format' => " fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag");
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{CATALOG} );
      $self->{WRITER}->endTag( 'ObjectList' );
-     
+
      # ImageData
      # ---------
-     $self->{WRITER}->startTag( 'ImageData', 
+     $self->{WRITER}->startTag( 'ImageData',
          type => "FITS16", delivery => "url", reduced => "true" );
             $self->{WRITER}->characters( ${$self->{OPTIONS}}{IMAGE_URI} );
      $self->{WRITER}->endTag( 'ImageData' );
-     
-     
+
+
      # FITS Headers
      # ------------
      $self->{WRITER}->startTag( 'FITSHeader', type => "all" );
-            $self->{WRITER}->characters( ${$self->{OPTIONS}}{HEADERS} );     
+            $self->{WRITER}->characters( ${$self->{OPTIONS}}{HEADERS} );
      $self->{WRITER}->endTag( 'FITSHeader' );
-     
-                  
-  $self->{WRITER}->endTag( 'Observation' );  
-   
+
+
+  $self->{WRITER}->endTag( 'Observation' );
+
   # Score Tags
-  # ---------- 
+  # ----------
   $self->{WRITER}->startTag( 'Score' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{SCORE} );
   $self->{WRITER}->endTag( 'Score' );
   $self->{WRITER}->startTag( 'CompletionTime' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{COMPLETIONTIME} );
-  $self->{WRITER}->endTag( 'CompletionTime' );       
-    
+  $self->{WRITER}->endTag( 'CompletionTime' );
+
   # close the RTML document
   # =======================
   $self->{WRITER}->endTag( 'RTML' );
@@ -1460,100 +1460,100 @@ sub complete_response {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure 
-                    Snr Flux Score Time Filter Catalogue Headers ImageURI 
-                    GroupCount SeriesCount Interval 
+  for my $key (qw / Target TargetType TargetIdent RA Dec Equinox Exposure
+                    Snr Flux Score Time Filter Catalogue Headers ImageURI
+                    GroupCount SeriesCount Interval
                     Tolerance TimeConstraint Priority / ) {
-  
+
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
-  
+
   # open the document
   $self->{WRITER}->xmlDecl( 'US-ASCII' );
   $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
- 
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
                              'version' => '2.1',
                              'type' => 'observation' );
-  
+
   # IntelligentAgent Tag
   # --------------------
-  
-  # identify the IA               
-  $self->{WRITER}->startTag( 'IntelligentAgent', 
+
+  # identify the IA
+  $self->{WRITER}->startTag( 'IntelligentAgent',
                              'host' => ${$self->{OPTIONS}}{HOST},
-                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
-  
+                             'port' =>  ${$self->{OPTIONS}}{PORT} );
+
   # unique IA identity sting
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
-  
+
   $self->{WRITER}->endTag( 'IntelligentAgent' );
-  
+
   # Telescope Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Telescope' );
-  
+
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
-                             
-     $self->{WRITER}->startTag( 'User');                          
+
+     $self->{WRITER}->startTag( 'User');
      $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
      $self->{WRITER}->endTag( 'User' );
-  
-     $self->{WRITER}->startTag( 'Name');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
-     $self->{WRITER}->endTag( 'Name' );  
-      
-     $self->{WRITER}->startTag( 'Institution');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
-     $self->{WRITER}->endTag( 'Institution' ); 
-      
-     $self->{WRITER}->startTag( 'Email');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
-     $self->{WRITER}->endTag( 'Email' ); 
 
-  $self->{WRITER}->endTag( 'Contact' ); 
-  
+     $self->{WRITER}->startTag( 'Name');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );
+
+     $self->{WRITER}->startTag( 'Institution');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' );
+
+     $self->{WRITER}->startTag( 'Email');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' );
+
+  $self->{WRITER}->endTag( 'Contact' );
+
   # Project Tag
   # -------------
   $self->{WRITER}->emptyTag( 'Project' );
-    
+
   # Observation tag
   # ---------------
-  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );  
-  
-     $self->{WRITER}->startTag( 'Target', , 
+  $self->{WRITER}->startTag( 'Observation', 'status' => 'ok' );
+
+     $self->{WRITER}->startTag( 'Target', ,
                                 'type' => ${$self->{OPTIONS}}{TARGETTYPE},
-                                'ident' => ${$self->{OPTIONS}}{TARGETIDENT} ); 
-    
+                                'ident' => ${$self->{OPTIONS}}{TARGETIDENT} );
+
         $self->{WRITER}->startTag( 'TargetName' );
         $self->{WRITER}->characters( ${$self->{OPTIONS}}{TARGET} );
         $self->{WRITER}->endTag( 'TargetName' );
 
         $self->{WRITER}->startTag( 'Coordinates', 'type' => 'equatorial' );
-        
-           $self->{WRITER}->startTag( 'RightAscension', 
+
+           $self->{WRITER}->startTag( 'RightAscension',
                                     'format' => 'hh mm ss.s', units => 'hms' );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{RA} );
            $self->{WRITER}->endTag( 'RightAscension' );
-           
-           $self->{WRITER}->startTag( 'Declination', 
+
+           $self->{WRITER}->startTag( 'Declination',
                                     'format' => 'sdd mm ss.s', units => 'dms' );
            if ( ${$self->{OPTIONS}}{DEC} =~ m/^\+/ ) {
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-           } else {                       
-              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) { 
+           } else {
+              if ( ${$self->{OPTIONS}}{DEC} =~ m/-/ ) {
                 $self->{WRITER}->characters( ${$self->{OPTIONS}}{DEC} );
-              } else {                    
+              } else {
                 $self->{WRITER}->characters( "+" . ${$self->{OPTIONS}}{DEC} );
-              }  
+              }
            }
-           $self->{WRITER}->endTag( 'Declination' );   
+           $self->{WRITER}->endTag( 'Declination' );
 
            $self->{WRITER}->startTag( 'Equinox'  );
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EQUINOX} );
@@ -1564,53 +1564,53 @@ sub complete_response {
         if( defined ${$self->{OPTIONS}}{SNR} ) {
 
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'Flux', 
-               'type' => 'continuum', 'units' => 'mag', 
-               'wavelength' => ${$self->{OPTIONS}}{FILTER} );           
-           } else {        
-              $self->{WRITER}->startTag( 'Flux', 
+              $self->{WRITER}->startTag( 'Flux',
+               'type' => 'continuum', 'units' => 'mag',
+               'wavelength' => ${$self->{OPTIONS}}{FILTER} );
+           } else {
+              $self->{WRITER}->startTag( 'Flux',
                'type' => 'continuum', 'units' => 'mag', 'wavelength' => 'V' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{FLUX} );
            $self->{WRITER}->endTag( 'Flux' );
         }
 
-     $self->{WRITER}->endTag( 'Target' );        
-     
+     $self->{WRITER}->endTag( 'Target' );
+
      $self->{WRITER}->startTag( 'Device', 'type' => 'camera' );
-        
-           $self->{WRITER}->startTag( 'Filter' ); 
- 
+
+           $self->{WRITER}->startTag( 'Filter' );
+
            if( defined ${$self->{OPTIONS}}{FILTER} ) {
-              $self->{WRITER}->startTag( 'FilterType'); 
+              $self->{WRITER}->startTag( 'FilterType');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{FILTER} );
-              $self->{WRITER}->endTag( 'FilterType' ); 
-           } else {          
-              $self->{WRITER}->startTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
+           } else {
+              $self->{WRITER}->startTag( 'FilterType' );
               $self->{WRITER}->characters( 'V' );
-              $self->{WRITER}->endTag( 'FilterType' ); 
+              $self->{WRITER}->endTag( 'FilterType' );
            }
-           
+
            $self->{WRITER}->endTag( 'Filter' );
-     $self->{WRITER}->endTag( 'Device' );    
-        
-     
+     $self->{WRITER}->endTag( 'Device' );
+
+
      my $priority;
      if( defined ${$self->{OPTIONS}}{PRIORITY} ) {
         $priority = ${$self->{OPTIONS}}{PRIORITY};
      } else {
         $priority = 3;
      }
-     	     	               
+
      $self->{WRITER}->startTag( 'Schedule', 'priority' => $priority );
-     
+
         if( defined ${$self->{OPTIONS}}{SNR} ) {
            $self->{WRITER}->startTag( 'Exposure', 'type' => 'snr' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
+              $self->{WRITER}->endTag( 'Count' );
            }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{SNR} );
         } else {
@@ -1618,85 +1618,85 @@ sub complete_response {
                                    'type' => 'time', 'units' => 'seconds' );
            if( defined ${$self->{OPTIONS}}{GROUPCOUNT} &&
                ${$self->{OPTIONS}}{GROUPCOUNT} > 1 ) {
-              $self->{WRITER}->startTag( 'Count'); 
+              $self->{WRITER}->startTag( 'Count');
               $self->{WRITER}->characters( ${$self->{OPTIONS}}{GROUPCOUNT} );
-              $self->{WRITER}->endTag( 'Count' ); 
-           }                        
+              $self->{WRITER}->endTag( 'Count' );
+           }
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{EXPOSURE} );
-        }                              
+        }
         $self->{WRITER}->endTag( 'Exposure' );
-        
+
         if( defined ${$self->{OPTIONS}}{STARTDATETIME} &&
             defined ${$self->{OPTIONS}}{ENDDATETIME} ) {
-            
+
              $self->{WRITER}->startTag( 'TimeConstraint' );
              $self->{WRITER}->startTag( 'StartDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{STARTDATETIME} );
              $self->{WRITER}->endTag( 'StartDateTime' );
              $self->{WRITER}->startTag( 'EndDateTime' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{ENDDATETIME} );
-             $self->{WRITER}->endTag( 'EndDateTime' );           
+             $self->{WRITER}->endTag( 'EndDateTime' );
              $self->{WRITER}->endTag( 'TimeConstraint' );
         }
-        
+
         if ( defined ${$self->{OPTIONS}}{SERIESCOUNT} &&
              defined ${$self->{OPTIONS}}{INTERVAL} &&
              defined ${$self->{OPTIONS}}{TOLERANCE} ) {
-             
+
              $self->{WRITER}->startTag( 'SeriesConstraint' );
-             
+
              $self->{WRITER}->startTag( 'Count' );
              $self->{WRITER}->characters(${$self->{OPTIONS}}{SERIESCOUNT});
              $self->{WRITER}->endTag( 'Count' );
-             
+
              $self->{WRITER}->startTag( 'Interval' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{INTERVAL});
-             $self->{WRITER}->endTag( 'Interval' );               
-             
+             $self->{WRITER}->endTag( 'Interval' );
+
              $self->{WRITER}->startTag( 'Tolerance' );
              $self->{WRITER}->characters( ${$self->{OPTIONS}}{TOLERANCE});
-             $self->{WRITER}->endTag( 'Tolerance' );               
-            
+             $self->{WRITER}->endTag( 'Tolerance' );
+
              $self->{WRITER}->endTag( 'SeriesConstraint' );
-            
+
         }
 
      $self->{WRITER}->endTag( 'Schedule' );
-     
+
      # ObjectList
      # ----------
-     $self->{WRITER}->startTag( 'ObjectList', 
-'type' => "cluster", 'number' => "all", 
+     $self->{WRITER}->startTag( 'ObjectList',
+'type' => "cluster", 'number' => "all",
 'format' => " fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag");
            $self->{WRITER}->characters( ${$self->{OPTIONS}}{CATALOG} );
      $self->{WRITER}->endTag( 'ObjectList' );
-     
+
      # ImageData
      # ---------
-     $self->{WRITER}->startTag( 'ImageData', 
+     $self->{WRITER}->startTag( 'ImageData',
          type => "FITS16", delivery => "url", reduced => "true" );
             $self->{WRITER}->characters( ${$self->{OPTIONS}}{IMAGE_URI} );
      $self->{WRITER}->endTag( 'ImageData' );
-     
-     
+
+
      # FITS Headers
      # ------------
      $self->{WRITER}->startTag( 'FITSHeader', type => "all" );
-            $self->{WRITER}->characters( ${$self->{OPTIONS}}{HEADERS} );     
+            $self->{WRITER}->characters( ${$self->{OPTIONS}}{HEADERS} );
      $self->{WRITER}->endTag( 'FITSHeader' );
-     
-                  
-  $self->{WRITER}->endTag( 'Observation' );  
-   
+
+
+  $self->{WRITER}->endTag( 'Observation' );
+
   # Score Tags
-  # ---------- 
+  # ----------
   $self->{WRITER}->startTag( 'Score' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{SCORE} );
   $self->{WRITER}->endTag( 'Score' );
   $self->{WRITER}->startTag( 'CompletionTime' );
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{COMPLETIONTIME} );
-  $self->{WRITER}->endTag( 'CompletionTime' );       
-    
+  $self->{WRITER}->endTag( 'CompletionTime' );
+
   # close the RTML document
   # =======================
   $self->{WRITER}->endTag( 'RTML' );
@@ -1723,57 +1723,57 @@ sub reject_response {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / / ) {
-  
+
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
-  
+
   # open the document
   $self->{WRITER}->xmlDecl( 'US-ASCII' );
   $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
- 
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
                              'version' => '2.1',
                              'type' => 'reject' );
-  
+
   # IntelligentAgent Tag
   # --------------------
-  
-  # identify the IA               
-  $self->{WRITER}->startTag( 'IntelligentAgent', 
+
+  # identify the IA
+  $self->{WRITER}->startTag( 'IntelligentAgent',
                              'host' => ${$self->{OPTIONS}}{HOST},
-                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
-  
+                             'port' =>  ${$self->{OPTIONS}}{PORT} );
+
   # unique IA identity sting
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
-  
+
   $self->{WRITER}->endTag( 'IntelligentAgent' );
- 
+
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
-                             
-     $self->{WRITER}->startTag( 'User');                          
+
+     $self->{WRITER}->startTag( 'User');
      $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
      $self->{WRITER}->endTag( 'User' );
-  
-     $self->{WRITER}->startTag( 'Name');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
-     $self->{WRITER}->endTag( 'Name' );  
-      
-     $self->{WRITER}->startTag( 'Institution');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
-     $self->{WRITER}->endTag( 'Institution' ); 
-      
-     $self->{WRITER}->startTag( 'Email');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
-     $self->{WRITER}->endTag( 'Email' ); 
 
-  $self->{WRITER}->endTag( 'Contact' ); 
- 
+     $self->{WRITER}->startTag( 'Name');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );
+
+     $self->{WRITER}->startTag( 'Institution');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' );
+
+     $self->{WRITER}->startTag( 'Email');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' );
+
+  $self->{WRITER}->endTag( 'Contact' );
+
   # close the RTML document
   # =======================
   $self->{WRITER}->endTag( 'RTML' );
@@ -1801,57 +1801,57 @@ sub failure_response {
 
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / / ) {
-  
+
      # print "Calling " . lc($key) ."()\n";
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
   }
-  
+
   # open the document
   $self->{WRITER}->xmlDecl( 'US-ASCII' );
   $self->{WRITER}->doctype( 'RTML', '', ${$self->{OPTIONS}}{DTD} );
- 
+
   # open the RTML document
   # ======================
   $self->{WRITER}->startTag( 'RTML',
                              'version' => '2.1',
                              'type' => 'failed' );
-  
+
   # IntelligentAgent Tag
   # --------------------
-  
-  # identify the IA               
-  $self->{WRITER}->startTag( 'IntelligentAgent', 
+
+  # identify the IA
+  $self->{WRITER}->startTag( 'IntelligentAgent',
                              'host' => ${$self->{OPTIONS}}{HOST},
-                             'port' =>  ${$self->{OPTIONS}}{PORT} ); 
-  
+                             'port' =>  ${$self->{OPTIONS}}{PORT} );
+
   # unique IA identity sting
   $self->{WRITER}->characters( ${$self->{OPTIONS}}{ID} );
-  
+
   $self->{WRITER}->endTag( 'IntelligentAgent' );
- 
+
   # Contact Tag
   # -----------
   $self->{WRITER}->startTag( 'Contact', 'PI' => 'true' );
-                             
-     $self->{WRITER}->startTag( 'User');                          
+
+     $self->{WRITER}->startTag( 'User');
      $self->{WRITER}->characters( ${$self->{OPTIONS}}{USER} );
      $self->{WRITER}->endTag( 'User' );
-  
-     $self->{WRITER}->startTag( 'Name');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
-     $self->{WRITER}->endTag( 'Name' );  
-      
-     $self->{WRITER}->startTag( 'Institution');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
-     $self->{WRITER}->endTag( 'Institution' ); 
-      
-     $self->{WRITER}->startTag( 'Email');                          
-     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
-     $self->{WRITER}->endTag( 'Email' ); 
 
-  $self->{WRITER}->endTag( 'Contact' ); 
- 
+     $self->{WRITER}->startTag( 'Name');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{NAME} );
+     $self->{WRITER}->endTag( 'Name' );
+
+     $self->{WRITER}->startTag( 'Institution');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{INSTITUTION} );
+     $self->{WRITER}->endTag( 'Institution' );
+
+     $self->{WRITER}->startTag( 'Email');
+     $self->{WRITER}->characters( ${$self->{OPTIONS}}{EMAIL} );
+     $self->{WRITER}->endTag( 'Email' );
+
+  $self->{WRITER}->endTag( 'Contact' );
+
   # close the RTML document
   # =======================
   $self->{WRITER}->endTag( 'RTML' );
@@ -1876,7 +1876,7 @@ sub dump_rtml {
 
 }
 
-# A C C E S S O R   M  E T H O D S ------------------------------------------ 
+# A C C E S S O R   M  E T H O D S ------------------------------------------
 =back
 
 =head2 Accessor Methods
@@ -1885,7 +1885,7 @@ sub dump_rtml {
 
 =item B<port>
 
-Sets (or returns) the port which the Discovey Node should send RTML 
+Sets (or returns) the port which the Discovey Node should send RTML
 messages to (ie the port on which the IA is listening).
 
    $message->port( '8080' );
@@ -1904,8 +1904,8 @@ sub port {
 
   # return the current port
   return ${$self->{OPTIONS}}{PORT};
-} 
-  
+}
+
 =item B<host>
 
 Sets (or returns) the machine on which the IA is running
@@ -1926,7 +1926,7 @@ sub host {
 
   # return the current port
   return ${$self->{OPTIONS}}{HOST};
-}   
+}
 
 =item B<id>
 
@@ -1935,8 +1935,8 @@ Sets (or returns) the unique ID for the Intelligent Agent request
    $message->id( 'IATEST0001:CT1:0013' );
    $id = $message->id();
 
-note that there is NO DEFAULT, a unique ID for the score/observing 
-request must be supplied, see the eSTAR Communications and the ERS 
+note that there is NO DEFAULT, a unique ID for the score/observing
+request must be supplied, see the eSTAR Communications and the ERS
 command set documents for further details.
 
 =cut
@@ -1950,8 +1950,8 @@ sub id {
 
   # return the current ID
   return ${$self->{OPTIONS}}{ID};
-} 
- 
+}
+
 =item B<user>
 
 Sets (or returns) the user name of the observer
@@ -1970,8 +1970,8 @@ sub user {
 
   # return the current ID
   return ${$self->{OPTIONS}}{USER};
-}  
- 
+}
+
 =item B<name>
 
 Sets (or returns) the name of the observer
@@ -1990,8 +1990,8 @@ sub name {
 
   # return the current ID
   return ${$self->{OPTIONS}}{NAME};
-}  
- 
+}
+
 =item B<institution>
 
 Sets (or returns) the Institution of the observer
@@ -2010,8 +2010,8 @@ sub institution {
 
   # return the current ID
   return ${$self->{OPTIONS}}{INSTITUTION};
-}  
- 
+}
+
 =item B<email>
 
 Sets (or returns) the email address of the observer
@@ -2030,8 +2030,8 @@ sub email {
 
   # return the current ID
   return ${$self->{OPTIONS}}{EMAIL};
-}  
- 
+}
+
 =item B<target>
 
 Sets (or returns) the target name
@@ -2050,9 +2050,9 @@ sub target {
 
   # return the current target ID
   return ${$self->{OPTIONS}}{TARGET};
-}  
+}
 
- 
+
 =item B<ra>
 
 Sets (or returns) the target RA
@@ -2073,8 +2073,8 @@ sub ra {
 
   # return the current target RA
   return ${$self->{OPTIONS}}{RA};
-}  
- 
+}
+
 =item B<dec>
 
 Sets (or returns) the target DEC
@@ -2095,7 +2095,7 @@ sub dec {
 
   # return the current target DEC
   return ${$self->{OPTIONS}}{DEC};
-}  
+}
 
 =item B<equinox>
 
@@ -2106,7 +2106,7 @@ Sets (or returns) the equinox of the target co-ordinates
 
 default is J2000, currently the telescope expects J2000.0 coordinates, no
 translation is currently carried out by the library before formatting the
-RTML message. It is therefore suggested that the user therefoer provides 
+RTML message. It is therefore suggested that the user therefoer provides
 their coordinates in J2000.0 as this is merely a placeholder routine.
 
 =cut
@@ -2120,9 +2120,9 @@ sub equinox {
 
   # return the current co-ord equinox
   return ${$self->{OPTIONS}}{EQUINOX};
-}  
+}
 
- 
+
 =item B<score>
 
 Sets (or returns) the target score
@@ -2145,7 +2145,7 @@ sub score {
   return ${$self->{OPTIONS}}{SCORE};
 }
 
- 
+
 =item B<filter>
 
 Sets (or returns) the target filter required
@@ -2165,7 +2165,7 @@ sub filter {
   # return the current filter
   return ${$self->{OPTIONS}}{FILTER};
 }
-   
+
 =item B<time>
 
 Sets (or returns) the target completion time
@@ -2186,8 +2186,8 @@ sub time {
 
   # return the current target score
   return ${$self->{OPTIONS}}{COMPLETIONTIME};
-} 
- 
+}
+
 =item B<exposure>
 
 Sets (or returns) the exposure time for the image
@@ -2209,9 +2209,9 @@ sub exposure {
 
   # return the current target exposure
   return ${$self->{OPTIONS}}{EXPOSURE};
-}  
+}
 
- 
+
 =item B<snr>
 
 Sets (or returns) the signal to noise for the image
@@ -2233,9 +2233,9 @@ sub snr {
 
   # return the current target snr
   return ${$self->{OPTIONS}}{SNR};
-}  
+}
 
-  
+
 =item B<targettype>
 
 Sets (or returns) the target type for the image
@@ -2256,8 +2256,8 @@ sub targettype {
 
   # return the current target type
   return ${$self->{OPTIONS}}{TARGETTYPE};
-}  
-  
+}
+
 =item B<targetident>
 
 Sets (or returns) the target type for the image
@@ -2278,7 +2278,7 @@ sub targetident {
 
   # return the current target type
   return ${$self->{OPTIONS}}{TARGETIDENT};
-} 
+}
 =item B<flux>
 
 Sets (or returns) the flux of teh object needed for signal to noise
@@ -2300,8 +2300,8 @@ sub flux {
 
   # return the current flux in magntitudes
   return ${$self->{OPTIONS}}{FLUX};
-}  
- 
+}
+
 =item B<catalogue>
 
 Sets (or returns) a scalar containing the serialised point source
@@ -2323,11 +2323,11 @@ sub catalogue {
 
   # return the catalog
   return ${$self->{OPTIONS}}{CATALOG};
-}  
- 
+}
+
 =item B<headers>
 
-Sets (or returns) the FITS Headers associated with the current 
+Sets (or returns) the FITS Headers associated with the current
 observation
 
    $message->headers( $headerblock );
@@ -2343,8 +2343,8 @@ sub headers {
   }
 
   return ${$self->{OPTIONS}}{HEADERS};
-}  
- 
+}
+
 =item B<imageuri>
 
 Sets (or returns) the URI of the FITS image assocaited with the
@@ -2366,7 +2366,7 @@ sub imageuri {
 
   # return the current flux in magntitudes
   return ${$self->{OPTIONS}}{IMAGE_URI};
-}  
+}
 
 =item B<groupcount>
 
@@ -2389,7 +2389,7 @@ sub groupcount {
 
 Gets or sets the number of observations (monitor groups) to be taken
 
-=cut 
+=cut
 
 sub  seriescount {
   my $self = shift;
@@ -2406,8 +2406,8 @@ sub  seriescount {
 
 Gets or sets the interval between monitoring groups
 
-=cut  
-                  
+=cut
+
 sub  interval {
   my $self = shift;
 
@@ -2415,7 +2415,7 @@ sub  interval {
     ${$self->{OPTIONS}}{INTERVAL} = shift;
     unless ( ${$self->{OPTIONS}}{INTERVAL} =~ "PT" ) {
        ${$self->{OPTIONS}}{INTERVAL} = "PT" . ${$self->{OPTIONS}}{INTERVAL};
-    }   
+    }
   }
 
   return ${$self->{OPTIONS}}{INTERVAL};
@@ -2426,7 +2426,7 @@ sub  interval {
 
 Gets or sets the tolerance we have for the interval spacing
 
-=cut 
+=cut
 
 sub  tolerance {
   my $self = shift;
@@ -2435,7 +2435,7 @@ sub  tolerance {
     ${$self->{OPTIONS}}{TOLERANCE} = shift;
     unless ( ${$self->{OPTIONS}}{TOLERANCE} =~ "PT" ) {
        ${$self->{OPTIONS}}{TOLERANCE} = "PT" . ${$self->{OPTIONS}}{TOLERANCE};
-    }   
+    }
   }
 
   return ${$self->{OPTIONS}}{TOLERANCE};
@@ -2448,16 +2448,16 @@ sub  tolerance {
 
 Gets or sets the time constraint, takes an array ref.
 
-=cut 
+=cut
 
 sub timeconstraint {
   my $self = shift;
 
   if (@_) {
-    
+
     my $ref = shift;
     my @array = @{$ref};
-  
+
     ${$self->{OPTIONS}}{STARTDATETIME} = $array[0];
     ${$self->{OPTIONS}}{ENDDATETIME} = $array[1];
   }
@@ -2472,7 +2472,7 @@ sub timeconstraint {
 
 Gets or sets the priority of the observations (monitor groups) to be taken
 
-=cut 
+=cut
 
 sub  priority {
   my $self = shift;
@@ -2508,31 +2508,31 @@ sub configure {
 
   # Create the RTML::Writer object
   # ------------------
-  $self->{BUFFER} = new XML::Writer::String();  
+  $self->{BUFFER} = new XML::Writer::String();
   $self->{WRITER} = new XML::Writer( OUTPUT      => $self->{BUFFER},
                                      DATA_MODE   => 1,
-                                     UNSAFE      => 1, 
+                                     UNSAFE      => 1,
                                      DATA_INDENT => 4 );
-    
+
   # DEFAULTS
   # --------
-  
+
   # use the RTML Namespace as defined by the v2.2 DTD
-  ${$self->{OPTIONS}}{DTD} = "http://www.estar.org.uk/documents/rtml2.2.dtd"; 
-  
-  #${$self->{OPTIONS}}{HOST} = hostname() . "." . hostdomain(); 
+  ${$self->{OPTIONS}}{DTD} = "http://www.estar.org.uk/documents/rtml2.2.dtd";
+
+  #${$self->{OPTIONS}}{HOST} = hostname() . "." . hostdomain();
   ${$self->{OPTIONS}}{HOST} = "127.0.0.1";
   ${$self->{OPTIONS}}{PORT} = '8000';
-  
+
   ${$self->{OPTIONS}}{EQUINOX} = 'J2000';
-  
-  
+
+
   ${$self->{OPTIONS}}{TARGETTYPE} = 'normal';
   ${$self->{OPTIONS}}{TARGETIDENT} = 'SingleExposure';
-     
+
   # ARGUEMENTS
   # ----------
-  
+
   # return unless we have arguments
   return undef unless @_;
 
@@ -2581,4 +2581,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

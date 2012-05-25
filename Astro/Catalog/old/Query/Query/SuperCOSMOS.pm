@@ -11,7 +11,7 @@ Astro::Catalog::SuperCOSMOS::Query - Query the SuperCOSMOS Catalog
                                                       Band      => $waveband,
                                                       Radius    => $radius,
                                                     );
-      
+
   my $catalog = $supercos->querydb();
 
 =head1 DESCRIPTION
@@ -19,12 +19,12 @@ Astro::Catalog::SuperCOSMOS::Query - Query the SuperCOSMOS Catalog
 The module is an object orientated interface to the online SuperCOSOMOS
 catalogue.
 
-Stores information about an prospective SuperCOSMOS Sky Survey query and 
+Stores information about an prospective SuperCOSMOS Sky Survey query and
 allows the query to be made, returning an Astro::Catalog object.
 
 Since the module uses the Astro::Aladin module to drive the CDS Aladin
 application to retrieve the catalogue, its doubtful that it will work
-through a proxy (unlike the USNO-A2 and GSC modules). 
+through a proxy (unlike the USNO-A2 and GSC modules).
 
 =cut
 
@@ -68,7 +68,7 @@ Set (or query) the Primary survey/waveband, options UKST Blue: -90 < Dec < +2.5,
    $band = $query->band();
    $query->band( "UKST IR" );
 
-valid options are "UKST Blue", "UKST Red", "UKST Infrared", "ESO Red" and 
+valid options are "UKST Blue", "UKST Red", "UKST Infrared", "ESO Red" and
 "POSS-I Red".
 
 =cut
@@ -128,7 +128,7 @@ sub _get_default_options {
 =item B<_make_query>
 
 Private function used to make an SuperCOSMOS query. Should not be called
-directly, since it does not parse the results. Instead use the querydb() 
+directly, since it does not parse the results. Instead use the querydb()
 assessor method.
 
 =cut
@@ -177,7 +177,7 @@ sub _make_query {
 =item B<_parse_query>
 
 Private function used to parse the results returned in an SuperCOSMOS query.
-Should not be called directly. Instead use the querydb() assessor method to 
+Should not be called directly. Instead use the querydb() assessor method to
 make and parse the results.
 
 =cut
@@ -196,15 +196,15 @@ sub _parse_query {
   # create a temporary object to hold stars
   my $star;
 
-  # loop round the returned buffer and stuff the contents into star 
-  # objects, skip the first two lines, they're just headers 
+  # loop round the returned buffer and stuff the contents into star
+  # objects, skip the first two lines, they're just headers
   foreach my $i ( 2 ... $#buffer ) {
 
      # break the line down into bits
      my @line = split( /\t+/,$buffer[$i]);
 
      # create a temporary place holder object
-     $star = new Astro::Catalog::Star(); 
+     $star = new Astro::Catalog::Star();
 
      # ID
      $star->id( $line[2] );

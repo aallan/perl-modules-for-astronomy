@@ -18,9 +18,9 @@ Number::Uncertainty - An object-orientated uncertainty object
   $obj = new Number::Uncertainty ( Value => $value,
                                    Min   => $minimum_value,
 				   Max   => $maximum_value );
-				   
+
   $obj = new Number::Uncertainty ( Value => $value,
-                                   Bound => 'lower' );				   
+                                   Bound => 'lower' );
 
   $obj = new Number::Uncertainty ( Value => $value,
                                    Bound => 'upper' );
@@ -69,7 +69,7 @@ Create a new instance from a hash of options
 
   $object = new Number::Uncertainty( %hash );
 
-returns a reference a C<Number::Uncertainty> object. 'Value' is the sole 
+returns a reference a C<Number::Uncertainty> object. 'Value' is the sole
 mandatory agruement.
 
 =cut
@@ -115,7 +115,7 @@ sub value {
      $self->{VALUE} = shift;
   }
   return $self->{VALUE};
-  
+
 }
 
 =item B<error>
@@ -133,22 +133,22 @@ sub error {
   if (@_) {
      my $error = shift;
      $self->{LOWER} = 0.5*$error;
-     $self->{UPPER} = 0.5*$error;     
+     $self->{UPPER} = 0.5*$error;
   }
-  
+
   if( defined $self->bound() ) {
      return undef;
-  }   
-  
+  }
+
   my $errorbar;
   if ( defined $self->lower() && defined $self->upper() ) {
     $errorbar = abs ( $self->lower() + $self->upper() );
   } else {
     $errorbar = 0;
-  }  
-    
+  }
+
   return $errorbar;
-  
+
 }
 
 =item B<lower>
@@ -164,13 +164,13 @@ sub lower {
   my $self = shift;
 
   if (@_) {
-     $self->{LOWER} = shift;  
+     $self->{LOWER} = shift;
   }
-  
+
   if( defined $self->bound() ) {
      return undef;
-  } 
-  
+  }
+
   return $self->{LOWER};
 }
 
@@ -188,13 +188,13 @@ sub upper {
   my $self = shift;
 
   if (@_) {
-     $self->{UPPER} = shift;  
+     $self->{UPPER} = shift;
   }
-  
+
   if( defined $self->bound() ) {
      return undef;
-  } 
-  
+  }
+
   return $self->{UPPER};
 }
 
@@ -212,23 +212,23 @@ sub min {
 
   if (@_) {
      my $min = shift;
-     $self->{LOWER} = abs ( $self->value() - $min );  
+     $self->{LOWER} = abs ( $self->value() - $min );
   }
-  
+
   if( defined $self->bound() ) {
      if( $self->bound() eq 'upper' ) {
         return undef;
      } elsif ( $self->bound() eq 'lower' ) {
-        return $self->value(); 
+        return $self->value();
      }
   }
-  
+
   my $min;
   if( defined $self->{LOWER} ) {
      $min = $self->value() - $self->{LOWER};
   } else {
-     $min = $self->value(); 
-  }     
+     $min = $self->value();
+  }
   return $min;
 }
 
@@ -247,22 +247,22 @@ sub max {
 
   if (@_) {
      my $max = shift;
-     $self->{UPPER} = $max - $self->value();  
+     $self->{UPPER} = $max - $self->value();
   }
-  
+
   if( defined $self->bound() ) {
      if( $self->bound() eq 'upper' ) {
         return $self->value();
      } elsif ( $self->bound() eq 'lower' ) {
-        return undef; 
+        return undef;
      }
   }
-  
+
   my $max;
   if( defined $self->{UPPER} ) {
      $max = $self->value() + $self->{UPPER};
   } else {
-     $max = $self->value();    
+     $max = $self->value();
   }
   return $max;
 }
@@ -287,10 +287,10 @@ sub bound {
      if( lc ( $flag ) eq 'upper' ) {
         $self->{BOUND} = 'upper';
      } elsif ( lc ( $flag ) eq 'lower' ) {
-        $self->{BOUND} = 'lower';	
+        $self->{BOUND} = 'lower';
      } else {
-        $self->{BOUND} = undef;	
-     }	
+        $self->{BOUND} = undef;
+     }
   }
   return $self->{BOUND};
 }
@@ -325,7 +325,7 @@ sub configure {
   unless ( defined $args{"Value"} || defined $args{"value"} ) {
      croak( "Error - Number::Uncertainty: No value defined..." );
   }
-  
+
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / Value Error Lower Upper Bound Min Max / ) {
       my $method = lc($key);
@@ -352,22 +352,22 @@ When the object is used in a string context it is stringify'ed.
 
 sub stringify {
   my $self = shift;
-  
+
   my $string;
   if( defined $self->bound() ) {
      if ( $self->bound() eq 'lower' ) {
         $string = "lower bound of " . $self->value();
      } elsif ( $self->bound() eq 'upper' ) {
         $string = "upper bound of " . $self->value();
-     }	
+     }
   } else {
      if( $self->{UPPER} == $self->{LOWER} ) {
-        $string = $self->value . " +- " . $self->{UPPER}; 
+        $string = $self->value . " +- " . $self->{UPPER};
      } else {
-         $string = $self->value . " + " . $self->{UPPER} . 
-	           ", - " . $self->{LOWER}; 
+         $string = $self->value . " + " . $self->{UPPER} .
+	           ", - " . $self->{LOWER};
      }
-  
+
   }
   return $string;
 }
@@ -383,28 +383,28 @@ the two values are within the error bounds.
 sub equal {
   my $self = shift;
   my $other = shift;
-  
+
   return 0 unless defined $other;
   return 0 unless UNIVERSAL::isa($other, "Number::Uncertainty" );
 
   # both objects are boundary value, bugger...
   if( defined $self->bound() && defined $other->bound() ) {
      #print "Both objects are boundary objects\n";
-     
+
      if( ( $self->bound() eq 'upper' && $self->bound() eq 'upper' ) ||
          ( $self->bound() eq 'lower' && $self->bound() eq 'lower' ) ) {
         return 1;
      }
-     
+
      my ($lower, $upper);
      if ( $self->bound() eq 'lower' ) {
         $lower = $self->min();
 	$upper = $other->max();
      } elsif ( $self->bound() eq 'upper' ) {
         $upper = $self-> max();
-	$lower = $other->lower(); 	
+	$lower = $other->lower();
      }
-     
+
      if( $lower <= $upper ) {
         return 1;
      } else {
@@ -412,66 +412,66 @@ sub equal {
      }
 
   }
-  
+
   # The self object is a boundary value
   if( defined $self->bound() ) {
      #print "The \$self object is a boundary objects\n";
-   
+
      # the value is an upper bound
      if( $self->bound() eq 'upper' ) {
         if ($other->max() >= $self->max() ) {
-	   return 1; 
+	   return 1;
         } else {
            return 0;
-        }   
+        }
      }
-     
+
      # the value is an lower bound
      if( $self->bound() eq 'lower' ) {
         if ( $other->min() <= $self->min() ) {
 	   return 1;
         } else {
            return 0;
-        }  
-     }	   
+        }
+     }
   }
 
   # The other object is a boundary value
   if( defined $other->bound() ) {
      #print "The \$other object is a boundary objects\n";
-   
+
      # the value is an upper bound
      if( $other->bound() eq 'upper' ) {
         if ($self->max() >= $other->max() ) {
-	   return 1; 
+	   return 1;
         } else {
            return 0;
-        }   
+        }
      }
-     
+
      # the value is an lower bound
      if( $other->bound() eq 'lower' ) {
         if ( $self->min() <= $other->min() ) {
 	   return 1;
         } else {
            return 0;
-        }  
-     }	   
+        }
+     }
   }
 
   # Case 1) The upper and lower bound of the $other object
   # falls within the bounds of the $self object
-  if ( ( $other->value() <= $self->max() )  && 
+  if ( ( $other->value() <= $self->max() )  &&
        ( $other->value() >= $self->min() ) ) {
      return 1;
   }
-  
+
   # Case 2) The lower bound of the $other object falls within
   # the bound of the self object, but the upper bound is outside
   if( ( $other->min() <= $self->max() ) &&
       ( $other->max() >= $self->max() ) ) {
      return 1;
-  }      
+  }
 
   # Case 3) The upper bound of the $other object falls within
   # the bound of the self object, but the lower bound is outside
@@ -479,13 +479,13 @@ sub equal {
       ( $other->min() <= $self->min() ) ) {
      return 1;
   }
-  
+
   # Case 4) The self object lies within the bounds of the other
   if( ( $other->max() >= $self->max() ) &&
       ( $other->min() <= $self->min() ) ) {
      return 1;
-  }      
-  
+  }
+
   # We don't have any overlap
   return 0;
 
@@ -501,8 +501,8 @@ the two values are within the error bounds.
 sub notequal {
   my $self = shift;
   my $other = shift;
-  
-  return !($self->equal( $other ));  
+
+  return !($self->equal( $other ));
 
 }
 
@@ -577,7 +577,7 @@ When the object is multiplied.
 sub multiply {
   my $self = shift;
   my $other = shift;
-  
+
   if ( !UNIVERSAL::isa( $other, "Number::Uncertainty" ) ) {
      if( defined $self->error()  ) {
         my $value = $self->value()*$other;
@@ -588,21 +588,21 @@ sub multiply {
         return  new Number::Uncertainty( Value => $value );
      }
   }
-     
+
   my $value = $self->value() * $other->value();
   if( defined $self->bound() || defined $other->bound() ) {
     return new Number::Uncertainty( Value => $value );
   }
-  
+
   if( defined $self->error() && defined $other->error() ) {
     my $error = sqrt ( $self->error()*$self->error() +
-                       $other->error()*$other->error() );  
+                       $other->error()*$other->error() );
     return new Number::Uncertainty( Value => $value, Error => $error );
   }
 
 }
 
-=back 
+=back
 
 =head1 COPYRIGHT
 
@@ -620,4 +620,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

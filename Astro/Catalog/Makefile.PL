@@ -4,7 +4,7 @@ use Data::Dumper;
 my $cfg_directory = '$(PERLPREFIX)/etc';
 my $cfg_to_install = "sss.cfg skycat.cfg";
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::Catalog',
 	       'VERSION'        => '4.2',
                'EXE_FILES'      => [ ],

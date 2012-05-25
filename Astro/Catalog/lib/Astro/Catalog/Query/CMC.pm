@@ -19,13 +19,13 @@ This code should be superceeded by the generic Vizier query class.
 
 =head1 DESCRIPTION
 
-The module is an object orientated interface to the online 
+The module is an object orientated interface to the online
 Carlsberg Meridian Catalogues (CMC11)
 
 Stores information about an prospective query and allows the query to
 be made, returning an Astro::Catalog::Query::CMC object.
 
-The object will by default pick up the proxy information from the HTTP_PROXY 
+The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
@@ -122,7 +122,7 @@ sub _get_default_options {
 =item B<_parse_query>
 
 Private function used to parse the results returned in an GSC query.
-Should not be called directly. Instead use the querydb() assessor method to 
+Should not be called directly. Instead use the querydb() assessor method to
 make and parse the results.
 
 =cut
@@ -133,7 +133,7 @@ sub _parse_query {
   print $self->{BUFFER};
   return new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER},
 			     Origin => 'Carlsberg Meridian Catalogue (CMC/11)',
-			     ReadOpt => { ra_col => 2, dec_col => 4, } 
+			     ReadOpt => { ra_col => 2, dec_col => 4, }
 			   );
 }
 

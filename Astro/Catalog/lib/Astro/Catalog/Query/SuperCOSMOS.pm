@@ -6,7 +6,7 @@ package Astro::Catalog::Query::SuperCOSMOS;
 # the entire module into this sub-class so I can do queries.
 #
 # Yes Tim, I know this sucks.
-  
+
 =head1 NAME
 
 Astro::Catalog::Query::CMC - A query request to the SuperCOSMOS catalogue
@@ -36,7 +36,7 @@ catalogue using the generic Astro::Catalog::Query::SkyCat class
 Stores information about an prospective query and allows the query to
 be made, returning an Astro::Catalog::Query::SuperCOSMOS object.
 
-The object will by default pick up the proxy information from the HTTP_PROXY 
+The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
@@ -79,7 +79,7 @@ $FOLLOW_DIRS = 0;
 
 # This is the name of the config file that was used to generate
 # the content in %CONFIG. Can be different to the contents ofg_file
-# if that 
+# if that
 my $CFG_FILE;
 
 # This is the content of the config file
@@ -113,7 +113,7 @@ Simple constructor, handles the 'Colour' option, e.g.
 
  $q = new Astro::Catalog::Query::SuperCOSMOS( colour => 'UKJ', %options );
 
-Allowed options are 'UKJ', 'UKR', 'UKI', and 'ESOR' for the UK Blue, UK Red, 
+Allowed options are 'UKJ', 'UKR', 'UKI', and 'ESOR' for the UK Blue, UK Red,
 UK near-IR and ESO Red catalogues respectively.
 
 All other options are passed on to SUPER::new().
@@ -147,10 +147,10 @@ sub _selected_catalog {
     # The class has to be configured as a hash!!!
     $self->{SKYCAT_CATALOG} = shift;
   }
-  
+
   #print "\nSuperCOSMOS: _selected_catalog() returning " .
   #      $self->{SKYCAT_CATALOG} . "\n" if $DEBUG;
-        
+
   return $self->{SKYCAT_CATALOG};
 }
 
@@ -174,7 +174,7 @@ sub configure {
   # Note that this may force a remote URL read via directory
   # directives even though we do not have a user agent configured...
   $self->_load_config() unless %CONFIG;
-  
+
   # Error if we have no config yet
   croak "Error instantiating SuperCOSMOS object since no config was located"
     unless %CONFIG;
@@ -191,7 +191,7 @@ sub configure {
   #     print "   $key = $args{$key}\n";
   #  }
   #  print "\n\n";
-  #}     
+  #}
 
   croak "A colour must be provided using the 'colour' key"
     unless exists $args{colour};
@@ -201,22 +201,22 @@ sub configure {
 
   if ( $colour eq 'ukj' ) {
      $self->_selected_catalog( 'ssscat_ukj@wfau' );
-  
-  } elsif ( $colour eq 'ukr' ) { 
+
+  } elsif ( $colour eq 'ukr' ) {
      $self->_selected_catalog( 'ssscat_ukr@wfau' );
-  
-  } elsif ( $colour eq 'uki' ) { 
+
+  } elsif ( $colour eq 'uki' ) {
      $self->_selected_catalog( 'ssscat_uki@wfau' );
-  
-  } elsif ( $colour eq 'esor' ) { 
+
+  } elsif ( $colour eq 'esor' ) {
      $self->_selected_catalog( 'ssscat_esor@wfau' );
-  
+
   } else {
-  
+
      # default to UKR
      $self->_selected_catalog( 'SSScat_UKR@WFAU' );
   }
-  
+
   # Configure
   $self->SUPER::configure( %args );
 
@@ -279,15 +279,15 @@ sub _parse_query {
       $params{$key} = $CONFIG{$cat}->{$key};
     }
   }
-  
-  # Time to pad the params with known values, this is yet another un-Godly 
+
+  # Time to pad the params with known values, this is yet another un-Godly
   # hack for which I'm duely ashamed. God help us if they ever change the
   # catalogues. Why is SuperCOSMOS so much bloody trouble?
-  
+
   #print $self->{BUFFER} ."\n" if $DEBUG;
 
   # Make sure we set origin and field centre if we know it
-  my $query = new Astro::Catalog( Format => 'TST', 
+  my $query = new Astro::Catalog( Format => 'TST',
                                   Data => $self->{BUFFER},
 			          ReadOpt => \%params,
 			          Origin => $CONFIG{$cat}->{long_name} );
@@ -295,24 +295,24 @@ sub _parse_query {
   # Grab each star in the catalog and add some value to it
   my $catalog = new Astro::Catalog( );
   $catalog->origin( $query->origin() );
-  $catalog->set_coords( $query->get_coords() ) if defined $query->get_coords(); 
-  
-  my @stars = $query->allstars(); 
-  
+  $catalog->set_coords( $query->get_coords() ) if defined $query->get_coords();
+
+  my @stars = $query->allstars();
+
   my ( @mags, @cols );
   foreach my $i ( 0 ... $#stars ) {
     my ($cval, $err, $mag, $col );
     my @mags = undef;
     my @cols = undef;
-        
-    my $star = $stars[$i];  
+
+    my $star = $stars[$i];
     #print Dumper( $star );
 
     # if we have a non-zero quality, set the quality to 1 (this sucks!)
-    $star->quality(1) if( $star->quality() != 0 ); 
-    
+    $star->quality(1) if( $star->quality() != 0 );
+
     # calulate the errors
-    
+
     $err = 0.04;
     if ( $star->get_magnitude( "BJ" ) != 99.999 ) {
        $err = 0.04 if $star->get_magnitude( "BJ" ) > 15.0;
@@ -320,15 +320,15 @@ sub _parse_query {
        $err = 0.06 if $star->get_magnitude( "BJ" ) > 19.0;
        $err = 0.07 if $star->get_magnitude( "BJ" ) > 20.0;
        $err = 0.12 if $star->get_magnitude( "BJ" ) > 21.0;
-       $err = 0.08 if $star->get_magnitude( "BJ" ) > 22.0;  
+       $err = 0.08 if $star->get_magnitude( "BJ" ) > 22.0;
     } else {
        $err = 99.999;
     }
-    $mag = new Astro::Flux( new Number::Uncertainty( 
+    $mag = new Astro::Flux( new Number::Uncertainty(
           Value => $star->get_magnitude("BJ"), Error => $err ), 'mag', 'BJ' );
-    push @mags, $mag;	  
+    push @mags, $mag;
 
-    $err = 0.06;	      
+    $err = 0.06;
     if ( $star->get_magnitude( "R1" ) != 99.999 ) {
        $err = 0.06 if $star->get_magnitude( "R1" ) > 11.0;
        $err = 0.03 if $star->get_magnitude( "R1" ) > 12.0;
@@ -339,10 +339,10 @@ sub _parse_query {
     } else {
        $err = 99.999;
     }
-    $mag = new Astro::Flux( new Number::Uncertainty( 
+    $mag = new Astro::Flux( new Number::Uncertainty(
           Value => $star->get_magnitude("R1"), Error => $err ), 'mag', 'R1' );
-    push @mags, $mag;	
-    
+    push @mags, $mag;
+
     $err = 0.02;
     if ( $star->get_magnitude( "R2" ) != 99.999 ) {
        $err = 0.02 if $star->get_magnitude( "R2" ) > 12.0;
@@ -355,11 +355,11 @@ sub _parse_query {
     } else {
        $err = 99.999;
     }
-    $mag = new Astro::Flux( new Number::Uncertainty( 
+    $mag = new Astro::Flux( new Number::Uncertainty(
           Value => $star->get_magnitude("R2"), Error => $err ), 'mag', 'R2' );
     push @mags, $mag;
-     
-    $err = 0.05;   
+
+    $err = 0.05;
     if ( $star->get_magnitude( "I" ) != 99.999 ) {
        $err = 0.05 if $star->get_magnitude( "I" ) > 15.0;
        $err = 0.06 if $star->get_magnitude( "I" ) > 16.0;
@@ -368,72 +368,72 @@ sub _parse_query {
     } else {
        $err = 99.999;
     }
-    $mag = new Astro::Flux( new Number::Uncertainty( 
+    $mag = new Astro::Flux( new Number::Uncertainty(
           Value => $star->get_magnitude("I"), Error => $err ), 'mag', 'I' );
     push @mags, $mag;
-        
+
     # calculate colours UKST Bj - UKST R, UKST Bj - UKST I
-    
+
     if ( $star->get_magnitude( "BJ" ) != 99.999 &&
          $star->get_magnitude( "R2" ) != 99.999  ) {
-    
+
        my $bj_minus_r2 = $star->get_magnitude( "BJ" ) -
                          $star->get_magnitude( "R2" );
        $bj_minus_r2 =  sprintf("%.4f", $bj_minus_r2 );
-       
+
        my $delta_bjmr = ( ( $star->get_errors( "BJ" ) )**2.0 +
                           ( $star->get_errors( "R2" ) )**2.0     )** (1/2);
-       $delta_bjmr = sprintf("%.4f", $delta_bjmr ); 
-       
+       $delta_bjmr = sprintf("%.4f", $delta_bjmr );
+
        $cval = $bj_minus_r2;
-       $err = $delta_bjmr;                 
-       
+       $err = $delta_bjmr;
+
     } else {
        $cval = 99.999;
        $err = 99.999;
-    }                              
+    }
     $col = new Astro::FluxColor( upper => 'BJ', lower => "R2",
        quantity => new Number::Uncertainty( Value => $cval, Error => $err ) );
     push @cols, $col;
-    
+
     if ( $star->get_magnitude( "BJ" ) != 99.999 &&
          $star->get_magnitude( "I" ) != 99.999  ) {
-          
-       my $bj_minus_i = $star->get_magnitude( "BJ" ) - 
-                        $star->get_magnitude( "I" );   
+
+       my $bj_minus_i = $star->get_magnitude( "BJ" ) -
+                        $star->get_magnitude( "I" );
        $bj_minus_i =  sprintf("%.4f", $bj_minus_i );
-       
+
        my $delta_bjmi = ( ( $star->get_errors( "BJ" ) )**2.0 +
                           ( $star->get_errors( "I" ) )**2.0     )** (1/2);
-       $delta_bjmi = sprintf("%.4f", $delta_bjmi );                  
+       $delta_bjmi = sprintf("%.4f", $delta_bjmi );
 
        $cval = $bj_minus_i;
-       $err = $delta_bjmi; 
-              
+       $err = $delta_bjmi;
+
     } else {
        $cval = 99.999;
        $err = 99.999;
-    }                                  
+    }
     $col = new Astro::FluxColor( upper => 'BJ', lower => "I",
        quantity => new Number::Uncertainty( Value => $cval, Error => $err ) );
     push @cols, $col;
-        
+
     # Push the data back into the star object, overwriting ther previous
-    # values we got from the initial Skycat query. This isn't a great 
+    # values we got from the initial Skycat query. This isn't a great
     # solution, but it wasn't easy in version 3 syntax either, so I guess
     # your milage may vary.
-    
+
     my $fluxes = new Astro::Fluxes( @mags, @cols );
     $star->fluxes( $fluxes, 1 );  # the 1 means overwrite the previous values
 
- 
-    
+
+
     # push it onto the stack
     $stars[$i] = $star if defined $star;
-    
-    
+
+
   }
-  
+
   $catalog->allstars( @stars );
 
   # set the field centre
@@ -531,7 +531,7 @@ C<$PERLPREFIX/etc/sss.cfg>.
 # set or get the cfg_file() name
 sub cfg_file {
   my $class = shift;
-  
+
   my $cfg_file;
   if (@_) {
     $cfg_file = shift;
@@ -546,19 +546,19 @@ sub cfg_file {
     my @path;
     foreach my $i ( 0 .. $#dirs-2 ) {
       push @path, $dirs[$i];
-    }  
+    }
     my $directory = File::Spec->catdir( @path, 'etc' );
-    
+
     # reset to the default
-    $cfg_file = File::Spec->catfile( $directory, "sss.cfg" );    
-    
+    $cfg_file = File::Spec->catfile( $directory, "sss.cfg" );
+
     # debugging and testing purposes
     unless ( -f $cfg_file ) {
       # use blib version!
       $cfg_file = File::Spec->catfile( '.', 'etc', 'sss.cfg' );
-    }    
+    }
   }
-  
+
   print "SuperCOSMOS.pm: \$cfg_file in cfg_file() is $cfg_file\n" if $DEBUG;
   return $cfg_file;
 }
@@ -593,7 +593,7 @@ has not previously been read.
 sub _load_config {
   my $self = shift;
   my $cfg = $self->cfg_file;
-  
+
   #print "SuperCOSMOS.pm: \$cfg = $cfg\n" if $DEBUG;
 
   if (!defined $cfg) {
@@ -642,7 +642,7 @@ sub _load_config {
       #print "Already know about " . $entry->{short_name} . "\n" if $DEBUG;
       next;
     }
-    
+
     #print "Processing " . $entry->{short_name} . "\n\n" if $DEBUG;
     #print Dumper( $entry ) . "\n" if( $DEBUG );
 
@@ -656,7 +656,7 @@ sub _load_config {
     # since we can trivially replace the tokens without having to
     # reconstruct the url. Of course, this does allow us to provide
     # mandatory keywords. $url =~ s/\%ra/$ra/;
-    if ( $entry->{url} =~ m|^http://www-wfau.roe.ac.uk/~sss/cgi-bin/gaia_obj.cgi?             
+    if ( $entry->{url} =~ m|^http://www-wfau.roe.ac.uk/~sss/cgi-bin/gaia_obj.cgi?
 	       (.*)               # CGI options without trailing space
 	      |x) {
       $entry->{remote_host} = "www-wfau.roe.ac.uk";
@@ -679,7 +679,7 @@ sub _load_config {
       # We still need to extract the tokens themselves so that we
       # can generate an allowed options list.
 
-      # tokens have the form %xxx but we have to make sure we allow 
+      # tokens have the form %xxx but we have to make sure we allow
       # %mime-type. Use the /g modifier to get all the matches
       my @tokens = ( $options =~ /(\%[\w\-]+)/g);
 
@@ -702,7 +702,7 @@ sub _load_config {
 	    $allow{ $map{$strip} } = $strip;
 	  }
 	} else {
-	
+
 	  warnings::warnif("Token $tok not currently recognized")
 	      unless exists $map{$strip};
 	}
@@ -715,7 +715,7 @@ sub _load_config {
 
       #print Dumper( $entry ) if $DEBUG;
 
-      # And store this in the config. Only store it if we have 
+      # And store this in the config. Only store it if we have
       # tokens
       $CONFIG{lc($entry->{short_name})} = $entry;
 
@@ -762,7 +762,7 @@ sub _extract_raw_info {
       # This is content
       my $key = $1;
       my $value = $2;
-      # Assume that serv_type is always first 
+      # Assume that serv_type is always first
       if ($key eq 'serv_type') {
 	# Store previous config if it contains something
 	# If it actually contains information on a serv_type of
@@ -797,7 +797,7 @@ sub _extract_raw_info {
 =item B<_dir_check>
 
 If the supplied hash reference has content, look at the content
-and decide whether you simply want to keep that content or 
+and decide whether you simply want to keep that content or
 follow up directory specifications by doing a remote URL call
 and expanding that directory specification to many more remote
 catalogue server configs.
@@ -822,10 +822,10 @@ sub _dir_check {
     if ($current->{serv_type} eq 'directory') {
       # Get the content of the URL unless we are not
       # reading directories
-      if ($FOLLOW_DIRS && defined $current->{url} && 
+      if ($FOLLOW_DIRS && defined $current->{url} &&
 	  !exists $followed_dirs{$current->{short_name}}) {
 	print "Following directory link to ". $current->{short_name}.
-	  "[".$current->{url}."]\n" 
+	  "[".$current->{url}."]\n"
 	  if $DEBUG;
 
 	# Indicate that we have followed this link
@@ -930,7 +930,7 @@ sub _token_mapping {
 SkyCat specific translations from the internal format to URL format
 go here.
 
-RA/Dec must match format described in 
+RA/Dec must match format described in
 http://vizier.u-strasbg.fr/doc/asu.html
 (at least for GSC) ie  hh:mm:ss.s+/-dd:mm:ss
 or decimal degrees.

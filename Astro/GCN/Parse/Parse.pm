@@ -10,9 +10,9 @@ GCN::Packet::Parse - module which parses valid GCN binary messages
 
 =head1 DESCRIPTION
 
-The module parses incoming GCN binary packet and parses it, it will 
+The module parses incoming GCN binary packet and parses it, it will
 correct parse TYPE_IM_ALIVE and all (most?) SWIFT related packets.
-   
+
 =cut
 
 # L O A D   M O D U L E S --------------------------------------------------
@@ -149,12 +149,12 @@ Returns true if the packet originates from SWIFT, or undef if not
 
 sub is_swift {
   my $self = shift;
-  
+
   if ( $self->type() >= 60 && $self->type <= 82 ) {
      return 1;
   } else {
      return undef;
-  }      
+  }
 }
 
 =item B<trigger_num>
@@ -167,13 +167,13 @@ Return the trigger number (SWIFT packets only)
 
 sub trigger_num {
   my $self = shift;
-  
+
   return undef unless $self->is_swift();
-  
-  my ( $trig_num, $obs_num ) = 
+
+  my ( $trig_num, $obs_num ) =
     Astro::GCN::Util::SWIFT::convert_trig_obs_num( $self->{MESSAGE}[4] );
   return $trig_num;
-     
+
 }
 
 =item B<obs_num>
@@ -188,16 +188,16 @@ sub obs_num {
   my $self = shift;
   return undef unless $self->is_swift();
 
-  my ( $trig_num, $obs_num ) = 
+  my ( $trig_num, $obs_num ) =
     Astro::GCN::Util::SWIFT::convert_trig_obs_num( $self->{MESSAGE}[4] );
   return $obs_num;
-     
+
 }
 
 =item B<tjd>
 
-Return the truncated Julian Date of the observation. The precise 
-defintion of this varies depending on the type of the original packet. 
+Return the truncated Julian Date of the observation. The precise
+defintion of this varies depending on the type of the original packet.
 
 
   $julian_date = $message->tjd();
@@ -211,37 +211,37 @@ sub tjd {
   return undef unless $self->is_swift();
   if ( $self->type() >= 74 && $self->type <= 75 ) {
      return undef;
-  }   
-  
+  }
+
   return $self->{MESSAGE}[5];
-     
+
 }
 
 =item B<data_sod>
 
 Return the time (seconds of day) when the data originated at the
-instrument. The precise defintion of this varies depending on the 
+instrument. The precise defintion of this varies depending on the
 type of the original packet.
 
   $sod = $message->data_sod();
-  
+
 For now this method will only return a value for SWIFT packets.
 
 =cut
 
 sub data_sod {
   my $self = shift;
-  
+
   return undef unless $self->is_swift();
   if ( $self->type() >= 74 && $self->type <= 75 ) {
      return undef;
-  }   
+  }
   return ( $self->{MESSAGE}[6] / 100.0 );
 }
 
 =item B<ra>
 
-Return the RA in "hh mm ss.ss" format. The precise defintion of this 
+Return the RA in "hh mm ss.ss" format. The precise defintion of this
 varies depending on the type of the original packet.
 
   $ra = $message->ra();
@@ -256,16 +256,16 @@ sub ra {
   if ( $self->type() == 60 || $self->type == 62 ||
        ( $self->type() >= 74 && $self->type <= 75 ) ) {
      return undef;
-  }   
-  
+  }
+
   my $ra = Astro::GCN::Util::convert_ra_to_sextuplets( $self->{MESSAGE}[7] );
-  return $ra;  
-     
+  return $ra;
+
 }
 
 =item B<dec>
 
-Return the Declination in "+dd mm ss.ss" format. The precise defintion 
+Return the Declination in "+dd mm ss.ss" format. The precise defintion
 of this varies depending on the type of the original packet.
 
   $dec = $message->dec();
@@ -280,17 +280,17 @@ sub dec {
   if ( $self->type() == 60 || $self->type == 62 ||
        ( $self->type() >= 74 && $self->type <= 75 ) ) {
      return undef;
-  }   
-  
+  }
+
   my $dec = Astro::GCN::Util::convert_dec_to_sextuplets( $self->{MESSAGE}[8] );
-  return $dec;  
-     
+  return $dec;
+
 }
 
 =item B<burst_error>
 
-Return the error in RA & Declination in arc minutes. The precise 
-defintion of the original values of RA & Declination will vary depending 
+Return the error in RA & Declination in arc minutes. The precise
+defintion of the original values of RA & Declination will vary depending
 on the type of the original packet.
 
   $error = $message->burst_error();
@@ -306,19 +306,19 @@ sub burst_error {
   unless ( $self->type() == 61 || $self->type == 67 ||
            $self->type() == 81 || $self->type == 84 ) {
      return undef;
-  }   
-  
-  my $error = 
+  }
+
+  my $error =
     Astro::GCN::Util::convert_burst_error_to_arcmin ( $self->{MESSAGE}[11] );
-    
-  return $error;  
-     
+
+  return $error;
+
 }
 
 
 =item B<ra_degrees>
 
-Return the RA in degrees. The precise defintion of this 
+Return the RA in degrees. The precise defintion of this
 varies depending on the type of the original packet.
 
   $ra = $message->ra_degrees();
@@ -333,16 +333,16 @@ sub ra_degrees {
   if ( $self->type() == 60 || $self->type == 62 ||
        ( $self->type() >= 74 && $self->type <= 75 ) ) {
      return undef;
-  }   
-  
+  }
+
   my $ra = Astro::GCN::Util::convert_ra_to_degrees( $self->{MESSAGE}[7] );
-  return $ra;  
-     
+  return $ra;
+
 }
 
 =item B<dec_degrees>
 
-Return the Declination in degrees. The precise defintion 
+Return the Declination in degrees. The precise defintion
 of this varies depending on the type of the original packet.
 
   $dec = $message->dec_degrees();
@@ -357,17 +357,17 @@ sub dec_degrees {
   if ( $self->type() == 60 || $self->type == 62 ||
        ( $self->type() >= 74 && $self->type <= 75 ) ) {
      return undef;
-  }   
-  
+  }
+
   my $dec = Astro::GCN::Util::convert_dec_to_degrees( $self->{MESSAGE}[8] );
-  return $dec;  
-     
+  return $dec;
+
 }
 
 =item B<burst_error_degrees>
 
-Return the error in RA & Declination in degrees. The precise 
-defintion of the original values of RA & Declination will vary depending 
+Return the error in RA & Declination in degrees. The precise
+defintion of the original values of RA & Declination will vary depending
 on the type of the original packet.
 
   $error = $message->burst_error_degrees();
@@ -383,13 +383,13 @@ sub burst_error_degrees {
   unless ( $self->type() == 61 || $self->type == 67 ||
            $self->type() == 81 || $self->type == 84 ) {
      return undef;
-  }   
-  
-  my $error = 
+  }
+
+  my $error =
     Astro::GCN::Util::convert_burst_error_to_degrees ( $self->{MESSAGE}[11] );
-    
-  return $error;  
-     
+
+  return $error;
+
 }
 
 =item B<solution_status>
@@ -409,13 +409,13 @@ sub solution_status {
   unless ( $self->type() == 61 || $self->type == 62 ||
            $self->type() == 82 || $self->type == 84 ) {
      return undef;
-  }   
-  
-  my %soln_status = 
+  }
+
+  my %soln_status =
     Astro::GCN::Util::SWIFT::convert_soln_status ( $self->{MESSAGE}[18] );
-    
-  return %soln_status;  
-     
+
+  return %soln_status;
+
 }
 
 =item B<bat_ipeak>
@@ -433,10 +433,10 @@ sub bat_ipeak {
   return undef unless $self->is_swift();
   unless ( $self->type() == 61 || $self->type == 82 ) {
      return undef;
-  }   
-  
+  }
+
   return $self->{MESSAGE}[10];
-         
+
 }
 
 
@@ -454,10 +454,10 @@ sub uvot_mag {
   my $self = shift;
   unless ( $self->type() == 81 ) {
      return undef;
-  }   
-  
+  }
+
   return ( $self->{MESSAGE}[9] / 100.0 );
-         
+
 }
 
 # C O N F I G U R E ----------------------------------------------------------
@@ -517,7 +517,7 @@ accessor methods.
 sub packet {
   my $self = shift;
   $self->{BUFFER} = shift;
-  
+
   # parse the document using private methods.
   push @{$self->{MESSAGE}}, unpack( "N40", $self->{BUFFER} );
   $self->{TYPE} = $self->{MESSAGE}[0];
@@ -545,4 +545,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

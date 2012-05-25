@@ -2,7 +2,7 @@ package Astro::Aladin;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::Aladin
 
@@ -17,7 +17,7 @@ package Astro::Aladin;
 #    This module gives a high level interface to images and catalogues
 #    available using the CDS Aladin Application. It sits ontop of the
 #    Astro::Aladin::LowLevel module which drives Aladin directly
-#    through an anonymous pipe. You should use this module for access 
+#    through an anonymous pipe. You should use this module for access
 #    to resources rather than the lower level.
 
 
@@ -41,12 +41,12 @@ Astro::Aladin - Perl class giving access to images and catalogues
 =head1 SYNOPSIS
 
   my $aladin = new Astro::Aladin();
-  
-  my $aladin = new Astro::Aladin( RA     => $ra, 
-                                  Dec    => $dec, 
+
+  my $aladin = new Astro::Aladin( RA     => $ra,
+                                  Dec    => $dec,
                                   Radius => $radius );
 
-An instance my be created using the default constructor, or using 
+An instance my be created using the default constructor, or using
 one that defines an R.A., Dec and Radius for future queries.
 
 =head1 DESCRIPTION
@@ -54,7 +54,7 @@ one that defines an R.A., Dec and Radius for future queries.
 This module gives a high level interface to images and catalogues
 available using the CDS Aladin Application. It sits ontop of the
 Astro::Aladin::LowLevel module which drives Aladin directly
-through an anonymous pipe. You should use this module for access 
+through an anonymous pipe. You should use this module for access
 to resources rather than the lower level.
 
 =cut
@@ -86,24 +86,24 @@ use Astro::Aladin::LowLevel;
 
 my $threaded_supercos_catalog = sub {
     my ( $ra, $dec, $radius, $band, $file ) = @_;
-  
+
     # create a lowlevel object
     my $aladin = new Astro::Aladin::LowLevel( );
 
     # grab waveband
     my $waveband = undef;
     if( $band eq "UKST Red" ) {
-       $waveband = "2";  
+       $waveband = "2";
     } elsif ( $band eq "UKST Infrared" ) {
-       $waveband = "3";  
+       $waveband = "3";
     } elsif ( $band eq "ESO Red" ) {
-       $waveband = "4";  
+       $waveband = "4";
     } elsif ( $band eq "POSS-I Red" ) {
-       $waveband = "5";  
+       $waveband = "5";
     } else {
-       $waveband = "1"; # Go with default, UKST Blue (Bj)  
+       $waveband = "1"; # Go with default, UKST Blue (Bj)
     }
-    
+
     # grab catalogue
     $aladin->get( "SSS.cat", [$waveband], "$ra $dec", $radius );
     $aladin->sync();
@@ -112,7 +112,7 @@ my $threaded_supercos_catalog = sub {
     $aladin->close();
 
     return $file;
-  
+
 };
 
 # C O N S T R U C T O R ----------------------------------------------------
@@ -178,11 +178,11 @@ sub ra {
   my $self = shift;
 
   # SETTING R.A.
-  if (@_) { 
+  if (@_) {
     # grab the new R.A.
     $self->{RA} = shift;
   }
-  
+
   return $self->{RA};
 }
 
@@ -199,11 +199,11 @@ or -40 25 67.89
 
 =cut
 
-sub dec { 
+sub dec {
   my $self = shift;
 
   # SETTING DEC
-  if (@_) { 
+  if (@_) {
     # grab the new Dec
     $self->{DEC} = shift;
   }
@@ -224,10 +224,10 @@ Return (or set) a default radius (in arcminutes) for future Aladin queries
 sub radius {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     $self->{RADIUS} = shift;
   }
-  
+
   return $self->{RADIUS};
 
 }
@@ -239,8 +239,8 @@ Return (or set) a default waveband for future Aladin queries
    $waveband = $aladin->band();
    $aladin->band( $waveband );
 
-this is only really useful for repetative queries using the same 
-catalogue or image server. Valid choices for the waveband are 
+this is only really useful for repetative queries using the same
+catalogue or image server. Valid choices for the waveband are
 "UKST Blue", "UKST Red", "UKST Infrared", "ESO Red" and "POSS-I Red".
 
 =cut
@@ -248,10 +248,10 @@ catalogue or image server. Valid choices for the waveband are
 sub band {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     $self->{BAND} = shift;
   }
-  
+
   return $self->{BAND};
 
 }
@@ -269,10 +269,10 @@ images to
 sub file {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     $self->{FILE} = File::Spec->catfile( shift );
   }
-  
+
   return $self->{FILE};
 
 }
@@ -281,17 +281,17 @@ sub file {
 
 Retrieves a SuperCOSMOS catalogue from Edinburgh using Aladin.
 
-   $filename = $aladin->supercos_catalog( 
-                       RA     => $ra, 
-                       Dec    => $dec, 
+   $filename = $aladin->supercos_catalog(
+                       RA     => $ra,
+                       Dec    => $dec,
                        Radius => $radius,
                        File   => $catalog_file,
                        Band   => $waveband );
-   
+
    $filename = $aladin->supercos_catalog();
-   
-where the RA and Dec are in standard sextuple format and the radius 
-is in arc minutes. Valid choices for the waveband are "UKST Blue", 
+
+where the RA and Dec are in standard sextuple format and the radius
+is in arc minutes. Valid choices for the waveband are "UKST Blue",
 "UKST Red", "UKST Infrared", "ESO Red" and "POSS-I Red".
 
 The routine returns the filename of the retrieved catalogue, or
@@ -304,18 +304,18 @@ returned file should always be checked when calling this method.
 
 sub supercos_catalog {
   my $self = shift;
-  
+
   # return unless we have arguements
   return undef unless @_;
 
   my %args = @_;
-  
+
   # Loop over the allowed keys and modify the default query options
   for my $key (qw / RA Dec Radius Band File/ ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
-  }  
-  
+  }
+
   # Check query parameters
   my $ra = $self->{RA};
   my $dec = $self->{DEC};
@@ -335,18 +335,18 @@ sub supercos_catalog {
   share( $file );
   share( $status );
 
-  my $supercos_thread = threads->create( sub { 
-  
-     $status = &$threaded_supercos_catalog( $ra, $dec, $radius, $band, $file ); 
-  });   
-  
+  my $supercos_thread = threads->create( sub {
+
+     $status = &$threaded_supercos_catalog( $ra, $dec, $radius, $band, $file );
+  });
+
   # wait for the supercos thread to join
   $supercos_thread->join();
-  
+
   # return the status, with luck this will be set to $file, however
   # if we get an error (and sucessfully pick up on it) it will be undef
   return $status;
-  
+
 }
 
 # C O N F I G U R E -------------------------------------------------------
@@ -371,21 +371,21 @@ Does nothing if the array is not supplied.
 
 sub configure {
   my $self = shift;
-  
+
 
   # CONFIGURE FROM ARGUEMENTS
   # -------------------------
 
   # return unless we have arguments
   return undef unless @_;
-  
+
   # configure the default options
   $self->{RA}     = undef;
   $self->{DEC}    = undef;
   $self->{RADIUS} = 10;
   $self->{BAND}   = undef;
   $self->{FILE}   = undef;
-  
+
   # grab the argument list
   my %args = @_;
 
@@ -393,7 +393,7 @@ sub configure {
   for my $key (qw / RA Dec Radius Band File / ) {
       my $method = lc($key);
       $self->$method( $args{$key} ) if exists $args{$key};
-  }  
+  }
 
 }
 
@@ -417,4 +417,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

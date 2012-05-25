@@ -1,4 +1,4 @@
-#!/home/globus/Perl/bin/perl -W 
+#!/home/globus/Perl/bin/perl -W
 
 # eSTAR::IO::Client test harness
 
@@ -10,7 +10,7 @@ use strict;
 
 # load test
 use Test;
-use Test::Harness qw(&runtests $verbose); 
+use Test::Harness qw(&runtests $verbose);
 $verbose=1;
 
 BEGIN { plan tests => 5 };
@@ -23,7 +23,7 @@ use eSTAR::IO::Client;
 use Data::Dumper;
 
 
-# ---------------------------------------------------------------------------- 
+# ----------------------------------------------------------------------------
 
 # test the test system
 ok( 1 );
@@ -111,4 +111,4 @@ if( $status == GLOBUS_FALSE) {
 
 exit;
 
-# ---------------------------------------------------------------------------- 
+# ----------------------------------------------------------------------------

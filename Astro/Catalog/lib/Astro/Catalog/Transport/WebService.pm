@@ -10,7 +10,7 @@ Astro::Catalog::Transport::WebService - A base class for WebService querys
 
 =head1 DESCRIPTION
 
-This class forms a base class for all the WebService based query classes 
+This class forms a base class for all the WebService based query classes
 in the C<Astro::Catalog> distribution (eg C<Astro::Catalog::Query::Sesame>).
 
 =cut
@@ -48,7 +48,7 @@ $Id: WebService.pm,v 1.4 2003/08/03 06:18:35 timj Exp $
 
 Create a new instance from a hash of options
 
-  $q = new Astro::Catalog::Transport::WebService( 
+  $q = new Astro::Catalog::Transport::WebService(
                                             Coords    => new Astro::Coords(),
 				            Radius    => $radius,
 				            Bright    => $magbright,
@@ -90,7 +90,7 @@ sub new {
 =item B<querydb>
 
 Unlike C<Astro::Transport::REST> a default C<querydb()> method is not
-provided by this base class, each sub-class must provide its own 
+provided by this base class, each sub-class must provide its own
 implemetation.
 
 =cut
@@ -110,7 +110,7 @@ Return (or set) the current proxy for the catalog request.
 
 sub proxy {
    my $self = shift;
-   
+
    # SOAP::Lite respects the HTTP_proxy environment variable
 
    if (@_) {
@@ -126,7 +126,7 @@ sub proxy {
 
 =item B<urn>
 
-Return the current remote urn for the query 
+Return the current remote urn for the query
 
    $host = $q->urn();
 
@@ -138,7 +138,7 @@ sub urn {
   my $self = shift;
 
   # SETTING URL
-  if (@_) { 
+  if (@_) {
 
     # set the url option
     my $urn = shift;
@@ -146,12 +146,12 @@ sub urn {
   }
 
   return $self->{URN};
-  
+
 }
 
 =item B<endpoint>
 
-Return the current endpoint for the query 
+Return the current endpoint for the query
 
    $host = $q->endpoint();
    $q->endpoint( 'http://www.blah.org:8080' ););
@@ -168,24 +168,24 @@ sub endpoint {
   my $self = shift;
 
   # SETTING ENDPOINT
-  if (@_) { 
+  if (@_) {
 
     # set the url option
     my $endpoint = shift;
-    
+
     if( $endpoint =~ /wsdl$/ ) {
       $self->{SERVICE} = 1;
-    }  
+    }
     $self->{ENDPOINT} = $endpoint;
-    
+
   }
-  
+
   if ( defined $self->{ENDPOINT} ) {
      return $self->{ENDPOINT};
   } else {
      return $self->_default_endpoint();
   }
-     
+
 }
 
 =back

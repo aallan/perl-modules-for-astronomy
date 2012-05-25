@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'          => 'Misc::Quality',
 	       'VERSION'       => '0.1',
                'PREREQ_PM'     => {  },

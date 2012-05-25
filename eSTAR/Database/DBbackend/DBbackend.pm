@@ -521,7 +521,7 @@ The number can not be negative (forced to zero if it is).
 
 sub trans_count {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     my $c = shift;
     $c = 0 if $c < 0;
     $self->{TransCount} = $c;
@@ -614,7 +614,7 @@ sub disconnect {
 Begin a database transaction. This is defined as something that has
 to happen in one go or trigger a rollback to reverse it.
 
-If a transaction is already in progress this method increments the 
+If a transaction is already in progress this method increments the
 transaction counter and returns without attempting to start a new
 transaction.
 
@@ -649,7 +649,7 @@ sub begin_trans {
 Commit the transaction. This informs the database that everthing
 is okay and that the actions should be finalised.
 
-Note that if we have started multiple nested transactions we only 
+Note that if we have started multiple nested transactions we only
 commit when the last transaction is committed.
 
 =cut

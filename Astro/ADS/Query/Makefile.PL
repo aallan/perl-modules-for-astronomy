@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::ADS::Query',
 	       'VERSION_FROM'   => 'Query.pm',
                'PREREQ_PM'      => { },

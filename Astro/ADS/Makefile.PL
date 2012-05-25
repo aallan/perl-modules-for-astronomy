@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::ADS',
 	       'VERSION_FROM'   => 'ADS.pm',
                'EXE_FILES'      => [ 'adsquery' ],

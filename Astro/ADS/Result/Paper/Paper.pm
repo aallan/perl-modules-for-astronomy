@@ -187,7 +187,7 @@ if called in a scalar context it will return the first author.
 
 sub authors {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{AUTHORS} = shift;
   }
   my @authors = @{$self->{AUTHORS}};
@@ -209,7 +209,7 @@ first author.
 
 sub affil {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     $self->{AFFIL} = shift;
   }
   my @affil = @{$self->{AFFIL}};
@@ -539,12 +539,12 @@ Takes a hash as argument with the following keywords:
 
 =item B<Bibcode>
 
-The bibcode of the paper. A complete description of the bibcode reference 
-coding has been published as a chapter of the book "Information & On-Line 
+The bibcode of the paper. A complete description of the bibcode reference
+coding has been published as a chapter of the book "Information & On-Line
 Data in Astronomy", 1995, D. Egret and M. A. Albrecht (Eds), Kluwer Acad. Publ.
 
 A copy of the relevant chapter in this book is available online as a Postscript
-file via the CDS at http://cdsweb.u-strasbg.fr/simbad/refcode.ps 
+file via the CDS at http://cdsweb.u-strasbg.fr/simbad/refcode.ps
 
 =item B<Title>
 
@@ -716,8 +716,8 @@ sub summary {
 	  push(@output, "  <$lcfield/>");
 	}
       } else {
-	push(@output, sprintf("%-15s %s", ucfirst($lcfield).":", 
-			      (defined $results[0] ? 
+	push(@output, sprintf("%-15s %s", ucfirst($lcfield).":",
+			      (defined $results[0] ?
 			       $results[0] : "undefined")));
       }
 
@@ -769,4 +769,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

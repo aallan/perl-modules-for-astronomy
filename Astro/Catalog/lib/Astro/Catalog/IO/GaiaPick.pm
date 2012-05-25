@@ -99,7 +99,7 @@ sub _read_catalog {
     # Parse the time stamp. Need to work out where to put the
     # time since this is not an observation date (epoch).
     # Think of a concept for Astro::Catalog::Star
-    # catalogDate ?? 
+    # catalogDate ??
 
     # Parse the actual star information. Split on space.
     my @chunks = split(/\s+/,$pickline);

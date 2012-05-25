@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::SIMBAD::Query',
 	       'VERSION_FROM'   => 'Query.pm',
                'PREREQ_PM'      => { },

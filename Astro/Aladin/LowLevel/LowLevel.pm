@@ -2,7 +2,7 @@ package Astro::Aladin::LowLevel;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::Aladin::LowLevel
 
@@ -14,7 +14,7 @@ package Astro::Aladin::LowLevel;
 
 #  Description:
 #    This module drives the CDS Aladin Java application through an
-#    anonymous pipe. 
+#    anonymous pipe.
 #
 #    This isn't an optimal solution, its a kludge hack and I hope
 #    nobody I know is reading the code. There is a higher level class
@@ -131,7 +131,7 @@ sub close {
 
   # set the "quit" command to Aladin
   print $ALADIN "quit\n";
-  
+
   # close the pipe
   close( $ALADIN );
   $ALADIN = undef;
@@ -153,20 +153,20 @@ sub reopen {
 
   # check that the pipe is closed and undefined
   unless ( defined $self->{PIPE} ) {
-     
+
      my $aladin_jar;
-     if ( defined $ENV{"ALADIN_JAR"} ) { 
+     if ( defined $ENV{"ALADIN_JAR"} ) {
          $aladin_jar = File::Spec->catfile($ENV{"ALADIN_JAR"});
      } else {
          croak( "Error: Environment variable \$ALADIN_JAR not defined".
                 " see package README file");
      }
-  
+
      # open the pipe to the application
      $ENV{ALADIN_MEM} = "128m" unless defined $ENV{ALADIN_MEM};
      open( $ALADIN ,"| java -mx$ENV{ALADIN_MEM} -jar $ENV{ALADIN_JAR} -script" );
-     return;  
-  }   
+     return;
+  }
 
   return undef;
 }
@@ -231,18 +231,18 @@ Gets images and catalogues from the server
 For example
 
    $aladin->get( "aladin", ["DSS1"], $object_name, $radius );
-   $aladin->get( "aladin", ["DSS1", "LOW"], $object_name, $radius );  
-   $aladin->get( "aladin", [""], $object_name, $radius );  
+   $aladin->get( "aladin", ["DSS1", "LOW"], $object_name, $radius );
+   $aladin->get( "aladin", [""], $object_name, $radius );
 
 the radius arguement can be omitted
 
    $aladin->get( "aladin", ["DSS1"], $object_name );
-   
+
 or even more simply
-   
+
    $aladin->get( "simbad", $object_name );
 
-always remember to sync after a series of request, or you might end 
+always remember to sync after a series of request, or you might end
 up closing Aladin before its actually finished download the layers.
 
 =cut
@@ -260,7 +260,7 @@ sub get {
     ( $self, $server, $object ) = @_;
     $args_ref = [""];
   }
-    
+
   # Call the _get() private method
   _get( $server, $args_ref, $object, $radius );
 
@@ -313,22 +313,22 @@ Get an image or catalogue
 
 sub _get {
   my ( $server, $args_ref, $object, $radius ) = @_;
-  
-  # Grab the args array 
+
+  # Grab the args array
   my @args = @{$args_ref};
-  
+
   # process the args array
   my $args_string = "";
-  
+
   for my $i ( 0 .. $#args ) {
     if( $i == 0 ) {
        $args_string = $args[$i];
     } else {
        $args_string = "," . $args[$i];
-    }      
+    }
   }
-  
-  
+
+
   # set the "status" command to Aladin
   if( $args_string eq "" ) {
      unless ( $radius ) {
@@ -337,7 +337,7 @@ sub _get {
      } else {
         print "Sending: get $server() $object $radius"."arcmin\n";
         print $ALADIN "get $server() $object $radius"."arcmin\n";
-     }  
+     }
   } else {
      unless ( $radius ) {
         print "Sending: get $server($args_string) $object\n";
@@ -345,9 +345,9 @@ sub _get {
      } else {
         print "Sending: get $server($args_string) $object $radius"."arcmin\n";
         print $ALADIN "get $server($args_string) $object $radius"."arcmin\n";
-     } 
+     }
   }
-  
+
 }
 
 =end __PRIVATE_METHODS__
@@ -368,4 +368,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

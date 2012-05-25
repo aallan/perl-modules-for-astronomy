@@ -18,15 +18,15 @@ my $star = $result->popstar();
 my $ra = $star->ra();
 my $dec = $star->dec();
 
-my $query = new Astro::Catalog::Query::SuperCOSMOS( RA      => $ra, 
+my $query = new Astro::Catalog::Query::SuperCOSMOS( RA      => $ra,
                                                     Dec     => $dec,
                                                     Radius  => '1',
                                                     Equinox => 'J2000',
                                                     Colour => 'UKJ',
                                                     Timeout => 60 );
 my $file = File::Spec->catfile( '.', 'etc', 'sss.cfg' );
-$query->cfg_file( $file );  
-     
+$query->cfg_file( $file );
+
 my $catalog = $query->querydb();
 
 #print Dumper($catalog);
@@ -34,4 +34,4 @@ my $catalog = $query->querydb();
 my $buffer;
 $catalog->write_catalog( File => \$buffer, Format => 'Cluster' );
 
-print $buffer . "\n";                         
+print $buffer . "\n";

@@ -107,7 +107,7 @@ Return the number of objects in the Astro::SIMBAD::Result object.
 =cut
 
 sub sizeof {
-  my $self = shift;  
+  my $self = shift;
   return $self->{SIZE};
 }
 
@@ -127,18 +127,18 @@ sub addobject {
 
   # return unless we have arguments
   return undef unless @_;
-  
+
   # grab the object reference
   my $new_object = shift;
-    
+
   # increment the sizeof counter
   $self->{SIZE} = $self->{SIZE} + 1;
-  
+
   # get the object name as a key for $self->{RESULTS} hash
   my $object_name = $new_object->name();
   $object_name = "Object " . $self->{SIZE} unless defined $object_name;
   ${$self->{RESULTS}}{$object_name} = $new_object;
-  
+
   return $self->{SIZE};
 
 }
@@ -154,13 +154,13 @@ stored in the results object.
 
 sub objects {
   my $self = shift;
-  
+
   # build the return array from the Object hash
   my @array;
   for my $key ( keys %{$self->{RESULTS}} ) {
      push ( @array, ${$self->{RESULTS}}{$key} );
   }
-  
+
   # return it
   return @array;
 }
@@ -171,7 +171,7 @@ Returns an list of C<Astro::SIMBAD::Result::Object> objects by name
 
   @objects = $result->objectbyname("IP Peg");
 
-the name given does not have to be a full object name, only a sub-string. 
+the name given does not have to be a full object name, only a sub-string.
 However, if multiple matches are found an array of possible matches will be
 returned.
 
@@ -179,14 +179,14 @@ returned.
 
 sub objectbyname {
   my $self = shift;
-  
+
   my $search_string = shift;
   # build the return array from the Object hash
   my @array;
   for my $key ( keys %{$self->{RESULTS}} ) {
      push ( @array, ${$self->{RESULTS}}{$key} ) if $key =~ $search_string;
   }
-  
+
   # return it
   return @array;
 }
@@ -206,12 +206,12 @@ the Result object.
 
 sub listofobjects{
    my $self = shift;
-   
+
    my @list;
    for my $key ( sort keys %{$self->{RESULTS}} ) {
      push ( @list, $key);
-  }   
-   
+  }
+
   return wantarray ? @list : scalar(@list);
 
 }
@@ -247,10 +247,10 @@ sub configure {
 
      # Go through each of the supplied stellar object and add it
      for my $i ( 0 ...$#{$args{Objects}} ) {
- 
+
         # increment the hash counter
         $self->{SIZE} = $self->{SIZE} + 1;
-        
+
         # extract the object name and index by it
         my $object_name = ${$args{Objects}}[$i]->name();
         $object_name = "Object " . $self->{SIZE} unless defined $object_name;
@@ -270,7 +270,7 @@ sub configure {
 
 Copyright (C) 2001 University of Exeter. All Rights Reserved.
 
-This program was written as part of the eSTAR project and is free software; 
+This program was written as part of the eSTAR project and is free software;
 you can redistribute it and/or modify it under the terms of the GNU Public
 License.
 

@@ -30,7 +30,7 @@ package Astro::SIMBAD::Result::Object;
 
 =head1 NAME
 
-Astro::SIMBAD::Result::Object - A individual astronomical object 
+Astro::SIMBAD::Result::Object - A individual astronomical object
 
 =head1 SYNOPSIS
 
@@ -220,10 +220,10 @@ sub frame {
     my $frame = shift;
     @{$self->{FRAME}} = @{$frame};
   }
-   
-  my $stringify = 
+
+  my $stringify =
      "${$self->{FRAME}}[0] ${$self->{FRAME}}[1]/${$self->{FRAME}}[2]";
-     
+
   return wantarray ? @{$self->{FRAME}} : $stringify;
 }
 
@@ -494,4 +494,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

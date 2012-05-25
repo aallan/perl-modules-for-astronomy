@@ -8,7 +8,7 @@ eSTAR::RTML - Object interface to parse and create VOEvent messages
 =head1 SYNOPSIS
 
    $rtml = new Astro::VO::VOEvent();
- 
+
 
 =head1 DESCRIPTION
 
@@ -94,8 +94,8 @@ Build a VOEvent document
                          ID         => $url,
                          Reference => { URL => $url, Type => $string } );
 
-or 
-  
+or
+
   $xml = $object->build( Type        => $string,
                          Role        => $string,
                          ID          => $url,
@@ -120,7 +120,7 @@ or
                                           Time  => $time },
                          How         => { Name     => $string,
                                           Location => $string,
-                                          RTML     => $url ), 
+                                          RTML     => $url ),
                          What        => [ { Name  => $strig,
                                             UCD   => $string,
                                             Value => $string },
@@ -130,22 +130,22 @@ or
                                           { Name  => $string,
                                             UCD   => $string,
                                             Value => $string } ],
-                         Hypothesis  => { Classification => { 
+                         Hypothesis  => { Classification => {
                                                    Probability  => $string,
                                                    Type         => $string,
                                                    Description  => string },
                                                        .
                                                        .
-                                                       . 
-                                          Identification => { 
+                                                       .
+                                          Identification => {
                                                    Type        => $string,
                                                    Description => string } }
                        );
-                         
-  
+
+
 this will create a document from the options passed to the method, most
 of the hash keys are optional and if missed out the relevant keywords will
-be blank or missing entirely from the built document. Type, Role, ID and 
+be blank or missing entirely from the built document. Type, Role, ID and
 either Reference or WhereWhen (and their sub-tags) are mandatory.
 
 The <Group> tag can be utilised from within the <What> tag as follows
@@ -194,7 +194,7 @@ NB: This is the low level interface to build a message, this is subject
 to change without notice as higher level "easier to use" accessor methods
 are added to the module. It may eventually be reclassified as a PRIVATE
 method.
- 
+
 =cut
 
 sub build {
@@ -202,17 +202,17 @@ sub build {
   my %args = @_;
 
   # mandatory tags
-  unless ( exists $args{Role} && exists $args{ID} && 
+  unless ( exists $args{Role} && exists $args{ID} &&
            ( exists $args{Reference} || $args{WhereWhen} ) ) {
      return undef;
-  }         
+  }
 
   # open the document
   $self->{WRITER}->xmlDecl( 'UTF-8' );
-   
-  # BEGIN DOCUMENT ------------------------------------------------------- 
+
+  # BEGIN DOCUMENT -------------------------------------------------------
   if ( exists $args{UseSTC} ) {
-     $self->{WRITER}->startTag( 'VOEvent', 
+     $self->{WRITER}->startTag( 'VOEvent',
           #'type' => $args{Type},
           'role' => $args{Role},
           'id'   => $args{ID},
@@ -222,32 +222,32 @@ sub build {
           'xmlns:xi'  => 'http://www.w3c.org/2001/XInclude',
           'xmlns:xsi'  => 'http://www.w3c.org/2001/XMLSchema-instance',
           'xsi:schemaLocation' => 'http://www.ivoa.net/xml/STC/stc-v1.20'
-	  );   
+	  );
   } else {
-     $self->{WRITER}->startTag( 'VOEvent', 
+     $self->{WRITER}->startTag( 'VOEvent',
           #'type' => $args{Type},
           'role' => $args{Role},
           'id'   => $args{ID},
-	  'version' => 'HTN/0.1' );  
+	  'version' => 'HTN/0.1' );
   }
-                            
+
   # REFERENCE ONLY -------------------------------------------------------
-                             
+
   if ( exists $args{Reference} ) {
      if ( exists $args{Description} ) {
         $self->{WRITER}->startTag( 'Description' );
         $self->{WRITER}->characters( $args{Description} );
         $self->{WRITER}->endTag( 'Description' );
      }
-     
+
      $self->{WRITER}->emptyTag( 'Reference',
                                 'uri' => ${$args{Reference}}{URL},
                                 'type' => ${$args{Reference}}{Type} );
-  
-       
+
+
      $self->{WRITER}->endTag( 'VOEvent' );
      $self->{WRITER}->end();
-     
+
      return $self->{BUFFER}->value();
   }
 
@@ -258,12 +258,12 @@ sub build {
      $self->{WRITER}->startTag( 'Description' );
      $self->{WRITER}->characters( $args{Description} );
      $self->{WRITER}->endTag( 'Description' );
-  }   
- 
+  }
+
   # WHO
   if ( exists $args{Who} ) {
      $self->{WRITER}->startTag( 'Who' );
-  
+
      if ( exists ${$args{Who}}{Publisher} ) {
        $self->{WRITER}->startTag( 'Publisher' );
        $self->{WRITER}->characters( ${$args{Who}}{Publisher} );
@@ -273,49 +273,49 @@ sub build {
        $self->{WRITER}->startTag( 'Contact' );
        if ( exists ${${$args{Who}}{Contact}}{Name} ) {
           $self->{WRITER}->startTag( 'Name' );
-          $self->{WRITER}->characters( 
+          $self->{WRITER}->characters(
                              ${${$args{Who}}{Contact}}{Name} );
-          $self->{WRITER}->endTag( 'Name' );          
-       }           
+          $self->{WRITER}->endTag( 'Name' );
+       }
        if ( exists ${${$args{Who}}{Contact}}{Institution} ) {
           $self->{WRITER}->startTag( 'Institution' );
-          $self->{WRITER}->characters( 
+          $self->{WRITER}->characters(
                              ${${$args{Who}}{Contact}}{Institution} );
-          $self->{WRITER}->endTag( 'Institution' );          
+          $self->{WRITER}->endTag( 'Institution' );
        }
        if ( exists ${${$args{Who}}{Contact}}{Address} ) {
           $self->{WRITER}->startTag( 'Address' );
-          $self->{WRITER}->characters( 
+          $self->{WRITER}->characters(
                              ${${$args{Who}}{Contact}}{Address} );
-          $self->{WRITER}->endTag( 'Address' );          
-       }   
+          $self->{WRITER}->endTag( 'Address' );
+       }
        if ( exists ${${$args{Who}}{Contact}}{Telephone} ) {
           $self->{WRITER}->startTag( 'Telephone' );
-          $self->{WRITER}->characters( 
+          $self->{WRITER}->characters(
                              ${${$args{Who}}{Contact}}{Telephone} );
-          $self->{WRITER}->endTag( 'Telephone' );          
-       }   
+          $self->{WRITER}->endTag( 'Telephone' );
+       }
        if ( exists ${${$args{Who}}{Contact}}{Email} ) {
           $self->{WRITER}->startTag( 'Email' );
-          $self->{WRITER}->characters( 
+          $self->{WRITER}->characters(
                              ${${$args{Who}}{Contact}}{Email} );
-          $self->{WRITER}->endTag( 'Email' );          
-       }    
+          $self->{WRITER}->endTag( 'Email' );
+       }
        $self->{WRITER}->endTag( 'Contact' );
      }
      if ( exists ${$args{Who}}{Date} ) {
        $self->{WRITER}->startTag( 'Date' );
        $self->{WRITER}->characters( ${$args{Who}}{Date} );
        $self->{WRITER}->endTag( 'Date' );
-     }   
-     
+     }
+
      $self->{WRITER}->endTag( 'Who' );
   }
- 
+
   # CITATIONS
   if ( exists $args{Citations} ) {
      $self->{WRITER}->startTag( 'Citations' );
-     
+
      my @array = @{$args{Citations}};
      foreach my $i ( 0 ... $#array ) {
         $self->{WRITER}->startTag( 'EventID','cite' => ${$array[$i]}{Cite} );
@@ -324,10 +324,10 @@ sub build {
      }
      $self->{WRITER}->endTag( 'Citations' );
   }
-   
-  # WHERE & WHEN  
+
+  # WHERE & WHEN
   if ( exists $args{UseSTC} ) {
-      $self->{WRITER}->startTag( 'WhereWhen', 
+      $self->{WRITER}->startTag( 'WhereWhen',
                                  'type' => 'stc', );
       $self->{WRITER}->startTag( 'stc:ObservationLocation' );
       $self->{WRITER}->startTag( 'crd:AstroCoords',
@@ -356,13 +356,13 @@ sub build {
       $self->{WRITER}->endTag( 'crd:AstroCoords' );
       $self->{WRITER}->endTag( 'stc:ObservationLocation' );
   } else {
-      $self->{WRITER}->startTag( 'WhereWhen', 
+      $self->{WRITER}->startTag( 'WhereWhen',
                                  'type' => 'simple', );
       $self->{WRITER}->startTag( 'RA', units => 'deg' );
       $self->{WRITER}->startTag( 'Coord' );
       $self->{WRITER}->characters( ${$args{WhereWhen}}{RA} );
       $self->{WRITER}->endTag( 'Coord' );
-      $self->{WRITER}->emptyTag( 'Error', 
+      $self->{WRITER}->emptyTag( 'Error',
                             value => ${$args{WhereWhen}}{Error},
 			    units => "arcmin" );
       $self->{WRITER}->endTag( 'RA' );
@@ -370,49 +370,49 @@ sub build {
       $self->{WRITER}->startTag( 'Coord' );
       $self->{WRITER}->characters( ${$args{WhereWhen}}{Dec} );
       $self->{WRITER}->endTag( 'Coord' );
-      $self->{WRITER}->emptyTag( 'Error', 
+      $self->{WRITER}->emptyTag( 'Error',
                             value => ${$args{WhereWhen}}{Error},
 			    units => "arcmin" );
-      $self->{WRITER}->endTag( 'Dec' );  
-      $self->{WRITER}->emptyTag( 'Epoch', value => "J2000.0" );      
-      $self->{WRITER}->emptyTag( 'Equinox', value => "2000.0" ); 
+      $self->{WRITER}->endTag( 'Dec' );
+      $self->{WRITER}->emptyTag( 'Epoch', value => "J2000.0" );
+      $self->{WRITER}->emptyTag( 'Equinox', value => "2000.0" );
 
       $self->{WRITER}->startTag( 'Time' );
       $self->{WRITER}->startTag( 'Value' );
       $self->{WRITER}->characters( ${$args{WhereWhen}}{Time} );
       $self->{WRITER}->endTag( 'Value' );
       if ( exists ${$args{WhereWhen}}{TimeError} ) {
-         $self->{WRITER}->emptyTag( 'Error', 
+         $self->{WRITER}->emptyTag( 'Error',
                             value => ${$args{WhereWhen}}{TimeError},
 			    units => "s" );
-      }		    
-      $self->{WRITER}->endTag( 'Time' );  
-       
-  } 
+      }
+      $self->{WRITER}->endTag( 'Time' );
+
+  }
   $self->{WRITER}->endTag( 'WhereWhen' );
-   
+
   # HOW
   if ( exists $args{How} ) {
      $self->{WRITER}->startTag( 'How' );
      $self->{WRITER}->startTag( 'Instrument' );
-    
+
      if ( exists ${$args{How}}{Name} ) {
        $self->{WRITER}->startTag( 'Name' );
        $self->{WRITER}->characters( ${$args{How}}{Name} );
        $self->{WRITER}->endTag( 'Name' );
-     }           
-    
+     }
+
      if ( exists ${$args{How}}{Location} ) {
        $self->{WRITER}->startTag( 'Location' );
        $self->{WRITER}->characters( ${$args{How}}{Location} );
        $self->{WRITER}->endTag( 'Location' );
-     }     
+     }
      if ( exists ${$args{How}}{RTML} ) {
-       $self->{WRITER}->emptyTag( 'Reference' , 
-                                   uri => ${$args{How}}{RTML}, 
+       $self->{WRITER}->emptyTag( 'Reference' ,
+                                   uri => ${$args{How}}{RTML},
                                    type => 'rtml' );
-     }         
-        
+     }
+
      $self->{WRITER}->endTag( 'Instrument' );
      $self->{WRITER}->endTag( 'How' );
   }
@@ -420,18 +420,18 @@ sub build {
   # WHAT
   if ( exists $args{What} ) {
      $self->{WRITER}->startTag( 'What' );
-     
+
      my @array = @{$args{What}};
      foreach my $i ( 0 ... $#array ) {
-     
+
         my %hash = %{${$args{What}}[$i]};
-        
+
         if ( exists $hash{Group} ) {
            $self->{WRITER}->startTag( 'Group' );
-        
+
            my @subarray = @{$hash{Group}};
            foreach my $i ( 0 ... $#subarray ) {
-           
+
               # Only UNITS is optional for Param tags
               if ( exists ${$subarray[$i]}{Units} ) {
                 $self->{WRITER}->emptyTag('Param',
@@ -445,11 +445,11 @@ sub build {
                                           'ucd'   => ${$subarray[$i]}{UCD},
                                           'value' => ${$subarray[$i]}{Value},
                                           'units' => ${$subarray[$i]}{Units} );
-              }    
+              }
            }
-                                         
+
            $self->{WRITER}->endTag( 'Group' );
-        
+
         } else {
            # Only UNITS is optional for Param tags
            if ( exists $hash{Units} ) {
@@ -457,60 +457,60 @@ sub build {
                                         'name'  => $hash{Name},
                                         'ucd'   => $hash{UCD},
                                         'value' => $hash{Value},
-                                        'units' => $hash{Units} ); 
+                                        'units' => $hash{Units} );
            } else {
               $self->{WRITER}->emptyTag('Param',
                                         'name'  => $hash{Name},
                                         'ucd'   => $hash{UCD},
-                                        'value' => $hash{Value} );  
-           } 
-        }                                                     
-     }    
-          
+                                        'value' => $hash{Value} );
+           }
+        }
+     }
+
      $self->{WRITER}->endTag( 'What' );
   }
-  
+
   # WHY
   if ( exists $args{Why} ) {
      $self->{WRITER}->startTag( 'Why' );
-           
+
      if ( exists ${$args{Why}}{Classification} ) {
         if ( exists ${${$args{Why}}{Classification}}{Probability} ) {
-          $self->{WRITER}->startTag( 'Classification', 
+          $self->{WRITER}->startTag( 'Classification',
           'probability' => ${${$args{Why}}{Classification}}{Probability},
           'units'       => 'percent',
           'type'        => ${${$args{Why}}{Classification}}{Type});
-          $self->{WRITER}->characters( 
+          $self->{WRITER}->characters(
                         ${${$args{Why}}{Classification}}{Description} );
           $self->{WRITER}->endTag( 'Classification' );
         } else {
-          $self->{WRITER}->startTag( 'Classification', 
+          $self->{WRITER}->startTag( 'Classification',
                    'type' => ${${$args{Why}}{Classification}}{Type});
-          $self->{WRITER}->characters( 
+          $self->{WRITER}->characters(
                         ${${$args{Why}}{Classification}}{Description} );
           $self->{WRITER}->endTag( 'Classification' );
-        }         
-     }    
-      
+        }
+     }
+
      if ( exists ${$args{Why}}{Identification} ) {
-       $self->{WRITER}->startTag( 'Identification', 
+       $self->{WRITER}->startTag( 'Identification',
              'type'   => ${${$args{Why}}{Identification}}{Type});
-       $self->{WRITER}->characters( 
+       $self->{WRITER}->characters(
                         ${${$args{Why}}{Identification}}{Description} );
        $self->{WRITER}->endTag( 'Identification' );
-     }         
-     
-     
+     }
+
+
      $self->{WRITER}->endTag( 'Why' );
-  }  
-  
-  # END DOCUMENT --------------------------------------------------------- 
+  }
+
+  # END DOCUMENT ---------------------------------------------------------
   $self->{WRITER}->endTag( 'VOEvent' );
   $self->{WRITER}->end();
-     
-  return $self->{BUFFER}->value();  
-   
-     
+
+  return $self->{BUFFER}->value();
+
+
 }
 
 =item B<parse>
@@ -527,22 +527,22 @@ this parse a VOEvent document.
 sub parse {
   my $self = shift;
   my %args = @_;
-    
+
   # Loop over the allowed keys
   for my $key (qw / File XML / ) {
-     if ( lc($key) eq "file" && exists $args{$key} ) { 
+     if ( lc($key) eq "file" && exists $args{$key} ) {
         $self->{DOCUMENT} = $self->{PARSER}->parsefile( $args{$key} );
         return $self->{DOCUMENT};
-        
+
      } elsif ( lc($key) eq "xml"  && exists $args{$key} ) {
         $self->{DOCUMENT} = $self->{PARSER}->parse( $args{$key} );
         return $self->{DOCUMENT};
-        
-     }  
+
+     }
   }
   return undef;
-  
- 
+
+
 }
 
 =item B<determine_id>
@@ -559,7 +559,7 @@ this is the only information about the document available via this module.
 sub determine_id {
   my $self = shift;
   my %args = @_;
-  
+
   $self->parse( %args );
   return ${${${$self->{DOCUMENT}}[1]}[0]}{'id'};
 }
@@ -596,9 +596,9 @@ sub configure {
 
   # BLESS XML WRITER
   # ----------------
-  $self->{BUFFER} = new XML::Writer::String();  
+  $self->{BUFFER} = new XML::Writer::String();
   $self->{WRITER} = new XML::Writer( OUTPUT      => $self->{BUFFER},
-                                     DATA_MODE   => 1, 
+                                     DATA_MODE   => 1,
                                      DATA_INDENT => 4 );
 
   # Nothing to configure...
@@ -626,4 +626,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

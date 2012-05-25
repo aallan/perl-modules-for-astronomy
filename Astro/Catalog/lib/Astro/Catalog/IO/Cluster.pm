@@ -55,7 +55,7 @@ $Id: Cluster.pm,v 1.19 2006/01/18 01:29:33 cavanagh Exp $
 
 =head1 Private methods
 
-These methods are for internal use only and are called from the 
+These methods are for internal use only and are called from the
 Astro::Catalog module. Its not expected that anyone would want to
 call them from utside that module.
 
@@ -75,7 +75,7 @@ sub _read_catalog {
    my $class = shift;
    my $arg = shift;
    my @lines = @{$arg};
-   
+
    # create am Astro::Catalog object;
    my $catalog = new Astro::Catalog();
 
@@ -115,7 +115,7 @@ sub _read_catalog {
 				      ra    => $objra,
 				      dec   => $objdec,
 				      name  => $star->id() );
-      
+
       # and push it into the Astro::Catalog::Star object
       $star->coords( $coords );
 
@@ -140,24 +140,24 @@ sub _read_catalog {
 
             # build a colour object and push it into the @colors array
 	    my @filters = split "-", $colours[$j];
-            my $color = new Astro::FluxColor( 
+            my $color = new Astro::FluxColor(
               upper => new Astro::WaveBand( Filter => $filters[0] ),
               lower => new Astro::WaveBand( Filter => $filters[1] ),
-	      quantity => new Number::Uncertainty( 
+	      quantity => new Number::Uncertainty(
 	                   Value => $separated[3*$j+10],
 			   Error => $separated[3*$j+11] ) );
 	    push @colors, $color;
 
             # quality flags
             $quality[$j] = $separated[3*$j+12];
-	    
+
 
          } else {
 
 
-            
-	    my $mag = new Astro::Flux( 
-	                   new Number::Uncertainty( 
+
+	    my $mag = new Astro::Flux(
+	                   new Number::Uncertainty(
 	                   Value => $separated[3*$j+10],
 			   Error => $separated[3*$j+11] ),
 			   'mag', $colours[$j] );
@@ -173,7 +173,7 @@ sub _read_catalog {
          }
 
       }
-      
+
       $star->fluxes( new Astro::Fluxes( @fluxes, @colors ) );
 
       # set default "good" quality
@@ -183,22 +183,22 @@ sub _read_catalog {
       foreach my $k( 0 .. $#colours ) {
 
          # if quality not good then set bad flag
-         if ( Scalar::Util::looks_like_number($quality[$k]) ) { 
+         if ( Scalar::Util::looks_like_number($quality[$k]) ) {
             if( defined $quality[$k] && $quality[$k] != 0 ) {
                $star->quality( 1 );
             }
-         } else {   
+         } else {
             if( defined $quality[$k] && $quality[$k] ne "OO") {
                $star->quality( 1 );
             }
-         }   
+         }
       }
 
       # push it onto the stack
       $catalog->pushstar( $star );
 
    }
-   
+
    $catalog->origin( 'IO::Cluster' );
    return $catalog;
 
@@ -210,10 +210,10 @@ Will write the catalogue object to an standard ARK Cluster format file
 
    \@lines = Astro::Catalog::IO::Cluster->_write_catalog( $catalog, %opts );
 
-where $catalog is an Astro::Catalog object and allowable options are 
+where $catalog is an Astro::Catalog object and allowable options are
 currently C<Colours> and C<Mags>, e.g.
 
-   \@lines = Astro::Catalog::IO::Cluster->_write_catalog( 
+   \@lines = Astro::Catalog::IO::Cluster->_write_catalog(
                        $catalog, Magnitudes => \@mags, Colours => \@colours );
 
 where magnitudes and colours passed in the array will be used in the catalog
@@ -221,7 +221,7 @@ despite the presence of other
 
    my @mags = ( 'R' );
    my @colour = ( 'B-R', 'B-V' );
-   \@lines = Astro::Catalog::IO::Cluster->write_catalog( 
+   \@lines = Astro::Catalog::IO::Cluster->write_catalog(
                       $catalog, Magnitudes => \@mags, Colours => \@colours );
 
 will write a catalogue with R, B-R and B-V.
@@ -317,12 +317,12 @@ sub _write_catalog {
     "Origin: " . $catalog->origin() . " " if defined $catalog->origin();
 
   if( defined $catalog->get_ra() && defined $catalog->get_dec() ) {
-     $output_line = $output_line . 
+     $output_line = $output_line .
        "  Field Centre: RA " . $catalog->get_ra() .
        ", Dec " . $catalog->get_dec() . " ";
   }
 
-  $output_line = $output_line . 
+  $output_line = $output_line .
       "  Catalogue Radius: " . $catalog->get_radius() .
       " arcmin" if defined $catalog->get_radius();
 
@@ -449,10 +449,10 @@ JAC, but might prive useful elsewhere.
 =cut
 
 sub _default_file {
- 
+
    # returns an empty list
    return;
-}  
+}
 
 =back
 

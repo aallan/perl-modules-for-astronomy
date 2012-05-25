@@ -45,7 +45,7 @@ are:
           This key is used in preference to 'File' if both are present.
 
   File => File name for catalog on disk. Not used if 'Data' supplied.
-          If a file is specified but is called 'default', the default file 
+          If a file is specified but is called 'default', the default file
           for the class is used.
 
   ReadOpt => Reference to hash of options to be forwarded onto the

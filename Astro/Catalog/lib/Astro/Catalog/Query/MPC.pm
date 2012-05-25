@@ -221,7 +221,7 @@ sub _parse_query {
           $vmag =~ s/^\s+//;
           #my %vmag = ( V => $vmag );
           #$star->magnitudes( \%vmag );
-	    
+
 	  $star->fluxes( new Astro::Fluxes( new Astro::Flux(
 	                 new Number::Uncertainty( Value => $vmag ),
 			 'mag', "V" )));

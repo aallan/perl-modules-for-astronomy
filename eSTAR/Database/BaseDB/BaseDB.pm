@@ -164,7 +164,7 @@ instance. Must be zero or positive.
 
 sub _intrans {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     my $c = shift;
     $c = 0 if $c < 0;
     $self->{InTrans} = $c;
@@ -195,7 +195,7 @@ is thrown.
 sub _dbhandle {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     my $db = shift;
     if (UNIVERSAL::isa($db, "eSTAR::Database::DBbackend")) {
       $self->{DB} = $db;

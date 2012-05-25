@@ -98,7 +98,7 @@ for the query.
 =item B<--xml>
 
 Output the results in XML where the element names are the
-same as the query fields. The top level element is 
+same as the query fields. The top level element is
 E<lt>ADSResultE<gt>. Default is to print a tabulated ASCII
 result.
 
@@ -145,7 +145,7 @@ if ($version) {
   exit;
 }
 
-# if we have been supplied with a file of bibcodes open it 
+# if we have been supplied with a file of bibcodes open it
 # and store the results into the bibcode array
 if ($opt{bibfile}) {
   open BIB, $opt{bibfile}

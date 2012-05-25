@@ -180,8 +180,8 @@ C<max> and/or C<min> as keys).
 
 sub query_hash {
   my $self = shift;
-  if (@_) { 
-    $self->{QHash} = shift; 
+  if (@_) {
+    $self->{QHash} = shift;
   } else {
     # Check to see if we have something
     unless (%{ $self->{QHash} }) {
@@ -449,7 +449,7 @@ sub _convert_to_perl {
         # so we must trap that
         my $firstchild = $grand->firstChild;
         if ($firstchild) {
-          $self->_add_text_to_hash(\%query, 
+          $self->_add_text_to_hash(\%query,
                                    $name, $firstchild->toString,
                                    $childname, \%attr );
         }
@@ -538,7 +538,7 @@ sub _add_text_to_hash {
     if ($special) {
 
 
-      # Okay, we've already got this key set up. 
+      # Okay, we've already got this key set up.
 
       if( exists( $hash->{$key}->[scalar( @{$hash->{$key}} )-1] ) &&
           exists( $hash->{$key}->[scalar( @{$hash->{$key}} )-1]->{$secondkey} ) ) {

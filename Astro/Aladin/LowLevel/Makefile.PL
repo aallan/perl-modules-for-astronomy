@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::Aladin::LowLevel',
 	       'VERSION_FROM'   => 'LowLevel.pm',
                'PREREQ_PM'      => { },

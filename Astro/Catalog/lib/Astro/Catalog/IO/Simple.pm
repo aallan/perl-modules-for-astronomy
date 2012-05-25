@@ -48,7 +48,7 @@ $Id: Simple.pm,v 1.6 2005/03/31 01:24:53 cavanagh Exp $
 
 =head1 Private methods
 
-These methods are for internal use only and are called from the 
+These methods are for internal use only and are called from the
 Astro::Catalog module. It is not expected that anyone would want to
 call them from outside that module.
 
@@ -188,7 +188,7 @@ sub _read_catalog {
 
 =item B<_write_catalog>
 
-Will write the catalogue object to an simple output format 
+Will write the catalogue object to an simple output format
 
    \@lines = Astro::Catalog::IO::Simple->_write_catalog( $catalog );
 

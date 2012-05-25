@@ -11,8 +11,8 @@ require Exporter;
 @ISA = qw/Exporter/;
 
 @EXPORT_OK = qw//;
-                                      
-%EXPORT_TAGS = ( 'packet_types'=>[qw/ TYPE_UNDEF	
+
+%EXPORT_TAGS = ( 'packet_types'=>[qw/ TYPE_UNDEF
                                       TYPE_GRB_COORDS
                                       TYPE_TEST_COORDS
                                       TYPE_IM_ALIVE
@@ -85,19 +85,19 @@ use constant TYPE_UNDEF	=> 0;
 # BATSE-Original Trigger coords packet
 use constant TYPE_GRB_COORDS => 1;
 
-# Test coords packet  
+# Test coords packet
 use constant TYPE_TEST_COORDS => 2;
 
-# I'm_alive packet 
+# I'm_alive packet
 use constant TYPE_IM_ALIVE => 3;
 
 # Kill a socket connection packet
-use constant TYPE_KILL_SOCKET => 4; 
+use constant TYPE_KILL_SOCKET => 4;
 
-# MAXC1/BC packet 
+# MAXC1/BC packet
 use constant TYPE_MAXBC	=> 11;
-  
-# Special Test coords packet for BRADFORD  
+
+# Special Test coords packet for BRADFORD
 use constant TYPE_BRAD_COORDS => 21;
 
 # BATSE-Final coords packet
@@ -106,160 +106,160 @@ use constant TYPE_GRB_FINAL => 22;
 # Huntsville LOCBURST GRB coords packet
 use constant TYPE_HUNTS_SRC => 24;
 
-# ALEXIS Transient coords packet  
+# ALEXIS Transient coords packet
 use constant TYPE_ALEXIS_SRC => 25;
 
-# XTE-PCA ToO Scheduled packet  
+# XTE-PCA ToO Scheduled packet
 use constant TYPE_XTE_PCA_ALERT	=> 26;
 
 # XTE-PCA GRB coords packet
 use constant TYPE_XTE_PCA_SRC => 27;
 
 # XTE-ASM Alert packet
-use constant TYPE_XTE_ASM_ALERT => 28;  
+use constant TYPE_XTE_ASM_ALERT => 28;
 
 # XTE-ASM GRB coords packet
-use constant TYPE_XTE_ASM_SRC => 29;  
+use constant TYPE_XTE_ASM_SRC => 29;
 
 # COMPTEL GRB coords packet
-use constant TYPE_COMPTEL_SRC => 30;  
+use constant TYPE_COMPTEL_SRC => 30;
 
 # IPN_RAW GRB annulus coords packet
-use constant TYPE_IPN_RAW_SRC => 31;  
+use constant TYPE_IPN_RAW_SRC => 31;
 
 # IPN_SEGment GRB annulus segment coords pkt
-use constant TYPE_IPN_SEG_SRC  => 32;  
+use constant TYPE_IPN_SEG_SRC  => 32;
 
 # SAX-WFC Alert packet
-use constant TYPE_SAX_WFC_ALERT => 33;  
+use constant TYPE_SAX_WFC_ALERT => 33;
 
 # SAX-WFC GRB coords packet
-use constant TYPE_SAX_WFC_SRC => 34;  
+use constant TYPE_SAX_WFC_SRC => 34;
 
 # SAX-NFI Alert packet
-use constant TYPE_SAX_NFI_ALERT => 35;  
+use constant TYPE_SAX_NFI_ALERT => 35;
 
 # SAX-NFI GRB coords packet
-use constant TYPE_SAX_NFI_SRC => 36;  
+use constant TYPE_SAX_NFI_SRC => 36;
 
 # XTE-ASM TRANSIENT coords packet
-use constant TYPE_XTE_ASM_TRANS => 37;  
+use constant TYPE_XTE_ASM_TRANS => 37;
 
 # spare
-use constant TYPE_spare_SRC => 38;  
+use constant TYPE_spare_SRC => 38;
 
 # IPN_POSition coords packet
-use constant TYPE_IPN_POS_SRC => 39;  
+use constant TYPE_IPN_POS_SRC => 39;
 
 # HETE S/C_Alert packet
-use constant TYPE_HETE_ALERT_SRC => 40;  
+use constant TYPE_HETE_ALERT_SRC => 40;
 
 # HETE S/C_Update packet
-use constant TYPE_HETE_UPDATE_SRC => 41;  
+use constant TYPE_HETE_UPDATE_SRC => 41;
 
 # HETE S/C_Last packet
-use constant TYPE_HETE_FINAL_SRC => 42;  
+use constant TYPE_HETE_FINAL_SRC => 42;
 
 # HETE Ground Analysis packet
-use constant TYPE_HETE_GNDANA_SRC => 43;  
+use constant TYPE_HETE_GNDANA_SRC => 43;
 
 # HETE Test packet
-use constant TYPE_HETE_TEST => 44;  
+use constant TYPE_HETE_TEST => 44;
 
 # GRB Counterpart coords packet
-use constant TYPE_GRB_CNTRPART_SRC => 45;  
+use constant TYPE_GRB_CNTRPART_SRC => 45;
 
 # INTEGRAL Pointing Dir packet
-use constant TYPE_INTEGRAL_POINTDIR_SRC => 51;  
+use constant TYPE_INTEGRAL_POINTDIR_SRC => 51;
 
 # INTEGRAL SPIACS packet
-use constant TYPE_INTEGRAL_SPIACS_SRC => 52;  
+use constant TYPE_INTEGRAL_SPIACS_SRC => 52;
 
 # INTEGRAL Wakeup packet
-use constant TYPE_INTEGRAL_WAKEUP_SRC => 53;  
+use constant TYPE_INTEGRAL_WAKEUP_SRC => 53;
 
 # INTEGRAL Refined packet
-use constant TYPE_INTEGRAL_REFINED_SRC => 54;  
+use constant TYPE_INTEGRAL_REFINED_SRC => 54;
 
 # INTEGRAL Offline packet
-use constant TYPE_INTEGRAL_OFFLINE_SRC => 55;  
+use constant TYPE_INTEGRAL_OFFLINE_SRC => 55;
 
 # MILAGRO Position message
-use constant TYPE_MILAGRO_POS_SRC => 58;  
+use constant TYPE_MILAGRO_POS_SRC => 58;
 
 # KONUS Lightcurve message
-use constant TYPE_KONUS_LC_SRC => 59;  
+use constant TYPE_KONUS_LC_SRC => 59;
 
 # SWIFT BAT GRB ALERT message
-use constant TYPE_SWIFT_BAT_GRB_ALERT_SRC => 60;  
+use constant TYPE_SWIFT_BAT_GRB_ALERT_SRC => 60;
 
 # SWIFT BAT GRB Position Acknowledge message
-use constant TYPE_SWIFT_BAT_GRB_POS_ACK_SRC => 61;  
+use constant TYPE_SWIFT_BAT_GRB_POS_ACK_SRC => 61;
 
 # SWIFT BAT GRB Position NOT Acknowledge message
-use constant TYPE_SWIFT_BAT_GRB_POS_NACK_SRC => 62;  
+use constant TYPE_SWIFT_BAT_GRB_POS_NACK_SRC => 62;
 
 # SWIFT BAT GRB Lightcurve message
-use constant TYPE_SWIFT_BAT_GRB_LC_SRC => 63;  
+use constant TYPE_SWIFT_BAT_GRB_LC_SRC => 63;
 
 # SWIFT BAT Scaled Map message
-use constant TYPE_SWIFT_SCALEDMAP_SRC => 64; 
+use constant TYPE_SWIFT_SCALEDMAP_SRC => 64;
 
 # SWIFT BAT FOM to Observe message
-use constant TYPE_SWIFT_FOM_2OBSAT_SRC => 65;  
+use constant TYPE_SWIFT_FOM_2OBSAT_SRC => 65;
 
 # SWIFT BAT S/C to Slew message
 use constant TYPE_SWIFT_FOSC_2OBSAT_SRC => 66;
-  
+
 # SWIFT XRT Position message
 use constant TYPE_SWIFT_XRT_POSITION_SRC => 67;
-  
+
 # SWIFT XRT Spectrum message
 use constant TYPE_SWIFT_XRT_SPECTRUM_SRC => 68;
-  
+
 # SWIFT XRT Image message (aka postage stamp)
-use constant TYPE_SWIFT_XRT_IMAGE_SRC => 69; 
- 
+use constant TYPE_SWIFT_XRT_IMAGE_SRC => 69;
+
 # SWIFT XRT Lightcurve message (aka Prompt)
-use constant TYPE_SWIFT_XRT_LC_SRC => 70;  
+use constant TYPE_SWIFT_XRT_LC_SRC => 70;
 
 # SWIFT XRT Position NOT Ack message (Centroid Error)
-use constant TYPE_SWIFT_XRT_CENTROID_SRC => 71; 
- 
+use constant TYPE_SWIFT_XRT_CENTROID_SRC => 71;
+
 # SWIFT UVOT DarkBurst message (aka Neighbor)
-use constant TYPE_SWIFT_UVOT_DBURST_SRC => 72;  
+use constant TYPE_SWIFT_UVOT_DBURST_SRC => 72;
 
 # SWIFT UVOT Finding Chart message
-use constant TYPE_SWIFT_UVOT_FCHART_SRC => 73; 
- 
+use constant TYPE_SWIFT_UVOT_FCHART_SRC => 73;
+
 # SWIFT Full Data Set Initial message
-use constant TYPE_SWIFT_FULL_DATA_INIT_SRC => 74;  
+use constant TYPE_SWIFT_FULL_DATA_INIT_SRC => 74;
 
 # SWIFT Full Data Set Updated message
 use constant TYPE_SWIFT_FULL_DATA_UPDATE_SRC => 75;
- 
+
 # SWIFT BAT GRB Lightcurve processed message
-use constant TYPE_SWIFT_BAT_GRB_LC_PROC_SRC => 76; 
- 
+use constant TYPE_SWIFT_BAT_GRB_LC_PROC_SRC => 76;
+
 # SWIFT XRT Spectrum processed message
-use constant TYPE_SWIFT_XRT_SPECTRUM_PROC_SRC => 77;  
+use constant TYPE_SWIFT_XRT_SPECTRUM_PROC_SRC => 77;
 
 # SWIFT XRT Image processed message
-use constant TYPE_SWIFT_XRT_IMAGE_PROC_SRC => 78;  
+use constant TYPE_SWIFT_XRT_IMAGE_PROC_SRC => 78;
 
 # SWIFT UVOT DarkBurst processed mesg (aka Neighbor)
-use constant TYPE_SWIFT_UVOT_DBURST_PROC_SRC => 79;  
+use constant TYPE_SWIFT_UVOT_DBURST_PROC_SRC => 79;
 
 # SWIFT UVOT Finding Chart processed message
-use constant TYPE_SWIFT_UVOT_FCHART_PROC_SRC => 80;  
+use constant TYPE_SWIFT_UVOT_FCHART_PROC_SRC => 80;
 
 # SWIFT UVOT Position message
-use constant TYPE_SWIFT_UVOT_POS_SRC  => 81;  
+use constant TYPE_SWIFT_UVOT_POS_SRC  => 81;
 
 # SWIFT BAT GRB Position Test message
-use constant TYPE_SWIFT_BAT_GRB_POS_TEST => 82; 
- 
+use constant TYPE_SWIFT_BAT_GRB_POS_TEST => 82;
+
 # SWIFT Pointing Direction message
-use constant TYPE_SWIFT_POINTDIR_SRC => 83; 
+use constant TYPE_SWIFT_POINTDIR_SRC => 83;
 
 1;

@@ -465,7 +465,7 @@ caller).
   $star = Astro::Catalog::IO::JCMT->_parse_line( $line, $tel );
 
 where C<$line> is the line to be parsed and (optional) C<$tel>
-is an C<Astro::Telescope> object to be associated with the 
+is an C<Astro::Telescope> object to be associated with the
 coordinate objects.
 
 The line is parsed using a pattern match.

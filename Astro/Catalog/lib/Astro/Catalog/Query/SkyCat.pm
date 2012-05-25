@@ -9,7 +9,7 @@ Astro::Catalog::Query::SkyCat - Generate SkyCat catalogue query clients
 =head1 DESCRIPTION
 
 On load, automatically parse the SkyCat server specification file
-from C<~/.skycat/skycat.cfg>, if available, and dynamically 
+from C<~/.skycat/skycat.cfg>, if available, and dynamically
 generate query classes that can send queries to each catalog
 server and parse the results.
 
@@ -37,7 +37,7 @@ $FOLLOW_DIRS = 0;
 
 # This is the name of the config file that was used to generate
 # the content in %CONFIG. Can be different to the contents ofg_file
-# if that 
+# if that
 my $CFG_FILE;
 
 # This is the content of the config file
@@ -71,7 +71,7 @@ Currently only one config file is supported at any given time.
 If a config file is changed (see the C<cfg_file> class method)
 the current config is overwritten automatically.
 
-It is not possible to override the catalog file in the 
+It is not possible to override the catalog file in the
 constructor. Use the C<cfg_file> class method instead.
 
 Obviously a config per object can be supported but this is
@@ -251,7 +251,7 @@ sub _parse_query {
   print $self->{BUFFER} ."\n" if $DEBUG;
 
   # Make sure we set origin and field centre if we know it
-  my $newcat = new Astro::Catalog( 
+  my $newcat = new Astro::Catalog(
 				  Format => 'TST', Data => $self->{BUFFER},
 				  ReadOpt => \%params,
 				  Origin => $CONFIG{$cat}->{long_name},
@@ -377,7 +377,7 @@ sub _set_cfg_file {
     my $directory = File::Spec->catdir( @path, 'etc' );
 
     # reset to the default
-    $cfg_file = File::Spec->catfile( $directory, "skycat.cfg" ); 
+    $cfg_file = File::Spec->catfile( $directory, "skycat.cfg" );
 
     # debugging and testing purposes
     unless ( -f $cfg_file ) {
@@ -487,7 +487,7 @@ sub _load_config {
 	if $DEBUG;
       next;
     }
-    
+
     print "  Processing " . $entry->{short_name} . "\n" if $DEBUG;
     print Dumper( $entry ) if( $DEBUG );
 
@@ -528,7 +528,7 @@ sub _load_config {
       # We still need to extract the tokens themselves so that we
       # can generate an allowed options list.
 
-      # tokens have the form %xxx but we have to make sure we allow 
+      # tokens have the form %xxx but we have to make sure we allow
       # %mime-type. Use the /g modifier to get all the matches
       my @tokens = ( $options =~ /(\%[\w\-]+)/g);
 
@@ -551,7 +551,7 @@ sub _load_config {
 	    $allow{ $map{$strip} } = $strip;
 	  }
 	} else {
-	
+
 	  warnings::warnif("Token $tok not currently recognized")
 	      unless exists $map{$strip};
 	}
@@ -564,7 +564,7 @@ sub _load_config {
 
       print Dumper( $entry ) if( $DEBUG );
 
-      # And store this in the config. Only store it if we have 
+      # And store this in the config. Only store it if we have
       # tokens
       $CONFIG{lc($entry->{short_name})} = $entry;
 
@@ -610,7 +610,7 @@ sub _extract_raw_info {
       # This is content
       my $key = $1;
       my $value = $2;
-      # Assume that serv_type is always first 
+      # Assume that serv_type is always first
       if ($key eq 'serv_type') {
 	# Store previous config if it contains something
 	# If it actually contains information on a serv_type of
@@ -645,7 +645,7 @@ sub _extract_raw_info {
 =item B<_dir_check>
 
 If the supplied hash reference has content, look at the content
-and decide whether you simply want to keep that content or 
+and decide whether you simply want to keep that content or
 follow up directory specifications by doing a remote URL call
 and expanding that directory specification to many more remote
 catalogue server configs.
@@ -670,10 +670,10 @@ sub _dir_check {
     if ($current->{serv_type} eq 'directory') {
       # Get the content of the URL unless we are not
       # reading directories
-      if ($FOLLOW_DIRS && defined $current->{url} && 
+      if ($FOLLOW_DIRS && defined $current->{url} &&
 	  !exists $followed_dirs{$current->{short_name}}) {
 	print "Following directory link to ". $current->{short_name}.
-	  "[".$current->{url}."]\n" 
+	  "[".$current->{url}."]\n"
 	  if $DEBUG;
 
 	# Indicate that we have followed this link
@@ -778,7 +778,7 @@ sub _token_mapping {
 SkyCat specific translations from the internal format to URL format
 go here.
 
-RA/Dec must match format described in 
+RA/Dec must match format described in
 http://vizier.u-strasbg.fr/doc/asu.html
 (at least for GSC) ie  hh:mm:ss.s+/-dd:mm:ss
 or decimal degrees.
@@ -844,7 +844,7 @@ sub _translate_one_to_one {
 =head1 NOTES
 
 'directory' entries are not followed by default although the class
-can be configured to do so by setting 
+can be configured to do so by setting
 
  $Astro::Catalog::Query::SkyCat::FOLLOW_DIRS = 1;
 

@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-WriteMakefile( 
+WriteMakefile(
                'NAME'           => 'Astro::ADS::Result::Paper',
 	       'VERSION_FROM'   => 'Paper.pm',
                'PREREQ_PM'      => { },

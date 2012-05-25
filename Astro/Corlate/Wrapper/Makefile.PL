@@ -8,7 +8,7 @@ $location = '-LFortran';
 $cor_lib = '-lCorlate';
 
 # LIBS line for ExtUtils::MakeMaker
-$libs = "$location $cor_lib -lm"; 
+$libs = "$location $cor_lib -lm";
 #$libs = $libs . ExtUtils::F77->runtime;
 
 WriteMakefile(

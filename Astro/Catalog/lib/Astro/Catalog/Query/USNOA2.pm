@@ -17,13 +17,13 @@ Astro::Catalog::Query::USNOA2 - A query request to the USNO-A2.0 Catalog
 
 =head1 DESCRIPTION
 
-The module is an object orientated interface to the online USNO-A2.0 
-catalogue at the ESO/ST-ECF archive site. 
+The module is an object orientated interface to the online USNO-A2.0
+catalogue at the ESO/ST-ECF archive site.
 
 Stores information about an prospective USNO-A2.0 query and allows the query to
 be made, returning an Astro::Catalog::USNOA2::Catalog object.
 
-The object will by default pick up the proxy information from the HTTP_PROXY 
+The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
@@ -129,7 +129,7 @@ sub _get_default_options {
 =item B<_parse_query>
 
 Private function used to parse the results returned in an USNO-A2.0 query.
-Should not be called directly. Instead use the querydb() assessor method to 
+Should not be called directly. Instead use the querydb() assessor method to
 make and parse the results.
 
 =cut
@@ -194,7 +194,7 @@ sub _parse_query {
            }
 
            # remove leading spaces
-           $buffer[$counter] =~ s/^\s+//; 
+           $buffer[$counter] =~ s/^\s+//;
 
            # split each line
            my @separated = split( /\s+/, $buffer[$counter] );
@@ -213,7 +213,7 @@ sub _parse_query {
               # ID
               my $id = $separated[1];
               #my $num = $counter - $line -2;
-              #print "# ID $id star $num\n"; 
+              #print "# ID $id star $num\n";
               $star->id( $id );
 
               # RA
@@ -234,7 +234,7 @@ sub _parse_query {
 					             name => $star->id(),
 					          ) );
               }
-              
+
               # R Magnitude
               #my %r_mag = ( R => $separated[8] );
               #$star->magnitudes( \%r_mag );
@@ -270,7 +270,7 @@ sub _parse_query {
            }
 
 
-           
+
            # Calculate error
            # ---------------
 
@@ -293,7 +293,7 @@ sub _parse_query {
            # mag errors
            #my %mag_errors = ( B => $delta_b,  R => $delta_r );
            #$star->magerr( \%mag_errors );
-			 
+
            # calcuate B-R colour and error
            # -----------------------------
 
@@ -314,30 +314,30 @@ sub _parse_query {
            #my %col_errors = ( 'B-R' => $delta_bmr );
            #$star->colerr( \%col_errors );
 
-          $star->fluxes( new Astro::Fluxes( 
-            new Astro::Flux( 
+          $star->fluxes( new Astro::Fluxes(
+            new Astro::Flux(
 	       new Number::Uncertainty( Value => $separated[8],
 	                                Error => $delta_r ),'mag', "R" ),
-            new Astro::Flux( 
+            new Astro::Flux(
 	       new Number::Uncertainty( Value => $separated[9],
 	                                Error => $delta_b),'mag', "B" ),
-            new Astro::FluxColor( lower => "R", upper => "B", 
-	                          quantity => new Number::Uncertainty( 
+            new Astro::FluxColor( lower => "R", upper => "B",
+	                          quantity => new Number::Uncertainty(
 	                                Value => $b_minus_r,
-	                                Error => $delta_bmr) ),								
+	                                Error => $delta_bmr) ),
 			));
-			
+
            # Push the star into the catalog
            # ------------------------------
-           
-           # only push the star if the Astro::Coords object is 
+
+           # only push the star if the Astro::Coords object is
            # correctly defined. The Dec might be bogus since the
-           # USNO-A2 catalogue has its seconds field out of 
+           # USNO-A2 catalogue has its seconds field out of
            # normal range (0-59.9) in some cases.
            if( $star->coords() ) {
               $catalog->pushstar( $star );
            }
-	   
+
            # increment counter
            # -----------------
            $counter = $counter + 1;

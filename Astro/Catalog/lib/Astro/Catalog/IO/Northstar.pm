@@ -69,7 +69,7 @@ sub _read_catalog {
   croak "Must supply catalogue contents as a reference to an array"
     unless ref($lines) eq 'ARRAY';
 
-  # Create a new telescope to associate with this 
+  # Create a new telescope to associate with this
   my $tel;
   $tel = new Astro::Telescope( $options{telescope} )
     if $options{telescope};

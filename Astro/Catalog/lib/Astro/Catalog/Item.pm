@@ -245,8 +245,8 @@ $Id: Item.pm,v 1.13 2007/09/25 23:23:43 cavanagh Exp $
 Create a new instance from a hash of options
 
 
-  $star = new Astro::Catalog::Item( 
-               ID           => $id, 
+  $star = new Astro::Catalog::Item(
+               ID           => $id,
                Coords	    => new Astro::Coords(),
                Morphology   => new Astro::Catalog::Item::Morphology(),
                Fluxes	    => new Astro::Fluxes(),
@@ -352,7 +352,7 @@ inside this Star object and not a clone. If the coordinates
 are changed through this object the coordinate of the star is
 also changed.
 
-Currently, if you modify the RA or Dec through the ra() 
+Currently, if you modify the RA or Dec through the ra()
 or dec() methods of Star, the internal object associated with
 the Star will change.
 
@@ -564,8 +564,8 @@ Return or set the flux measurements of the star as an C<Astro::Fluxes>
 object.
 
   $f = $star->fluxes();
-  $star->fluxes( $f );    
-  
+  $star->fluxes( $f );
+
   $star->fluxes( $f, 1 );  # will replace instead of appending
 
 
@@ -620,10 +620,10 @@ sub what_filters {
   my $self = shift;
 
   my $fluxes = $self->{FLUXES};
-  
+
   #use Data::Dumper; print Dumper( $self->{FLUXES} );
   my @mags = $fluxes->original_wavebands('filters') if defined $fluxes;
-  
+
   # return array of filters or number if called in scalar context
   return wantarray ? @mags : scalar( @mags );
 }
@@ -645,7 +645,7 @@ sub what_colours {
 
   my $fluxes = $self->{FLUXES};
   my @cols = $fluxes->original_colors() if defined $fluxes;
-    
+
   # return array of colours or number if called in scalar context
   return wantarray ? @cols : scalar( @cols );
 }
@@ -661,9 +661,9 @@ Returns the magnitude for the supplied filter if available
 
 sub get_magnitude {
   my $self = shift;
-  #warnings::warn("Astro::Item::get_magnitude is deprecated") 
+  #warnings::warn("Astro::Item::get_magnitude is deprecated")
   #					  if warnings::enabled();
-					   
+
   my $magnitude;
   if (@_) {
 
@@ -735,7 +735,7 @@ Returns the error in the magnitude value for the supplied filter if available
 
 sub get_errors {
   my $self = shift;
-  #warnings::warn("Astro::Item::get_errors is deprecated") 
+  #warnings::warn("Astro::Item::get_errors is deprecated")
   #					  if warnings::enabled();
 
   my $mag_error;
@@ -808,9 +808,9 @@ Returns the value of the supplied colour if available
 
 sub get_colour {
   my $self = shift;
-  #warnings::warn("Astro::Item::get_colour is deprecated") 
+  #warnings::warn("Astro::Item::get_colour is deprecated")
   #					  if warnings::enabled();
-  
+
   my $value;
   if (@_) {
 
@@ -818,10 +818,10 @@ sub get_colour {
      my $colour = shift;
      my @filters = split "-", $colour;
      my $fluxes = $self->{FLUXES};
-     my $color = $fluxes->color( 
+     my $color = $fluxes->color(
         upper => new Astro::WaveBand( Filter => $filters[0] ),
         lower => new Astro::WaveBand( Filter => $filters[1] ) );
-     $value = $color->quantity('mag');	
+     $value = $color->quantity('mag');
   }
   return $value;
 }
@@ -836,7 +836,7 @@ Returns the error in the colour value for the supplied colour if available
 
 sub get_colourerr {
   my $self = shift;
-  #warnings::warn("Astro::Item::get_colourerr is deprecated") 
+  #warnings::warn("Astro::Item::get_colourerr is deprecated")
   #					  if warnings::enabled();
 
   my $col_error;
@@ -846,14 +846,14 @@ sub get_colourerr {
      my $colour = shift;
      my @filters = split "-", $colour;
      my $fluxes = $self->{FLUXES};
-     my $color = $fluxes->color( 
+     my $color = $fluxes->color(
         upper => new Astro::WaveBand( Filter => $filters[0] ),
         lower => new Astro::WaveBand( Filter => $filters[1] ) );
-	
+
      #use Data::Dumper; print Dumper( $color );
-     $col_error = $color->error('mag');	
-     
-    
+     $col_error = $color->error('mag');
+
+
   }
   return $col_error;
 }
@@ -937,7 +937,7 @@ constants on catalog I/O.
 sub quality {
   my $self = shift;
   if (@_) {
-  
+
     # 2MASS hack
     # ----------
     # quick, dirty and ultimately icky hack. The entire quality flag
@@ -945,47 +945,47 @@ sub quality {
     # and gets assocaited with a magnitude. For now, if the JHK QFlag
     # for 2MASS is A,B or C then the internal quality flag is 0 (good),
     # otherwise it gets set to 1 (bad). This pretty much sucks.
-    
-    # Yes Tim, I know I'm doing this in the wrong place. I'm panicing 
+
+    # Yes Tim, I know I'm doing this in the wrong place. I'm panicing
     # I'll fix it later. I've moved the Cluster specific hack about the
     # star ID's out of Astro::Catalog::query::USNOA2 and into the Cluster
     # IO module and used Scalar::Util to figure out whether I've got a
     # number (neat solution) before blowing it away.
-    
+
     # Anyway...
     my $quality = shift;
-    
+
     # Shouldn't happen?
     unless ( defined $quality ) {
       $self->{QUALITY} = undef;
       return undef;
-    }  
+    }
 
     if ( $quality =~ /^[A-Z][A-Z][A-Z]$/ ) {
-       
+
        $_ = $quality;
        m/^([A-Z])([A-Z])([A-Z])$/;
-       
+
        my $j_quality = $1;
        my $h_quality = $2;
        my $k_quality = $3;
-       
+
        if ( ($j_quality eq 'A' || $j_quality eq 'B' || $j_quality eq 'C') &&
             ($h_quality eq 'A' || $h_quality eq 'B' || $h_quality eq 'C') ) {
-       
+
           # good quality
           $self->{QUALITY} = 0;
-          
-       } else { 
-          # bad quality  
+
+       } else {
+          # bad quality
           $self->{QUALITY} = 1;
        }
-       
+
     } else {
-    
+
        $self->{QUALITY} = $quality;
     }
-          
+
   }
   return $self->{QUALITY};
 }
@@ -1014,7 +1014,7 @@ Return (or set) the GSC flag for the object
    $gsc = $star->gsc();
    $star->gsc( 'TRUE' );
 
-the flag is TRUE if the object is known to be in the Guide Star Catalogue, 
+the flag is TRUE if the object is known to be in the Guide Star Catalogue,
 and FALSE otherwise.
 
 =cut
@@ -1312,10 +1312,10 @@ time of observation of the object.
 sub fluxdatestamp {
   my $self = shift;
   if( @_ ) {
-    my $datetime = shift; 
+    my $datetime = shift;
     croak "Astro::Catalog::Item::fluxdatestamp()\n".
           "Error: Not a DateTime object\n"
-                      unless UNIVERSAL::isa( $datetime, "DateTime" );   
+                      unless UNIVERSAL::isa( $datetime, "DateTime" );
     $self->{FLUXES}->datestamp( $datetime );
   }
   return $self->{FLUXES};
@@ -1336,11 +1336,11 @@ the star is too far away.
 sub distancetostar {
   my $self = shift;
   my $other = shift;
-  
+
   croak "Astro::Catalog::Item::distancetostar()\n".
         "Error: Not an Astro::Catalog::Item object\n"
-        unless UNIVERSAL::isa( $other, "Astro::Catalog::Item" );    
-  
+        unless UNIVERSAL::isa( $other, "Astro::Catalog::Item" );
+
   my $sep = $self->coords->distance( $other->coords );
   return (defined $sep ? $sep->arcsec : $sep );
 }
@@ -1360,14 +1360,14 @@ sub within {
   my $self = shift;
   my $other = shift;
   my $max = shift;
- 
+
   croak "Astro::Catalog::Item::within()\n".
         "Error: Not an Astro::Catalog::Item object\n"
-        unless UNIVERSAL::isa( $other, "Astro::Catalog::Item" );    
-	  
+        unless UNIVERSAL::isa( $other, "Astro::Catalog::Item" );
+
   my $distance = $self->distancetostar( $other );
   return 1 if $distance < $max;
-  return 0;  
+  return 0;
 }
 
 
@@ -1489,9 +1489,9 @@ sub configure {
 			       );
 
       # Make sure we have the same reference place and time
-      $c->datetime( $check{coords}->datetime ) 
+      $c->datetime( $check{coords}->datetime )
 	if $check{coords}->has_datetime;
-      $c->telescope( $check{coords}->telescope ) 
+      $c->telescope( $check{coords}->telescope )
 	if defined $check{coords}->telescope;
 
 

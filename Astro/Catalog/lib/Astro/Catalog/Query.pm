@@ -191,7 +191,7 @@ sub target {
   my $self = shift;
 
   # SETTING IDENTIFIER
-  if (@_) { 
+  if (@_) {
 
     # grab the new object name
     my $ident = shift;
@@ -277,8 +277,8 @@ Set or query the order in which the stars are listed in the catalogue
    $sort = $query->sort();
    $query->sort( 'RA' );
 
-valid options are RA, DEC, RMAG, BMAG, DIST (distance to centre of the 
-requested field) and POS (the position angle to the centre of the field).  
+valid options are RA, DEC, RMAG, BMAG, DIST (distance to centre of the
+requested field) and POS (the position angle to the centre of the field).
 
 =cut
 

@@ -18,14 +18,14 @@ Astro::Catalog::Query::Vizier - A query request to the Vizier catalogs
 
 =head1 DESCRIPTION
 
-The module is an object orientated interface to the online 
+The module is an object orientated interface to the online
 Vizier catalogs. Multiple catalogues can be specified using a
 comma-separated list.
 
 Stores information about an prospective query and allows the query to
 be made, returning an Astro::Catalog::Query::Vizier object.
 
-The object will by default pick up the proxy information from the HTTP_PROXY 
+The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
@@ -138,7 +138,7 @@ sub _get_default_options {
 =item B<_parse_query>
 
 Private function used to parse the results returned in an GSC query.
-Should not be called directly. Instead use the querydb() assessor method to 
+Should not be called directly. Instead use the querydb() assessor method to
 make and parse the results.
 
 =cut

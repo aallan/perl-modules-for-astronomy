@@ -12,7 +12,7 @@ Tk::SourceCatalog - creates a self-standing sources catalog widget
 
 =head1 DESCRIPTION
 
-Tk::AstroCatalog creates a non-editable text widget, displaying 
+Tk::AstroCatalog creates a non-editable text widget, displaying
 sources from a default catalog or user-selected catalog file.
 
 =cut
@@ -52,7 +52,7 @@ Create a new Tk::AstroCatalog object.  A new catalog object will be
 created.  Callbacks must be specified for -addCmd and -upDate; a
 warning is issued for -onDestroy when it is missing.
 
-  $cat = new Tk::AstroCatalog($MW, 
+  $cat = new Tk::AstroCatalog($MW,
 			    -addCmd => $addCmd,
 			    -upDate => $upDate,
 			    -onDestroy => $onDestroy);
@@ -60,7 +60,7 @@ warning is issued for -onDestroy when it is missing.
 Additionally a pre-existing Astro::Catalog object can be supplied
 using the "-catalog" option.
 
-  $cat = new Tk::AstroCatalog($MW, 
+  $cat = new Tk::AstroCatalog($MW,
 			    -addCmd => $addCmd,
 			    -upDate => $upDate
 			    -catalog => $cat,
@@ -136,7 +136,7 @@ sub new {
   $self->makeCatalog();
   return $self;
 }
- 
+
 #
 #  Common data manipulation functions
 #
@@ -194,7 +194,7 @@ sub AddCommand
 	return $self->{AddCommand};
 }
 
-=item UpDate 
+=item UpDate
 
 returns and sets the UpDate callback code for the catalog
 
@@ -224,7 +224,7 @@ sub UpDate
 	return $self->{upDate};
 }
 
-=item Reset 
+=item Reset
 
 returns and sets the onDestroy callback code for the catalog
 
@@ -233,7 +233,7 @@ returns and sets the onDestroy callback code for the catalog
 
 =cut
 
-sub Reset 
+sub Reset
 {
 	my $self = shift;
 	if(@_)
@@ -251,9 +251,9 @@ sub Reset
 	return $self->{Reset};
 }
 
-=item Toplevel 
+=item Toplevel
 
-returns and sets the name of the Toplevel 
+returns and sets the name of the Toplevel
 
   $toplevel = $cat->Toplevel();
   $cat->Toplevel($top);
@@ -336,9 +336,9 @@ sub RefLabel {
   return \$self->{RefLabel};
 }
 
-=item CatClass 
+=item CatClass
 
-returns and sets the name of the CatClass 
+returns and sets the name of the CatClass
 
   $class = $cat->CatClass();
   $cat->CatClass($class);
@@ -354,7 +354,7 @@ sub CatClass {
 	return $self->{CatClass};
 }
 
-=item Selected 
+=item Selected
 
 returns the Selected array or the indexed value of this array
 
@@ -376,9 +376,9 @@ sub Selected
 		return $self->{Selected}->[$index];
 	}
 	return $self->{Selected};
-} 
+}
 
-=item file 
+=item file
 
 returns and sets the File name
 
@@ -397,7 +397,7 @@ sub file
 	return $self->{File};
 }
 
-=item makeCatalog 
+=item makeCatalog
 
 makeCatalog creates a window that displays the
 contents of a catalog and allows the user to select as
@@ -408,7 +408,7 @@ many entries as the user wishes.
 
 =cut
 
-sub makeCatalog 
+sub makeCatalog
 {
   my $self = shift;
   my $selected = $self->{Selected};
@@ -421,7 +421,7 @@ sub makeCatalog
 
   my @Sources;
   my $topFrame = $Top->Frame(-relief=>'groove', -borderwidth =>2, -width =>50)->pack(-padx=>10, -fill => 'x', -ipady=>3, -pady => 10);
-  
+
   # create the header
   my $headFrame = $topFrame->Frame(-relief=>'flat', -borderwidth =>2)->grid(-row=>0, -sticky=>'nsew', -ipadx => 3);
   my $head = $topFrame->Text(
@@ -441,10 +441,10 @@ sub makeCatalog
 
   # create the text scrollable window
   my $T = $topFrame->Scrolled('Text',
-			      -scrollbars => 'e',		  
+			      -scrollbars => 'e',
 			      -wrap       => 'none',
 			      -width      => 100,
-			      -height     => 15, 
+			      -height     => 15,
 			      -font       => '-*-Courier-Medium-R-Normal--*-120-*-*-*-*-*-*',
 			      -setgrid    => 1,
 			     )->grid(qw/-sticky nsew/);
@@ -470,18 +470,18 @@ sub makeCatalog
   }
 
   # create the Add button
-  my $addBut = $buttonF->Button( -text=>'Add', 
-		    -relief => 'raised', 
+  my $addBut = $buttonF->Button( -text=>'Add',
+		    -relief => 'raised',
 		    -width        => 7,
 		    -command => sub {
 			my $callback = $self->AddCommand;
 			my $selected = $self->Selected;
-			# turn off tags	
+			# turn off tags
 		  	foreach my $one (@$selected) {
 			  # KLUGE source does not have index attribute
 		          $T->tag('configure', 'd'.$one->{index}, -foreground => 'blue');
 		  	}
-			#$callback->(@$selected);	
+			#$callback->(@$selected);
 			$callback->($selected);
 
 			if ($self->Transient) {
@@ -492,8 +492,8 @@ sub makeCatalog
 
   # create the Search button
   my $searchBut;
-  $searchBut = $buttonF->Button( -text=>'Search', 
-		    -relief => 'raised', 
+  $searchBut = $buttonF->Button( -text=>'Search',
+		    -relief => 'raised',
 		    -width        => 7,
 		    -command => sub {
 		      $searchBut->configure(-state=>'disabled');
@@ -504,12 +504,12 @@ sub makeCatalog
   my $catEnt;
 
   # create the Rescan button
-  my $rescanBut = $buttonF->Button( -text=>'Rescan', 
-		    -relief => 'raised', 
+  my $rescanBut = $buttonF->Button( -text=>'Rescan',
+		    -relief => 'raised',
 		    -width        => 7,
 		    -command => sub {
 		      $self->file($catEnt->get);
-                      # reset current array to original list 
+                      # reset current array to original list
 		      $self->Catalog->reset_list;
 		      $self->fillWithSourceList ('full');
 		    })->pack(-side=>'right', -padx =>'20');
@@ -530,27 +530,27 @@ sub makeCatalog
 			});
   $sortmenu->command(-label=>'Dec', -command=> sub {
 			$self->Catalog->sort_catalog('dec');
-			$self->fillWithSourceList ('full'); 
+			$self->fillWithSourceList ('full');
 			});
   $sortmenu->command(-label=>'Az', -command=> sub {
 			$self->Catalog->sort_catalog('az');
-			$self->fillWithSourceList ('full'); 
+			$self->fillWithSourceList ('full');
 			});
   $sortmenu->command(-label=>'El', -command=> sub {
 			$self->Catalog->sort_catalog('el');
-			$self->fillWithSourceList ('full'); 
+			$self->fillWithSourceList ('full');
 			});
   # add sort by distance if we have a reference position
   if ($self->Catalog->reference) {
     $sortmenu->command(-label=>'Distance', -command=> sub {
 			 $self->Catalog->sort_catalog('distance');
-			 $self->fillWithSourceList ('full'); 
+			 $self->fillWithSourceList ('full');
 		       });
   }
 
 
   $sortmenu->pack(-side=>'right', -padx=>'20');
-  
+
   # create the catalog menu button
   my $catB = $buttonF2->Menubutton( -text=>'Catalogs', -relief => 'raised', -width => 8);
   $catB->command(-label =>'Default Catalog', -command=> sub{
@@ -598,7 +598,7 @@ sub makeCatalog
 
   # Create the catalog file label
   $buttonF2->Label (
-  		     -text => "Catalog file:", 
+  		     -text => "Catalog file:",
   		    )->pack(-side=>'left');
   $catEnt = $buttonF2->Entry(-relief=>'sunken',
   				-width=>37)->pack(-side=>'left', -padx =>10);
@@ -653,7 +653,7 @@ Remove the widget from display. Calls the Reset handler.
 sub destroy {
   my $self = shift;
   my $callback = $self->Reset;
-  $callback->() if defined $callback; 
+  $callback->() if defined $callback;
   my $Top = $self->Toplevel;
   $Top->destroy() if defined $Top && Exists($Top);
 }
@@ -690,7 +690,7 @@ Also triggers the UpDate method.
 #  fills a Text box with the list of current sources
 #
 sub fillWithSourceList {
-  my(@bold, @normal);  
+  my(@bold, @normal);
   my $self = shift;
   my $T = $self->Text;
   my $selected = $self->Selected;
@@ -792,11 +792,11 @@ sub fillWithSourceList {
 	}
       }
     }
-  
+
     $len = @sources;
     for ($itag=0; $itag < $len; $itag++) {
       my $dtag = "d$itag";
-      $T->tag('bind', $dtag, '<Any-Enter>' => 
+      $T->tag('bind', $dtag, '<Any-Enter>' =>
 	      sub {
 		shift->tag('configure', $dtag, @bold);
 	      }
@@ -806,7 +806,7 @@ sub fillWithSourceList {
 		shift->tag('configure', $dtag, @normal);
 	      }
 	     );
-      $T->tag('bind', $dtag, '<ButtonRelease-1>' => 
+      $T->tag('bind', $dtag, '<ButtonRelease-1>' =>
 	      sub {
 		if (!$BUSY){
 		  if (! $self->isWithin ($sources[substr($dtag,1,99)], @$selected) ) {
@@ -830,17 +830,17 @@ sub fillWithSourceList {
 		  push (@$selected, $source);
 		  my $T = shift;
 		 # my $callback = $self->UpDate;
-	         # $callback->();	
+	         # $callback->();
 		  my $callback = $self->AddCommand;
-		  # turn off tags	
+		  # turn off tags
 		  foreach $source (@$selected) {
 		    # KLUGE source does not have index attribute
 		    	$T->tag('configure', 'd'.$source->{index}, -foreground => 'blue');
 		  }
-		print " ref(@$selected) is selected \n" if $locateBug; 
+		print " ref(@$selected) is selected \n" if $locateBug;
 		my @array = [1..2];
-		 # $callback->(@array);	
-		  $callback->($selected);	
+		 # $callback->(@array);
+		  $callback->($selected);
 		  $BUSY = 0;
 		  @$selected = ();
 
@@ -849,9 +849,9 @@ sub fillWithSourceList {
 		});
     }
   }
-  
+
   $T->mark(qw/set insert 1.0/);
-  
+
   # Disable access to infobox
   $T->configure(-state=>'disabled');
 
@@ -859,7 +859,7 @@ sub fillWithSourceList {
   $self->UpDate->( $self );
 }
 
-=item color 
+=item color
 
 returns a color from @COLOR_LIST and increments the latter's index
 
@@ -878,7 +878,7 @@ sub getColor {
   return $color;
 }
 
-=item error 
+=item error
 
 Displays an error message in Tk
 
@@ -892,7 +892,7 @@ Displays an error message in Tk
 sub error {
   my $MW = shift;
   my $errWin = $MW->Toplevel(-borderwidth=>10);
-  $errWin->title('Observation Log Error!');  
+  $errWin->title('Observation Log Error!');
   $errWin->resizable(0,0);
   $errWin->Button(
      -text         => 'Ok',
@@ -901,7 +901,7 @@ sub error {
   })->pack(-side=>'bottom');
   my $message = shift;
   $errWin->Label (
-    -text => "\nError!\n\n   ".$message."   \n", 
+    -text => "\nError!\n\n   ".$message."   \n",
     -relief=>'sunken'
   )->pack(-side=>'bottom', -pady => 10);
   $errWin->title(shift) if @_;
@@ -909,14 +909,14 @@ sub error {
   $errWin->grab;
 }
 
-=item inswt 
+=item inswt
 
  inswt inserts text into a given text widget and applies
  one or more tags to that text.
 
  Parameters:
         $text  -  Text to insert (it's inserted at the "insert" mark)
-        $args  -  One or more tags to apply to text.  If this is empty 
+        $args  -  One or more tags to apply to text.  If this is empty
                   then all tags are removed from the text.
 
    $cat->inswt($text, $args);
@@ -932,7 +932,7 @@ sub error {
 #
 # Parameters:
 #        $text  -  Text to insert (it's inserted at the "insert" mark)
-#        $args  -  One or more tags to apply to text.  If this is empty 
+#        $args  -  One or more tags to apply to text.  If this is empty
 #                  then all tags are removed from the text.
 #
 # Returns:  Nothing
@@ -955,7 +955,7 @@ sub inswt {
 } # end inswt
 
 
-=item getSource 
+=item getSource
 
 getSource prompts the user to enter source coords and name
 Can specify previous source object to edit.
@@ -1040,7 +1040,7 @@ sub getSource {
   return;
 }
 
-=item isWithin 
+=item isWithin
 
   isWithin returns a boolean value as to whether an element is
   within the array specified.
@@ -1064,7 +1064,7 @@ sub isWithin {
   return 0;
 }
 
-=item remove 
+=item remove
 
    Removes the item passed from the array specified.
 

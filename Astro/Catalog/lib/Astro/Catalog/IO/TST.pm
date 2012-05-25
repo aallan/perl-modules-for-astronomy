@@ -287,7 +287,7 @@ sub _read_catalog {
 
   # Now convert the information into a star object
 
-  # This is a back-of-the-envelope data dictionary from looking at 
+  # This is a back-of-the-envelope data dictionary from looking at
   # USNO-A2, 2MASS, Bright Star Catalogues and SuperCOSMOS. Maps the
   # Astro::Catalog::Star methods to different columns names
   my %datadict = (
@@ -535,7 +535,7 @@ Returns back the columns.
  @content = $class->_parse_line( $line );
 
 This routine is trivial but it seemed sensible to put it in a function
-since the parse is done in more than one place in _read_catalog. 
+since the parse is done in more than one place in _read_catalog.
 Whitespace around the column separators is stripped.
 
 =cut

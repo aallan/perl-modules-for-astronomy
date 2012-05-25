@@ -2,7 +2,7 @@ package Astro::ADS::Query;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::ADS::Query
 
@@ -38,7 +38,7 @@ Astro::ADS::Query - Object definining an prospective ADS query.
   $query = new Astro::ADS::Query( Authors     => \@authors,
                                   AuthorLogic => $aut_logic,
                                   Objects     => \@objects,
-                                  ObjectLogic => $obj_logic, 
+                                  ObjectLogic => $obj_logic,
                                   Bibcode     => $bibcode,
                                   Proxy       => $proxy,
                                   Timeout     => $timeout,
@@ -49,9 +49,9 @@ Astro::ADS::Query - Object definining an prospective ADS query.
 =head1 DESCRIPTION
 
 Stores information about an prospective ADS query and allows the query to
-be made, returning an Astro::ADS::Result object. 
+be made, returning an Astro::ADS::Result object.
 
-The object will by default pick up the proxy information from the HTTP_PROXY 
+The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
@@ -90,7 +90,7 @@ Create a new instance from a hash of options
   $query = new Astro::ADS::Query( Authors     => \@authors,
                                   AuthorLogic => $aut_logic,
                                   Objects     => \@objects,
-                                  ObjectLogic => $obj_logic, 
+                                  ObjectLogic => $obj_logic,
                                   Bibcode     => $bibcode,
                                   Proxy       => $proxy,
                                   Timeout     => $timeout,
@@ -247,10 +247,10 @@ sub url {
   my $self = shift;
 
   # SETTING URL
-  if (@_) { 
+  if (@_) {
 
-    # set the url option 
-    my $base_url = shift; 
+    # set the url option
+    my $base_url = shift;
     $self->{URL} = $base_url;
     if( defined $base_url ) {
        $self->{QUERY} = "http://$base_url/cgi-bin/nph-abs_connect?";
@@ -293,9 +293,9 @@ sub authors {
   my $self = shift;
 
   # SETTING AUTHORS
-  if (@_) { 
+  if (@_) {
 
-    # clear the current author list   
+    # clear the current author list
     ${$self->{OPTIONS}}{"author"} = "";
 
     # grab the new list from the arguements
@@ -311,13 +311,13 @@ sub authors {
        if ( $i eq 0 ) {
           ${$self->{OPTIONS}}{"author"} = $author_list[$i];
        } else {
-          ${$self->{OPTIONS}}{"author"} = 
-               ${$self->{OPTIONS}}{"author"} . ";" . $author_list[$i]; 
+          ${$self->{OPTIONS}}{"author"} =
+               ${$self->{OPTIONS}}{"author"} . ";" . $author_list[$i];
        }
     }
   }
 
-  # RETURNING AUTHORS 
+  # RETURNING AUTHORS
   my $author_line =  ${$self->{OPTIONS}}{"author"};
   $author_line =~ s/\+/ /g;
   my @authors = split(/;/, $author_line);
@@ -343,7 +343,7 @@ sub authorlogic {
 
   if (@_) {
 
-     my $logic = shift; 
+     my $logic = shift;
      if ( $logic eq "OR"   || $logic eq "AND" || $logic eq "SIMPLE" ||
           $logic eq "BOOL" || $logic eq "FULLMATCH" ) {
 
@@ -386,13 +386,13 @@ sub objects {
        if ( $i eq 0 ) {
           ${$self->{OPTIONS}}{"object"} = $object_list[$i];
        } else {
-          ${$self->{OPTIONS}}{"object"} = 
+          ${$self->{OPTIONS}}{"object"} =
                ${$self->{OPTIONS}}{"object"} . ";" . $object_list[$i];
        }
     }
   }
 
-  # RETURNING OBJECTS 
+  # RETURNING OBJECTS
   my $object_line =  ${$self->{OPTIONS}}{"object"};
   $object_line =~ s/\+/ /g;
   my @objects = split(/;/, $object_line);
@@ -419,7 +419,7 @@ sub objectlogic {
 
   if (@_) {
 
-     my $logic = shift; 
+     my $logic = shift;
      if ( $logic eq "OR"   || $logic eq "AND" || $logic eq "SIMPLE" ||
           $logic eq "BOOL" || $logic eq "FULLMATCH" ) {
 
@@ -444,9 +444,9 @@ sub bibcode {
   my $self = shift;
 
   # SETTING BIBCODE
-  if (@_) { 
+  if (@_) {
 
-    # set the bibcode option  
+    # set the bibcode option
     ${$self->{OPTIONS}}{"bibcode"} = shift;
   }
 
@@ -468,9 +468,9 @@ sub startmonth {
   my $self = shift;
 
   # SETTING STARTING MONTH
-  if (@_) { 
+  if (@_) {
 
-    # set the starting month option  
+    # set the starting month option
     ${$self->{OPTIONS}}{"start_mon"} = shift;
   }
 
@@ -492,9 +492,9 @@ sub endmonth {
   my $self = shift;
 
   # SETTING END MONTH
-  if (@_) { 
+  if (@_) {
 
-    # set the end month option  
+    # set the end month option
     ${$self->{OPTIONS}}{"end_mon"} = shift;
   }
 
@@ -516,9 +516,9 @@ sub startyear {
   my $self = shift;
 
   # SETTING START YEAR
-  if (@_) { 
+  if (@_) {
 
-    # set the starting year option  
+    # set the starting year option
     ${$self->{OPTIONS}}{"start_year"} = shift;
   }
 
@@ -540,9 +540,9 @@ sub endyear {
   my $self = shift;
 
   # SETTING END YEAR
-  if (@_) { 
+  if (@_) {
 
-    # set the end year option  
+    # set the end year option
     ${$self->{OPTIONS}}{"end_year"} = shift;
   }
 
@@ -558,7 +558,7 @@ Return (or set) whether refereed, non-refereed (OTHER) or all bibilographic sour
    $query->journal( "REFEREED" );
    $query->journal( "OTHER" );
    $query->journal( "ALL" );
-   
+
    $journals = $query->journal();
 
 the default is ALL bibilographic sources
@@ -569,17 +569,17 @@ sub journal {
   my $self = shift;
 
   # SETTING END YEAR
-  if (@_) { 
+  if (@_) {
 
     my $source = shift;
-    
+
     if ( $source eq "REFEREED" ) {
        ${$self->{OPTIONS}}{"jou_pick"} = "NO";
     } elsif ( $source eq "OTHER" ) {
        ${$self->{OPTIONS}}{"jou_pick"} = "EXCL";
     } else {
        ${$self->{OPTIONS}}{"jou_pick"} = "ALL";
-    }  
+    }
 
   }
 
@@ -614,17 +614,17 @@ sub configure {
 
   # define the default base URL
   $self->{URL} = "cdsads.u-strasbg.fr";
-  
+
   # define the query URLs
   my $default_url = $self->{URL};
   $self->{QUERY} = "http://$default_url/cgi-bin/nph-abs_connect?";
   $self->{FOLLOWUP} = "http://$default_url/cgi-bin/nph-ref_query?";
 
-   
+
   # Setup the LWP::UserAgent
   my $HOST = hostname();
   my $DOMAIN = hostdomain();
-  $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
+  $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 );
   $self->{USERAGENT}->agent("Astro::ADS/$VERSION ($HOST.$DOMAIN)");
 
   # Grab Proxy details from local environment
@@ -689,7 +689,7 @@ sub configure {
   my %args = @_;
 
   # Loop over the allowed keys and modify the default query options
-  for my $key (qw / Authors AuthorLogic Objects ObjectLogic Bibcode 
+  for my $key (qw / Authors AuthorLogic Objects ObjectLogic Bibcode
                     StartMonth EndMonth StartYear EndYear Journal
                     Proxy Timeout URL/ ) {
       my $method = lc($key);
@@ -741,7 +741,7 @@ sub _make_query {
 
    # build final query URL
    $URL = $URL . $options;
-   
+
    # build request
    my $request = new HTTP::Request('GET', $URL);
 
@@ -749,43 +749,43 @@ sub _make_query {
    my $reply = $ua->request($request);
 
    if ( ${$reply}{"_rc"} eq 200 ) {
-   
+
       # stuff the page contents into the buffer
       $self->{BUFFER} = ${$reply}{"_content"};
-      
+
    } elsif ( ${$reply}{"_rc"} eq 500 ) {
-   
+
       # we may have a network unreachable, or we may have a no reference
       # selected error returned by ADS (go figure)
 
       $self->{BUFFER} = ${$reply}{"_content"};
       my @buffer = split( /\n/,$self->{BUFFER});
       chomp @buffer;
-            
+
       # assume we have an error unless we can prove otherwise
       my $error_flag = 1;
-      
+
       foreach my $line ( 0 ... $#buffer ) {
           if( $buffer[$line] =~ "No reference selected" ) {
-       
+
              # increment the counter and drop out of the loop
              $line = $#buffer;
              $error_flag = 0;
-          }      
+          }
       }
-      
+
       # we definately have an error
-      if( $error_flag ) { 
+      if( $error_flag ) {
          $self->{BUFFER} = undef;
          croak("Error ${$reply}{_rc}: Failed to establish network connection");
       }
-      
+
    } else {
       $self->{BUFFER} = undef;
       croak("Error ${$reply}{_rc}: Failed to establish network connection");
    }
-   
-   
+
+
 }
 
 =item B<_make_followup>
@@ -819,7 +819,7 @@ sub _make_followup {
    my $fmt = ${$self->{OPTIONS}}{"return_fmt"};
 
    # build the final query URL
-   $URL = $URL . "bibcode=$bibcode&refs=$refs&db_key=$db_key&data_type=$data_type&return_fmt=$fmt"; 
+   $URL = $URL . "bibcode=$bibcode&refs=$refs&db_key=$db_key&data_type=$data_type&return_fmt=$fmt";
 
    # build request
    my $request = new HTTP::Request('GET', $URL);
@@ -838,7 +838,7 @@ sub _make_followup {
 
 =item B<_parse_query>
 
-Private function used to parse the results returned in an ADS query. Should 
+Private function used to parse the results returned in an ADS query. Should
 not be called directly. Instead use the querydb() assessor method to make and
 parse the results.
 
@@ -881,16 +881,16 @@ sub _parse_query {
 
         # increment the counter and drop out of the loop
         $line = $#buffer;
-        
+
      }
-     
+
      # NO ABSTRACT (HTML version)
      if( $buffer[$line] =~ "No reference selected" ) {
-       
+
        # increment the counter and drop out of the loop
         $line = $#buffer;
      }
-     
+
      # NEW PAPER
      if( substr( $buffer[$line], 0, 2 ) eq "%R" ) {
 
@@ -907,7 +907,7 @@ sub _parse_query {
         $counter++;
 
         # LOOP THROUGH PAPER
-        my ( @title, @authors, @affil, @journal, @pubdate, @keywords, 
+        my ( @title, @authors, @affil, @journal, @pubdate, @keywords,
              @origin, @links, @url, @object, @abstract, @score );
         while ( $counter <= $#buffer &&
                 substr( $buffer[$counter], 0, 2 ) ne "%R" ) {
@@ -1361,4 +1361,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

@@ -2,7 +2,7 @@ package Astro::DSS;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::DSS
 
@@ -50,7 +50,7 @@ Astro::DSS - An Object Orientated interface to the Digital Sky Survey
 Stores information about an prospective DSS query and allows the query to
 be made, returning a filename pointing to the file returned.
 
-The object will by default pick up the proxy information from the HTTP_PROXY 
+The object will by default pick up the proxy information from the HTTP_PROXY
 and NO_PROXY environment variables, see the LWP::UserAgent documentation for
 details.
 
@@ -213,10 +213,10 @@ sub url {
   my $self = shift;
 
   # SETTING URL
-  if (@_) { 
+  if (@_) {
 
-    # set the url option 
-    my $base_url = shift; 
+    # set the url option
+    my $base_url = shift;
     $self->{URL} = $base_url;
     if( defined $base_url ) {
        $self->{QUERY} = "http://$base_url/dss/dss/image?";
@@ -258,16 +258,16 @@ sub ra {
   my $self = shift;
 
   # SETTING R.A.
-  if (@_) { 
-    
+  if (@_) {
+
     # grab the new R.A.
     my $ra = shift;
-    
-    # mutilate it and stuff it and the current $self->{RA} 
+
+    # mutilate it and stuff it and the current $self->{RA}
     $ra =~ s/\s/\+/g;
     ${$self->{OPTIONS}}{"ra"} = $ra;
   }
-  
+
   # un-mutilate and return a nicely formated string to the user
   my $ra = ${$self->{OPTIONS}}{"ra"};
   $ra =~ s/\+/ /g;
@@ -286,21 +286,21 @@ or -40 25 67.89
 
 =cut
 
-sub dec { 
+sub dec {
   my $self = shift;
 
   # SETTING DEC
-  if (@_) { 
+  if (@_) {
 
     # grab the new Dec
     my $dec = shift;
-    
-    # mutilate it and stuff it and the current $self->{DEC} 
+
+    # mutilate it and stuff it and the current $self->{DEC}
     $dec =~ s/\+/%2B/g;
     $dec =~ s/\s/\+/g;
     ${$self->{OPTIONS}}{"dec"} = $dec;
   }
-  
+
   # un-mutilate and return a nicely formated string to the user
   my $dec = ${$self->{OPTIONS}}{"dec"};
   $dec =~ s/\+/ /g;
@@ -324,10 +324,10 @@ defaults to 2000.
 sub equinox {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{OPTIONS}}{"equinox"} = shift;
   }
-  
+
   return ${$self->{OPTIONS}}{"equinox"};
 
 }
@@ -351,18 +351,18 @@ sub target {
   my $self = shift;
 
   # SETTING IDENTIFIER
-  if (@_) { 
+  if (@_) {
 
     # grab the new object name
     my $ident = shift;
-    
+
     # mutilate it and stuff it into $self->{TARGET}
     $ident =~ s/\s/\+/g;
     ${$self->{OPTIONS}}{"name"} = $ident;
     ${$self->{OPTIONS}}{"ra"} = undef;
     ${$self->{OPTIONS}}{"dec"} = undef;
   }
-  
+
   return ${$self->{OPTIONS}}{"name"};
 
 }
@@ -374,20 +374,20 @@ The x extent of the DSS image to be retrieved in arcmin.
    $xsize = $dss->xsize();
    $dss->xsize( 20 );
 
-Image sizes for FITS, gzipped FITS and GIF are 260kB, 
-110kB and 70 kB respectively for a field of 10*10 arc minutes. 
-There's a limit of around 4 MB for the largest image to be delivered. 
-Images from the DSS2 are bigger, because the pixel size is smaller. 
+Image sizes for FITS, gzipped FITS and GIF are 260kB,
+110kB and 70 kB respectively for a field of 10*10 arc minutes.
+There's a limit of around 4 MB for the largest image to be delivered.
+Images from the DSS2 are bigger, because the pixel size is smaller.
 
 =cut
 
 sub xsize {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{OPTIONS}}{"x"} = shift;
   }
-  
+
   return ${$self->{OPTIONS}}{"x"};
 
 }
@@ -399,17 +399,17 @@ The y extent of the DSS image to be retrieved in arcmin.
    $xsize = $dss->ysize();
    $dss->ysize( 20 );
 
-Image sizes for FITS, gzipped FITS and GIF are 260kB, 110kB and 70 kB respectively for a field of 10*10 arc minutes. There's a limit of around 4 MB for the largest image to be delivered. Images from the DSS2 are bigger, because the pixel size is smaller. 
+Image sizes for FITS, gzipped FITS and GIF are 260kB, 110kB and 70 kB respectively for a field of 10*10 arc minutes. There's a limit of around 4 MB for the largest image to be delivered. Images from the DSS2 are bigger, because the pixel size is smaller.
 
 =cut
 
 sub ysize {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{OPTIONS}}{"y"} = shift;
   }
-  
+
   return ${$self->{OPTIONS}}{"y"};
 
 }
@@ -421,7 +421,7 @@ The survey to return
    $survey = $dss->survey();
    $dss->survey( "DSS1" );
 
-valid choices are DSS1, DSS2-red, DSS2-blue, DSS2-infrared. The entire DSS1 data is stored on magnetic disks at the ESO-ECF Archive. DSS2 is stored on DVD-ROM in a juke box. Retrieval time takes about less than 5 seconds for a DSS1 field and less than 20 seconds for a random DSS2 field in the juke box. 
+valid choices are DSS1, DSS2-red, DSS2-blue, DSS2-infrared. The entire DSS1 data is stored on magnetic disks at the ESO-ECF Archive. DSS2 is stored on DVD-ROM in a juke box. Retrieval time takes about less than 5 seconds for a DSS1 field and less than 20 seconds for a random DSS2 field in the juke box.
 
 The DSS1 survey is 100% complete, while the DSS2-red now covers 98% of the sky; DSS2-blue 45% of the sky and DSS2-infrared 27% of the sky.
 
@@ -430,10 +430,10 @@ The DSS1 survey is 100% complete, while the DSS2-red now covers 98% of the sky; 
 sub survey {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{OPTIONS}}{"Sky-Survey"} = shift;
   }
-  
+
   return ${$self->{OPTIONS}}{"Sky-Survey"};
 
 }
@@ -445,7 +445,7 @@ The image format required
    $format = $dss->format();
    $dss->format( "FITS" );
 
-valid format types are FITS and GIF and FITS.gz. The default is to return 
+valid format types are FITS and GIF and FITS.gz. The default is to return
 a GIF Image.
 
 =cut
@@ -453,7 +453,7 @@ a GIF Image.
 sub format {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     my $format = shift;
     if( $format eq "FITS" ) {
        ${$self->{OPTIONS}}{"mime-type"} = "download-fits";
@@ -461,9 +461,9 @@ sub format {
        ${$self->{OPTIONS}}{"mime-type"} = "download-gz-fits";
     } else {
        ${$self->{OPTIONS}}{"mime-type"} = "download-gif";
-    } 
+    }
   }
-  
+
   return $self->{FORMAT};
 
 }
@@ -494,20 +494,20 @@ sub configure {
 
   # define the default base URL
   $self->{URL} = "archive.eso.org";
-  
+
   # define the query URLs
   my $default_url = $self->{URL};
   $self->{QUERY} = "http://$default_url/dss/dss/image?";
-   
+
   # Setup the LWP::UserAgent
   my $HOST = hostname();
   my $DOMAIN = hostdomain();
-  $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 ); 
+  $self->{USERAGENT} = new LWP::UserAgent( timeout => 30 );
   $self->{USERAGENT}->agent("Astro::DDS/$VERSION ($HOST.$DOMAIN)");
 
   # Grab Proxy details from local environment
-  $self->{USERAGENT}->env_proxy();  
-  
+  $self->{USERAGENT}->env_proxy();
+
   # Grab something for DATA directory
   if ( defined $ENV{"ESTAR_DATA"} ) {
      if ( opendir (DIR, File::Spec->catdir($ENV{"ESTAR_DATA"}) ) ) {
@@ -517,7 +517,7 @@ sub configure {
      } else {
         # Shouldn't happen?
        croak("Cannot open $ENV{ESTAR_DATA} for incoming files.");
-     }        
+     }
   } elsif ( opendir(TMP, File::Spec->tmpdir() ) ) {
         # fall back on the /tmp directory
         $self->{DATADIR} = File::Spec->tmpdir();
@@ -525,13 +525,13 @@ sub configure {
   } else {
      # Shouldn't happen?
      croak("Cannot open any directory for incoming files.");
-  }   
-  
+  }
+
   # configure the default options
   ${$self->{OPTIONS}}{"ra"}          = undef;
   ${$self->{OPTIONS}}{"dec"}         = undef;
   ${$self->{OPTIONS}}{"name"}        = undef;
-  
+
   ${$self->{OPTIONS}}{"equinox"}     = 2000;
   ${$self->{OPTIONS}}{"x"}           = 10;
   ${$self->{OPTIONS}}{"y"}           = 10;
@@ -590,7 +590,7 @@ sub _make_query {
 
    # loop round all the options keys and build the query
    foreach my $key ( keys %{$self->{OPTIONS}} ) {
-      $options = $options . 
+      $options = $options .
         "&$key=${$self->{OPTIONS}}{$key}" if defined ${$self->{OPTIONS}}{$key};
    }
 
@@ -605,37 +605,37 @@ sub _make_query {
 
    # declare file name
    my $file_name;
-   
+
    if ( ${$reply}{"_rc"} eq 200 ) {
-      if ( ${${$reply}{"_headers"}}{"content-type"} 
+      if ( ${${$reply}{"_headers"}}{"content-type"}
             eq "application/octet-stream" ) {
-            
-         # mangle filename from $ENV and returned unique(?) filename   
+
+         # mangle filename from $ENV and returned unique(?) filename
          $file_name = ${${$reply}{"_headers"}}{"content-disposition"};
          my $start_index = index( $file_name, q/"/ );
          my $last_index = rindex( $file_name, q/"/ );
-         $file_name = substr( $file_name, $start_index+1, 
+         $file_name = substr( $file_name, $start_index+1,
                               $last_index-$start_index-1);
-         
-         $file_name = File::Spec->catfile( $self->{DATADIR}, $file_name);                       
+
+         $file_name = File::Spec->catfile( $self->{DATADIR}, $file_name);
          # Open output file
          unless ( open ( FH, ">$file_name" )) {
             croak("Error: Cannont open output file $file_name");
-         }   
+         }
 
          # Needed for Windows (yuck!)
          binmode FH;
-         
+
          # Write to output file
          my $length = length(${$reply}{"_content"});
          syswrite( FH, ${$reply}{"_content"}, $length );
          close(FH);
- 
+
       }
    } else {
       croak("Error ${$reply}{_rc}: Failed to establish network connection");
    }
-   
+
    return $file_name;
 }
 
@@ -673,4 +673,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

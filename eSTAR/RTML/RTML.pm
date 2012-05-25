@@ -2,7 +2,7 @@ package eSTAR::RTML;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    eSTAR::RTML
 
@@ -35,7 +35,7 @@ eSTAR::RTML - Object Orientatied interface to create and parse RTML messages
 =head1 SYNOPSIS
 
    $rtml = new eSTAR::RTML();
- 
+
 
 =head1 DESCRIPTION
 
@@ -139,7 +139,7 @@ C<XML::Parse> directly rather than deal with the C<eSTAR::RTML> infrastructure.
 
 sub return_tree {
   my $self = shift;
-  
+
   my $reference = $self->{DOCUMENT};
   return $reference;
 }
@@ -219,10 +219,10 @@ This method is called directly from configure() is the C<File> key and value is 
 
 sub file {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
      my $file = shift;
      $self->{DOCUMENT} = $self->{XML}->parsefile( $file );
-     
+
      my ( $FILE, $rtml );
      return undef unless open ( $FILE, "<$file" );
      {
@@ -231,7 +231,7 @@ sub file {
         close $FILE;
         $self->{BUFFER} = $rtml;
      }
-     
+
   }
   return ${${${$self->{DOCUMENT}}[1]}[0]}{'dtd'};
 }
@@ -242,14 +242,14 @@ Populates the object from a scalar returning the version number of the DTD.
 
    $dtd = $rtml->source( $rtml );
 
-This method is called directly from configure() is the C<Document> key and 
+This method is called directly from configure() is the C<Document> key and
 value is passed into to teh object in the %options hash.
 
 =cut
 
 sub source {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
      my $rtml = shift;
      $self->{DOCUMENT} = $self->{XML}->parse( $rtml );
      $self->{BUFFER} = $rtml;
@@ -277,4 +277,4 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

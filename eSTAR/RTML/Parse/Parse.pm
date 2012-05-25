@@ -2,7 +2,7 @@ package eSTAR::RTML::Parse;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    eSTAR::RTML::Parse
 
@@ -36,7 +36,7 @@ eSTAR::RTML::Parse - module which parses valid RTML messages
 =head1 SYNOPSIS
 
    $message = new eSTAR::RTML::Parse( RTML => $rtml );
- 
+
 
 =head1 DESCRIPTION
 
@@ -278,7 +278,7 @@ Return the type of observation we want to make the document
 
 =cut
 sub targetident {
-  my $self = shift;  
+  my $self = shift;
   return ${${$self->{OBSERVATION}}{Target}}{ident};
 }
 
@@ -290,7 +290,7 @@ Return the type of observation we want to make the document
 
 =cut
 sub targettype {
-  my $self = shift;  
+  my $self = shift;
   return ${${$self->{OBSERVATION}}{Target}}{type};
 }
 
@@ -302,7 +302,7 @@ Return the prioriy of observation we want to make the document
 
 =cut
 sub priority {
-  my $self = shift;  
+  my $self = shift;
   return ${${$self->{OBSERVATION}}{Schedule}}{priority};
 }
 
@@ -377,7 +377,7 @@ Return the equinox of the RA and Dec
 
 =cut
 sub equinox {
-  my $self = shift;  
+  my $self = shift;
   return ${${${$self->{OBSERVATION}}{Target}}{Coordinates}}{Equinox};
 }
 
@@ -390,9 +390,9 @@ Return the filter type of the observation
 
 =cut
 sub filter {
-  my $self = shift;  
+  my $self = shift;
   return ${${${$self->{OBSERVATION}}{Device}}{Filter}}{FilterType};
- 
+
 }
 
 =item B<host>
@@ -403,7 +403,7 @@ Return the host of the IA origininating the document
 
 =cut
 sub host {
-  my $self = shift;  
+  my $self = shift;
   return ${$self->{INTELLIGENTAGENT}}{host};
 }
 
@@ -416,7 +416,7 @@ Return the port of the IA origininating the document
 
 =cut
 sub port {
-  my $self = shift;  
+  my $self = shift;
   return ${$self->{INTELLIGENTAGENT}}{port};
 }
 
@@ -428,9 +428,9 @@ Return the group count of the observation
 
 =cut
 sub group_count {
-  my $self = shift;  
+  my $self = shift;
   return ${${${$self->{OBSERVATION}}{Schedule}}{Exposure}}{Count};
- 
+
 }
 
 
@@ -442,35 +442,35 @@ Return the series count of the observation
 =cut
 
 sub series_count {
-  my $self = shift;  
+  my $self = shift;
   return ${${${$self->{OBSERVATION}}{Schedule}}{Seriesconstraint}}{Count};
- 
+
 }
 
 =item B<interval>
 
-Return the interval between monitoring groups 
+Return the interval between monitoring groups
 
 
 =cut
 
 sub interval {
-  my $self = shift;  
+  my $self = shift;
   return ${${${$self->{OBSERVATION}}{Schedule}}{Seriesconstraint}}{Interval};
- 
+
 }
 
 =item B<tolerance>
 
-Return the interval between monitoring groups 
+Return the interval between monitoring groups
 
 
 =cut
 
 sub tolerance {
-  my $self = shift;  
+  my $self = shift;
   return ${${${$self->{OBSERVATION}}{Schedule}}{Seriesconstraint}}{Tolerance};
- 
+
 }
 
 
@@ -481,9 +481,9 @@ Return the start time constraint
 =cut
 
 sub start_time {
-  my $self = shift; 
+  my $self = shift;
   return ${${${$self->{OBSERVATION}}{Schedule}}{Timeconstraint}}{StartDateTime};
- 
+
 }
 
 
@@ -494,9 +494,9 @@ Return the end time constraint
 =cut
 
 sub end_time {
-  my $self = shift;  
+  my $self = shift;
   return ${${${$self->{OBSERVATION}}{Schedule}}{Timeconstraint}}{EndDateTime};
- 
+
 }
 
 
@@ -557,10 +557,10 @@ method if an RTML key and value is supplied to the %options hash.
 sub rtml {
   my $self = shift;
   my $rtml = shift;
- 
+
   # populate the document tree (icky)
   $self->{BUFFER} = $rtml->return_tree();
-  
+
   # parse the document tree using provate methods.
   _parse_rtml();
 
@@ -616,28 +616,28 @@ rtml() method directly during construction of the object.
 
 sub _parse_rtml {
    print "# Parsing RTML document\n#\n";
-   
+
    # grab the RTML document from inside the XML tags
    my @document = @{${$SELF->{BUFFER}}[1]};
-   
+
    # set DTD version and document type tags in object
    $SELF->{DTD} = ${$document[0]}{'version'};
    $SELF->{TYPE} = ${$document[0]}{'type'};
-   
+
    # parse the remainder of the RTML document
    for ( my $i = 3; $i <= $#document; $i++ ) {
       print "# $i = $document[$i] (*)\n";
-      
+
       my @tag = @{$document[$i+1]};
       # parse the tag
       _parse_tag( $document[$i], \@tag );
-      
+
       # increment counter
       $i = $i + 3;
-      
+
    }
-   
-   # empty buffer 
+
+   # empty buffer
    $SELF->{BUFFER} = undef;
 
 }
@@ -648,14 +648,14 @@ Private method to parse individual tags within the RTML, called from the
 private method C<_parse_rtml>. Trust me, you don't want to call this from
 outside the C<eSTAR::RTML::Parse> module, it'll almost certainly do odd
 things unless you can figure out exactly what sort of array reference you
-need to pass in. 
+need to pass in.
 
 =cut
 
 sub _parse_tag {
   croak 'Parse.pm: _parse_tag() usage error'
     unless scalar(@_) == 2 ;
-    
+
   # read arguements
   my ( $name, $array_reference ) = @_;
   my @array = @$array_reference;
@@ -665,34 +665,34 @@ sub _parse_tag {
 
   #use Data::Dumper;
   #print Dumper( @obs );
-         
-  # check for attributes         
-  _parse_sub_attrib( $name, \%{$obs[0]} );  
-         
+
+  # check for attributes
+  _parse_sub_attrib( $name, \%{$obs[0]} );
+
   # check for CDATA
-  _parse_sub_value( $name, \@obs );  
-        
+  _parse_sub_value( $name, \@obs );
+
   # loop through sub-tags individually, nearly all have
   # their own sub-tags so need to deal with them individually
-         
+
   for ( my $j = 3; $j <= $#obs; $j++ ) {
      print "#    $j = $obs[$j] <*>\n";
-         
+
      # grab section
      my @generic = @{$obs[$j+1]};
-         
+
      # check for attributes
      _parse_sub_sub_attrib( $name, $obs[$j],
                             \%{$generic[0]} );
-         
+
      # check for CDATA
-     _parse_sub_sub_value( $name, $obs[$j], 
-                                     \@generic ); 
-               
+     _parse_sub_sub_value( $name, $obs[$j],
+                                     \@generic );
+
      # loop through sub-tags
      for ( my $k = 3; $k <= $#generic; $k++ ) {
         print "#       $k = $generic[$k] [*]\n";
-                  
+
         # grab sub-tag array reference
         my @array = @{$generic[$k+1]};
         #use Data::Dumper; print Dumper( @array );
@@ -704,12 +704,12 @@ sub _parse_tag {
         _parse_sub_sub_sub_attrib( $name, $obs[$j],
                                    $generic[$k], \%{$array[0]} );
         # loop through sub-tags
-        _parse_sub_sub_sub_tag( $name, $obs[$j], 
+        _parse_sub_sub_sub_tag( $name, $obs[$j],
                                 $generic[$k], \@array );
         # check for CDATA
-        _parse_sub_sub_sub_value( $name, $obs[$j], 
-                                  $generic[$k] , \@array ); 
-           
+        _parse_sub_sub_sub_value( $name, $obs[$j],
+                                  $generic[$k] , \@array );
+
         ##########################################################
         #                                                        #
         # NB: This is where to add another sub loop if we end    #
@@ -721,11 +721,11 @@ sub _parse_tag {
         #     way so you'll have to live with this...            #
         #                                                        #
         ##########################################################
-         
+
         # increment counter
-        $k = $k + 3;               
-      }                             
-               
+        $k = $k + 3;
+      }
+
       # increment counter
       $j = $j + 3;
    }
@@ -748,25 +748,25 @@ sub _parse_sub_tag {
   # read arguements
   my ( $name, $array_reference ) = @_;
   my @array = @$array_reference;
-   
+
   for ( my $j = 3; $j <= $#array; $j++ ) {
      print "#    $j = $array[$j] *\n";
-            
+
      # grab the hash entry
      my $entry = ${$array[$j+1]}[2];
      chomp($entry);
-           
+
      # remove leading spaces
      $entry =~ s/^\s+//;
-            
+
      # remove trailing spaces
      $entry =~ s/\s+$//;
-            
+
      chomp($entry);
-            
+
      # assign the entry
      ${$SELF->{uc($name)}}{$array[$j]} = $entry;
-            
+
      # increment counter
      $j = $j + 3;
    }
@@ -780,31 +780,31 @@ sub _parse_sub_sub_tag {
   # read arguements
   my ( $name, $sub_name, $array_reference ) = @_;
   my @array = @$array_reference;
-  
+
   # loop through sub-tags
   for ( my $l = 3; $l <= $#array; $l++ ) {
      print "#          $l = $array[$l] *\n";
-                    
+
      # grab the hash entry
      my $entry = ${$array[$l+1]}[2];
      chomp($entry);
-           
+
      # remove leading spaces
      $entry =~ s/^\s+//;
-            
+
      # remove trailing spaces
      $entry =~ s/\s+$//;
-            
+
      chomp($entry);
-             
+
      # assign the entry
      ${$SELF->{uc($name)}}{ucfirst(lc($sub_name))}{$array[$l]}  = $entry;
-     
+
      # increment counter
      $l = $l + 3;
-     
-   }  
-} 
+
+   }
+}
 
 sub _parse_sub_sub_sub_tag {
   croak 'Parse.pm: _parse_sub_sub_sub_tag() usage error'
@@ -813,32 +813,32 @@ sub _parse_sub_sub_sub_tag {
   # read arguements
   my ( $name, $sub_name, $subsub_name, $array_reference ) = @_;
   my @array = @$array_reference;
-  
+
   # loop through sub-tags
   for ( my $l = 3; $l <= $#array; $l++ ) {
      print "#          $l = $array[$l] *\n";
-                    
+
      # grab the hash entry
      my $entry = ${$array[$l+1]}[2];
      chomp($entry);
-           
+
      # remove leading spaces
      $entry =~ s/^\s+//;
-            
+
      # remove trailing spaces
      $entry =~ s/\s+$//;
-            
+
      chomp($entry);
-             
+
      # assign the entry
      ${$SELF->{uc($name)}}
        {ucfirst(lc($sub_name))}
        {ucfirst(lc($subsub_name))}{$array[$l]} = $entry;
-     
+
      # increment counter
      $l = $l + 3;
-   }  
-} 
+   }
+}
 sub _parse_sub_sub_sub_sub_tag {
   croak 'Parse.pm: _parse_sub_sub_sub_sub_tag() usage error'
     unless scalar(@_) == 5 ;
@@ -846,37 +846,37 @@ sub _parse_sub_sub_sub_sub_tag {
   # read arguements
   my ( $name, $sub_name, $subsub_name, $subsubsub_name, $array_reference ) = @_;
   my @array = @$array_reference;
-  
+
   # loop through sub-tags
   for ( my $l = 3; $l <= $#array; $l++ ) {
      print "#          $l = $array[$l] *\n";
-                    
+
      # grab the hash entry
      my $entry = ${$array[$l+1]}[2];
      chomp($entry);
-           
+
      # remove leading spaces
      $entry =~ s/^\s+//;
-            
+
      # remove trailing spaces
      $entry =~ s/\s+$//;
-            
+
      chomp($entry);
-             
+
      # assign the entry
      ${$SELF->{uc($name)}}
        {ucfirst(lc($sub_name))}
        {ucfirst(lc($subsub_name))}
        {ucfirst(lc($subsubsub_name))}{$array[$l]} = $entry;
-     
+
      # increment counter
      $l = $l + 3;
-   }  
-} 
+   }
+}
 
 # _parse_sub*_attrib() routines: these parse the sub tag attributes
 
-sub _parse_sub_attrib { 
+sub _parse_sub_attrib {
   croak 'Parse.pm: _parse_sub_attrib() usage error'
     unless scalar(@_) == 2 ;
 
@@ -885,15 +885,15 @@ sub _parse_sub_attrib {
   my %hash = %$hash_reference;
 
   # loop through hash and drop all the keys into the parsed output
-  # as hash items in the list. This isn't really neat, perhaps a 
+  # as hash items in the list. This isn't really neat, perhaps a
   # hash of hashs would be better?
   foreach my $key ( sort keys %hash ) {
      ${$SELF->{uc($name)}}{$key} = $hash{$key};
   }
-  
+
 }
 
-sub _parse_sub_sub_attrib { 
+sub _parse_sub_sub_attrib {
   croak 'Parse.pm: _parse_sub_sub_attrib() usage error'
     unless scalar(@_) == 3 ;
 
@@ -902,15 +902,15 @@ sub _parse_sub_sub_attrib {
   my %hash = %$hash_reference;
 
   # loop through hash and drop all the keys into the parsed output
-  # as hash items in the list. This isn't really neat, perhaps a 
+  # as hash items in the list. This isn't really neat, perhaps a
   # hash of hashs would be better?
   foreach my $key ( sort keys %hash ) {
      ${$SELF->{uc($name)}}{ucfirst(lc($sub_name))}{$key} = $hash{$key};
   }
-  
+
 }
 
-sub _parse_sub_sub_sub_attrib { 
+sub _parse_sub_sub_sub_attrib {
   croak 'Parse.pm: _parse_sub_sub_sub_attrib() usage error'
     unless scalar(@_) == 4 ;
 
@@ -919,9 +919,9 @@ sub _parse_sub_sub_sub_attrib {
   my %hash = %$hash_reference;
 
   #use Data::Dumper; print "ATTRIB " . Dumper(%hash) . "\n";
-  
+
   # loop through hash and drop all the keys into the parsed output
-  # as hash items in the list. This isn't really neat, perhaps a 
+  # as hash items in the list. This isn't really neat, perhaps a
   # hash of hashs would be better?
   foreach my $key ( sort keys %hash ) {
 
@@ -931,11 +931,11 @@ sub _parse_sub_sub_sub_attrib {
         {ucfirst(lc($sub_name))}
         {ucfirst(lc($subsub_name))}{$key} = $hash{$key};
   }
-  
+
 }
 
 
-sub _parse_sub_sub_sub_sub_attrib { 
+sub _parse_sub_sub_sub_sub_attrib {
   croak 'Parse.pm: _parse_sub_sub_sub_sub_attrib() usage error'
     unless scalar(@_) == 5 ;
 
@@ -944,9 +944,9 @@ sub _parse_sub_sub_sub_sub_attrib {
   my %hash = %$hash_reference;
 
   #use Data::Dumper; print "ATTRIB " . Dumper(%hash) . "\n";
-  
+
   # loop through hash and drop all the keys into the parsed output
-  # as hash items in the list. This isn't really neat, perhaps a 
+  # as hash items in the list. This isn't really neat, perhaps a
   # hash of hashs would be better?
   foreach my $key ( sort keys %hash ) {
 
@@ -957,7 +957,7 @@ sub _parse_sub_sub_sub_sub_attrib {
         {ucfirst(lc($subsub_name))}
         {ucfirst(lc($subsubsub_name))}{$key} = $hash{$key};
   }
-  
+
 }
 
 # _parse_sub*_value() routines: these grab the tags CDATA
@@ -969,19 +969,19 @@ sub _parse_sub_value {
   # read arguements
   my ( $name, $array_reference ) = @_;
   my @array = @$array_reference;
-       
+
   # grab tag value
-  if( defined $array[2] ) { 
+  if( defined $array[2] ) {
      my $entry = $array[2];
      $entry =~ s/^\s+//;
      $entry =~ s/\s+$//;
      chomp($entry);
-     
+
      if( $entry ne '' ) {
         ${$SELF->{uc($name)}}{'tag_value'} = $entry;
-     }   
+     }
   }
-}  
+}
 
 sub _parse_sub_sub_value {
   croak 'Parse.pm: _parse_sub_sub_value() usage error'
@@ -990,16 +990,16 @@ sub _parse_sub_sub_value {
   # read arguements
   my ( $name, $sub_name, $array_reference ) = @_;
   my @array = @$array_reference;
-       
+
   # grab tag value
-  if( defined $array[2] ) { 
+  if( defined $array[2] ) {
      my $entry = $array[2];
      $entry =~ s/^\s+//;
      $entry =~ s/\s+$//;
      chomp($entry);
      if( $entry ne '' ) {
         ${$SELF->{uc($name)}}{ucfirst(lc($sub_name))}{'tag_value'} = $entry;
-     }   
+     }
   }
 }
 
@@ -1010,9 +1010,9 @@ sub _parse_sub_sub_sub_value {
   # read arguements
   my ( $name, $sub_name, $subsub_name, $array_reference ) = @_;
   my @array = @$array_reference;
-       
+
   # grab tag value
-  if( defined $array[2] ) { 
+  if( defined $array[2] ) {
      my $entry = $array[2];
      $entry =~ s/^\s+//;
      $entry =~ s/\s+$//;
@@ -1021,7 +1021,7 @@ sub _parse_sub_sub_sub_value {
         ${$SELF->{uc($name)}}
            {ucfirst(lc($sub_name))}
            {ucfirst(lc($subsub_name))}{'tag_value'} = $entry;
-     }      
+     }
   }
 }
 
@@ -1032,9 +1032,9 @@ sub _parse_sub_sub_sub_sub_value {
   # read arguements
   my ( $name, $sub_name, $subsub_name, $subsubsub_name, $array_reference ) = @_;
   my @array = @$array_reference;
-       
+
   # grab tag value
-  if( defined $array[2] ) { 
+  if( defined $array[2] ) {
      my $entry = $array[2];
      $entry =~ s/^\s+//;
      $entry =~ s/\s+$//;
@@ -1044,10 +1044,10 @@ sub _parse_sub_sub_sub_sub_value {
            {ucfirst(lc($sub_name))}
            {ucfirst(lc($subsub_name))}
            {ucfirst(lc($subsubsub_name))}{'tag_value'} = $entry;
-     }      
+     }
   }
 }
 
 # L A S T  O R D E R S ------------------------------------------------------
 
-1;                                                                  
+1;

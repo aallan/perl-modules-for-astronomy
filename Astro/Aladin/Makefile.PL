@@ -13,7 +13,7 @@ if( $] < 5.007003 ) {
          "the Astro::Aladin module.\n";
    exit;
 } else {
-   print "Looks good.\n";  
+   print "Looks good.\n";
 }
 
 # Good start, but alot of Perl distributions aren't compiled
@@ -25,7 +25,7 @@ unless( $Config{'useithreads'} eq "define") {
    print "It doesn't! You need to recompile Perl with ithreads support.\n";
    exit;
 } else {
-   print "Looks good.\n"; 
+   print "Looks good.\n";
 }
 
 # Almost there, make or break, can we actually load the threading
@@ -39,21 +39,21 @@ unless( $threads::shared::threads_shared ) {
    print "Nope! threads::shared doesn't seem to be loaded.\n";
    exit;
 } else {
-   print "Looks good.\n"; 
+   print "Looks good.\n";
 }
 
 # You've got a Perl binary with ithreads support, this thing
 # might actually work out. But just in case you've got some
-# wierd and wonderful verison of Perl that I haven't seen 
+# wierd and wonderful verison of Perl that I haven't seen
 # before lets put threads into the PREREQ_PM line anyway.
 
-WriteMakefile( 
+WriteMakefile(
       'NAME'           => 'Astro::Aladin',
       'VERSION'        => '2.0.2',
       'PREREQ_PM'      => { threads => 0.0.5,
                             threads::shared => 0.90 },
       'dist'           => { COMPRESS => "gzip -9f"},
-      ($] >= 5.005 ?   
+      ($] >= 5.005 ?
 	( ABSTRACT => 'Perl class giving access to images and catalogues',
 	  AUTHOR   => 'Alasdair Allan <aa@astro.ex.ac.uk>') : ()),
       );

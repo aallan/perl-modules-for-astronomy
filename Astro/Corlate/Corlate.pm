@@ -2,7 +2,7 @@ package Astro::Corlate;
 
 # ---------------------------------------------------------------------------
 
-#+ 
+#+
 #  Name:
 #    Astro::Corlate
 
@@ -13,7 +13,7 @@ package Astro::Corlate;
 #    Perl module
 
 #  Description:
-#    This module is an object-orientated interface to the 
+#    This module is an object-orientated interface to the
 #    Astro::Corlate::Wrapper module, which in turn wraps the
 #    Fortran 95 CORLATE sub-routine
 
@@ -37,28 +37,28 @@ Astro::Corlate - Object a catalog corelation
 =head1 SYNOPSIS
 
   use Astro::Corlate;
-  
+
   $corlate = new Astro::Corlate( Reference   =>  $catalogue,
                                  Observation =>  $observation );
 
   # run the corelation routine
   $corlate->run_corrlate();
-  
+
   # get the log file
   my $log = $corlate->logfile();
-  
+
   # get the variable star catalogue
   my $variables = $corlate->variables();
-  
+
   # fitted colour data catalogue
   my $data = $corlate->data();
-  
+
   # fit to the colour data
   my $fit = $corlate->fit();
-  
+
   # get probability histogram file
   my $histogram = $corlate->histogram();
-  
+
   # get the useful information file
   my $information = $corlate->information();
 
@@ -143,44 +143,44 @@ sub run_corlate {
   unless ( defined ${$self->{FILES}}{"reference"} ) {
      croak( "Error: No reference catalogue supplied" );
   }
-  
+
   # Check that the observation catalogue files has been supplied
-  unless ( defined ${$self->{FILES}}{"observation"} ) { 
+  unless ( defined ${$self->{FILES}}{"observation"} ) {
      croak( "Error: No observation catalogue supplied" );
   }
-   
+
   # declare status
   my $status;
-                     
+
   # call the corlate sub-routine
   eval {
     $status = corlate( ${$self->{FILES}}{reference},
-                       ${$self->{FILES}}{observation}, 
-                       ${$self->{FILES}}{logfile}, 
-                       ${$self->{FILES}}{variables}, 
-                       ${$self->{FILES}}{data}, 
-                       ${$self->{FILES}}{fit}, 
-                       ${$self->{FILES}}{histogram}, 
+                       ${$self->{FILES}}{observation},
+                       ${$self->{FILES}}{logfile},
+                       ${$self->{FILES}}{variables},
+                       ${$self->{FILES}}{data},
+                       ${$self->{FILES}}{fit},
+                       ${$self->{FILES}}{histogram},
                        ${$self->{FILES}}{information} );
   };
-  
-  # check for errors                   
+
+  # check for errors
   if($@) {
      print "$@\n";
      croak ( "Error: Unknown error running catalogue corelation" );
   }
-  
-  # Run through possible status values                      
+
+  # Run through possible status values
   if ( $status == -1 ) {
      croak ( "Error: Failed to open reference catalogue file" );
   } elsif ( $status == -2 ) {
      croak ( "Error: Failed to open observation catalogue file" );
   } elsif ( $status == -3 ) {
      croak ( "Error: Too few stars paired between catalogues" );
-  }  
-   
-  # Should have good status? 
-  return $status;                      
+  }
+
+  # Should have good status?
+  return $status;
 }
 
 # O T H E R   M E T H O D S ------------------------------------------------
@@ -199,10 +199,10 @@ this catalogue file should be in CLUSTER format.
 sub reference {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{FILES}}{"reference"} = shift;
   }
-  
+
   return ${$self->{FILES}}{"reference"};
 }
 
@@ -220,10 +220,10 @@ this catalogue file should be in CLUSTER format.
 sub observation {
   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{FILES}}{"observation"} = shift;
   }
-  
+
   return ${$self->{FILES}}{"observation"};
 }
 
@@ -235,14 +235,14 @@ Returns the full path to the Corlate log file
 
 =cut
 
-sub logfile { 
-  my $self = shift; 
+sub logfile {
+  my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{FILES}}{"logfile"} = shift;
   }
-    
-  return ${$self->{FILES}}{"logfile"}; 
+
+  return ${$self->{FILES}}{"logfile"};
 }
 
 =item B<Variables>
@@ -253,14 +253,14 @@ Returns the full path to the variable star catalogue file
 
 =cut
 
-sub variables { 
-   my $self = shift; 
+sub variables {
+   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{FILES}}{"variables"} = shift;
-  }   
-   
-   return ${$self->{FILES}}{"variables"}; 
+  }
+
+   return ${$self->{FILES}}{"variables"};
  }
 
 =item B<Data>
@@ -271,13 +271,13 @@ Returns the full path to the catalogue file containing the fitted colour data
 
 =cut
 
-sub data { 
-   my $self = shift; 
+sub data {
+   my $self = shift;
 
-  if (@_) { 
+  if (@_) {
     ${$self->{FILES}}{"data"} = shift;
-  }     
-   return ${$self->{FILES}}{"data"}; 
+  }
+   return ${$self->{FILES}}{"data"};
 }
 
 =item B<Fit>
@@ -288,14 +288,14 @@ Returns the full path to the X-Y file defining the fit to the colour data
 
 =cut
 
-sub fit { 
-   my $self = shift; 
- 
-  if (@_) { 
+sub fit {
+   my $self = shift;
+
+  if (@_) {
     ${$self->{FILES}}{"fit"} = shift;
-  }   
-   
-   return ${$self->{FILES}}{"fit"}; 
+  }
+
+   return ${$self->{FILES}}{"fit"};
 }
 
 =item B<Histogram>
@@ -306,14 +306,14 @@ Returns the full path to the X-Y data file of the probability histogram
 
 =cut
 
-sub histogram { 
-   my $self = shift; 
-  
-  if (@_) { 
+sub histogram {
+   my $self = shift;
+
+  if (@_) {
     ${$self->{FILES}}{"histogram"} = shift;
-  }     
-   
-   return ${$self->{FILES}}{"histogram"}; 
+  }
+
+   return ${$self->{FILES}}{"histogram"};
 }
 
 =item B<Information>
@@ -324,14 +324,14 @@ Returns the full path to the Corlate useful information file
 
 =cut
 
-sub information { 
-   my $self = shift; 
-  
-  if (@_) { 
+sub information {
+   my $self = shift;
+
+  if (@_) {
     ${$self->{FILES}}{"information"} = shift;
-  }     
-    
-   return ${$self->{FILES}}{"information"}; 
+  }
+
+   return ${$self->{FILES}}{"information"};
 }
 
 # C O N F I G U R E -------------------------------------------------------
@@ -357,7 +357,7 @@ sub configure {
 
   # CONFIGURE DEFAULTS
   # ------------------
-  
+
   # Grab something for DATA directory
   if ( defined $ENV{"ESTAR_DATA"} ) {
      if ( opendir (DIR, File::Spec->catdir($ENV{"ESTAR_DATA"}) ) ) {
@@ -367,7 +367,7 @@ sub configure {
      } else {
         # Shouldn't happen?
        croak("Cannot open $ENV{ESTAR_DATA} for incoming files.");
-     }        
+     }
   } elsif ( opendir(TMP, File::Spec->tmpdir() ) ) {
         # fall back on the /tmp directory
         $self->{DATADIR} = File::Spec->tmpdir();
@@ -375,25 +375,25 @@ sub configure {
   } else {
      # Shouldn't happen?
      croak("Cannot open any directory for incoming files.");
-  }     
-  
+  }
+
   # DEFAULT FILENAMES
-  ${$self->{FILES}}{"reference"} = 
+  ${$self->{FILES}}{"reference"} =
              File::Spec->catfile( $self->{DATADIR}, 'reference.cat' );
-  ${$self->{FILES}}{"observation"} = 
+  ${$self->{FILES}}{"observation"} =
              File::Spec->catfile( $self->{DATADIR}, 'observation.cat' );
-  ${$self->{FILES}}{"logfile"} = 
-             File::Spec->catfile( $self->{DATADIR}, 'corlate_log.log' ); 
-  ${$self->{FILES}}{"variables"} = 
-             File::Spec->catfile( $self->{DATADIR}, 'corlate_var.cat' ); 
-  ${$self->{FILES}}{"data"} = 
+  ${$self->{FILES}}{"logfile"} =
+             File::Spec->catfile( $self->{DATADIR}, 'corlate_log.log' );
+  ${$self->{FILES}}{"variables"} =
+             File::Spec->catfile( $self->{DATADIR}, 'corlate_var.cat' );
+  ${$self->{FILES}}{"data"} =
              File::Spec->catfile( $self->{DATADIR}, 'corlate_fit.cat' );
-  ${$self->{FILES}}{"fit"} = 
+  ${$self->{FILES}}{"fit"} =
              File::Spec->catfile( $self->{DATADIR}, 'corlate_fit.fit' );
-  ${$self->{FILES}}{"histogram"} = 
-             File::Spec->catfile( $self->{DATADIR}, 'corlate_hist.dat' ); 
-  ${$self->{FILES}}{"information"} = 
-             File::Spec->catfile( $self->{DATADIR}, 'corlate_info.dat' );       
+  ${$self->{FILES}}{"histogram"} =
+             File::Spec->catfile( $self->{DATADIR}, 'corlate_hist.dat' );
+  ${$self->{FILES}}{"information"} =
+             File::Spec->catfile( $self->{DATADIR}, 'corlate_info.dat' );
 
   # return unless we have arguments
   return undef unless @_;
@@ -427,6 +427,6 @@ Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 
 # T I M E   A T   T H E   B A R  --------------------------------------------
 
-1;                                                                  
+1;
 
 __END__

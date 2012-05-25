@@ -132,7 +132,7 @@ sub pushpaper {
   my $paper = shift;
   my $bibcode = $paper->bibcode();
 
-  # push the new hash item onto the stack 
+  # push the new hash item onto the stack
   return push( @{$self->{RESULTS}}, $paper );
 }
 
@@ -174,7 +174,7 @@ Return the Astro::ADS::Result::Paper object at index $index
 
    $paper = $result->paperbyindex( $index );
 
-the first paper is at index 0 (not 1). Returns undef if no arguements 
+the first paper is at index 0 (not 1). Returns undef if no arguements
 are provided.
 
 =cut
@@ -257,14 +257,14 @@ sub summary {
   my @output;
 
   # If we are in XML mode we need to add a wrapper
-  push(@output, "<ADSResult>") if exists $args{format} and 
+  push(@output, "<ADSResult>") if exists $args{format} and
     $args{format} eq 'XML';
 
   # loop over papers
   push(@output, map { $_->summary(%args) } $self->papers);
 
   # If we are in XML mode we need to add a wrapper
-  push(@output, "</ADSResult>") if exists $args{format} and 
+  push(@output, "</ADSResult>") if exists $args{format} and
     $args{format} eq 'XML';
 
   return join("\n", @output). "\n";
@@ -291,7 +291,7 @@ sub stringify {
 
 Copyright (C) 2001 University of Exeter. All Rights Reserved.
 
-This program was written as part of the eSTAR project and is free software; 
+This program was written as part of the eSTAR project and is free software;
 you can redistribute it and/or modify it under the terms of the GNU Public
 License.
 
