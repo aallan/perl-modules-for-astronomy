@@ -29,7 +29,6 @@ use Astro::Catalog;
 use Astro::Catalog::Item;
 use Astro::Catalog::Item::Morphology;
 use Astro::Coords;
-use Astro::SLA;
 
 use Number::Uncertainty;
 use Astro::Flux;

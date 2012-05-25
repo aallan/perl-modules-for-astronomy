@@ -8,10 +8,8 @@
 
 use strict;
 use warnings;
-use Test::More tests => 1769;
-use Astro::SLA;
+use Test::More tests => 1768;
 
-require_ok( 'Astro::SLA' );
 require_ok( 'Astro::Catalog::Star' );
 require_ok( 'Astro::Catalog' );
 
@@ -44,7 +42,8 @@ my $refcoords = new Astro::Coords( ra => "23:14:00",
 
 # 10 arcmin
 $cat->reset_list;
-@results = $cat->filter_by_distance( (10*60*Astro::SLA::DAS2R), $refcoords);
+my $limit = Astro::Coords::Angle->new( 10.0, units => "arcmin" );
+@results = $cat->filter_by_distance( $limit->radians, $refcoords);
 is( scalar(@results), 4, "search by radius");
 
 # search for string

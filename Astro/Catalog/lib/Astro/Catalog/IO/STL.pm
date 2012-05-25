@@ -28,7 +28,6 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 use Astro::Coords;
-use Astro::SLA;
 
 use base qw/ Astro::Catalog::IO::ASCII /;
 
@@ -168,25 +167,12 @@ sub _read_catalog {
     my $star = new Astro::Catalog::Star();
 
     # Do RA/Dec conversions to radians, if necessary.
-    my $ra;
-    if( $ra_convert ) {
-      my $pos = 1;
-      my $field = $fields[$ra_column];
-      $field =~ s/:/ /g;
-      slaDafin( $field, $pos, $ra, my $status );
-      $ra *= 15;
-    } else {
-      $ra = $fields[$ra_column];
-    }
-    my $dec;
-    if( $dec_convert ) {
-      my $pos = 1;
-      my $field = $fields[$dec_column];
-      $field =~ s/:/ /g;
-      slaDafin( $field, $pos, $dec, my $status );
-    } else {
-      $dec = $fields[$dec_column];
-    }
+    my $ra = Astro::Coords::Angle::Hour->new( $fields[$ra_column],
+                                              units => ($ra_convert ? "sex" : "rad")
+                                            );
+    my $dec = Astro::Coords::Angle->new( $fields[$dec_column],
+                                         units => ($dec_convert ? "sex" : "rad" )
+                                         );
 
     # Create an Astro::Coords object, assuming J2000 for RA/Dec.
     my $coords = new Astro::Coords( type => ( $equinox ? $equinox : 'J2000' ),

@@ -8,11 +8,8 @@
 
 use strict;
 use warnings;
-use Test::More tests => 6;
-use Astro::SLA;
+use Test::More tests => 4;
 
-require_ok( 'Astro::SLA' );
-require_ok( 'Astro::Catalog::Star' );
 require_ok( 'Astro::Catalog' );
 
 # Create a new catalogue from the DATA handle

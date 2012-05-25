@@ -75,7 +75,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 use Carp;
-use Astro::Coords;
+use Astro::Coords 0.12;
 use Astro::Catalog::Item::Morphology;
 use Astro::Fluxes;
 use Astro::Flux;
@@ -83,12 +83,6 @@ use Astro::FluxColor;
 
 # Register an Astro::Catalog::Item warning category
 use warnings::register;
-
-# Radians to arcseconds
-# Copied from Astro::SLA just in case Astro::Coords ever loses Astro::SLA
-# dependency. I am not really happy about this - TJ
-# This is not meant to part of the documented public interface.
-use constant DR2AS => 2.0626480624709635515647335733077861319665970087963e5;
 
 '$Revision: 1.13 $ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
@@ -1334,7 +1328,8 @@ The distance from another Item,
 
   my $distance1 = $star->distancetostar( $star2 )
 
-returns a separation value in arcsec.
+returns a tangent plane separation value in arcsec. Returns undef if
+the star is too far away.
 
 =cut
 
@@ -1346,11 +1341,8 @@ sub distancetostar {
         "Error: Not an Astro::Catalog::Item object\n"
         unless UNIVERSAL::isa( $other, "Astro::Catalog::Item" );    
   
-  my $radsep = $self->coords->distance( $other->coords );
-  my $assep = $radsep * Astro::Catalog::Item::DR2AS;
-  
-  my $distance = $assep;
-  return $distance;
+  my $sep = $self->coords->distance( $other->coords );
+  return (defined $sep ? $sep->arcsec : $sep );
 }
 
 
@@ -1507,9 +1499,10 @@ sub configure {
       my $d = $c->distance( $check{coords} );
 
       # Raise warn if the error is more than 1 arcsecond
-      my $arcsec = $d * DR2AS;
-      warnings::warnif( "Coords and RA/Dec were specified and they differ by more than 1 arcsec [$arcsec sec]. Ignoring RA/Dec keys.\n")
-	if $arcsec > 1;
+      warnings::warnif( "Coords and RA/Dec were specified and they differ by more than 1 arcsec [".
+                        (defined $d ? $d->arcsec : "<undef>")
+                        ." sec]. Ignoring RA/Dec keys.\n")
+          if (!defined $d || $d->arcsec > 1.0);
 
     } elsif (!exists $check{ra}) {
       warnings::warnif("Dec specified in addition to Coords but without RA. Ignoring it.");

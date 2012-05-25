@@ -22,7 +22,7 @@ use strict;
 use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-use Astro::Coords;
+use Astro::Coords 0.12;
 use Tk;
 use Tk::FileSelect;
 
@@ -743,9 +743,9 @@ sub fillWithSourceList {
 
   # write the label
   if ($ref) {
+    my ($az, $el) = $ref->azel();
     my $summary = sprintf("%-15s Az: %3.0f  El: %3.0f", $ref->name,
-			  $ref->az(format=>'d'),
-			  $ref->el(format=>'d'));
+			  $az->degrees, $el->degrees );
     $self->RefLabel("Reference position: $summary");
   } else {
     # blank it
@@ -765,7 +765,7 @@ sub fillWithSourceList {
       if ($ref) {
 	my $d = $ref->distance($source);
 	if (defined $d) {
-	  $distance = sprintf("%5.0f", (Astro::SLA::DR2D*$d));
+	  $distance = sprintf("%5.0f", $d->degrees);
 	} else {
 	  $distance = "  Inf";
 	}
