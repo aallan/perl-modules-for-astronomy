@@ -39,6 +39,8 @@ lib/Astro/Catalog/IO/Binary.pm
 lib/Astro/Catalog/IO/ASCII.pm
 lib/Astro/Catalog/IO/FITSTable.pm
 lib/Astro/Catalog/IO/GaiaPick.pm
+lib/Astro/Catalog/IO/ASSM.pm
+lib/Astro/Catalog/IO/LCOGTFITSTable.pm
 lib/Astro/Catalog/Item.pm
 lib/Astro/Catalog.pm
 t/1_compile.t

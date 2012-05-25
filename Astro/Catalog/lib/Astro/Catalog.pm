@@ -1499,8 +1499,10 @@ sub _load_io_plugin {
   $format = 'SExtractor' if $format eq 'Sextractor';
   $format = 'FINDOFF' if $format eq 'Findoff';
   $format = 'FITSTable' if $format eq 'Fitstable';
+  $format = 'LCOGTFITSTable' if $format eq 'Lcogtfitstable';
   $format = 'RITMatch' if $format eq 'Ritmatch';
   $format = 'XY' if $format eq 'Xy';
+  $format = 'ASSM' if $format eq 'Assm';
 
   my $class = "Astro::Catalog::IO::" . $format;
 
@@ -1538,6 +1540,7 @@ License.
 
 Alasdair Allan E<lt>aa@astro.ex.ac.ukE<gt>,
 Tim Jenness E<lt>tjenness@cpan.orgE<gt>
+Tim Lister E<lt>tlister@lcogt.netE<gt>
 
 =cut
 
