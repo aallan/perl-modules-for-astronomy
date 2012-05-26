@@ -161,7 +161,7 @@ my $refs = $paper->references();
 print "# Continuing Tests\n";
 
 #### Source of Possible Confusion #### 
-# As of Feb 2010, there are 27 citations and 30 references reported by ADS
+# As of May 2012, there are 32 citations and 30 references reported by ADS
 # There were 27 references on ADS for this paper in July 2003,
 # but there were 30 references on ADS for this paper in May 2009
 # There are 32 references in the original paper
@@ -172,8 +172,8 @@ ok( $refs->sizeof(), 30 );
 print "# Connecting to ADS\n";
 my $cites = $paper->citations();
 print "# Continuing Tests\n";
-# 27 citations as of Feb 2010
-ok( $cites->sizeof(), 27 );
+# 32 citations as of May 2012
+ok( $cites->sizeof(), 32 );
 
 # shouldn't be a TOC with this paper
 print "# Connecting to ADS\n";
