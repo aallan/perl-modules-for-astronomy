@@ -1,0 +1,3 @@
+[submodule "Astro-Catalog"]
+	path = Astro-Catalog
+	url = git@github.com:timj/perl-Astro-Catalog.git
